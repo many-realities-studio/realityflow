@@ -272,6 +272,14 @@ namespace Ubiq.Spawning
                 spawnedForPeers.Add(roomClient.Me, new Dictionary<string, GameObject>());
             }
             spawnedForPeers[roomClient.Me].Add(key, go);
+
+            // Debug log to display the network ID of the spawned object.
+            var networkableComponents = go.GetComponentsInChildren<INetworkSpawnable>(true);
+            foreach (var component in networkableComponents)
+            {
+                Debug.Log($"Spawned Object Network ID: {component.NetworkId}");
+            }
+
             OnSpawned(go, room: null, roomClient.Me, GetOrigin(local: true));
 
             roomClient.Me[key] = JsonUtility.ToJson(new Message()

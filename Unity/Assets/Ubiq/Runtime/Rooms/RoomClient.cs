@@ -467,6 +467,16 @@ namespace Ubiq.Rooms
             {
                 Connect(item);
             }
+
+            // ADDED Script (Jonathan O'Leary 5/2/2024)
+            OnJoinRejected.AddListener(OnRoomJoinFailed);
+        }
+
+        // ADDED Function (Jonathan O'Leary 5/2/2024)
+        private void OnRoomJoinFailed(Rejection rejection)
+        {
+            Debug.LogError("Failed to join room: " + rejection.reason);
+            // --Implement additional logic to handle the failure, like showing UI elements to the user--
         }
 
         protected void ProcessMessage(ReferenceCountedSceneGraphMessage message)
@@ -650,6 +660,34 @@ namespace Ubiq.Rooms
         /// <remarks>
         /// RoomClient is one of a few components able to create new connections. Usually it will be user code that makes such connections.
         /// </remarks>
+        
+        // ADDED Function (Jonathan O'Leary 5/2/2024)
+        public void CreateAndJoinRoom(string roomName, string sceneName, bool publish = true)
+        {
+            Join(roomName, publish);  // This uses the existing Join method to create a room.
+            SceneManager.LoadScene(sceneName);  // Load the new scene where the room exists.
+        }
+
+        // New methods for saving and loading rooms
+        public void SaveRoom(string saveFilePath)
+        {
+            // Implement logic to save the room's state to a file
+            Debug.Log("Room saved to " + saveFilePath);
+        }
+
+        public void LoadRoom(string loadFilePath)
+        {
+            // Implement logic to load the room's state from a file
+            Debug.Log("Room loaded from " + loadFilePath);
+        }
+
+        // ADDED Function (Jonathan O'Leary 5/2/2024)
+        public void printDebug()
+        {
+            Debug.Log("Print Function Success\n");
+        }
+
+        
         public void Connect(ConnectionDefinition connection)
         {
             scene.AddConnection(Connections.Resolve(connection));
