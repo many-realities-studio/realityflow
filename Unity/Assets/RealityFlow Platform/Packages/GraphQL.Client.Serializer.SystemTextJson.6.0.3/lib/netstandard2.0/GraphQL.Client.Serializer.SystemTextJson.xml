@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GraphQL.Client.Serializer.SystemTextJson</name>
+    </assembly>
+    <members>
+        <member name="T:GraphQL.Client.Serializer.SystemTextJson.ImmutableConverter">
+            <summary>
+            class for converting immutable objects, derived from https://github.com/manne/obviously/blob/master/src/system.text.json/Core/ImmutableConverter.cs
+            </summary>
+        </member>
+        <member name="T:GraphQL.Client.Serializer.SystemTextJson.MapConverter">
+            <summary>
+            A custom JsonConverter for reading the extension fields of <see cref="T:GraphQL.GraphQLResponse`1"/> and <see cref="T:GraphQL.GraphQLError"/>.
+            </summary>
+            <remarks>
+            Taken and modified from GraphQL.SystemTextJson.ObjectDictionaryConverter (GraphQL.NET)
+            </remarks>
+        </member>
+    </members>
+</doc>
