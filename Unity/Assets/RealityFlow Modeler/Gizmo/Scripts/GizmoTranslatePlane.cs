@@ -10,16 +10,12 @@ public class GizmoTranslatePlane : GizmoTransform
 {
     public Vector3 originalIntersection;
 
-    private ComponentTranslation currentOperation;
-    private Vector3 startPos;
-
     void Update()
     {
         if (!awake) return;
 
         if (StartOfRaySelect())
         {
-            GetAttachedObject().GetComponent<MeshFilter>().mesh.RecalculateBounds();
             InitRayGizmolData();
             originalIntersection = PlaneIntersectionTest(
                 GetGizmoContainer().transform.position,
@@ -27,13 +23,11 @@ public class GizmoTranslatePlane : GizmoTransform
             );
 
             lastUpdateRaySelect = true;
-            BeginMeshOperation();
         }
 
         else if (EndOfRaySelect())
         {
             lastUpdateRaySelect = false;
-            EndMeshOperation();
         }
 
         if (lastUpdateRaySelect)
@@ -102,23 +96,5 @@ public class GizmoTranslatePlane : GizmoTransform
 
         else
             return new Vector3(0, 0, 0);
-    }
-
-    void BeginMeshOperation()
-    {
-        if (currentOperation == null)
-            currentOperation = new ComponentTranslation(HandleSelectionManager.Instance.GetUniqueSelectedIndices());
-        startPos = GetAttachedObject().transform.position;
-    }
-
-    void EndMeshOperation()
-    {
-        currentOperation.AddOffsetAmount(GetAttachedObject().transform.position - startPos);
-        try
-        {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
-        }
-        catch { }
-        currentOperation = null;
     }
 }

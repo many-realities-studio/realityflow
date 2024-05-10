@@ -38,12 +38,7 @@ public class SVImageControl : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
 
         pickerTransform = pickerImage.GetComponent<RectTransform>();
-
-        // Only set picker information if you are the owner of the palette. If not, NetworkedPalette.cs will handle this information.
-        if (NetworkedPalette.reference != null && NetworkedPalette.reference.owner)
-        {
-            pickerTransform.localPosition = new Vector2(-59.92683f, -57.8448f);
-        }
+        pickerTransform.localPosition = new Vector2(-59.92683f, -57.8448f);
 
         leftHand = GameObject.Find("MRTK LeftHand Controller");
         rightHand = GameObject.Find("MRTK RightHand Controller");
@@ -115,14 +110,10 @@ public class SVImageControl : MonoBehaviour
 
     public void SetColor()
     {
-        // Only set picker information if you are the owner of the palette. If not, NetworkedPalette.cs will handle this information.
-        if (NetworkedPalette.reference != null && NetworkedPalette.reference.owner)
-        {
-            pickerTransform.localPosition = pos;
+        pickerTransform.localPosition = pos;
 
-            // Dynamically change the color of the picker to contrast that of the current color it's on
-            pickerImage.color = Color.HSVToRGB(0, 0, 1 - yNorm);
-        }
+        // Dynamically change the color of the picker to contrast that of the current color it's on
+        pickerImage.color = Color.HSVToRGB(0, 0, 1 - yNorm);
 
         // Debug.Log("xNorm = " + xNorm + " and yNorm = " + yNorm);
         CC.SetSV(xNorm, yNorm);

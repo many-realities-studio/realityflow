@@ -21,7 +21,7 @@ public class GridTool : MonoBehaviour
     void OnDestroy()
     {
         UpdateSnapMode.OnSnapModeChange -= SwapSnapModeValues;
-        UpdateSnapUnits.OnSnapUnitChange -= SwapSnapUnitValues;
+        UpdateSnapUnits.OnSnapUnitChange += SwapSnapUnitValues;
     }
 
     private void SwapSnapModeValues(float newSnapModeValue)

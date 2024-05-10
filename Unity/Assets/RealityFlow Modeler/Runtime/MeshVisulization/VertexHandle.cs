@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Class VertexHandle spawns vertex handles for manipulating the vertices of a mesh
+/// Class VertexHandleBillboard rotates all handles so they are facing the camera direction
 /// </summary>
 public class VertexHandle : Handle
 {

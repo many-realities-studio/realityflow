@@ -7,12 +7,8 @@ using UnityEngine.InputSystem;
 public class GetObjectName : MonoBehaviour
 {
     public MRTKRayInteractor rayInteractor;
-    public static GetObjectName instance;
     public string aName = null;
-    public void Start()
-    {
-        instance = this;
-    }
+
     public void GetName()
     {
         

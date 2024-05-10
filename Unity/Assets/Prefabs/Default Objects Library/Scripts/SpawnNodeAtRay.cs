@@ -6,18 +6,14 @@ using Ubiq.Messaging;
 using Ubiq.Spawning;
 public class SpawnNodeAtRay : MonoBehaviour
 {
-    
-    [Header("References to cursor")]
-    [Tooltip("this is a cursor")]
     public TrackCursor cursor;
     public RealityFlowGraphView rfgv;
     private BaseGraph graph;
     private bool spawnToggle = false;
     private string currentNode = null;
 
-    [Header("References for object spawning")]
     public string ObjectName;
-    public GameObject spawnManager;
+    GameObject rightHand;
 
     public NetworkId NetworkId { get; set; }
     NetworkContext context;
@@ -25,16 +21,22 @@ public class SpawnNodeAtRay : MonoBehaviour
 	// Start is called before the first frame update
     void Start()
     {
-        spawnManager = GameObject.Find("Spawn Manager");
+        rightHand = GameObject.Find("Spawn Manager");
     }
 	void Awake()
     {
+        if (rfgv != null)
+        {
         graph = rfgv.graph;
+
+        }
     }
 
     // Function to spawn an object at the position of the ray interactor
     public void Spawn()
     {
+        if (graph == null)
+            return;
         // This action is technically always active, so unless the toggle is on for spawning objects just return from here
         if (!spawnToggle || currentNode == null)
             return;
@@ -46,15 +48,11 @@ public class SpawnNodeAtRay : MonoBehaviour
             return;
         }
         // Get last selected object's name
-        Debug.Log(this.gameObject);
-        if(spawnManager.GetComponent<GetObjectName>().aName != null)
-        {
-            ObjectName = spawnManager.GetComponent<GetObjectName>().aName;
-        }
+        ObjectName = rightHand.GetComponent<GetObjectName>().aName;
         // Retrieve the cursor position from the TrackCursor script attached to GraphContent on the whiteboard
         rfgv.newNodePosition = cursor.cursorPosition;
 
-        // Add AddNodeCommandthe node to the whiteboard
+        // Add the node to the whiteboard
         rfgv.AddNodeCommand(currentNode, ObjectName);
         Debug.Log("Spawned " + currentNode + " node");
     }

@@ -33,8 +33,8 @@ public class EdgeView : MonoBehaviour
 		// calculate the extra points for a better looking circuit board line
         // switched with explicit references to Transforms since that's wayyyyy more efficient than having to use GetComponent() every Update()
         // set small buffer positions:
-        Vector3 outputBuffer = outputLoc.position + Vector3.right * padding;
-        Vector3 inputBuffer = inputLoc.position + Vector3.left * padding;
+        Vector3 outputBuffer = outputLoc.position + Vector3.left * (padding * 2);
+        Vector3 inputBuffer = inputLoc.position + Vector3.right * padding;
 		Vector3 [] edgePoints = new [] {
 			outputLoc.position,
             outputBuffer,

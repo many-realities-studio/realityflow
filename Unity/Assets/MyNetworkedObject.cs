@@ -22,6 +22,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     Vector3 lastScale;
     Quaternion lastRotation;
     Color lastColor;
+    bool lastGravity;
 
     // Start is called before the first frame update
     void Start()
@@ -38,10 +39,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         myObject = this.GetComponent<MyNetworkedObject>();
         obj = this.gameObject;
         rb = this.GetComponent<Rigidbody>();
-        if(rb)
-        {
         rb.isKinematic = false;
-        }
         if(this.NetworkId == null)
             Debug.Log("Networked Object " + obj.name + " Network ID is null");
         //color = obj.GetComponent<Renderer>().material.color;
@@ -65,7 +63,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 owner = false,
                 isHeld = true,
                 isKinematic = true,
-                color = obj.GetComponent<Renderer>().material.color
+                color = obj.GetComponent<Renderer>().material.color,
+                gravity = obj.GetComponent<Rigidbody>().useGravity
             }); 
     }
 
@@ -81,7 +80,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             owner = true,
             isHeld = false,
             isKinematic = true,
-            color = obj.GetComponent<Renderer>().material.color
+            color = obj.GetComponent<Renderer>().material.color,
+            gravity = obj.GetComponent<Rigidbody>().useGravity
         });
     }
 
@@ -105,6 +105,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 lastRotation = transform.localRotation;
                 lastOwner = myObject.owner;
                 lastColor = obj.GetComponent<Renderer>().material.color;
+                lastGravity = obj.GetComponent<Rigidbody>().useGravity;
 
                 // Send position details to the rest of the users in the lobby
                 context.SendJson(new Message()
@@ -115,7 +116,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                     owner = false, 
                     isHeld = isHeld,
                     isKinematic = true,
-                    color = obj.GetComponent<Renderer>().material.color
+                    color = obj.GetComponent<Renderer>().material.color,
+                    gravity = obj.GetComponent<Rigidbody>().useGravity
                 });
             }
         //}
@@ -130,6 +132,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         public bool isHeld;
         public bool isKinematic;
         public Color color;
+        public bool gravity;
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
@@ -145,6 +148,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         myObject.isHeld = m.isHeld;
         rb.isKinematic = m.isKinematic;
         obj.GetComponent<Renderer>().material.color = m.color;
+        obj.GetComponent<Rigidbody>().useGravity = m.gravity;
 
         // Make sure the logic in Update doesn't trigger as a result of this message
         lastPosition = obj.transform.localPosition;
@@ -152,5 +156,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastRotation = obj.transform.localRotation;
         lastOwner = myObject.owner;
         lastColor = obj.GetComponent<Renderer>().material.color;
+        lastGravity = obj.GetComponent<Rigidbody>().useGravity;
     }
 }

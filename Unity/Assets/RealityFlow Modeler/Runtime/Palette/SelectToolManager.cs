@@ -5,6 +5,7 @@ using UnityEngine;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Ubiq.Avatars;
 
 /// <summary>
 /// Class SelectToolManager keeps track of the current active state of the Select Tool and
@@ -24,7 +25,8 @@ public class SelectToolManager : MonoBehaviour
     // These variables are used to keep track of the active states of all tools that should show bounds visuals
     private bool lastSelectToolActiveState, lastEraserToolActiveState, lastColorToolActiveState, lastMetallicToolActiveState, lastSmoothnessToolActiveState, lastManipulationsToolActiveState;
     private bool isSelected, deselectOnRelease;
-    
+
+
     void Start()
     {
         // Find RealityFlow tools that need hover selection support
@@ -188,6 +190,8 @@ public class SelectToolManager : MonoBehaviour
                 {
                     lastHandlesActiveState = gameObject.GetComponent<BoundsControl>().HandlesActive;
                     gameObject.GetComponent<NetworkedMesh>().ControlSelection();
+                    
+                    SelectMesh();
                 }
             }
 

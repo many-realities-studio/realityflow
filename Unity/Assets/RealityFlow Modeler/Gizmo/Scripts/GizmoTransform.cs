@@ -7,7 +7,6 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using UnityEngine;
 
-
 /// <summary>
 /// This class is the parent class for all gizmo transformation classes
 /// </summary>
@@ -32,8 +31,6 @@ public class GizmoTransform : MonoBehaviour
 
     private SnapGrid grid;
     private GridTool gridTool;
-
-
 
 
     public void Awake()
@@ -289,12 +286,11 @@ public class GizmoTransform : MonoBehaviour
     {
         if (!gridTool.isActive)
             return position;
-
-        if (GetAttachedObject().GetComponent<EditableMesh>() == null)
-            return position;
             
         if (GetAttachedObject().GetComponent<EditableMesh>().baseShape != ShapeType.Plane)
             return position;
+
+        Debug.Log("Pass");
 
         if (Mathf.Abs(position.y) == 0f)
             position.y += 0.05f;
@@ -302,13 +298,5 @@ public class GizmoTransform : MonoBehaviour
         Debug.Log(position.y);
 
         return position;
-    }
-
-    public void BakeRotation()
-    {
-        VertexPosition.BakeVerticesWithNetworking(GetAttachedObject().GetComponent<EditableMesh>());
-        GetAttachedObject().GetComponent<MeshFilter>().mesh.RecalculateBounds();
-        /*GetAttachedObject().transform.rotation = Quaternion.identity;
-        GetAttachedObject().transform.localScale = Vector3.one;*/
     }
 }

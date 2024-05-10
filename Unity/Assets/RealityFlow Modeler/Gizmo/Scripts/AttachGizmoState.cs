@@ -124,7 +124,7 @@ public class AttachGizmoState : MonoBehaviour
         }
         catch
         {
-            
+            Debug.Log("Target object is missing a component!");
         }
 
         gizmoContainerInst = Instantiate(gizmoContainerPrefab);
@@ -152,7 +152,7 @@ public class AttachGizmoState : MonoBehaviour
             attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             ActivateFreeTransform(attachedGameObject);
         }
-        catch { }
+        catch { Debug.Log("missing components"); }
 
         attachedGameObject = null;
 
@@ -339,31 +339,16 @@ public class AttachGizmoState : MonoBehaviour
         LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
         LayerMask ui = 1 << LayerMask.NameToLayer("UI");
 
-        farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;
-        // 6 is gizmo layer
-        SetLayerOfFarRay(farRay, 6);
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;       
     }
 
     public void DisableMeshRaySelection()
     {
-        // if (!lookForTarget) return;
+        if (!lookForTarget) return;
 
         GameObject farRay = GetActiveContollerFarRay();
         LayerMask everything = ~0;
 
         farRay.GetComponent<MRTKRayInteractor>().raycastMask = everything;
-        // 0 is default layer
-        SetLayerOfFarRay(farRay, 0);
-    }
-
-    private void SetLayerOfFarRay(GameObject farRay, int layer)
-    {
-        farRay.layer = layer;
-        foreach (Transform child in farRay.transform)
-        {
-            child.gameObject.layer = layer;
-            if (child.name == "RayReticle") 
-                SetLayerOfFarRay(child.gameObject, layer);
-        }
     }
 }

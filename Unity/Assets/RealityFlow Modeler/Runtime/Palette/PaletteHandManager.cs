@@ -33,9 +33,8 @@ public class PaletteHandManager : MonoBehaviour
         rightHandPokeInteractor = GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor");
     }
 
-    public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, ParentConstraint otherPaletteParentConstraint, Ubiq.Avatars.Avatar[] avatars, string paletteType, bool handStateAlreadyFound)
+    public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars)
     {
-        // Debug.Log("Called UpdateHand() from palette " + gameObject.name + " in scene " + gameObject.transform.parent.parent.parent.name);
         // Go through every avatar looking for the palette owner's avatar.
         // Only put a parent constraint for the owner's palette (if the first avatar found is the owner)
         for (int i = 0; i < avatars.Length; i++)
@@ -44,37 +43,17 @@ public class PaletteHandManager : MonoBehaviour
             {
                 GameObject[] dominantHandManagers = GameObject.FindGameObjectsWithTag("DominantHandManager");
 
-                // foreach (GameObject go in dominantHandManagers)
-                // {
-                //     Debug.Log(go.name + " in palette " + go.transform.parent.parent.parent.name);
-                // }
-
-                if (isLeftHandDominant == null && !handStateAlreadyFound)
+                if (isLeftHandDominant == null)
                 {
                     for (int j = 0; j < dominantHandManagers.Length; j++)
-                    {                      
-                        if (paletteType == "Palette" && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>() != null && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().ownerName.Contains(AvatarManager.UUID)
-                            && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().gameObject == gameObject)
+                    {
+                        if (dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().ownerName.Contains(AvatarManager.UUID))
                         {
-                            // Debug.Log("Successfully got the right hand manager");
+                            
                             isLeftHandDominant = dominantHandManagers[j].GetComponent<PressableButton>();
-                            // return;
-                        }
-
-                        if (paletteType == "PlayPalette" && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>() != null && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>().ownerName.Contains(AvatarManager.UUID)
-                            && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>().gameObject == gameObject)
-                        {
-                            // Debug.Log("Successfully got the right hand manager");
-                            isLeftHandDominant = dominantHandManagers[j].GetComponent<PressableButton>();
-                            // return;
                         }
                     }
                 }
-                // if (handStateAlreadyFound)
-                // {
-                //     Debug.Log("handStateAlreadyFound");
-                //     isLeftHandDominant.ForceSetToggled(handStateAlreadyFound);
-                // }
 
                 // By default the dominant hand is assigned to the right hand
                 Transform dominantHand = avatars[i].transform.Find("Body/LeftHand IK Target");
@@ -90,16 +69,6 @@ public class PaletteHandManager : MonoBehaviour
                         parentConstraint.SetRotationOffset(0, Vector3.Scale(parentConstraint.GetRotationOffset(0), new Vector3(1, -1, 1)));
                     }
 
-                    // Ensure the other palette is in the same dominant hand
-                    if (otherPaletteParentConstraint != null)
-                    {
-                        if (Mathf.Sign(otherPaletteParentConstraint.GetRotationOffset(0).y) == -1)
-                        {
-                            otherPaletteParentConstraint.SetRotationOffset(0, Vector3.Scale(otherPaletteParentConstraint.GetRotationOffset(0), new Vector3(1, -1, 1)));
-                        }
-                    }
-
-                    // Debug.Log("Turn on left hand interactors");
                     // Disable and enable the appropriate selectors for a dominant left hand
                     leftHandRay.SetActive(true);
                     leftHandPokeInteractor.SetActive(true);
@@ -117,16 +86,6 @@ public class PaletteHandManager : MonoBehaviour
                         parentConstraint.SetRotationOffset(0, Vector3.Scale(parentConstraint.GetRotationOffset(0), new Vector3(1, -1, 1)));
                     }
 
-                    // Ensure the other palette is in the same dominant hand
-                    if (otherPaletteParentConstraint != null)
-                    {
-                        if (Mathf.Sign(otherPaletteParentConstraint.GetRotationOffset(0).y) == 1)
-                        {
-                            otherPaletteParentConstraint.SetRotationOffset(0, Vector3.Scale(otherPaletteParentConstraint.GetRotationOffset(0), new Vector3(1, -1, 1)));
-                        }
-                    }
-
-                    // Debug.Log("Turn on right hand interactors");
                     // Disable and enable the appropriate selectors for a dominant right hand
                     rightHandRay.SetActive(true);
                     rightHandPokeInteractor.SetActive(true);
@@ -146,13 +105,8 @@ public class PaletteHandManager : MonoBehaviour
                 constraintSource.weight = 1;
                 parentConstraint.SetSource(0, constraintSource);
 
-                if (otherPaletteParentConstraint != null)
-                {
-                    otherPaletteParentConstraint.enabled = true;
-
-                    otherPaletteParentConstraint.SetSource(0, constraintSource);
-                }
-
+                // Change which grip button determines the toggle ability of the palette
+                ChangeGripButton();
                 break;
             }
             else 
@@ -162,6 +116,27 @@ public class PaletteHandManager : MonoBehaviour
         }
 
         OnHandChange?.Invoke(isLeftHandDominant.IsToggled);
+    }
+
+    public void ChangeGripButton()
+    {
+        try
+        {
+            if (isLeftHandDominant.IsToggled)
+            {
+                paletteManager.GetComponents<OnButtonPress>()[0].enabled = false;
+                paletteManager.GetComponents<OnButtonPress>()[1].enabled = true;
+            }
+            else if (!isLeftHandDominant.IsToggled)
+            {
+                paletteManager.GetComponents<OnButtonPress>()[0].enabled = true;
+                paletteManager.GetComponents<OnButtonPress>()[1].enabled = false;
+            }
+        }
+        catch (NullReferenceException e)
+        {
+            Debug.Log(e);
+        }
     }
 
     // Disable the previous dominant controller after a slight interval to avoid button states locking into place

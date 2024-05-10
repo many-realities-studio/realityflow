@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Class EdgeHandle provides methods for creating edge handles to manipulate edges of a mesh
-/// </summary>
 public class EdgeHandle : Handle
 {
     // index of position in sharedVertex array

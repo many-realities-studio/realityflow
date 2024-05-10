@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 /// <summary>
 /// Class PrimitiveSpawner interfaces with the palette to handle spawning primitives
 /// </summary>
@@ -23,11 +24,6 @@ public class PrimitiveMenu : MonoBehaviour
         SpawnPrimitive(ShapeType.Cube);
     }
 
-    public void SpawnWedge()
-    {
-        SpawnPrimitive(ShapeType.Wedge);
-    }
-
     public void SpawnCylinder()
     {
         SpawnPrimitive(ShapeType.Cylinder);
@@ -46,11 +42,6 @@ public class PrimitiveMenu : MonoBehaviour
     public void SpawnTorus()
     {
         SpawnPrimitive(ShapeType.Torus);
-    }
-
-    public void SpawnPipe()
-    {
-        SpawnPrimitive(ShapeType.Pipe);
     }
     
     public void ExitMeshMode()

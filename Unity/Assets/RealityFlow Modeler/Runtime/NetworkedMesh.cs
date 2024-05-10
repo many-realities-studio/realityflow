@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ubiq.Messaging;
-using Ubiq.Rooms;
 using Ubiq.Spawning;
 using TransformTypes;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
@@ -26,11 +25,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     public NetworkContext context;
     private EditableMesh em;
     public bool owner;
-    [Tooltip("Displays the owner's UUID and should not be manually changed")]
-    public string ownerName;
-
-    // To have access to the owner name
-    private SelectTool selectTool;
     public bool isHeld;
 
     // Select Tool variables
@@ -42,7 +36,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private ObjectManipulator objectManipulator;
 
     bool lastOwner;
-    public bool wasBake;
 
     private Vector3 lastPosition;
     private Vector3 lastScale;
@@ -51,8 +44,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     public bool isDuplicate = false;
     public string originalName = "";
-    public bool sourceMesh = false;
-    private RoomClient roomClient;
 
     void Start()
     {
@@ -61,13 +52,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             context = NetworkScene.Register(this);
         else
             Debug.Log("ID is already valid");
-
-        // Find the reference for the room client to track peers
-        roomClient = NetworkScene.Find(this).GetComponent<RoomClient>();
-
-        roomClient.OnPeerRemoved.AddListener(OnPeerRemoved);
-
-        selectTool = FindObjectOfType<SelectTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
         // Find the child game object of this mesh that draws the bounds visuals
@@ -103,25 +87,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         }
 
         RequestMeshData();
-    }
-
-    void OnDestroy()
-    {
-        roomClient.OnPeerRemoved.RemoveListener(OnPeerRemoved);
-    }
-
-    void OnPeerRemoved(IPeer peer)
-    {
-        Debug.Log("Peer left: " + peer.uuid + " from the mesh name: " + gameObject.name);
-
-        // Deselect mesh if the owner left
-        if (ownerName == peer.uuid)
-        {
-            Debug.Log(peer.uuid + " left so do the operation");
-            gameObject.GetComponent<BoundsControl>().HandlesActive = false;
-            ControlSelection();
-            MeshSelectionManager.Instance.DeselectMesh(gameObject);
-        }
     }
 
     public void RegisterWithSetID(NetworkId netId)
@@ -164,11 +129,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 SendTransformData();
             }
         }
-    }
-
-    public void SetSize(float newSize)
-    {
-        lastSize = newSize;
     }
 
 
@@ -221,21 +181,18 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             boundsColor = new Color(0.078f, 0.54f, 1f, 1f),
             objectManipulator = true
         });
-
-        //SendCachedMeshData();
     }
 
     private void CreateMesh(ShapeType type)
     {
-        PrimitiveData data = PrimitiveGenerator.CreatePrimitive(type);
+        EditableMesh mesh = PrimitiveGenerator.CreatePrimitive(type);
 
         if (em)
         {
-            em.CreateMesh(data);
+            em.CreateMesh(mesh);
         }
 
-        boundsControl.enabled = true;
-        //Destroy(mesh.gameObject);
+        Destroy(mesh.gameObject);
     }
 
     public void StartHold()
@@ -266,18 +223,12 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     public void EndHold()
     {
-        if (!gameObject.GetComponent<CacheMeshData>().networkedPlayManager.playMode)
-        {
-            VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
-        }
-
         if (isSelected || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
             return;
 
         //Debug.Log("EndHold() was called");
         isHeld = false;
         // Debug.Log("Run the EndHold() networking messages");
-        
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -310,7 +261,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
             //Debug.Log("This mesh is now selected");
             owner = true;
-            ownerName = selectTool.ownerName;
             isSelected = true;
             boundsControl.HandlesActive = true;
             boundsVisuals.SetActive(true);
@@ -321,7 +271,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 scale = transform.localScale,
                 rotation = transform.localRotation,
                 owner = false,
-                mOwnerName = ownerName,
                 isSelected = true,
                 handlesActive = true,
                 boundsVisuals = true,
@@ -344,7 +293,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 scale = transform.localScale,
                 rotation = transform.localRotation,
                 owner = false,
-                mOwnerName = "",
                 isSelected = false,
                 handlesActive = false,
                 boundsVisuals = false,
@@ -360,7 +308,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     public void SendTransformData()
     {
         // Debug.Log("SendTransformData() was called");
-
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -375,10 +322,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             meshMetallic = meshMaterial.GetFloat("_Metallic"),
             meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
             boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-            objectManipulator = wasBake
+            objectManipulator = false
         });
-
-        wasBake = false;
     }
 
     public void UpdateAndSendMeshResizeData(float newSize)
@@ -406,38 +351,33 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     public void SendVertexTransformData(TransformType type, int[] indicies, Vector3 pos, Quaternion rotation, Vector3 scale)
     {
-        Vector3[] arr = { pos };
         context.SendJson(new Message()
         {
             type = CommandType.MoveVertices,
             transformType = type,
             selectedIndicies = indicies,
-            componentTranslation = arr,
+            componentTranslation = pos,
             componentRotation = rotation,
             componentScale = scale,
         });
     }
 
-    private void UpdateVertices(TransformType type, int[] indices, Vector3 pos, Quaternion rotation, Vector3 scale)
+    private void UpdateVertices(TransformType type, int[] indicies, Vector3 pos, Quaternion rotation, Vector3 scale)
     {
         if (type == TransformType.Translate)
         {
-            em.TransformVertices(indices, pos);
+            em.TransformVertices(indicies, pos);
         }
         else if (type == TransformType.Rotate)
         {
-            em.RotateVertices(indices, rotation);
+            em.RotateVertices(indicies, rotation);
         }
         else if (type == TransformType.Scale)
         {
-            em.ScaleVertices(indices, scale);
-        }
-        else if (type == TransformType.Bake)
-        {
-            em.BakeVertices();
+            em.ScaleVertices(indicies, scale);
         }
 
-        if (gameObject.GetComponent<BoundsControl>().HandlesActive)
+        if(gameObject.GetComponent<BoundsControl>().HandlesActive)
         {
             gameObject.GetComponent<BoundsControl>().RecomputeBounds();
         }
@@ -471,13 +411,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     public void DuplicateMesh(string originalName)
     {
         GameObject go = GameObject.Find(originalName);
-        if (go != null)
-        {
-            EditableMesh copyFrom = go.GetComponent<EditableMesh>();
-            em.CreateMesh(copyFrom);
-            // em.RecalculateBoundsSafe();
-            // em.GetComponent<BoundsControl>().RecomputeBounds();
-        }
+        EditableMesh copyFrom = go.GetComponent<EditableMesh>();
+        em.CreateMesh(copyFrom);
+        em.GetComponent<BoundsControl>().RecomputeBounds();
     }
 
     public struct Message
@@ -489,7 +425,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         public Vector3 scale;
         public Quaternion rotation;
         public bool owner;
-        public string mOwnerName;
         public bool isHeld;
         public bool isSelected;
         public bool handlesActive;
@@ -502,7 +437,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
         public int[] selectedIndicies;
         public TransformType transformType;
-        public Vector3[] componentTranslation;
+        public Vector3 componentTranslation;
         public Quaternion componentRotation;
         public Vector3 componentScale;
 
@@ -538,7 +473,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
         if (m.type == CommandType.MoveVertices)
         {
-            UpdateVertices(m.transformType, m.selectedIndicies, m.componentTranslation[0],
+            UpdateVertices(m.transformType, m.selectedIndicies, m.componentTranslation,
                 m.componentRotation, m.componentScale);
             return;
         }
@@ -553,7 +488,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         transform.localScale = m.scale;
         transform.localRotation = m.rotation;
         owner = m.owner;
-        ownerName = m.mOwnerName;
         isHeld = m.isHeld;
         isSelected = m.isSelected;
         boundsControl.HandlesActive = m.handlesActive;
@@ -569,5 +503,15 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
         lastOwner = owner;
+    }
+
+    public float GetLastSize()
+    {
+        return lastSize;
+    }
+
+    public void SetLastSize(float size)
+    {
+        lastSize = size;
     }
 }

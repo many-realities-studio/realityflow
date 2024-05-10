@@ -66,7 +66,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		SelectComparisonCanvas.SetActive(false);
 		parameterCreationCanvas.SetActive(false);
 		VSGraphDropdownCanvas.SetActive(false);
-		//CreateGraph();
 	}
 
 	private void Update(){
@@ -289,8 +288,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 				StartCoroutine (AddNodeCoroutine(con));
 				break;
 			case "ModalNode":
-				ModalNode mn = BaseNode.CreateFromType<ModalNode> (newNodePosition);
+
+				ModalNode mn = BaseNode.CreateFromType<ModalNode> (new Vector2 ());
 				graph.AddNode (mn);
+				mn.position = new Rect(newNodePosition, new Vector2(100,100));
+				// SetNewNodeLocation(newNodePosition);
+
 				StartCoroutine (AddNodeCoroutine(mn));
 				break;
 			case "PrintNode":
@@ -304,6 +307,16 @@ public class RealityFlowGraphView : MonoBehaviour {
 				GameObject obj = GameObject.Find(ObjectName);
 				gn.InitializeNodeFromObject(obj);
 				StartCoroutine (AddNodeCoroutine(gn));
+				break;
+			case "DestroyObjectNode":
+				DestroyObjectNode don = BaseNode.CreateFromType<DestroyObjectNode> (newNodePosition);
+				graph.AddNode (don);
+				StartCoroutine (AddNodeCoroutine(don));
+				break;
+			case "ToggleObjectGravityNode":
+				ToggleObjectGravityNode tog = BaseNode.CreateFromType<ToggleObjectGravityNode> (newNodePosition);
+				graph.AddNode (tog);
+				StartCoroutine (AddNodeCoroutine(tog));
 				break;
 			case "FloatNode":
 				FloatNode fn = BaseNode.CreateFromType<FloatNode> (newNodePosition);
@@ -451,11 +464,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	// A function created by Dr. Murray to create a template graph
 	public void CreateGraph () {
-		if (graph == null)
-		{
-			InitializeGraph(new FlowVSGraph("TestGraph"));
-		}
-
 		string tmp = JsonUtility.ToJson(graph);
 
 		// send this to the command palette

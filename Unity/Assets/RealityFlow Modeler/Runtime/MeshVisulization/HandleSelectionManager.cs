@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Ubiq.Networking;
-using Ubiq.Rooms;
 using System.Linq;
 using UnityEngine;
 
@@ -13,14 +11,12 @@ public class HandleSelectionManager : MonoBehaviour
 
     private List<Handle> selectedHandles;
     public static List<int> selectedIndices;
-    public HandleSpawner handleSpawner { get; private set; }
+    public HandleSelector handleSelector { get; private set; }
     private GameObject spawnedManipulator;
-    public List<int> indicies => selectedIndices;
+    public List<int> indicies() { return selectedIndices; }
 
     public AttachGizmoState gizmoTool;
     private Vector3 selectionCentroid;
-
-    public RoomClient room { get; private set; }
 
     public Color defaultColor;
     public Color OnHoverColor;
@@ -44,35 +40,20 @@ public class HandleSelectionManager : MonoBehaviour
         gizmoTool = tools.GetComponent<AttachGizmoState>();
 
         GameObject selectManager = GameObject.Find("Component Select Manager");
-        handleSpawner = selectManager.gameObject.GetComponent<HandleSpawner>();
+        handleSelector = selectManager.gameObject.GetComponent<HandleSelector>();
         
-        if(handleSpawner == null)
+        if(handleSelector == null)
         {
             Debug.Log("Handle selector not found");
         }
-
-        room = RoomClient.Find(this);
-
-        if (room == null)
-            Debug.Log("No RoomCLient found!");
     }
 
-    public int[] GetUniqueSelectedIndices()
-    {
-        return selectedIndices.Distinct().ToArray();
-    }
-
-    #region Selection
-    /// <summary>
-    /// Adds a handle to the list of selected handles and its corresponding indicies
-    /// </summary
     public void SelectHandle(Handle handle)
     {
         mesh = handle.mesh;
         selectedHandles.Add(handle);
         AppendSelectedVertices(handle);
         UpdateCentroidPosition();
-        UpdateManipulatorPosition();
     }
 
     private void AppendSelectedVertices(Handle handle)
@@ -81,9 +62,6 @@ public class HandleSelectionManager : MonoBehaviour
         selectedIndices.AddRange(indicies);
     }
 
-    /// <summary>
-    /// Removes a handle from the list of selected handles if it's present
-    /// </summary>
     public void RemoveSelectedHandle(Handle handle)
     {
         try
@@ -113,7 +91,7 @@ public class HandleSelectionManager : MonoBehaviour
         {
             for(int i = 0; i < indicies.Length; i++)
             {
-                selectedIndices.Remove(indicies[i]);
+                selectedIndices.Remove(indicies[0]);
             }
         }
         catch
@@ -121,7 +99,7 @@ public class HandleSelectionManager : MonoBehaviour
             Debug.LogError("Vertex not in list!");
         }
     }
-    #endregion
+
     private void UpdateManipulatorPosition()
     {
         if(spawnedManipulator == null)
@@ -142,6 +120,7 @@ public class HandleSelectionManager : MonoBehaviour
 
         Vector3 center = CalculateCentroidPosition();
         selectionCentroid = mesh.transform.TransformPoint(center);
+        UpdateManipulatorPosition();
     }
 
     private Vector3 CalculateCentroidPosition()
@@ -151,6 +130,11 @@ public class HandleSelectionManager : MonoBehaviour
         {
             int index = mesh.sharedVertices[selectedIndices[i]].vertices[0];
             centroid += mesh.positions[index];
+        }
+
+        for(int i = 0; i < selectedHandles.Count; i++)
+        {
+            FaceHandle fh = selectedHandles[i].GetComponent<FaceHandle>();
         }
 
         return centroid / selectedIndices.Count;
@@ -170,5 +154,6 @@ public class HandleSelectionManager : MonoBehaviour
 
     private void Update()
     {
+
     }
 }

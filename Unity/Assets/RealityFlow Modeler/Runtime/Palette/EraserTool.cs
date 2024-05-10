@@ -80,9 +80,6 @@ public class EraserTool : MonoBehaviour
         if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
-            // You should no longer be able to interact with this mesh
-            currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled = false;
-
             NetworkSpawnManager.Find(this).Despawn(currentHitResult.collider.gameObject);
         }
     }
@@ -92,6 +89,25 @@ public class EraserTool : MonoBehaviour
         if (isActive)
         {
             GetRayCollision();
+
+            // // Show the bounds visuals for the object to highlight selection
+            // if (lastHitResult.collider != currentHitResult.collider)
+            // {
+            //     // Turn off the bounds visuals on hover off
+            //     if (lastHitResult.collider != null && lastHitResult.transform.gameObject.GetComponent<EditableMesh>()
+            //         && lastHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.activeInHierarchy
+            //         && !lastHitResult.transform.gameObject.GetComponent<NetworkedMesh>().isSelected)
+            //     {
+            //         lastHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.SetActive(false);
+            //     }
+            //     else if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
+            //              && !currentHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.activeInHierarchy
+            //              && !currentHitResult.transform.gameObject.GetComponent<NetworkedMesh>().isSelected)
+            //     {
+            //         currentHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.SetActive(true);
+            //     }
+            // }
+            // lastHitResult = currentHitResult;
         }
     }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,8 +8,10 @@ using Ubiq.Spawning;
 /// Class EditableMesh stores all the data and methods for creating and modifying meshes
 /// at runtime.
 /// </summary>
-public class EditableMesh : MonoBehaviour
+public class EditableMesh : MonoBehaviour, IRealityFlowObject
 {
+    public string uuid { get; set; }
+
     public Mesh mesh { get; set; }
 
     MeshFilter meshFilter;
@@ -27,10 +28,66 @@ public class EditableMesh : MonoBehaviour
     public EMSharedVertex[] sharedVertices;
     internal Dictionary<int, int> sharedVertexLookup;
 
-    internal MeshOperationCache meshOperationCache;
-
     public ShapeType baseShape;
     public bool isEmpty = true;
+
+    public string type { get; set; }
+
+    public SerializableMeshInfo smi
+    {
+        get { return new SerializableMeshInfo(gameObject); }
+        set {
+            //Sets the info of the editable mesh based on an smi input
+            //From GetEM
+            positions = new Vector3[value.vertices.Length / 3];
+            for (int i = 0; i < positions.Length; i++)
+            {
+                positions[i] = new Vector3(value.vertices[i * 3], value.vertices[i * 3 + 1], value.vertices[i * 3 + 2]);
+            }
+
+            faces = new EMFace[value.faces.Length];
+
+            for (int i = 0; i < value.faces.Length; i++)
+            {
+                faces[i] = new EMFace(value.faces[i]);
+            }
+
+            baseShape = value.getShape();
+
+            //From create mesh
+            sharedVertices = EMSharedVertex.GetSharedVertices(positions);
+            sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(sharedVertices);
+
+            FinalizeMesh();
+
+            //From SerializeMesh
+
+            //To be taken out, should be a property of IRealityFloObject that communicates with the object transform directly
+            transform.localPosition = value.GetPosition();
+
+            transform.localRotation = value.GetRotation();
+
+            transform.localScale = value.GetScale();
+
+            Material material = GetComponent<Renderer>().material;
+            if (value.colorFlag)
+            {
+                material.SetColor("_Color", value.GetColor());//smi.colors.GetColor());
+            }
+
+            if (value.metalFlag)
+            {
+                material.SetFloat("_Metallic", value.metalFactor);
+            }
+
+            if (value.glossFlag)
+            {
+                material.SetFloat("_Glossiness", value.glossFactor);
+            }
+
+            GetComponent<NetworkedMesh>().SetLastSize(value.lastSize);
+        }
+    }
 
     private void Awake()
     {
@@ -52,32 +109,11 @@ public class EditableMesh : MonoBehaviour
 
     public void CreateMesh(EditableMesh otherMesh)
     {
-        positions = new Vector3[otherMesh.positions.Length];
-        Array.Copy(otherMesh.positions, positions, otherMesh.positions.Length);
-
-        faces = new EMFace[otherMesh.faces.Length];
-        Array.Copy(otherMesh.faces, faces, otherMesh.faces.Length);
-
+        positions = otherMesh.positions;
+        faces = otherMesh.faces;
         baseShape = otherMesh.baseShape;
         sharedVertices = EMSharedVertex.GetSharedVertices(positions);
         sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(sharedVertices);
-        meshOperationCache = new MeshOperationCache(this);
-
-        FinalizeMesh();
-    }
-
-    public void CreateMesh(PrimitiveData input)
-    {
-        positions = new Vector3[input.positions.Length];
-        Array.Copy(input.positions, positions, input.positions.Length);
-
-        faces = new EMFace[input.faces.Length];
-        Array.Copy(input.faces, faces, input.faces.Length);
-
-        baseShape = input.type;
-        sharedVertices = EMSharedVertex.GetSharedVertices(positions);
-        sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(sharedVertices);
-        meshOperationCache = new MeshOperationCache(this);
 
         FinalizeMesh();
     }
@@ -95,6 +131,7 @@ public class EditableMesh : MonoBehaviour
         return em;
     }
 
+    // Converts a list of points into faces and sets their indicies
     public static EditableMesh CreateMeshFromVertices(Vector3[] points)
     {
         GameObject go = new GameObject();
@@ -140,14 +177,6 @@ public class EditableMesh : MonoBehaviour
         return pos;
     }
 
-    public void CacheOperation(MeshOperation operation)
-    {
-        if (meshOperationCache == null)
-            meshOperationCache = new MeshOperationCache(this);
-
-        meshOperationCache.CacheOperation(operation);
-    }
-
     public void FinalizeMesh()
     {
         if (mesh == null)
@@ -182,7 +211,8 @@ public class EditableMesh : MonoBehaviour
     public void RefreshMesh()
     {
         mesh.vertices = positions;
-        
+        mesh.RecalculateNormals();
+        RecalculateBoundsSafe();
 
         var collider = GetComponent<MeshCollider>();
         if (collider != null)
@@ -191,16 +221,13 @@ public class EditableMesh : MonoBehaviour
         }
 
         meshFilter.mesh = mesh;
-
-        mesh.RecalculateNormals();
-        RecalculateBoundsSafe();
     }
 
     /// <summary>
     /// Recalculates the bounds of a mesh and adds some padding if they're 0
     /// this prevents errors with MRTK bounding boxes in BoundsControl
     /// </summary>
-    public void RecalculateBoundsSafe()
+    private void RecalculateBoundsSafe()
     {
         mesh.RecalculateBounds();
         Bounds mb = mesh.bounds;
@@ -288,5 +315,4 @@ public class EditableMesh : MonoBehaviour
             Debug.Log(s);
         */
     }
-
 }

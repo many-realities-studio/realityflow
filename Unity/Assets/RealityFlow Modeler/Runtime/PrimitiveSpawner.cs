@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
-using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
 using UnityEngine;
 
@@ -26,6 +26,7 @@ public class PrimitiveSpawner : MonoBehaviour
     [SerializeField] private GameObject rightHand;
     [SerializeField] private GameObject resizeMeshPlane;
 
+    public static PrimitiveSpawner instance;
     private GameObject attachedObject;
     private GameObject spawnedMesh;
     private NetworkedMesh attachedObjectNetworkMesh;
@@ -50,6 +51,11 @@ public class PrimitiveSpawner : MonoBehaviour
 
     public void Awake()
     {
+        if (!instance)
+        {
+            instance = this;
+        }
+
         grid = FindObjectOfType<SnapGrid>();
         gridTool = FindObjectOfType<GridTool>();
         rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
@@ -143,19 +149,17 @@ public class PrimitiveSpawner : MonoBehaviour
         }
 
         attachedObject = NetworkSpawnManager.Find(this).SpawnWithPeerScope(primitive);
-        //EditableMesh mesh = PrimitiveGenerator.CreatePrimitive(currentShapeType);
+        EditableMesh mesh = PrimitiveGenerator.CreatePrimitive(currentShapeType);
         EditableMesh em = attachedObject.GetComponent<EditableMesh>();
-        attachedObject.GetComponent<BoundsControl>().enabled = false;
 
-        em.CreateMesh(PrimitiveGenerator.CreatePrimitive(currentShapeType));
+        em.CreateMesh(mesh);
 
         // Disable mesh collision so the ray doesn't interact with it
         attachedObject.GetComponent<MeshCollider>().enabled = false;
 
         attachedObjectNetworkMesh = attachedObject.GetComponent<NetworkedMesh>();
-        attachedObjectNetworkMesh.sourceMesh = true;
 
-        //Destroy(mesh.gameObject);
+        Destroy(mesh.gameObject);
     }
 
     /// <summary>
@@ -298,8 +302,6 @@ public class PrimitiveSpawner : MonoBehaviour
 
         em.CreateMesh(attachedObject.GetComponent<EditableMesh>());
         spawnedMesh.transform.position = attachedObject.transform.position;
-        spawnedMesh.GetComponent<NetworkedMesh>().sourceMesh = true;
-        spawnedMesh.GetComponent<BoundsControl>().enabled = true;
 
         TryEnterResizeMode();
     }

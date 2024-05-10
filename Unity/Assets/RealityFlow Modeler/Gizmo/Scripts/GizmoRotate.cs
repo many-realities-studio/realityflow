@@ -13,8 +13,6 @@ public class GizmoRotate : GizmoTranslateAxis
     // This effects the sensitivity of the rotation input
     float rotationMulti = 50;
 
-    private ComponentRotation currentOperation;
-    private Quaternion startRot;
 
     // Start is called before the first frame update
     void Start()
@@ -36,15 +34,12 @@ public class GizmoRotate : GizmoTranslateAxis
             InitTanSphere();
 
             lastUpdateRaySelect = true;
-            BeginMeshOperation();
         }
 
         else if (EndOfRaySelect())
         { 
             DisableLineRenderer();
-            EndMeshOperation();
             Destroy(tanSphere);
-            BakeRotation();
 
             lastUpdateRaySelect = false;
         }
@@ -131,23 +126,5 @@ public class GizmoRotate : GizmoTranslateAxis
     bool InvalidVector(Vector3 vector)
     {
         return float.IsNaN(vector.x) || float.IsNaN(vector.y) || float.IsNaN(vector.z);
-    }
-
-    void BeginMeshOperation()
-    {
-        if (currentOperation == null)
-            currentOperation = new ComponentRotation(HandleSelectionManager.Instance.GetUniqueSelectedIndices());
-        startRot = GetAttachedObject().transform.rotation;
-    }
-
-    void EndMeshOperation()
-    {
-        currentOperation.AddOffsetAmount(GetAttachedObject().transform.localRotation * Quaternion.Inverse(startRot));
-        try
-        {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
-        }
-        catch { }
-        currentOperation = null;
     }
 }
