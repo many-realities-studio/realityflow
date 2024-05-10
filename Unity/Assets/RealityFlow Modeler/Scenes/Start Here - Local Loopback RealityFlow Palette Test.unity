@@ -148,6 +148,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: cf04967f-44ee-4ca5-9461-05786dc073ec
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &29359739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,6 +175,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8993d98b-f9a2-42f1-a3f4-5be24fbd450b
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &63029680
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -592,6 +622,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 140100163}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &140100165 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
+    type: 3}
+  m_PrefabInstance: {fileID: 140100163}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29359737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6a6c810b7b56744bb8aabb1175b7e2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &155225212
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2488,6 +2530,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: f0f5dbaf-b7ee-4f80-aa49-7ec49b81d5f8
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: d3054b2d-c1ed-426a-b95b-4aa589a55219
+      m_Path: <XRController>{RightHand}/secondaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &486027498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2500,6 +2565,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 04471eaa-aa61-4a82-b4e8-08c571ad5706
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: c739b5c0-a443-4e51-855c-f4e0b6847878
+      m_Path: <XRController>{RightHand}/secondaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    - m_Name: 
+      m_Id: b3fa5856-8b20-4687-8e3d-e23fe940dd22
+      m_Path: <Keyboard>/p
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 140100165}
+        m_TargetAssemblyTypeName: PaletteSpawner, Assembly-CSharp
+        m_MethodName: SpawnPalette
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!224 &504420747 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2030245397225026434, guid: 836ada3d5c8ec63438a88f707ca94c24,
@@ -2722,6 +2830,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 9fb8fe02-65af-4128-a115-41a70462a6ac
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &649767446 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7068762446051028577, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
@@ -3620,6 +3743,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 67be14b6-91ba-4bf0-938b-66d7050cb076
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &713581443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3632,6 +3770,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 822e1807-5999-4b55-91b5-5142ba725309
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &714665076
 GameObject:
   m_ObjectHideFlags: 0
@@ -4518,6 +4671,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 44fccf85-b7bd-4ab5-8308-b3f2e0207283
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &999065841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4542,6 +4710,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8c38adf0-692c-43f0-baa0-ffb3580310aa
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1048618794
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5750,6 +5933,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 954303a6-a5c3-43a4-a48c-c3ec3f3a4a04
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1961907484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5782,6 +5980,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: d416f9e2-d80a-4c5f-b99b-6e7d36df02de
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1961907486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5794,6 +6007,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a727e1dd-8936-474e-be7e-c033a3e8103d
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1961907487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5806,6 +6034,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: c0c9d0cd-26fb-4c95-94af-a9c151f6f4a6
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1978502506
 GameObject:
   m_ObjectHideFlags: 0
@@ -6094,6 +6337,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: b8b3bfc8-3694-4683-a460-79b29f5ad476
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2093928162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6120,6 +6378,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  action:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 3f435876-81dc-4be9-a410-709bc532b0e1
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!33 &2093928164
 MeshFilter:
   m_ObjectHideFlags: 0
