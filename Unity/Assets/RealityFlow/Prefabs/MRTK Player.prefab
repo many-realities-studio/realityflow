@@ -10,9 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5479181506340991470}
   - component: {fileID: 6748021905382973316}
-  - component: {fileID: 2113920246188450374}
-  - component: {fileID: 9121712624665162020}
-  - component: {fileID: 4930076440977287711}
   - component: {fileID: 7655743458566479560}
   m_Layer: 0
   m_Name: MRTK Player
@@ -55,51 +52,6 @@ MonoBehaviour:
   readme: This prefab represents the local player. It supports basic teleporting
     and interaction, on both the desktop and in VR. Prefab variants should be created
     for specific applications.
---- !u!114 &2113920246188450374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4320888274098329819}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04a661f59be0f514b9dca5468186cd23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableXROnStartup: 0
---- !u!114 &9121712624665162020
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4320888274098329819}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0194d553f7f5bca4fa9f4664182ac696, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_CameraFloorOffsetObject: {fileID: 0}
-  m_RequestedTrackingMode: 1
-  m_TrackingOriginMode: 0
-  m_TrackingSpace: 3
-  m_CameraYOffset: 1.36144
---- !u!114 &4930076440977287711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4320888274098329819}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 902b8d8471c073843ab4bc8ca5b84888, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnRequest:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &7655743458566479560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,7 +229,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -944628639613478452, guid: 70b361cf3c037d54896482d1ffd9f999,
         type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5880243892432921910, guid: 7c2aad014a22e4d5db741ef7fcef0657, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
