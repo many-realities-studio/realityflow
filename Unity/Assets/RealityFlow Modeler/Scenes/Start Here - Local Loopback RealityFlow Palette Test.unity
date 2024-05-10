@@ -352,6 +352,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 71166716}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &100807865 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3073775169810437857, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+    type: 3}
+  m_PrefabInstance: {fileID: 3390102547864423137}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &110728389
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,6 +655,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2973263019367995782, guid: 221cbe5979eef114ab214afcd9ebf51e,
+        type: 3}
+      propertyPath: leftHand
+      value: 
+      objectReference: {fileID: 100807865}
+    - target: {fileID: 2973263019367995782, guid: 221cbe5979eef114ab214afcd9ebf51e,
+        type: 3}
+      propertyPath: rightHand
+      value: 
+      objectReference: {fileID: 1878384108}
     - target: {fileID: 2973263019367995782, guid: 221cbe5979eef114ab214afcd9ebf51e,
         type: 3}
       propertyPath: gizmoContainer
@@ -2454,10 +2470,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 902b8d8471c073843ab4bc8ca5b84888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnRequest:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
 --- !u!1 &486027496 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4902614821818156488, guid: 221cbe5979eef114ab214afcd9ebf51e,
@@ -4518,10 +4530,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 902b8d8471c073843ab4bc8ca5b84888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnRequest:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
 --- !u!114 &999065842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5644,6 +5652,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85416945309f8244a5715a2ec5c254f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1878384108 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8186168544659291679, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+    type: 3}
+  m_PrefabInstance: {fileID: 3390102547864423137}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1948989721
 GameObject:
   m_ObjectHideFlags: 0
@@ -6052,7 +6066,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2093928160
 Transform:
   m_ObjectHideFlags: 0

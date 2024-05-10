@@ -45,8 +45,13 @@ public class AttachGizmoState : MonoBehaviour
         checkMeshRaySelection = false;
         attachedGameObject = null;
         lookForTarget = false;
-        rightHand = GameObject.Find("MRTK RightHand Controller");
-        leftHand = GameObject.Find("MRTK LeftHand Controller");
+        if(rightHand == null) {
+            rightHand = GameObject.Find("Right Controller");
+        }
+        // Debug.Log(rightHand);
+        if(leftHand == null) {
+            leftHand = GameObject.Find("Left Controller");
+        }
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
     }
@@ -192,10 +197,11 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if an interactor was found, otherwise, false</returns>
     bool SetActiveInteractor()
     {
-        interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
-
+        Debug.Log(rightHand);
+        interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        Debug.Log(interactor);
         if (interactor == null)
-            interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
 
         else if (interactor == null)
             return false;
@@ -326,7 +332,7 @@ public class AttachGizmoState : MonoBehaviour
     {
         GameObject activeContoller = rightHand;
 
-        if (rightHand.GetComponentInChildren<MRTKRayInteractor>() == null)
+        if (rightHand.GetComponentInChildren<XRRayInteractor>() == null)
             activeContoller = leftHand;            
 
         return activeContoller.transform.Find("Far Ray").gameObject;
@@ -339,7 +345,7 @@ public class AttachGizmoState : MonoBehaviour
         LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
         LayerMask ui = 1 << LayerMask.NameToLayer("UI");
 
-        farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;       
+        farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;       
     }
 
     public void DisableMeshRaySelection()
@@ -349,6 +355,6 @@ public class AttachGizmoState : MonoBehaviour
         GameObject farRay = GetActiveContollerFarRay();
         LayerMask everything = ~0;
 
-        farRay.GetComponent<MRTKRayInteractor>().raycastMask = everything;
+        farRay.GetComponent<XRRayInteractor>().raycastMask = everything;
     }
 }

@@ -40,16 +40,16 @@ public class SVImageControl : MonoBehaviour
         pickerTransform = pickerImage.GetComponent<RectTransform>();
         pickerTransform.localPosition = new Vector2(-59.92683f, -57.8448f);
 
-        leftHand = GameObject.Find("MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK RightHand Controller");
+        leftHand = GameObject.Find("Left Controller");
+        rightHand = GameObject.Find("Right Controller");
 
         if (dominantHandButton.IsToggled)
         {
-            rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
         }
         else
         {
-            rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         }
 
         if (rayInteractor == null)
@@ -132,11 +132,11 @@ public class SVImageControl : MonoBehaviour
         // Switch the interactor rays and triggers depending on the dominant hand
         if(isLeftHandDominant)
         {
-            rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
         }
         else
         {
-            rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         }
     }
 }

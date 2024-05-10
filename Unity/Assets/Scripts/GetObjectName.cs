@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class GetObjectName : MonoBehaviour
 {
-    public MRTKRayInteractor rayInteractor;
+    public XRRayInteractor rayInteractor;
     public string aName = null;
 
     public void GetName()

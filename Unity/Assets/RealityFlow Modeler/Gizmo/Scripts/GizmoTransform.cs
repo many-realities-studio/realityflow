@@ -35,8 +35,8 @@ public class GizmoTransform : MonoBehaviour
 
     public void Awake()
     {
-        rightHand = GameObject.Find("MRTK RightHand Controller");
-        leftHand = GameObject.Find("MRTK LeftHand Controller");
+        rightHand = GameObject.Find("Right Controller");
+        leftHand = GameObject.Find("Left Controller");
         gizmoManager = GameObject.Find("Gizmo Manager");
         SetActiveInteractor();
         awake = true;
@@ -94,10 +94,10 @@ public class GizmoTransform : MonoBehaviour
     /// <returns>True if an interactor on an active contoller was found</returns>
     public bool SetActiveInteractor()
     {
-        interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+        interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (interactor == null)
-            interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
 
         else if (interactor == null)
             return false;

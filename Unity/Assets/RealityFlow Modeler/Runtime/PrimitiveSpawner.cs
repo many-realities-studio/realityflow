@@ -58,7 +58,7 @@ public class PrimitiveSpawner : MonoBehaviour
 
         grid = FindObjectOfType<SnapGrid>();
         gridTool = FindObjectOfType<GridTool>();
-        rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+        rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (rayInteractor == null)
         {
@@ -183,11 +183,11 @@ public class PrimitiveSpawner : MonoBehaviour
         // Switch the interactor rays
         if(isLeftHandDominant)
         {
-            rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
         }
         else
         {
-            rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         }
 
         ChangeInputButtons(isLeftHandDominant);

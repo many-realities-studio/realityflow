@@ -31,9 +31,9 @@ public class HandleSelector : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK RightHand Controller");
-        rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+        leftHand = GameObject.Find("Left Controller");
+        rightHand = GameObject.Find("Right Controller");
+        rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         handles = new List<Handle>();
 
@@ -239,11 +239,11 @@ public class HandleSelector : MonoBehaviour
         // Switch the interactor rays and triggers depending on the dominant hand
         if (isLeftHandDominant)
         {
-            rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
         }
         else
         {
-            rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         }
     }
 }

@@ -9,7 +9,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class TrackCursor : MonoBehaviour
 {
-    public MRTKRayInteractor interactor;
+    public XRRayInteractor interactor;
     public IXRInteractable interactable;
     public Image reticle;
     public Vector2 cursorPosition;
@@ -24,8 +24,8 @@ public class TrackCursor : MonoBehaviour
 
     public void StartHover(HoverEnterEventArgs args) {
         interactable = args.interactableObject;
-        if(args.interactorObject.transform.gameObject.GetComponent<MRTKRayInteractor>() != null) {
-            interactor = args.interactorObject.transform.gameObject.GetComponent<MRTKRayInteractor>();
+        if(args.interactorObject.transform.gameObject.GetComponent<XRRayInteractor>() != null) {
+            interactor = args.interactorObject.transform.gameObject.GetComponent<XRRayInteractor>();
         }
         reticle.gameObject.SetActive(true);
         isHovering = true;
