@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph.Nodes.Actions
@@ -8,7 +6,7 @@ namespace RealityFlow.NodeGraph.Nodes.Actions
     {
         public static void Evaluate(Node node, EvalContext ctx)
         {
-            object lhs = ctx.GetValueForInputPort((node, 0));
+            object lhs = ctx.GetValueForInputPort(new(node, 0));
             Debug.Log(lhs);
         }
     }

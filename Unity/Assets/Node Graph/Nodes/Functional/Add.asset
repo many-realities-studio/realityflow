@@ -26,6 +26,11 @@ MonoBehaviour:
     Type:
       Data:
         rid: 6695490568032092176
+  TypeVariableConstraints:
+  - kind: 0
+    typeArgs:
+    - Data:
+        rid: 6695490568032092178
   ExecutionInput: 0
   ExecutionOutputs: []
   EvaluationMethod: RealityFlow.NodeGraph.Nodes.Functional.Add;Evaluate
@@ -41,6 +46,10 @@ MonoBehaviour:
       data:
         Index: 0
     - rid: 6695490568032092176
+      type: {class: NodeValueType/Kind/TypeVariable, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+      data:
+        Index: 0
+    - rid: 6695490568032092178
       type: {class: NodeValueType/Kind/TypeVariable, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
       data:
         Index: 0
