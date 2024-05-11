@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace RealityFlow.NodeGraph.Testing
 {
@@ -21,14 +20,15 @@ namespace RealityFlow.NodeGraph.Testing
             graph.AddEdge(twelve, 0, print, 0);
 
             return graph;
-
-            // TODO: JSON
         }
 
         public void Start()
         {
             Graph graph = ConstructGraph();
             graph.EvaluateRoot(0);
+
+            string json = JsonUtility.ToJson(graph, true);
+            Debug.Log(json);
         }
     }
 }
