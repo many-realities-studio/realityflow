@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
@@ -9,18 +10,30 @@ namespace RealityFlow.NodeGraph
     {
         public readonly NodeDefinition Definition;
 
-        List<NodePort> Inputs;
-        List<NodePort> Outputs;
+        [SerializeField]
+        List<NodeValueType> typeSubstitutions = new();
+        [SerializeField]
+        List<InputNodePort> Inputs = new();
+        [SerializeField]
+        List<OutputNodePort> Outputs = new();
 
         public Node(NodeDefinition definition)
         {
             Definition = definition;
-            Inputs = new();
+            for (int i = 0; i < definition.HighestTypeVariableIndex(); i++)
+                typeSubstitutions.Add(null);
             for (int i = 0; i < definition.Inputs.Count; i++)
                 Inputs.Add(new());
-            Outputs = new();
             for (int i = 0; i < definition.Outputs.Count; i++)
                 Outputs.Add(new());
+        }
+
+        public InputNodePort GetInput(int index) => Inputs[index];
+        public OutputNodePort GetOutput(int index) => Outputs[index];
+
+        public void SetInputConstant(int index, object value)
+        {
+            Inputs[index].ConstantValue = value;
         }
 
         public void Evaluate(EvalContext ctx)

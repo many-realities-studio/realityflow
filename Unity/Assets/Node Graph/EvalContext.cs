@@ -6,12 +6,12 @@ namespace RealityFlow.NodeGraph
     {
         public Graph graph;
         public Queue<Node> nodeQueue;
-        public Dictionary<(Node, int), object> valueCache;
+        public Dictionary<PortIndex, object> valueCache;
 
         public EvalContext(
             Graph graph,
             Queue<Node> nodeQueue,
-            Dictionary<(Node, int), object> valueCache
+            Dictionary<PortIndex, object> valueCache
         )
         {
             this.graph = graph;
@@ -19,22 +19,29 @@ namespace RealityFlow.NodeGraph
             this.valueCache = valueCache;
         }
 
-        public object GetValueForInputPort((Node, int) input)
+        public object GetValueForInputPort(PortIndex input)
         {
-            (Node, int) outputPort = graph.GetOutputPortOf(input);
-            if (valueCache.TryGetValue(outputPort, out object value))
-                return value;
-            else if (outputPort.Item1.Definition.IsPure)
-                outputPort.Item1.Evaluate(this);
-            else
-                throw new InvalidDataFlowException();
+            if (graph.TryGetOutputPortOf(input, out var outputPort))
+            {
+                if (valueCache.TryGetValue(outputPort, out object value))
+                    return value;
+                else if (outputPort.Node.Definition.IsPure)
+                    outputPort.Node.Evaluate(this);
+                else
+                    throw new InvalidDataFlowException();
 
-            return valueCache[outputPort];
+                return valueCache[outputPort];
+            }
+            else
+            {
+                InputNodePort inputPort = input.AsInput;
+                return inputPort.ConstantValue;
+            }
         }
 
         public void ExecuteTargetsOfPort(Node node, int port)
         {
-            List<Node> nodes = graph.GetExecutionInputPortsOf((node, port));
+            List<Node> nodes = graph.GetExecutionInputPortsOf(new(node, port));
             for (int i = 0; i < nodes.Count; i++)
                 nodes[i].Evaluate(this);
         }
