@@ -11,8 +11,6 @@ namespace RealityFlow.NodeGraph
         public readonly NodeDefinition Definition;
 
         [SerializeField]
-        List<NodeValueType> typeSubstitutions = new();
-        [SerializeField]
         List<InputNodePort> Inputs = new();
         [SerializeField]
         List<OutputNodePort> Outputs = new();
@@ -20,8 +18,6 @@ namespace RealityFlow.NodeGraph
         public Node(NodeDefinition definition)
         {
             Definition = definition;
-            for (int i = 0; i < definition.HighestTypeVariableIndex(); i++)
-                typeSubstitutions.Add(null);
             for (int i = 0; i < definition.Inputs.Count; i++)
                 Inputs.Add(new());
             for (int i = 0; i < definition.Outputs.Count; i++)

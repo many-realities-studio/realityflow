@@ -6,6 +6,6 @@ namespace RealityFlow.NodeGraph
     public class NodePortDefinition
     {
         public string Name;
-        public NodeValueType Type;
+        public Type Type;
     }
 }
