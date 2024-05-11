@@ -32,4 +32,15 @@ namespace RealityFlow.NodeGraph
             System.Runtime.Serialization.SerializationInfo info,
             System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
+
+    [System.Serializable]
+    public class GraphTypeMismatchException : EvaluationException
+    {
+        public GraphTypeMismatchException() : base("passed incorrect type to node port") { }
+        public GraphTypeMismatchException(string message) : base(message) { }
+        public GraphTypeMismatchException(string message, System.Exception inner) : base(message, inner) { }
+        protected GraphTypeMismatchException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
 }

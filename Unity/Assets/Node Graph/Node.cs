@@ -34,10 +34,7 @@ namespace RealityFlow.NodeGraph
 
         public void Evaluate(EvalContext ctx)
         {
-            string[] parts = Definition.EvaluationMethod.Split(';');
-            Type type = Assembly.GetExecutingAssembly().GetType(parts[0]);
-            MethodInfo method = type.GetMethod(parts[1]);
-            method.Invoke(null, new object[] { this, ctx });
+            Definition.GetEvaluation()(this, ctx);
         }
     }
 }

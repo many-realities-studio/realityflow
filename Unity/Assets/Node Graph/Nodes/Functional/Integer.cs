@@ -4,7 +4,7 @@ namespace RealityFlow.NodeGraph.Nodes.Functional
     {
         public static void Evaluate(Node node, EvalContext ctx)
         {
-            ctx.valueCache[new(node, 0)] = 12;
+            ctx.SetOutputValue(node, 0, 12);
         }
     }
 }

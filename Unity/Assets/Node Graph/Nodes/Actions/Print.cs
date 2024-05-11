@@ -6,7 +6,7 @@ namespace RealityFlow.NodeGraph.Nodes.Actions
     {
         public static void Evaluate(Node node, EvalContext ctx)
         {
-            object lhs = ctx.GetValueForInputPort(new(node, 0));
+            object lhs = ctx.GetValueForInputPort<object>(new(node, 0));
             Debug.Log(lhs);
         }
     }

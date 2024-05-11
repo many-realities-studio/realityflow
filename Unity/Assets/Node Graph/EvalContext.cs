@@ -6,7 +6,7 @@ namespace RealityFlow.NodeGraph
     {
         public Graph graph;
         public Queue<Node> nodeQueue;
-        public Dictionary<PortIndex, object> valueCache;
+        Dictionary<PortIndex, object> valueCache;
 
         public EvalContext(
             Graph graph,
@@ -19,24 +19,33 @@ namespace RealityFlow.NodeGraph
             this.valueCache = valueCache;
         }
 
-        public object GetValueForInputPort(PortIndex input)
+        public T GetValueForInputPort<T>(PortIndex input)
         {
+            object value;
             if (graph.TryGetOutputPortOf(input, out var outputPort))
             {
-                if (valueCache.TryGetValue(outputPort, out object value))
-                    return value;
+                if (valueCache.TryGetValue(outputPort, out value))
+                { }
                 else if (outputPort.Node.Definition.IsPure)
+                {
                     outputPort.Node.Evaluate(this);
+                    value = valueCache[outputPort];
+                }
                 else
                     throw new InvalidDataFlowException();
-
-                return valueCache[outputPort];
             }
             else
-            {
-                InputNodePort inputPort = input.AsInput;
-                return inputPort.ConstantValue;
-            }
+                value = input.AsInput.ConstantValue;
+
+            if (value is T typedVal)
+                return typedVal;
+            else
+                throw new GraphTypeMismatchException();
+        }
+
+        public void SetOutputValue<T>(Node node, int port, T value)
+        {
+            valueCache[new(node, port)] = value;
         }
 
         public void ExecuteTargetsOfPort(Node node, int port)
