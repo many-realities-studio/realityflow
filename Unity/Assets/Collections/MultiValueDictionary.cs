@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace RealityFlow.Collections
 {
+    [Serializable]
     public class MultiValueDictionary<TKey, TValue>
     {
-        readonly Dictionary<TKey, List<TValue>> dict = new();
+        [SerializeField]
+        SerializableDict<TKey, List<TValue>> dict = new();
 
         List<TValue> GetOrCreateList(TKey key)
         {
