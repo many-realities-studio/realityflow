@@ -71,18 +71,6 @@ namespace Ubiq.Avatars
 
         private void Start()
         {
-                if (RoomClient == null)
-                {
-                    Debug.LogError("RoomClient is not assigned!");
-                    return;
-                }
-
-                if (avatarCatalogue == null)
-                {
-                    Debug.LogError("Avatar Catalogue is not assigned!");
-                    return;
-                }
-
             spawner = new NetworkSpawner(NetworkScene.Find(this),
                 RoomClient, avatarCatalogue, "ubiq.avatars.");
             spawner.OnSpawned += OnSpawned;
