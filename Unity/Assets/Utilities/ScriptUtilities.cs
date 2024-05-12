@@ -14,28 +14,8 @@ namespace RealityFlow.Utilities
 {
     public static class ScriptUtilities
     {
-        static AppDomain scriptDomain = CreateAppDomain();
-
-        static AppDomain CreateAppDomain()
-        {
-            var info = new AppDomainSetup()
-            {
-                ApplicationName = "RealityFlowScripts",
-                ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                DynamicBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-            };
-            var domain = AppDomain.CreateDomain("realityflow-scripts", new Evidence(), info);
-            domain.AssemblyLoad += (_, args) =>
-            {
-                Debug.Log($"Loaded {args.LoadedAssembly.FullName}");
-            };
-            domain.AssemblyResolve += (_, args) =>
-            {
-                Debug.Log($"Attempted to resolve {args.Name} for {args.RequestingAssembly.FullName}");
-                return null;
-            };
-            return domain;
-        }
+        static AppDomain scriptDomain;
+        static ScriptProxy proxy;
 
         static CSharpCompilation compilation;
 
@@ -51,11 +31,30 @@ namespace RealityFlow.Utilities
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(dotnetStandardAsm.Location),
                     MetadataReference.CreateFromFile(typeof(UnityEngine.Object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Debug).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(ScriptUtilities).Assembly.Location)
                 )
                 .WithOptions(new CSharpCompilationOptions(
                     OutputKind.DynamicallyLinkedLibrary
                 ));
+
+            var appInfo = new AppDomainSetup()
+            {
+                ApplicationName = "RealityFlowScripts",
+                ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                DynamicBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            };
+            var domain = AppDomain.CreateDomain("realityflow-scripts", new Evidence(), appInfo);
+            scriptDomain = domain;
+
+            proxy = (ScriptProxy)scriptDomain.CreateInstanceAndUnwrap(
+                typeof(ScriptProxy).Assembly.FullName,
+                typeof(ScriptProxy).FullName
+            );
+
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                if (!asm.IsDynamic)
+                    proxy.LoadStaticAssembly(asm.Location);
         }
 
         /// <summary>
@@ -67,7 +66,7 @@ namespace RealityFlow.Utilities
         /// Returns null if compilation fails, and fills the provided list with warnings and errors
         /// if it is not null.
         /// </summary>
-        public static F CreateDelegate<F>(string code, List<Diagnostic> diagnostics)
+        public static ScriptDelegate<F> CreateDelegate<F>(string code, List<Diagnostic> diagnostics)
         where
             F : Delegate
         {
@@ -77,6 +76,7 @@ namespace RealityFlow.Utilities
 
             using var stream = new MemoryStream();
             EmitResult results = csc.Emit(stream);
+            stream.Seek(0, SeekOrigin.Begin);
 
             if (diagnostics != null)
             {
@@ -86,15 +86,7 @@ namespace RealityFlow.Utilities
             }
 
             if (results.Success)
-            {
-                ScriptProxy proxy = (ScriptProxy)scriptDomain.CreateInstanceAndUnwrap(
-                    typeof(ScriptProxy).Assembly.FullName,
-                    typeof(ScriptProxy).FullName
-                );
-                stream.Seek(0, SeekOrigin.Begin);
-
                 return proxy.LoadDelegateFromAppDomain<F>(stream);
-            }
 
             return null;
         }
