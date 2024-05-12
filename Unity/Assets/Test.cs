@@ -26,7 +26,10 @@ public class Test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        printy.Invoke();
+        if (printy is not null)
+            printy.Invoke();
+        printy = null;
+        ScriptUtilities.FreeScripts();
     }
 
     void OnDestroy()

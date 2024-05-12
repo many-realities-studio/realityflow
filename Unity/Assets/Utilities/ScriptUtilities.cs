@@ -103,9 +103,12 @@ namespace RealityFlow.Utilities
         /// </summary>
         public static void FreeScripts()
         {
+            if (scriptDomain == null)
+                return;
             try
             {
                 AppDomain.Unload(scriptDomain);
+                scriptDomain = null;
                 Debug.Log("Freed App Domain");
             }
             catch (CannotUnloadAppDomainException)
