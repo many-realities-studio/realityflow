@@ -50,7 +50,7 @@ namespace RealityFlow.NodeGraph
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)
             => ReverseEdges.TryGetValue(inputPort, out outputPort);
 
-        public bool GetInputPortOf(PortIndex outputPort, out PortIndex inputPort)
+        public bool TryGetInputPortOf(PortIndex outputPort, out PortIndex inputPort)
             => Edges.TryGetValue(outputPort, out inputPort);
 
         public List<Node> GetExecutionInputPortsOf(PortIndex outputPort)

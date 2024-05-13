@@ -10,13 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
-  m_Name: Integer
+  m_Name: IntMultiply
   m_EditorClassIdentifier: 
-  Inputs: []
+  Inputs:
+  - Name: 
+    Type: 0
+  - Name: 
+    Type: 0
   Outputs:
-  - Name: Value
+  - Name: 
     Type: 0
   EvaluationMethod: 
-  EvaluationCode: ctx.SetOutput(0, 12);
+  EvaluationCode: 'int lhs = ctx.GetInput<int>(0);
+
+    int rhs = ctx.GetInput<int>(1);
+
+    ctx.SetOutput(0,
+    lhs * rhs);'
   ExecutionInput: 0
   ExecutionOutputs: []

@@ -14,17 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Inputs:
   - Name: Value
-    Type:
-      Data:
-        rid: 6695490545830331364
+    Type: 0
   Outputs: []
+  EvaluationMethod: 
+  EvaluationCode: 'object lhs = ctx.GetInput<object>(0);
+
+    Debug.Log(lhs);
+
+'
   ExecutionInput: 0
   ExecutionOutputs: []
-  EvaluationMethod: RealityFlow.NodeGraph.Nodes.Actions.Print;Evaluate
-  references:
-    version: 2
-    RefIds:
-    - rid: 6695490545830331364
-      type: {class: NodeValueType/Kind/TypeVariable, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
-      data:
-        Index: 0

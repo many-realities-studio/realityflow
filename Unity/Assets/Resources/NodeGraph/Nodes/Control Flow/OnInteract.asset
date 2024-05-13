@@ -14,10 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Inputs: []
   Outputs: []
+  EvaluationMethod: 
+  EvaluationCode: ctx.ExecuteTargetsOfPort(0);
   ExecutionInput: 0
   ExecutionOutputs:
   - 
-  EvaluationMethod: RealityFlow.NodeGraph.Nodes.ControlFlow.OnInteract;Evaluate
-  references:
-    version: 2
-    RefIds: []

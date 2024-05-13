@@ -13,14 +13,19 @@ MonoBehaviour:
   m_Name: IntAdd
   m_EditorClassIdentifier: 
   Inputs:
-  - Name: Left
+  - Name: 
     Type: 0
-  - Name: Right
+  - Name: 
     Type: 0
   Outputs:
   - Name: Sum
     Type: 0
-  EvaluationMethod: RealityFlow.NodeGraph.Nodes.Functional.IntAdd;Evaluate
-  MethodCode: 
+  EvaluationMethod: 
+  EvaluationCode: 'int lhs = ctx.GetInput<int>(0);
+
+    int rhs = ctx.GetInput<int>(1);
+
+    ctx.SetOutput(0,
+    lhs + rhs);'
   ExecutionInput: 0
   ExecutionOutputs: []

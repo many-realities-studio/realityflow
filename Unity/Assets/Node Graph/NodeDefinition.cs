@@ -18,7 +18,7 @@ namespace RealityFlow.NodeGraph
         public List<NodePortDefinition> Inputs;
         public List<NodePortDefinition> Outputs;
         public string EvaluationMethod;
-        [Multiline]
+        [TextArea(8, 16)]
         public string EvaluationCode;
         public bool ExecutionInput;
         public List<string> ExecutionOutputs;
