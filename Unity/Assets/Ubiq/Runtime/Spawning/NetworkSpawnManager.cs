@@ -263,9 +263,14 @@ namespace Ubiq.Spawning
         /// </summary>
         public GameObject SpawnWithPeerScope(GameObject gameObject)
         {
+
+            
             var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
             var catalogueIdx = ResolveIndex(gameObject);
-
+            
+            Debug.Log($"Catalogue count: {catalogue.prefabs.Count}");
+            Debug.Log($"Attempting to access index: {catalogueIdx}");
+            
             var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
             if (!spawnedForPeers.ContainsKey(roomClient.Me))
             {
@@ -331,12 +336,38 @@ namespace Ubiq.Spawning
             return go;
         }
 
-        private int ResolveIndex(GameObject gameObject)
+       
+        /*private int ResolveIndex(GameObject gameObject)
         {
+           for (int curr = 0; curr < catalogue.prefabs.Count; curr++){
+            Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
+            }
+            
             var i = catalogue.IndexOf(gameObject);
             Debug.Assert(i >= 0, $"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
             return i;
+        }*/
+        private int ResolveIndex(GameObject gameObject){
+            
+    // Debug log each prefab in the catalogue for verification
+    for (int curr = 0; curr < catalogue.prefabs.Count; curr++)
+    {
+        Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
+    }
+
+    // Find the index of the prefab by name
+    for (int i = 0; i < catalogue.prefabs.Count; i++)
+    {
+        if (catalogue.prefabs[i].name == gameObject.name)
+        {
+            return i;
         }
+    }
+
+    Debug.LogError($"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
+    return -1; // Return -1 if the prefab is not found
+}
+
     }
 
     public class NetworkSpawnManager : MonoBehaviour
@@ -380,6 +411,7 @@ namespace Ubiq.Spawning
             spawner = new NetworkSpawner(NetworkScene.Find(this), roomClient, catalogue);
             spawner.OnSpawned += Spawner_OnSpawned;
             spawner.OnDespawned += Spawner_OnDespawned;
+            
         }
 
         private void OnDestroy()
