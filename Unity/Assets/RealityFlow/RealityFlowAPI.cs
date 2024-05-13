@@ -1,25 +1,21 @@
 using UnityEngine;
-using System.Collections.Generic;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
 
 public class RealityFlowAPI : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> prefabCatalogue; // Populate in the Unity Editor
-
     private NetworkSpawnManager spawnManager;
-    private NetworkContext networkContext;
 
     // Singleton instance
     private static RealityFlowAPI _instance;
     private static readonly object _lock = new object();
 
     public enum SpawnScope
-{
-    Room,
-    Peer
-}
+    {
+        Room,
+        Peer
+    }
 
     public static RealityFlowAPI Instance
     {
@@ -51,65 +47,67 @@ public class RealityFlowAPI : MonoBehaviour
             {
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
-            networkContext = NetworkScene.Register(this);
         }
     }
 
     public GameObject GetPrefabByName(string name)
     {
-        foreach (var prefab in prefabCatalogue)
+        if (spawnManager != null && spawnManager.catalogue != null)
         {
-            if (prefab.name == name)
-                return prefab;
+            foreach (var prefab in spawnManager.catalogue.prefabs)
+            {
+                if (prefab.name == name)
+                    return prefab;
+            }
         }
-        Debug.LogWarning($"Prefab named {name} not found.");
+        Debug.LogWarning($"Prefab named {name} not found in function GetPrefabByName.");
         return null;
     }
 
     public GameObject SpawnObject(string prefabName, Vector3 position, Quaternion rotation = default, SpawnScope scope = SpawnScope.Room)
-{
-    GameObject prefab = GetPrefabByName(prefabName);
-    if (prefab == null)
     {
-        Debug.LogError($"Prefab not found: {prefabName}");
-        return null;
-    }
+        //Debug.Log($"Attempting to spawn {prefabName}");
+        GameObject prefab = GetPrefabByName(prefabName);
+        if (prefab == null)
+        {
+            Debug.LogError($"Prefab not found: {prefabName}");
+            return null;
+        }
 
-    GameObject newObject = Instantiate(prefab, position, rotation);
-    
-    switch (scope)
-    {
-        case SpawnScope.Room:
-            spawnManager.SpawnWithRoomScope(newObject);  // Make sure this method exists and is implemented correctly
-            Debug.Log("Spawned with Room Scope");
-            break;
-        case SpawnScope.Peer:
-            spawnManager.SpawnWithPeerScope(newObject);  // Make sure this method exists and is implemented correctly
-            Debug.Log("Spawned with Peer Scope");
-            break;
-        default:
-            Debug.LogError("Unknown spawn scope");
-            break;
-    }
+        GameObject newObject = Instantiate(prefab, position, rotation);
+        newObject.name = prefabName;
 
-    return newObject;
-}
+        
+        Debug.Log($"Spawned object: {newObject.name}, Instance ID: {newObject.GetInstanceID()}");
+
+        switch (scope)
+        {
+            case SpawnScope.Room:
+                spawnManager.SpawnWithRoomScope(newObject);  // Ensure this method is correctly implemented in NetworkSpawnManager
+                Debug.Log("Spawned with Room Scope");
+                break;
+            case SpawnScope.Peer:
+                spawnManager.SpawnWithPeerScope(newObject);  // Ensure this method is correctly implemented in NetworkSpawnManager
+                Debug.Log("Spawned with Peer Scope");
+                break;
+            default:
+                Debug.LogError("Unknown spawn scope");
+                break;
+        }
+
+        return newObject;
+    }
 
     public void DespawnObject(GameObject objectToDespawn)
     {
         if (objectToDespawn != null)
         {
-            spawnManager.Despawn(objectToDespawn); // Assuming Despawn handles the network context
+            spawnManager.Despawn(objectToDespawn);
+            Debug.Log("Despawned: " + objectToDespawn.name);
         }
         else
         {
             Debug.LogError("Object to despawn is null");
         }
-    }
-
-    // Implement INetworkComponent if there are specific network messages to handle
-    public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
-    {
-        // Handle network messages here if necessary
     }
 }
