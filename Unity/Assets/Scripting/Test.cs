@@ -8,15 +8,16 @@ namespace RealityFlow.Scripting
     public class Test : MonoBehaviour
     {
         List<Diagnostic> diagnostics = new();
-        Action printy;
+        Action<string> printy;
 
         // Start is called before the first frame update
         void Start()
         {
             printy =
-                    ScriptUtilities.GetAction(
-                        "Debug.Log(\"The script is working!\");",
-                        diagnostics
+                    ScriptUtilities.GetAction<string>(
+                        "Debug.Log(\"The script is working!\" + \" \" + whatToPrint);",
+                        diagnostics,
+                        "whatToPrint"
                     );
 
             if (diagnostics.Count > 0)
@@ -26,7 +27,7 @@ namespace RealityFlow.Scripting
         // Update is called once per frame
         void Update()
         {
-            printy();
+            printy("Test");
         }
     }
 }
