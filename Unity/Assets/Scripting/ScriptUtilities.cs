@@ -29,8 +29,6 @@ namespace RealityFlow.Scripting
                     OutputKind.DynamicallyLinkedLibrary,
                     reportSuppressedDiagnostics: false
                 ));
-
-            CSharpScript.EvaluateAsync(ScriptOptions.Default.)
         }
 
         static Assembly Compile(CSharpCompilation csc, List<Diagnostic> diagnostics)
