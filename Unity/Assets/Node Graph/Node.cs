@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -30,11 +29,6 @@ namespace RealityFlow.NodeGraph
         public void SetInputConstant(int index, object value)
         {
             Inputs[index].ConstantValue = value;
-        }
-
-        public void Evaluate(EvalContext ctx)
-        {
-            Definition.GetEvaluation()(this, ctx);
         }
     }
 }

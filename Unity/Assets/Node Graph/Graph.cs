@@ -26,10 +26,8 @@ namespace RealityFlow.NodeGraph
 
         public void EvaluateRoot(int root)
         {
-            Queue<Node> nodeQueue = new();
-            Dictionary<PortIndex, object> valueCache = new();
-            EvalContext ctx = new(this, nodeQueue, valueCache);
-            Roots[root].Value.Evaluate(ctx);
+            EvalContext ctx = new(this);
+            ctx.EvaluateNode(Roots[root]);
         }
 
         public Node AddRoot(Node root)

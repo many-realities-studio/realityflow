@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
+using RealityFlow.Scripting;
+using Microsoft.CodeAnalysis;
 
 namespace RealityFlow.NodeGraph
 {
@@ -24,8 +26,9 @@ namespace RealityFlow.NodeGraph
         public bool IsRoot => !ExecutionInput && ExecutionOutputs.Count != 0;
         public bool IsPure => !ExecutionInput && ExecutionOutputs.Count == 0;
 
-        Action<Node, EvalContext> eval;
-        public Action<Node, EvalContext> GetEvaluation()
+        Action<EvalContext> eval;
+        List<Diagnostic> diagnostics = new();
+        public Action<EvalContext> GetEvaluation()
         {
             if (eval is null)
             {
@@ -39,12 +42,29 @@ namespace RealityFlow.NodeGraph
                         Type type = typeof(Node).Assembly.GetType(parts[0]);
                         MethodInfo method = type.GetMethod(parts[1]);
                         eval =
-                            (Action<Node, EvalContext>)Delegate.CreateDelegate(
-                                typeof(Action<Node, EvalContext>),
+                            (Action<EvalContext>)Delegate.CreateDelegate(
+                                typeof(Action<EvalContext>),
                                 method
                             );
+                        break;
                     case (true, false):
-                        eval = Scripting.ScriptUtilities.CompileToAssembly()
+                        eval =
+                            ScriptUtilities.GetAction<EvalContext>(EvaluationCode, diagnostics, "ctx");
+                        foreach (var diag in diagnostics)
+                            switch (diag.Severity)
+                            {
+                                case DiagnosticSeverity.Error:
+                                    Debug.LogError(diag);
+                                    break;
+                                case DiagnosticSeverity.Warning:
+                                    Debug.LogWarning(diag);
+                                    break;
+                                case DiagnosticSeverity.Info:
+                                    Debug.Log(diag);
+                                    break;
+                            }
+                        diagnostics.Clear();
+                        break;
                     case (false, false):
                         Debug.LogError("Only one of EvaluationMethod and EvaluationCode allowed at once");
                         return null;
