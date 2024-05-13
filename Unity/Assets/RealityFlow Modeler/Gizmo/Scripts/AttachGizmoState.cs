@@ -335,7 +335,7 @@ public class AttachGizmoState : MonoBehaviour
         if (rightHand.GetComponentInChildren<XRRayInteractor>() == null)
             activeContoller = leftHand;            
 
-        return activeContoller.transform.Find("Far Ray").gameObject;
+        return activeContoller.transform.Find("Ray Interactor").gameObject;
     }
     public void EnableMeshRaySelection()
     {

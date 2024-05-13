@@ -155,38 +155,31 @@ MonoBehaviour:
     m_Id: cf04967f-44ee-4ca5-9461-05786dc073ec
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 9a8e1fd5-9210-441c-b04a-2ef12249a3f9
+      m_Path: <XRController>{RightHand}/gripPressed
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
-  OnRelease:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &29359739
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 29359737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  action:
-    m_Name: Action
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 8993d98b-f9a2-42f1-a3f4-5be24fbd450b
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 140100165}
+        m_TargetAssemblyTypeName: PaletteSpawner, Assembly-CSharp
+        m_MethodName: SpawnPalette
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -486,7 +479,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 2
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 3390102547864423138}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -614,7 +607,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 939732352738646036, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 29359739}
+      addedObject: {fileID: 140100166}
   m_SourcePrefab: {fileID: 100100000, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
 --- !u!4 &140100164 stripped
 Transform:
@@ -634,6 +627,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6a6c810b7b56744bb8aabb1175b7e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &140100166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29359737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 04471eaa-aa61-4a82-b4e8-08c571ad5706
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: c739b5c0-a443-4e51-855c-f4e0b6847878
+      m_Path: <XRController>{LeftHand}/gripPressed
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    - m_Name: 
+      m_Id: b3fa5856-8b20-4687-8e3d-e23fe940dd22
+      m_Path: <Keyboard>/p
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 140100165}
+        m_TargetAssemblyTypeName: PaletteSpawner, Assembly-CSharp
+        m_MethodName: SpawnPalette
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &155225212
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -732,6 +780,18 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 486027498}
   m_SourcePrefab: {fileID: 100100000, guid: 221cbe5979eef114ab214afcd9ebf51e, type: 3}
+--- !u!114 &155225213 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2973263019367995782, guid: 221cbe5979eef114ab214afcd9ebf51e,
+    type: 3}
+  m_PrefabInstance: {fileID: 155225212}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486027496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c90f37443ce8d545b595308988b8516, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &180340420 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6925687871038521229, guid: 4047cf70b4dcd4431bc65db562b2bd93,
@@ -2539,8 +2599,8 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: d3054b2d-c1ed-426a-b95b-4aa589a55219
-      m_Path: <XRController>{RightHand}/secondaryButton
+      m_Id: 51063f50-566b-4d8d-9138-c17efeacd43f
+      m_Path: <XRController>{LeftHand}/gripPressed
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -2549,10 +2609,34 @@ MonoBehaviour:
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 155225213}
+        m_TargetAssemblyTypeName: AttachGizmoState, Assembly-CSharp
+        m_MethodName: EnableMeshRaySelection
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 155225213}
+        m_TargetAssemblyTypeName: AttachGizmoState, Assembly-CSharp
+        m_MethodName: DisableMeshRaySelection
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &486027498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2574,16 +2658,8 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: c739b5c0-a443-4e51-855c-f4e0b6847878
-      m_Path: <XRController>{RightHand}/secondaryButton
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Action
-      m_Flags: 0
-    - m_Name: 
-      m_Id: b3fa5856-8b20-4687-8e3d-e23fe940dd22
-      m_Path: <Keyboard>/p
+      m_Id: 75352397-3f38-4949-8dc9-8b7ed385644e
+      m_Path: <XRController>{RightHand}/gripPressed
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -2593,9 +2669,9 @@ MonoBehaviour:
   OnPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 140100165}
-        m_TargetAssemblyTypeName: PaletteSpawner, Assembly-CSharp
-        m_MethodName: SpawnPalette
+      - m_Target: {fileID: 155225213}
+        m_TargetAssemblyTypeName: AttachGizmoState, Assembly-CSharp
+        m_MethodName: EnableMeshRaySelection
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2607,7 +2683,19 @@ MonoBehaviour:
         m_CallState: 2
   OnRelease:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 155225213}
+        m_TargetAssemblyTypeName: AttachGizmoState, Assembly-CSharp
+        m_MethodName: DisableMeshRaySelection
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!224 &504420747 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2030245397225026434, guid: 836ada3d5c8ec63438a88f707ca94c24,
@@ -2831,17 +2919,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   action:
-    m_Name: 
+    m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 9fb8fe02-65af-4128-a115-41a70462a6ac
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 8af92a16-62cf-4cdc-b13a-2d9774676168
+      m_Path: <XRController>{RightHand}/primaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -3308,6 +3416,16 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4174624424866011183, guid: 630a557d0a0ecd647972a4c80bda957b,
+        type: 3}
+      propertyPath: handType
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4174624424866011183, guid: 630a557d0a0ecd647972a4c80bda957b,
+        type: 3}
+      propertyPath: proximityType
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 4459647895509053091, guid: 630a557d0a0ecd647972a4c80bda957b,
         type: 3}
       propertyPath: nameManager
@@ -3744,17 +3862,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   action:
-    m_Name: 
+    m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 67be14b6-91ba-4bf0-938b-66d7050cb076
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 87ba8fb1-4d9d-4d71-9174-c5237b1fa6e1
+      m_Path: <XRController>{LeftHand}/primaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 713581441}
+        m_TargetAssemblyTypeName: CopyTool, Assembly-CSharp
+        m_MethodName: EnableCopyOffGizmo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -3771,17 +3909,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   action:
-    m_Name: 
+    m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 822e1807-5999-4b55-91b5-5142ba725309
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 178c11fa-d829-48ba-a628-0ebcf19a751f
+      m_Path: <XRController>{RightHand}/primaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 713581441}
+        m_TargetAssemblyTypeName: CopyTool, Assembly-CSharp
+        m_MethodName: EnableCopyOffGizmo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -4604,11 +4762,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 999065837}
-  - component: {fileID: 999065839}
+  - component: {fileID: 999065842}
   - component: {fileID: 999065838}
   - component: {fileID: 999065841}
   - component: {fileID: 999065840}
-  - component: {fileID: 999065842}
   m_Layer: 0
   m_Name: Menu Manager
   m_TagString: Untagged
@@ -4647,18 +4804,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   socialMenu: {fileID: 1082172193}
   source: {fileID: 0}
---- !u!114 &999065839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 999065836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c6b1b8d164b89c44bc262fd7f6b76c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &999065840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4672,17 +4817,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   action:
-    m_Name: 
+    m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 44fccf85-b7bd-4ab5-8308-b3f2e0207283
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 2636d98e-f1f5-4ec8-8172-ebc8f02c3b99
+      m_Path: <XRController>{LeftHand}/menu
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 999065842}
+        m_TargetAssemblyTypeName: Ubiq.Samples.SocialMenu, Ubiq
+        m_MethodName: Request
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -4695,9 +4860,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 999065836}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 902b8d8471c073843ab4bc8ca5b84888, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d30df9401d078049941d291295936ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnRequest:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &999065842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4707,22 +4875,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 999065836}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 29c8d89b7edbf66468bd5d990ffe2b86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action:
-    m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 8c38adf0-692c-43f0-baa0-ffb3580310aa
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-  OnRelease:
+  networkSceneOverride: {fileID: 1314753234}
+  spawnRelativeTransform: {fileID: 0}
+  OnStateChange:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1001 &1048618794
@@ -4909,7 +5067,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 7068762447081937015}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2029801442}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85a8236d1040c2b439f6933935477a9d, type: 3}
@@ -5940,14 +6098,46 @@ MonoBehaviour:
     m_Id: 954303a6-a5c3-43a4-a48c-c3ec3f3a4a04
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: f406fc06-6a0a-4150-ad09-83e27837dcc5
+      m_Path: <XRController>{RightHand}/gripPressed
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1961907484}
+        m_TargetAssemblyTypeName: PrimitiveSpawner, Assembly-CSharp
+        m_MethodName: SpawnMesh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1961907484}
+        m_TargetAssemblyTypeName: PrimitiveSpawner, Assembly-CSharp
+        m_MethodName: OnSpawnButtonRelease
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1961907484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5987,14 +6177,46 @@ MonoBehaviour:
     m_Id: d416f9e2-d80a-4c5f-b99b-6e7d36df02de
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: ec9fee49-311a-4690-86a2-13c3ab8a1ff2
+      m_Path: <XRController>{LeftHand}/gripPressed
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1961907484}
+        m_TargetAssemblyTypeName: PrimitiveSpawner, Assembly-CSharp
+        m_MethodName: SpawnMesh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1961907484}
+        m_TargetAssemblyTypeName: PrimitiveSpawner, Assembly-CSharp
+        m_MethodName: OnSpawnButtonRelease
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1961907486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6014,11 +6236,31 @@ MonoBehaviour:
     m_Id: a727e1dd-8936-474e-be7e-c033a3e8103d
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: d45c3e39-b749-45d3-8cbb-7497a1917712
+      m_Path: <XRController>{RightHand}/primaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1961907484}
+        m_TargetAssemblyTypeName: PrimitiveSpawner, Assembly-CSharp
+        m_MethodName: ExitMeshSpawningMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -6041,11 +6283,31 @@ MonoBehaviour:
     m_Id: c0c9d0cd-26fb-4c95-94af-a9c151f6f4a6
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 0f686686-924c-4599-ae38-921289930362
+      m_Path: <XRController>{LeftHand}/primaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1961907484}
+        m_TargetAssemblyTypeName: PrimitiveSpawner, Assembly-CSharp
+        m_MethodName: ExitMeshSpawningMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -6289,6 +6551,54 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 836ada3d5c8ec63438a88f707ca94c24, type: 3}
+--- !u!1 &2029801442 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3296437958450568961, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 7068762447081937015}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2029801444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029801442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d1f9507f7ee2d546a7e99287a96b4db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rayInteractor: {fileID: 0}
+  aName: 
+--- !u!114 &2029801445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029801442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 652d58365648c5640b58289d5aeda57c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rayInteractor: {fileID: 0}
+--- !u!114 &2029801446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029801442}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5a5e517df2a6e4285550afcf930f87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursor: {fileID: 0}
+  rfgv: {fileID: 126496378}
+  ObjectName: 
 --- !u!1 &2093928159
 GameObject:
   m_ObjectHideFlags: 0
@@ -6457,6 +6767,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1707694649}
     m_Modifications:
+    - target: {fileID: 2047592062717236549, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4320888274098329819, guid: 4047cf70b4dcd4431bc65db562b2bd93,
         type: 3}
       propertyPath: m_Name
@@ -6512,11 +6827,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6530237703929467276, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4047cf70b4dcd4431bc65db562b2bd93, type: 3}
+--- !u!20 &3390102547864423138 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6925687871038521228, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+    type: 3}
+  m_PrefabInstance: {fileID: 3390102547864423137}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7068762447081937015
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7288,6 +7614,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 7068762447081937021}
+    - targetCorrespondingSourceObject: {fileID: 3296437958450568961, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2029801446}
+    - targetCorrespondingSourceObject: {fileID: 3296437958450568961, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2029801445}
+    - targetCorrespondingSourceObject: {fileID: 3296437958450568961, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2029801444}
   m_SourcePrefab: {fileID: 100100000, guid: 2fb578800afc87244b5ba3a0fbbd11c0, type: 3}
 --- !u!4 &7068762447081937016 stripped
 Transform:

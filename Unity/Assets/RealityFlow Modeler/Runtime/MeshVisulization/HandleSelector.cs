@@ -31,8 +31,16 @@ public class HandleSelector : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("Left Controller");
-        rightHand = GameObject.Find("Right Controller");
+        if(rightHand == null) {
+            rightHand = GameObject.Find("Right Controller");
+        }
+        // Debug.Log(rightHand);
+        if(leftHand == null) {
+            leftHand = GameObject.Find("Left Controller");
+        }
+        // leftHand = GameObject.Find("Left Controller");
+        // rightHand = GameObject.Find("Right Controller");
+        Debug.Log(rightHand);
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         handles = new List<Handle>();
