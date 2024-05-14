@@ -32,11 +32,11 @@ public class HandleSelector : MonoBehaviour
     {
         currentHitResult = new RaycastHit();
         if(rightHand == null) {
-            rightHand = GameObject.Find("Right Controller");
+            rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/Right Controller");
         }
         // Debug.Log(rightHand);
         if(leftHand == null) {
-            leftHand = GameObject.Find("Left Controller");
+            leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/Left Controller");
         }
         // leftHand = GameObject.Find("Left Controller");
         // rightHand = GameObject.Find("Right Controller");

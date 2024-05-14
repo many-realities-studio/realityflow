@@ -277,9 +277,10 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     {
         parentConstraint = gameObject.GetComponent<ParentConstraint>();
         Ubiq.Avatars.Avatar[] avatars = context.Scene.GetComponentsInChildren<Ubiq.Avatars.Avatar>();
-
+        
         // Initialize which hand the palette owner has for their dominant (default is right hand)
         gameObject.GetComponent<PaletteHandManager>().UpdateHand(context, parentConstraint, avatars);
+        
     }
     
     // Update is called once per frame

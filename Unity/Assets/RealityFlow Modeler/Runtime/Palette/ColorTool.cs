@@ -29,8 +29,8 @@ public class ColorTool : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("Left Controller");
-        rightHand = GameObject.Find("Right Controller");
+        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/Left Controller");
+        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/Right Controller");
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (rayInteractor == null)

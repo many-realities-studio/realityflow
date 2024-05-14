@@ -545,7 +545,6 @@ Transform:
   - {fileID: 7420632398332342324}
   - {fileID: 3953850089666829438}
   - {fileID: 3411550053142886305}
-  - {fileID: 2634045935212462244}
   - {fileID: 6925687870916426255}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2005,6 +2004,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5906567483703904329}
+    - targetCorrespondingSourceObject: {fileID: 5225623427108127623, guid: 7c2aad014a22e4d5db741ef7fcef0657,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2634045935212462244}
     - targetCorrespondingSourceObject: {fileID: 5225623428732845071, guid: 7c2aad014a22e4d5db741ef7fcef0657,
         type: 3}
       insertIndex: -1
@@ -2037,6 +2040,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5225623427108127621, guid: 7c2aad014a22e4d5db741ef7fcef0657,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 4519180196487495452}
+    - targetCorrespondingSourceObject: {fileID: 5225623427108127621, guid: 7c2aad014a22e4d5db741ef7fcef0657,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 3289677427648506637}
     - targetCorrespondingSourceObject: {fileID: 5225623427108127621, guid: 7c2aad014a22e4d5db741ef7fcef0657,
         type: 3}
@@ -2053,6 +2060,23 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2925607746689120648}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4519180196487495452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6925687870916426253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Camera: {fileID: 6925687871038521228}
+  m_OriginBaseGameObject: {fileID: 6925687870916426253}
+  m_CameraFloorOffsetObject: {fileID: 6925687871434999174}
+  m_RequestedTrackingOriginMode: 0
+  m_CameraYOffset: 1.36144
 --- !u!143 &3289677427648506637
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2092,8 +2116,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LocomotionProvider: {fileID: 5066208592182362465}
-  m_MinHeight: 1
-  m_MaxHeight: 2
+  m_MinHeight: 0
+  m_MaxHeight: Infinity
 --- !u!114 &7396930831158499407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,9 +2152,21 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2925607746689120648}
   m_PrefabAsset: {fileID: 0}
+--- !u!20 &6925687871038521228 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5225623429141644804, guid: 7c2aad014a22e4d5db741ef7fcef0657,
+    type: 3}
+  m_PrefabInstance: {fileID: 2925607746689120648}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6925687871038521229 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5225623429141644805, guid: 7c2aad014a22e4d5db741ef7fcef0657,
+    type: 3}
+  m_PrefabInstance: {fileID: 2925607746689120648}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6925687871434999174 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5225623428732845070, guid: 7c2aad014a22e4d5db741ef7fcef0657,
     type: 3}
   m_PrefabInstance: {fileID: 2925607746689120648}
   m_PrefabAsset: {fileID: 0}
@@ -2348,6 +2384,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Teleport Interactor
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761784063978902507, guid: c1800acf6366418a9b5f610249000331,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3448426214904589657, guid: c1800acf6366418a9b5f610249000331,
         type: 3}
@@ -2747,7 +2788,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 5479181506340991470}
+    m_TransformParent: {fileID: 6925687870916426255}
     m_Modifications:
     - target: {fileID: 5518282352369811398, guid: 8dfcedc24fed74f5ba31e2a2d230b7e4,
         type: 3}
@@ -3321,6 +3362,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Teleport Interactor
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761784063978902507, guid: c1800acf6366418a9b5f610249000331,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -375,9 +375,9 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 71166716}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &100807865 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3073775169810437857, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+--- !u!4 &100807869 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 731397985007929543, guid: 4047cf70b4dcd4431bc65db562b2bd93,
     type: 3}
   m_PrefabInstance: {fileID: 3390102547864423137}
   m_PrefabAsset: {fileID: 0}
@@ -749,12 +749,12 @@ PrefabInstance:
         type: 3}
       propertyPath: leftHand
       value: 
-      objectReference: {fileID: 100807865}
+      objectReference: {fileID: 0}
     - target: {fileID: 2973263019367995782, guid: 221cbe5979eef114ab214afcd9ebf51e,
         type: 3}
       propertyPath: rightHand
       value: 
-      objectReference: {fileID: 1878384108}
+      objectReference: {fileID: 0}
     - target: {fileID: 2973263019367995782, guid: 221cbe5979eef114ab214afcd9ebf51e,
         type: 3}
       propertyPath: gizmoContainer
@@ -801,12 +801,6 @@ Transform:
 --- !u!1 &292622217 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1136083825881946880, guid: 4047cf70b4dcd4431bc65db562b2bd93,
-    type: 3}
-  m_PrefabInstance: {fileID: 3390102547864423137}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &292622219 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1136083825881946881, guid: 4047cf70b4dcd4431bc65db562b2bd93,
     type: 3}
   m_PrefabInstance: {fileID: 3390102547864423137}
   m_PrefabAsset: {fileID: 0}
@@ -4836,7 +4830,7 @@ MonoBehaviour:
   OnPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 999065842}
+      - m_Target: {fileID: 382438890}
         m_TargetAssemblyTypeName: Ubiq.Samples.SocialMenu, Ubiq
         m_MethodName: Request
         m_Mode: 1
@@ -5975,12 +5969,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 3390102547864423137}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1729760641 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8960695553428289839, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+--- !u!114 &1771366318 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4519180196487495452, guid: 4047cf70b4dcd4431bc65db562b2bd93,
     type: 3}
   m_PrefabInstance: {fileID: 3390102547864423137}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0cb9aa70a22847b5925ee5f067c10a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1794352569 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4323569361081881972, guid: 4047cf70b4dcd4431bc65db562b2bd93,
@@ -5993,9 +5993,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85416945309f8244a5715a2ec5c254f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1878384108 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8186168544659291679, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+--- !u!4 &1878384112 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1233451976215030466, guid: 4047cf70b4dcd4431bc65db562b2bd93,
     type: 3}
   m_PrefabInstance: {fileID: 3390102547864423137}
   m_PrefabAsset: {fileID: 0}
@@ -6619,7 +6619,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2093928160
 Transform:
   m_ObjectHideFlags: 0
@@ -6642,23 +6642,51 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2093928159}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   action:
-    m_Name: 
+    m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: b8b3bfc8-3694-4683-a460-79b29f5ad476
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 73a3525f-5576-47c2-bb60-9959eb6daa82
+      m_Path: <XRController>{RightHand}/secondaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    - m_Name: 
+      m_Id: c9cc6ee6-9122-4ce8-8e68-157923da6820
+      m_Path: <Keyboard>/#(E)
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2093928162}
+        m_TargetAssemblyTypeName: SerializeMesh, Assembly-CSharp
+        m_MethodName: ExportMesh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -6683,23 +6711,51 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2093928159}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   action:
-    m_Name: 
+    m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 3f435876-81dc-4be9-a410-709bc532b0e1
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 754c60e0-6ff9-492d-a5fb-0c2510f1a5e3
+      m_Path: <XRController>{LeftHand}/secondaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 1d750ac4-b19d-4993-bcad-1488e9fe485a
+      m_Path: <Keyboard>/#(Q)
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
     m_Flags: 0
   OnPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2093928162}
+        m_TargetAssemblyTypeName: SerializeMesh, Assembly-CSharp
+        m_MethodName: ImportMesh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -6767,16 +6823,31 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1707694649}
     m_Modifications:
-    - target: {fileID: 2047592062717236549, guid: 4047cf70b4dcd4431bc65db562b2bd93,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4320888274098329819, guid: 4047cf70b4dcd4431bc65db562b2bd93,
         type: 3}
       propertyPath: m_Name
       value: MRTK Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5066208592182362465, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_ForwardSource
+      value: 
+      objectReference: {fileID: 180340420}
+    - target: {fileID: 5066208592182362465, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_HeadTransform
+      value: 
+      objectReference: {fileID: 180340420}
+    - target: {fileID: 5066208592182362465, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_LeftControllerTransform
+      value: 
+      objectReference: {fileID: 100807869}
+    - target: {fileID: 5066208592182362465, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_RightControllerTransform
+      value: 
+      objectReference: {fileID: 1878384112}
     - target: {fileID: 5479181506340991470, guid: 4047cf70b4dcd4431bc65db562b2bd93,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6827,11 +6898,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6530237703929467276, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+    - target: {fileID: 5944041098942333215, guid: 4047cf70b4dcd4431bc65db562b2bd93,
         type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
+      propertyPath: m_XROrigin
+      value: 
+      objectReference: {fileID: 1771366318}
+    - target: {fileID: 6365899547744555937, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_ControllerTransform
+      value: 
+      objectReference: {fileID: 100807869}
+    - target: {fileID: 8991265833038587478, guid: 4047cf70b4dcd4431bc65db562b2bd93,
+        type: 3}
+      propertyPath: m_ControllerTransform
+      value: 
+      objectReference: {fileID: 1878384112}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7645,7 +7726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48821abc6a7ccc049b804ef58f229199, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hintTransform: {fileID: 1729760641}
+  hintTransform: {fileID: 1878384112}
 --- !u!114 &7068762447081937022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7658,7 +7739,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48821abc6a7ccc049b804ef58f229199, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hintTransform: {fileID: 292622219}
+  hintTransform: {fileID: 100807869}
 --- !u!114 &7068762447081937023
 MonoBehaviour:
   m_ObjectHideFlags: 0
