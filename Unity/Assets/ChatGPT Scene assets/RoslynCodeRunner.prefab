@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8166159768438159200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4882875601001048474}
+  - component: {fileID: 4696085411123563326}
+  m_Layer: 0
+  m_Name: RoslynCodeRunner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4882875601001048474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8166159768438159200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.58444065, y: 2.3232894, z: 11.963817}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4696085411123563326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8166159768438159200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b81a52262b187c469f1a69739384298, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  namespaces:
+  - System
+  - UnityEngine
+  - StarterAssets
+  - InputSystem
+  - System.Collections
+  codeExecutionGameObjectName: ChatGPTTester
+  code: "using UnityEngine;\r\nusing System.Collections;\r\nusing StarterAssets;
+    \r\n\r\npublic class LoadPlayerArmature : MonoBehaviour\r\n{\r\n    private void
+    Start()\r\n    {\r\n        StartCoroutine(LoadPlayerArmatureCoroutine());\r\n   
+    }\r\n\r\n    private IEnumerator LoadPlayerArmatureCoroutine()\r\n    {\r\n       
+    while (true)\r\n        {\r\n            yield return new WaitForSeconds(0.5f);\r\n\r\n           
+    GameObject playerArmaturePrefab = Resources.Load<GameObject>(\"PlayerArmature\");\r\n           
+    GameObject playerArmatureInstance = Instantiate(playerArmaturePrefab);\r\n\r\n           
+    StarterAssetsInputs starterInputs = playerArmatureInstance.GetComponent<StarterAssetsInputs>();\r\n\r\n           
+    starterInputs.move = new Vector2(1.0f, 0);\r\n            starterInputs.jump
+    = true;\r\n        }\r\n    }\r\n}"
+  OnRunCodeCompleted:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+        m_MethodName: LogInfo
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: RunCode completed correctly...
+          m_BoolArgument: 0
+        m_CallState: 2
+  resultVars: []
+  resultInfo: 
+  assemblyReferences:
+  - {fileID: 11400000, guid: fe24fc97048e2974787cc8d5328fa171, type: 2}
+  - {fileID: 11400000, guid: a1c9628d65ee91440a328850888fb21e, type: 2}
+  - {fileID: 11400000, guid: 93cd16b8945e2b74cb3101170cee91dd, type: 2}
+  - {fileID: 11400000, guid: eee75363a127d4e43acec7a183e8ba84, type: 2}
+  - {fileID: 11400000, guid: e63cdc2c805fed14bae675aa110aea61, type: 2}
+  - {fileID: 11400000, guid: 7c28bb738560b684589ba03a1c68a118, type: 2}

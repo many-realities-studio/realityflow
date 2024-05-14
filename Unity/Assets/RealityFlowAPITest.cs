@@ -8,7 +8,7 @@ public class RealityFlowAPITest : MonoBehaviour
     void Start()
     {
         // Spawn a test object
-        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject("Ladder", Vector3.zero, Quaternion.identity,RealityFlowAPI.SpawnScope.Peer);
+        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject("Ladder", Vector3.zero, Quaternion.identity,RealityFlowAPI.SpawnScope.Room);
         if (spawnedObject != null)
         {
             Debug.Log("Successfully spawned: " + spawnedObject.name);
