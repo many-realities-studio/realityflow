@@ -26,6 +26,6 @@ MonoBehaviour:
     int rhs = ctx.GetInput<float>(1);
 
     ctx.SetOutput(0,
-    lhs + rhs);'
+    lhs - rhs);'
   ExecutionInput: 0
   ExecutionOutputs: []
