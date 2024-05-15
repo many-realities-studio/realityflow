@@ -27,10 +27,10 @@ public class PaletteHandManager : MonoBehaviour
     void Awake()
     {   
         paletteManager = GameObject.Find("Network Scene/Palette Manager");
-        leftHandRay = GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Left Controller/Ray Interactor");
-        leftHandPokeInteractor = GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Left Controller/Poke Interactor");
-        rightHandRay = GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Right Controller/Ray Interactor");
-        rightHandPokeInteractor = GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Right Controller/Poke Interactor");
+        leftHandRay = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor");
+        leftHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor");
+        rightHandRay = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Ray Interactor");
+        rightHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Poke Interactor");
     }
 
     public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars)
@@ -75,8 +75,8 @@ public class PaletteHandManager : MonoBehaviour
                     leftHandRay.SetActive(true);
                     leftHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Right Controller/Ray Interactor"),
-                                    GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Right Controller/Poke Interactor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Ray Interactor"),
+                                    GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Poke Interactor")));
                 }
                 else if (!isLeftHandDominant.IsToggled)
                 {
@@ -92,8 +92,8 @@ public class PaletteHandManager : MonoBehaviour
                     rightHandRay.SetActive(true);
                     rightHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Left Controller/Ray Interactor"),
-                                    GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/Left Controller/Poke Interactor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("MRTK Player/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor"),
+                                    GameObject.Find("MRTK Player/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor")));
                 }
 
                 // By default, parent constraint is set to false in the inspector. Turn it on only for the client. If parent

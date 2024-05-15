@@ -26,8 +26,8 @@ public class EraserTool : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/Left Controller");
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/Right Controller");
+        leftHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Left Controller");
+        rightHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller");
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (rayInteractor == null)

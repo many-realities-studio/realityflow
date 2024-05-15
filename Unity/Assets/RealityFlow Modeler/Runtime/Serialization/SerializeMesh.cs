@@ -42,7 +42,7 @@ public class SerializeMesh : MonoBehaviour//, IRealityFlowObject
     {
         //ProjectContentManager.instance.projectLoad.AddListener(ImportMesh);
 
-        interactor = GameObject.Find("MRTK XR Rig/Camera Offset/Right Controller").GetComponentInChildren<XRRayInteractor>();
+        interactor = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller").GetComponentInChildren<XRRayInteractor>();
         lookingAtObject = false;
     }
 

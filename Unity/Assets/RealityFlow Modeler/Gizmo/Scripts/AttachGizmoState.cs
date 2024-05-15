@@ -46,12 +46,12 @@ public class AttachGizmoState : MonoBehaviour
         attachedGameObject = null;
         lookForTarget = false;
         if(rightHand == null) {
-            rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/Right Controller");
+            rightHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller");
         }
         //Debug.Log("AttachGizmoState righthand set to" + rightHand);
-        //Debug.Log(GameObject.Find("MRTK XR Rig/Camera Offset/Right Controller"));
+        //Debug.Log(GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller"));
         if(leftHand == null) {
-            leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/Left Controller");
+            leftHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Left Controller");
         }
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
