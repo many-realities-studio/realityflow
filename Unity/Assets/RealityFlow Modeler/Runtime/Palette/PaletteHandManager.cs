@@ -92,8 +92,8 @@ public class PaletteHandManager : MonoBehaviour
                     rightHandRay.SetActive(true);
                     rightHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("MRTK Player/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor"),
-                                    GameObject.Find("MRTK Player/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor"),
+                                    GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor")));
                 }
 
                 // By default, parent constraint is set to false in the inspector. Turn it on only for the client. If parent
