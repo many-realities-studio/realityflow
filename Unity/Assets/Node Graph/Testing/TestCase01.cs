@@ -10,14 +10,15 @@ namespace RealityFlow.NodeGraph.Testing
         public NodeDefinition Integer;
         public NodeDefinition Print;
 
+        NodeIndex start;
+
         public Graph ConstructGraph()
         {
             Graph graph = new();
-            Node onInteract = new(OnInteract);
-            Node start = graph.AddRoot(onInteract);
-            Node print = new(Print);
+            start = graph.AddNode(OnInteract);
+            NodeIndex print = graph.AddNode(Print);
             graph.AddExecutionEdge(start, 0, print);
-            Node twelve = new(Integer);
+            NodeIndex twelve = graph.AddNode(Integer);
             graph.AddEdge(twelve, 0, print, 0);
 
             return graph;
@@ -26,7 +27,7 @@ namespace RealityFlow.NodeGraph.Testing
         public void Start()
         {
             Graph graph = ConstructGraph();
-            graph.EvaluateRoot(0);
+            graph.EvaluateFromRoot(start);
 
             string json = JsonUtility.ToJson(graph, true);
             Debug.Log(json);

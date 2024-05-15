@@ -4,15 +4,18 @@ using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
-    public class Graph 
+    public class Graph
     {
-        [SerializeField]
-        List<SerRef<Node>> Roots = new();
         /// <summary>
-        /// Forward data (non-execution) edges (output -> input)
+        /// The arena of nodes in this graph.
         /// </summary>
         [SerializeField]
-        SerializableDict<PortIndex, PortIndex> Edges = new();
+        Arena<Node> Nodes = new();
+        // /// <summary>
+        // /// Forward data (non-execution) edges (output -> input)
+        // /// </summary>
+        // [SerializeField]
+        // SerializableDict<PortIndex, PortIndex> Edges = new();
         /// <summary>
         /// Backwards data (non-execution) edges (input -> output)
         /// </summary>
@@ -22,27 +25,64 @@ namespace RealityFlow.NodeGraph
         /// Forward execution edges (output -> input)
         /// </summary>
         [SerializeField]
-        MultiValueDictionary<PortIndex, Node> ExecutionEdges = new();
+        MultiValueDictionary<PortIndex, NodeIndex> ExecutionEdges = new();
+        /// <summary>
+        /// Input ports, usually only present in subgraphs (such as within a for loop node)
+        /// </summary>
+        [SerializeField]
+        List<NodeValueType> InputPorts = new();
+        /// <summary>
+        /// Output ports, usually only present in subgraphs (such as within a for loop node)
+        /// </summary>
+        [SerializeField]
+        List<NodeValueType> OutputPorts = new();
+        /// <summary>
+        /// Edges between a node and the graph's input ports.
+        /// </summary>
+        [SerializeField]
+        SerializableDict<PortIndex, int> ReverseInputPortEdges = new();
+        /// <summary>
+        /// Edges between a node and the graph's output ports.
+        /// </summary>
+        [SerializeField]
+        SerializableDict<int, PortIndex> ReverseOutputPortEdges = new();
 
-        public void EvaluateRoot(int root)
+        /// <summary>
+        /// Nodes that don't have an incoming execution port and have at least one outgoing
+        /// execution port. Synced with Nodes automatically based on Node definitions.
+        /// </summary>
+        List<NodeIndex> Roots = new();
+
+        public void EvaluateFromRoot(NodeIndex root)
         {
             EvalContext ctx = new(this);
-            ctx.EvaluateNode(Roots[root]);
+            ctx.EvaluateNode(root);
         }
 
-        public Node AddRoot(Node root)
+        public NodeIndex AddNode(NodeDefinition definition)
         {
-            Roots.Add(root);
-            return root;
+            Node node = new(definition);
+            NodeIndex index = Nodes.Add(node);
+            return index;
         }
 
-        public void AddEdge(Node from, int fromPort, Node to, int toPort)
+        public bool RemoveNode(NodeIndex index)
         {
-            Edges.Add(new(from, fromPort), new(to, toPort));
+            return Nodes.Remove(index);
+        }
+
+        public Node GetNode(NodeIndex index)
+        {
+            return Nodes[index];
+        }
+
+        public void AddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
+        {
+            // Edges.Add(new(from, fromPort), new(to, toPort));
             ReverseEdges.Add(new(to, toPort), new(from, fromPort));
         }
 
-        public void AddExecutionEdge(Node from, int fromPort, Node to)
+        public void AddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
         {
             ExecutionEdges.Add(new(from, fromPort), to);
         }
@@ -50,10 +90,10 @@ namespace RealityFlow.NodeGraph
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)
             => ReverseEdges.TryGetValue(inputPort, out outputPort);
 
-        public bool TryGetInputPortOf(PortIndex outputPort, out PortIndex inputPort)
-            => Edges.TryGetValue(outputPort, out inputPort);
+        // public bool TryGetInputPortOf(PortIndex outputPort, out PortIndex inputPort)
+        //     => Edges.TryGetValue(outputPort, out inputPort);
 
-        public List<Node> GetExecutionInputPortsOf(PortIndex outputPort)
+        public List<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => ExecutionEdges[outputPort];
     }
 }

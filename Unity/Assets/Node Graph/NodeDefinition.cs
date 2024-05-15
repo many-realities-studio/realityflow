@@ -15,6 +15,7 @@ namespace RealityFlow.NodeGraph
     public class NodeDefinition : ScriptableObject
     {
         public string Name => name;
+        public List<NodeValueType> Fields;
         public List<NodePortDefinition> Inputs;
         public List<NodePortDefinition> Outputs;
         public string EvaluationMethod;

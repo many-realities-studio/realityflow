@@ -7,8 +7,10 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public class Node
     {
-        public readonly NodeDefinition Definition;
+        public NodeDefinition Definition;
 
+        [SerializeField]
+        List<object> FieldValues = new();
         [SerializeField]
         List<InputNodePort> Inputs = new();
         [SerializeField]

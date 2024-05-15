@@ -7,8 +7,8 @@ namespace RealityFlow.NodeGraph
     public class EvalContext
     {
         public Graph graph;
-        readonly Queue<Node> nodeQueue = new();
-        readonly Stack<Node> nodeStack = new();
+        readonly Queue<NodeIndex> nodeQueue = new();
+        readonly Stack<NodeIndex> nodeStack = new();
         readonly Dictionary<PortIndex, object> valueCache = new();
 
         public EvalContext(Graph graph)
@@ -18,14 +18,14 @@ namespace RealityFlow.NodeGraph
 
         public T GetInput<T>(int port)
         {
-            Node node = nodeStack.Peek();
+            NodeIndex node = nodeStack.Peek();
             PortIndex input = new(node, port);
             object value;
             if (graph.TryGetOutputPortOf(input, out var outputPort))
             {
                 if (valueCache.TryGetValue(outputPort, out value))
                 { }
-                else if (outputPort.Node.Definition.IsPure)
+                else if (outputPort.GetNode(graph).Definition.IsPure)
                 {
                     EvaluateNode(outputPort.Node);
                     value = valueCache[outputPort];
@@ -34,7 +34,7 @@ namespace RealityFlow.NodeGraph
                     throw new InvalidDataFlowException();
             }
             else
-                value = input.AsInput.ConstantValue;
+                value = input.AsInput(graph).ConstantValue;
 
             if (value is T typedVal)
                 return typedVal;
@@ -44,21 +44,21 @@ namespace RealityFlow.NodeGraph
 
         public void SetOutput<T>(int port, T value)
         {
-            Node node = nodeStack.Peek();
+            NodeIndex node = nodeStack.Peek();
             valueCache[new(node, port)] = value;
         }
 
         public void ExecuteTargetsOfPort(int port)
         {
-            Node node = nodeStack.Peek();
-            List<Node> nodes = graph.GetExecutionInputPortsOf(new(node, port));
+            NodeIndex node = nodeStack.Peek();
+            List<NodeIndex> nodes = graph.GetExecutionInputPortsOf(new(node, port));
             for (int i = 0; i < nodes.Count; i++)
                 EvaluateNode(nodes[i]);
         }
 
-        public void EvaluateNode(Node node)
+        public void EvaluateNode(NodeIndex node)
         {
-            Action<EvalContext> evaluate = node.Definition.GetEvaluation();
+            Action<EvalContext> evaluate = graph.GetNode(node).Definition.GetEvaluation();
             if (evaluate is not null)
             {
                 nodeStack.Push(node);

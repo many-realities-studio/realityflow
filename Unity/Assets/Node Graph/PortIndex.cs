@@ -6,17 +6,17 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public struct PortIndex
     {
-        [SerializeReference]
-        public Node Node;
+        public NodeIndex Node;
         public int Port;
 
-        public readonly InputNodePort AsInput => Node.GetInput(Port);
-        public readonly OutputNodePort AsOutput => Node.GetOutput(Port);
-
-        public PortIndex(Node node, int port)
+        public PortIndex(NodeIndex node, int port)
         {
             Node = node;
             Port = port;
         }
+
+        public Node GetNode(Graph graph) => graph.GetNode(Node);
+
+        public InputNodePort AsInput(Graph graph) => GetNode(graph).GetInput(Port);
     }
 }
