@@ -68,6 +68,11 @@ public class RealityFlowAPIEditor : Editor
                 Debug.LogError("prefab not found at " + path);
             }
         }
+        if (GUILayout.Button("Undo Last Action"))
+        {
+            realityFlowAPI.UndoLastAction();
+            Debug.Log("Undid last action.");
+        }
 
         // Button to test adding an in-scene game object to the catalogue
         if (GUILayout.Button("Add In-Scene GameObject to Catalogue"))

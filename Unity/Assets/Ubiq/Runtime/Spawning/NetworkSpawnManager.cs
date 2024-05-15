@@ -362,6 +362,8 @@ namespace Ubiq.Spawning
             Debug.Assert(i >= 0, $"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
             return i;
         }*/
+
+        //This function was edited by RealityFlow the commented out function above was the original
         private int ResolveIndex(GameObject gameObject)
         {
 
@@ -529,6 +531,16 @@ namespace Ubiq.Spawning
                 return spawner.GetSpawnedForPeers();
             }
             return null;
+        }
+
+        public void UpdatePeerPublic(IPeer peer)
+        {
+            //spawner.UpdatePeer(peer);
+        }
+
+        public void UpdateRoomPublic(IRoom room)
+        {
+            //spawner.UpdateRoom(room);
         }
     }
 

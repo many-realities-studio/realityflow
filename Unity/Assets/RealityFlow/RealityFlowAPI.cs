@@ -1,14 +1,16 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
-using System.Collections;
 using System;
 using UnityEditor;
 
 public class RealityFlowAPI : MonoBehaviour
 {
     private NetworkSpawnManager spawnManager;
+    private ActionLogger actionLogger = new ActionLogger();
 
     // Singleton instance
     private static RealityFlowAPI _instance;
@@ -69,11 +71,8 @@ public class RealityFlowAPI : MonoBehaviour
 
     public GameObject SpawnObject(string prefabName, Vector3 position, Quaternion rotation = default, SpawnScope scope = SpawnScope.Room)
     {
-        //Debug.Log($"Attempting to spawn {prefabName}");
-        //GameObject newObject = spawnManager.catalogue.prefabs[index of ignore case prefabName ]
         GameObject newObject = spawnManager.catalogue.prefabs.Find(prefab => prefab.name.Equals(prefabName, StringComparison.OrdinalIgnoreCase));
-        GameObject prefab = GetPrefabByName(prefabName);
-        if (prefab == null)
+        if (newObject == null)
         {
             Debug.LogError($"Prefab not found: {prefabName}");
             return null;
@@ -82,17 +81,19 @@ public class RealityFlowAPI : MonoBehaviour
         switch (scope)
         {
             case SpawnScope.Room:
-                spawnManager.SpawnWithRoomScope(newObject);  // Ensure this method is correctly implemented in NetworkSpawnManager
+                spawnManager.SpawnWithRoomScope(newObject);
                 Debug.Log("Spawned with Room Scope");
                 break;
             case SpawnScope.Peer:
-                spawnManager.SpawnWithPeerScope(newObject);  // Ensure this method is correctly implemented in NetworkSpawnManager
+                spawnManager.SpawnWithPeerScope(newObject);
                 Debug.Log("Spawned with Peer Scope");
                 break;
             default:
                 Debug.LogError("Unknown spawn scope");
                 break;
         }
+
+        actionLogger.LogAction(nameof(SpawnObject), prefabName, position, rotation, scope);
         return newObject;
     }
 
@@ -101,6 +102,7 @@ public class RealityFlowAPI : MonoBehaviour
         if (objectToDespawn != null)
         {
             spawnManager.Despawn(objectToDespawn);
+            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn);
             Debug.Log("Despawned: " + objectToDespawn.name);
         }
         else
@@ -151,9 +153,9 @@ public class RealityFlowAPI : MonoBehaviour
             obj.transform.position = position;
             obj.transform.rotation = rotation;
             obj.transform.localScale = scale;
-
-            // Send the updated transform to the network
-            //spawnManager.roomClient.OnRoomUpdated.Invoke(spawnManager.roomClient.Room);
+            spawnManager.roomClient.OnRoomUpdated.Invoke(spawnManager.roomClient.Room);
+            //spawnManager.roomClient.OnPeerUpdated.Invoke(spawnManager.roomClient.Room);
+            actionLogger.LogAction(nameof(UpdateObjectTransform), objectName, position, rotation, scale);
         }
         else
         {
@@ -161,7 +163,6 @@ public class RealityFlowAPI : MonoBehaviour
         }
     }
 
-    // This method is now for runtime additions that persist after the session ends
     public void AddPrefabToCatalogue(GameObject prefab)
     {
         if (spawnManager != null && spawnManager.catalogue != null)
@@ -211,5 +212,35 @@ public class RealityFlowAPI : MonoBehaviour
         AssetDatabase.Refresh();
         Debug.Log("Catalogue saved.");
 #endif
+    }
+
+    public void UndoLastAction()
+    {
+        var lastAction = actionLogger.GetLastAction();
+        if (lastAction == null) return;
+
+        switch (lastAction.FunctionName)
+        {
+            case nameof(SpawnObject):
+                string prefabName = (string)lastAction.Parameters[0];
+                GameObject spawnedObject = FindSpawnedObject(prefabName);
+                DespawnObject(spawnedObject);
+                break;
+
+            case nameof(DespawnObject):
+                GameObject obj = (GameObject)lastAction.Parameters[0];
+                SpawnObject(obj.name, obj.transform.position, obj.transform.rotation, SpawnScope.Peer);
+                break;
+
+            case nameof(UpdateObjectTransform):
+                string objName = (string)lastAction.Parameters[0];
+                Vector3 oldPosition = (Vector3)lastAction.Parameters[1];
+                Quaternion oldRotation = (Quaternion)lastAction.Parameters[2];
+                Vector3 oldScale = (Vector3)lastAction.Parameters[3];
+                UpdateObjectTransform(objName, oldPosition, oldRotation, oldScale);
+                break;
+
+                // Add cases for other functions...
+        }
     }
 }
