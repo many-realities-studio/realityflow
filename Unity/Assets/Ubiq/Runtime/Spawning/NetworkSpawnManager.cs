@@ -210,40 +210,47 @@ namespace Ubiq.Spawning
                 spawnedForPeers.Remove(peer);
             }
         }
-
         public void Despawn(GameObject gameObject)
         {
+            Debug.Log("1. Inside the despawn function");
             string key = null;
             foreach (var kvp in spawnedForRoom)
             {
+                //kvp.Value.name = kvp.Value.name.Replace("(Clone)", "").Trim();
                 if (kvp.Value == gameObject)
                 {
                     key = kvp.Key;
                     break;
                 }
             }
+            Debug.Log("2");
 
             // For room scope objects, despawn when we hear back from server
             if (key != null)
             {
+                Debug.Log("3 key value is" + key);
                 roomClient.Room[key] = string.Empty;
                 return;
             }
-
+            Debug.Log("4");
             if (key == null && spawnedForPeers.TryGetValue(roomClient.Me, out var spawned))
             {
+                Debug.Log("Debug Log 4.5");
                 foreach (var kvp in spawned)
                 {
+                    Debug.Log("Debug Log 4.6, The Key value pair value is" + kvp.Value + "The gameObject" + gameObject.name);
                     if (kvp.Value == gameObject)
                     {
+                        Debug.Log("Debug Log 4.7");
                         key = kvp.Key;
                         break;
                     }
                 }
-
+                Debug.Log("5");
                 // For (local) peer scope objects, despawn immediately
                 if (key != null)
                 {
+                    Debug.Log("6 About to despawn peer scope object");
                     OnDespawned(gameObject, room: null, peer: roomClient.Me);
                     GameObject.Destroy(gameObject);
                     spawned.Remove(key);
@@ -252,6 +259,7 @@ namespace Ubiq.Spawning
                 }
             }
         }
+
 
         /// <summary>
         /// Spawn an entity with peer scope. All Components implementing the
@@ -264,13 +272,13 @@ namespace Ubiq.Spawning
         public GameObject SpawnWithPeerScope(GameObject gameObject)
         {
 
-            
-            var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
+
+            var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
             var catalogueIdx = ResolveIndex(gameObject);
-            
-            Debug.Log($"Catalogue count: {catalogue.prefabs.Count}");
-            Debug.Log($"Attempting to access index: {catalogueIdx}");
-            
+
+            //Debug.Log($"Catalogue count: {catalogue.prefabs.Count}");
+            //Debug.Log($"Attempting to access index: {catalogueIdx}");
+
             var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
             if (!spawnedForPeers.ContainsKey(roomClient.Me))
             {
@@ -298,13 +306,20 @@ namespace Ubiq.Spawning
         /// </summary>
         public void SpawnWithRoomScope(GameObject gameObject)
         {
-            var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
+            var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
             var catalogueIdx = ResolveIndex(gameObject);
+
+            var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
+            spawnedForRoom.Add(key, go);
+
             roomClient.Room[key] = JsonUtility.ToJson(new Message()
             {
                 creatorPeer = roomClient.Me.networkId,
                 catalogueIndex = catalogueIdx,
             });
+
+            OnSpawned(go, roomClient.Room, null, GetOrigin(local: true));
+
         }
 
         private static NetworkId ParseNetworkId(string key, string propertyPrefix)
@@ -336,7 +351,7 @@ namespace Ubiq.Spawning
             return go;
         }
 
-       
+
         /*private int ResolveIndex(GameObject gameObject)
         {
            for (int curr = 0; curr < catalogue.prefabs.Count; curr++){
@@ -347,26 +362,37 @@ namespace Ubiq.Spawning
             Debug.Assert(i >= 0, $"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
             return i;
         }*/
-        private int ResolveIndex(GameObject gameObject){
-            
-    // Debug log each prefab in the catalogue for verification
-    for (int curr = 0; curr < catalogue.prefabs.Count; curr++)
-    {
-        Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
-    }
-
-    // Find the index of the prefab by name
-    for (int i = 0; i < catalogue.prefabs.Count; i++)
-    {
-        if (catalogue.prefabs[i].name == gameObject.name)
+        private int ResolveIndex(GameObject gameObject)
         {
-            return i;
-        }
-    }
 
-    Debug.LogError($"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
-    return -1; // Return -1 if the prefab is not found
-}
+            // Debug log each prefab in the catalogue for verification
+            for (int curr = 0; curr < catalogue.prefabs.Count; curr++)
+            {
+                Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
+            }
+
+            // Find the index of the prefab by name
+            for (int i = 0; i < catalogue.prefabs.Count; i++)
+            {
+                if (catalogue.prefabs[i].name == gameObject.name)
+                {
+                    return i;
+                }
+            }
+
+            Debug.LogError($"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
+            return -1; // Return -1 if the prefab is not found
+        }
+
+        public Dictionary<string, GameObject> GetSpawnedForRoom()
+        {
+            return spawnedForRoom;
+        }
+
+        public Dictionary<IPeer, Dictionary<string, GameObject>> GetSpawnedForPeers()
+        {
+            return spawnedForPeers;
+        }
 
     }
 
@@ -411,7 +437,7 @@ namespace Ubiq.Spawning
             spawner = new NetworkSpawner(NetworkScene.Find(this), roomClient, catalogue);
             spawner.OnSpawned += Spawner_OnSpawned;
             spawner.OnDespawned += Spawner_OnDespawned;
-            
+
         }
 
         private void OnDestroy()
@@ -430,6 +456,7 @@ namespace Ubiq.Spawning
         /// only the local peer can set values in their own properties, the
         /// object is created and immediately accessible.
         /// </summary>
+
         public GameObject SpawnWithPeerScope(GameObject gameObject)
         {
             if (spawner != null)
@@ -455,7 +482,7 @@ namespace Ubiq.Spawning
             }
         }
 
-        public void Despawn (GameObject gameObject)
+        public void Despawn(GameObject gameObject)
         {
             if (spawner != null)
             {
@@ -485,5 +512,24 @@ namespace Ubiq.Spawning
             }
             return null;
         }
+
+        public Dictionary<string, GameObject> GetSpawnedForRoom()
+        {
+            if (spawner != null)
+            {
+                return spawner.GetSpawnedForRoom();
+            }
+            return null;
+        }
+
+        public Dictionary<IPeer, Dictionary<string, GameObject>> GetSpawnedForPeers()
+        {
+            if (spawner != null)
+            {
+                return spawner.GetSpawnedForPeers();
+            }
+            return null;
+        }
     }
+
 }
