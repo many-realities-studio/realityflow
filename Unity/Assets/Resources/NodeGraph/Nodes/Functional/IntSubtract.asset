@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
   m_Name: IntSubtract
   m_EditorClassIdentifier: 
+  Fields: []
   Inputs:
   - Name: 
     Type: 0
@@ -20,8 +21,9 @@ MonoBehaviour:
   Outputs:
   - Name: 
     Type: 0
-  EvaluationMethod: 
-  EvaluationCode: 'int lhs = ctx.GetInput<int>(0);
+  EvaluationMethod: 1
+  EvalLookup: 
+  EvalCode: 'int lhs = ctx.GetInput<int>(0);
 
     int rhs = ctx.GetInput<int>(1);
 

@@ -16,6 +16,16 @@ namespace RealityFlow.NodeGraph
             this.graph = graph;
         }
 
+        public T GetField<T>(int index)
+        {
+            NodeIndex nodeIndex = nodeStack.Peek();
+            Node node = graph.GetNode(nodeIndex);
+            if (node.TryGetField(index, out T field))
+                return field;
+
+            throw new InvalidCastException();
+        }
+
         public T GetInput<T>(int port)
         {
             NodeIndex node = nodeStack.Peek();

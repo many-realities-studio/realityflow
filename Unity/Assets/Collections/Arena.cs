@@ -11,7 +11,9 @@ namespace RealityFlow.Collections
     [Serializable]
     public class Arena<T>
     {
-        Dictionary<Index, T> list = new();
+        [SerializeField]
+        SerializableDict<Index, T> list = new();
+        [SerializeField]
         int nextIndex = 0;
 
         public T this[Index index] => list[index];
@@ -37,6 +39,7 @@ namespace RealityFlow.Collections
         [Serializable]
         public struct Index
         {
+            [SerializeField]
             int value;
 
             public Index(int index)

@@ -10,5 +10,8 @@ namespace RealityFlow.NodeGraph
         Vector2,
         Vector3,
         Quaternion,
+        Graph,
+        Bool,
+        Any,
     }
 }

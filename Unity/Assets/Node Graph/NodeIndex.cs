@@ -1,9 +1,13 @@
+using System;
 using RealityFlow.Collections;
+using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
+    [Serializable]
     public struct NodeIndex
     {
+        [SerializeField]
         Arena<Node>.Index index;
 
         public NodeIndex(Arena<Node>.Index index)

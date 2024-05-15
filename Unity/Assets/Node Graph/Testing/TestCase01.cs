@@ -19,6 +19,7 @@ namespace RealityFlow.NodeGraph.Testing
             NodeIndex print = graph.AddNode(Print);
             graph.AddExecutionEdge(start, 0, print);
             NodeIndex twelve = graph.AddNode(Integer);
+            graph.GetNode(twelve).TrySetField(0, 12);
             graph.AddEdge(twelve, 0, print, 0);
 
             return graph;

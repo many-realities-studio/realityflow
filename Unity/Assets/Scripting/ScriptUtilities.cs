@@ -94,7 +94,7 @@ namespace RealityFlow.Scripting
                     }} 
                 }}";
         }
-
+         
         /// <summary>
         /// Produces an Action from the body of a C# method. 
         /// If diagnostics is not null, adds any warnings/errors to it.

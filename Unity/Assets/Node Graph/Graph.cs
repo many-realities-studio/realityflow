@@ -1,16 +1,20 @@
+using System;
 using System.Collections.Generic;
 using RealityFlow.Collections;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
+    [Serializable]
     public class Graph
     {
         /// <summary>
         /// The arena of nodes in this graph.
         /// </summary>
         [SerializeField]
+        [HideInInspector]
         Arena<Node> Nodes = new();
+
         // /// <summary>
         // /// Forward data (non-execution) edges (output -> input)
         // /// </summary>
@@ -20,41 +24,58 @@ namespace RealityFlow.NodeGraph
         /// Backwards data (non-execution) edges (input -> output)
         /// </summary>
         [SerializeField]
+        [HideInInspector]
         SerializableDict<PortIndex, PortIndex> ReverseEdges = new();
+
         /// <summary>
         /// Forward execution edges (output -> input)
         /// </summary>
         [SerializeField]
+        [HideInInspector]
         MultiValueDictionary<PortIndex, NodeIndex> ExecutionEdges = new();
+
         /// <summary>
         /// Input ports, usually only present in subgraphs (such as within a for loop node)
         /// </summary>
         [SerializeField]
         List<NodeValueType> InputPorts = new();
+
         /// <summary>
         /// Output ports, usually only present in subgraphs (such as within a for loop node)
         /// </summary>
         [SerializeField]
         List<NodeValueType> OutputPorts = new();
-        /// <summary>
-        /// Edges between a node and the graph's input ports.
-        /// </summary>
-        [SerializeField]
-        SerializableDict<PortIndex, int> ReverseInputPortEdges = new();
-        /// <summary>
-        /// Edges between a node and the graph's output ports.
-        /// </summary>
-        [SerializeField]
-        SerializableDict<int, PortIndex> ReverseOutputPortEdges = new();
 
         /// <summary>
-        /// Nodes that don't have an incoming execution port and have at least one outgoing
-        /// execution port. Synced with Nodes automatically based on Node definitions.
+        /// Backwards edges between a node and the graph's input ports (node -> graph input).
         /// </summary>
-        List<NodeIndex> Roots = new();
+        [SerializeField]
+        [HideInInspector]
+        SerializableDict<PortIndex, int> ReverseInputPortEdges = new();
+
+        /// <summary>
+        /// Backwards dges between a node and the graph's output ports (graph output -> node).
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        SerializableDict<int, PortIndex> ReverseOutputPortEdges = new();
+
+        [SerializeField]
+        int ExecutionInputs;
+
+        /// <summary>
+        /// Execution edges from the inputs to the graph (ExecutionInputs) to nodes.
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        MultiValueDictionary<int, NodeIndex> InputExecutionEdges = new();
 
         public void EvaluateFromRoot(NodeIndex root)
         {
+            Node node = Nodes[root];
+            if (!node.Definition.IsRoot)
+                throw new ArgumentException("Tried to start evaluation from a non-root");
+
             EvalContext ctx = new(this);
             ctx.EvaluateNode(root);
         }

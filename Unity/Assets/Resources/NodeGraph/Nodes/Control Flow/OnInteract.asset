@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
   m_Name: OnInteract
   m_EditorClassIdentifier: 
+  Fields: []
   Inputs: []
   Outputs: []
-  EvaluationMethod: 
-  EvaluationCode: ctx.ExecuteTargetsOfPort(0);
+  EvaluationMethod: 1
+  EvalLookup: 
+  EvalCode: ctx.ExecuteTargetsOfPort(0);
   ExecutionInput: 0
   ExecutionOutputs:
   - 

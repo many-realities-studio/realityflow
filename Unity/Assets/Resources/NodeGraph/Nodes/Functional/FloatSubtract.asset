@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
   m_Name: FloatSubtract
   m_EditorClassIdentifier: 
+  Fields: []
   Inputs:
   - Name: 
     Type: 1
@@ -20,10 +21,11 @@ MonoBehaviour:
   Outputs:
   - Name: 
     Type: 1
-  EvaluationMethod: 
-  EvaluationCode: 'int lhs = ctx.GetInput<float>(0);
+  EvaluationMethod: 1
+  EvalLookup: 
+  EvalCode: 'float lhs = ctx.GetInput<float>(0);
 
-    int rhs = ctx.GetInput<float>(1);
+    float rhs = ctx.GetInput<float>(1);
 
     ctx.SetOutput(0,
     lhs - rhs);'

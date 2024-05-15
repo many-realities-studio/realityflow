@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
   m_Name: Integer
   m_EditorClassIdentifier: 
+  Fields: []
   Inputs: []
   Outputs:
   - Name: Value
     Type: 0
-  EvaluationMethod: 
-  EvaluationCode: ctx.SetOutput(0, 12);
+  EvaluationMethod: 1
+  EvalLookup: 
+  EvalCode: ctx.SetOutput(0, 12);
   ExecutionInput: 0
   ExecutionOutputs: []
