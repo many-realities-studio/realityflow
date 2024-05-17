@@ -13,108 +13,108 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        Arena<Node> Nodes = new();
+        Arena<Node> nodes = new();
 
-        // /// <summary>
-        // /// Forward data (non-execution) edges (output -> input)
-        // /// </summary>
-        // [SerializeField]
-        // SerializableDict<PortIndex, PortIndex> Edges = new();
         /// <summary>
         /// Backwards data (non-execution) edges (input -> output)
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        SerializableDict<PortIndex, PortIndex> ReverseEdges = new();
+        SerializableDict<PortIndex, PortIndex> reverseEdges = new();
 
         /// <summary>
         /// Forward execution edges (output -> input)
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        MultiValueDictionary<PortIndex, NodeIndex> ExecutionEdges = new();
+        MultiValueDictionary<PortIndex, NodeIndex> executionEdges = new();
 
         /// <summary>
         /// Input ports, usually only present in subgraphs (such as within a for loop node)
         /// </summary>
         [SerializeField]
-        List<NodeValueType> InputPorts = new();
+        List<NodeValueType> inputPorts = new();
 
         /// <summary>
         /// Output ports, usually only present in subgraphs (such as within a for loop node)
         /// </summary>
         [SerializeField]
-        List<NodeValueType> OutputPorts = new();
+        List<NodeValueType> outputPorts = new();
 
         /// <summary>
         /// Backwards edges between a node and the graph's input ports (node -> graph input).
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        SerializableDict<PortIndex, int> ReverseInputPortEdges = new();
+        SerializableDict<PortIndex, int> reverseInputPortEdges = new();
 
         /// <summary>
-        /// Backwards dges between a node and the graph's output ports (graph output -> node).
+        /// Backwards edges between a node and the graph's output ports (graph output -> node).
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        SerializableDict<int, PortIndex> ReverseOutputPortEdges = new();
+        SerializableDict<int, PortIndex> reverseOutputPortEdges = new();
 
         [SerializeField]
-        int ExecutionInputs;
+        int executionInputs;
+
+        public int ExecutionInputs => executionInputs;
 
         /// <summary>
         /// Execution edges from the inputs to the graph (ExecutionInputs) to nodes.
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        MultiValueDictionary<int, NodeIndex> InputExecutionEdges = new();
+        MultiValueDictionary<int, NodeIndex> inputExecutionEdges = new();
 
-        public void EvaluateFromRoot(NodeIndex root)
-        {
-            Node node = Nodes[root];
-            if (!node.Definition.IsRoot)
-                throw new ArgumentException("Tried to start evaluation from a non-root");
+        /// <summary>
+        /// True if this graph, when a subgraph of a node, should have an input port for each
+        /// variadic input to its containing node.
+        /// </summary>
+        [SerializeField]
+        bool variadicPassthrough;
 
-            EvalContext ctx = new(this);
-            ctx.EvaluateNode(root);
-        }
+        /// <summary>
+        /// True if this graph, when a subgraph of a node, should have an output port for each
+        /// variadic input to its containing node.
+        /// </summary>
+        [SerializeField]
+        bool variadicOutput;
+
+        public List<NodeIndex> InputExecutionEdges(int index)
+            => inputExecutionEdges[index];
 
         public NodeIndex AddNode(NodeDefinition definition)
         {
             Node node = new(definition);
-            NodeIndex index = Nodes.Add(node);
+            NodeIndex index = nodes.Add(node);
             return index;
         }
 
         public bool RemoveNode(NodeIndex index)
         {
-            return Nodes.Remove(index);
+            return nodes.Remove(index);
         }
 
         public Node GetNode(NodeIndex index)
         {
-            return Nodes[index];
+            return nodes[index];
         }
 
         public void AddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
         {
-            // Edges.Add(new(from, fromPort), new(to, toPort));
-            ReverseEdges.Add(new(to, toPort), new(from, fromPort));
+            reverseEdges.Add(new(to, toPort), new(from, fromPort));
         }
 
         public void AddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
         {
-            ExecutionEdges.Add(new(from, fromPort), to);
+            executionEdges.Add(new(from, fromPort), to);
         }
 
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)
-            => ReverseEdges.TryGetValue(inputPort, out outputPort);
-
-        // public bool TryGetInputPortOf(PortIndex outputPort, out PortIndex inputPort)
-        //     => Edges.TryGetValue(outputPort, out inputPort);
+            => reverseEdges.TryGetValue(inputPort, out outputPort);
 
         public List<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
-            => ExecutionEdges[outputPort];
+            => executionEdges[outputPort];
     }
 }
