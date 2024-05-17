@@ -6,7 +6,7 @@ using UnityEngine;
 namespace RealityFlow.Collections
 {
     /// <summary>
-    /// A list with typesafe indices. 
+    /// A list with typesafe, generated indices. 
     /// </summary>
     [Serializable]
     public class Arena<T>

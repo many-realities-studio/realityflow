@@ -11,6 +11,9 @@ using System.Text;
 
 namespace RealityFlow.NodeGraph
 {
+    /// <summary>
+    /// A definition for a node type. Each instance of a node is created based on a definition.
+    /// </summary>
     [CreateAssetMenu(
         fileName = "Node",
         menuName = "NodeGraph/NodeDefinition",

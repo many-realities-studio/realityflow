@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace RealityFlow.Collections
 {
+    /// <summary>
+    /// A simple wrapper over a Dictionary<Key, List<Value>> which is also serializable.
+    /// </summary>
     [Serializable]
     public class MultiValueDictionary<TKey, TValue>
     {

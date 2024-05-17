@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
+    /// <summary>
+    /// A typesafe index into the arena of nodes of a given graph. Avoid mixing up which graph a 
+    /// node index belongs to.
+    /// </summary>
     [Serializable]
     public struct NodeIndex
     {

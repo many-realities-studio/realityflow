@@ -3,12 +3,31 @@ using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
+    /// <summary>
+    /// Represents any possible value that can be passed around or stored in a node graph.
+    /// Specially built to be serialized correctly despite containing polymorphic values.
+    /// A weird class, because unfortunately C# lacks good discriminated unions.
+    /// Is immutable.
+    /// Improvements to this class' design welcome.
+    /// </summary>
     [Serializable]
     public class NodeValue : ISerializationCallbackReceiver
     {
+        /// <summary>
+        /// A discriminant for the exact type that this value is.
+        /// Note: cannot be `Any`, which is equivalent to `Object`.
+        /// </summary>
         [SerializeField]
         NodeValueType type;
         
+        /// <summary>
+        /// The stored value. If the value is a value type (aka struct or enum, as opposed to a reference type/class)
+        /// then it will be boxed using the relevant Box class below. This is necessary because unity
+        /// doesn't serialize value types properly with SerializeReference, even through an object.
+        /// 
+        /// This does put every value type through 3 levels of indirection; once through NodeValue, then through
+        /// .value, then through the Box.
+        /// </summary>
         [SerializeField]
         [SerializeReference]
         object value;
@@ -18,6 +37,9 @@ namespace RealityFlow.NodeGraph
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
 
+        /// <summary>
+        /// Attempts to read this value as the given type. May fail, if this value is not that type.
+        /// </summary>
         public bool TryGetValue<T>(out T value)
         {
             if (this.value is T tValue)
@@ -37,6 +59,9 @@ namespace RealityFlow.NodeGraph
             }
         }
 
+        /// <summary>
+        /// Get the C# type that the given NodeValueType corresponds to.
+        /// </summary>
         public static Type GetValueType(NodeValueType type) => type switch
         {
             NodeValueType.Int => typeof(int),
@@ -50,8 +75,14 @@ namespace RealityFlow.NodeGraph
             _ => throw new ArgumentException(),
         };
 
+        /// <summary>
+        /// Get the C# type that this value's type corresponds to.
+        /// </summary>
         public Type GetValueType() => GetValueType(Type);
 
+        /// <summary>
+        /// Get the default value for a NodeValue of the given type.
+        /// </summary>
         public static NodeValue DefaultFor(NodeValueType type) => type switch
         {
             NodeValueType.Int => From(0),
@@ -64,6 +95,10 @@ namespace RealityFlow.NodeGraph
             _ => throw new ArgumentException(),
         };
 
+        /// <summary>
+        /// Get an instance of a NodeValue from a given value. May fail if the given value is not
+        /// of a type that NodeValue may represent.
+        /// </summary>
         public static NodeValue From<T>(T value) => value switch
         {
             int val => From(val),
@@ -87,15 +122,25 @@ namespace RealityFlow.NodeGraph
 
         public void OnAfterDeserialize()
         {
+            // Initialize all reference types, NodeValue cannot be null.
             if (Type is NodeValueType.Graph && value is null)
                 value = new Graph();
         }
 
+        // See the comment on `value` above for more details on these classes and why they're needed.
+
+        /// <summary>
+        /// This abstract box is used to retrieve the value of a box without branching on every possible 
+        /// type, like with a switch case.
+        /// </summary>
         abstract class Boxed 
         {
             public abstract object DynValue { get; }
         }
 
+        /// <summary>
+        /// Reusable implementation to cut down on repetition.
+        /// </summary>
         [Serializable]
         class Boxed<T> : Boxed
         {
@@ -109,26 +154,32 @@ namespace RealityFlow.NodeGraph
             public override object DynValue => value;
         }
 
+        [Serializable]
         class BoxedInt : Boxed<int>
         {
             public BoxedInt(int value) : base(value) { }
         }
+        [Serializable]
         class BoxedFloat : Boxed<float>
         {
             public BoxedFloat(float value) : base(value) { }
         }
+        [Serializable]
         class BoxedVector2 : Boxed<Vector2>
         {
             public BoxedVector2(Vector2 value) : base(value) { }
         }
+        [Serializable]
         class BoxedVector3 : Boxed<Vector3>
         {
             public BoxedVector3(Vector3 value) : base(value) { }
         }
+        [Serializable]
         class BoxedQuaternion : Boxed<Quaternion>
         {
             public BoxedQuaternion(Quaternion value) : base(value) { }
         }
+        [Serializable]
         class BoxedBool : Boxed<bool>
         {
             public BoxedBool(bool value) : base(value) { }

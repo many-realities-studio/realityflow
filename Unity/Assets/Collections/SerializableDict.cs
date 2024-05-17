@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace RealityFlow.Collections
 {
+    /// <summary>
+    /// A simple wrapper around dictionary to make it serializable. Increases memory consumption somewhat.
+    /// </summary>
     [Serializable]
     public class SerializableDict<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
     {

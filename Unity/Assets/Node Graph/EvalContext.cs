@@ -5,12 +5,15 @@ using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
+    /// <summary>
+    /// The primary class used to evaluate graphs/nodes.
+    /// Stores relevant information during evaluation, such as intermediate results.
+    /// </summary>
     public class EvalContext
     {
         public Stack<GraphView> graphStack = new();
         readonly Queue<NodeIndex> nodeQueue = new();
         readonly List<NodeIndex> nodeStack = new();
-        readonly HashSet<NodeIndex> evaluated = new();
         readonly Dictionary<PortIndex, object> nodeOutputCache = new();
 
         void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);

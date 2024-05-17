@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace RealityFlow.NodeGraph.Testing
 {
+    /// <summary>
+    /// Test a simple graph with an integer, print, and onInteract node which will print the integer.
+    /// </summary>
     public class TestCase01 : MonoBehaviour
     {
         public NodeDefinition OnInteract;

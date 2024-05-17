@@ -2,6 +2,9 @@ using System;
 
 namespace RealityFlow.Collections
 {
+    /// <summary>
+    /// A serializable version of a tuple. Converts back and forth easily.
+    /// </summary>
     [Serializable]
     public struct SerTuple<T1, T2>
     {
@@ -16,6 +19,9 @@ namespace RealityFlow.Collections
 
         public readonly (T1, T2) Tup()
             => (Item1, Item2);
+
+        public static implicit operator (T1, T2)(SerTuple<T1, T2> tup) => tup.Tup();
+        public static implicit operator SerTuple<T1, T2>((T1, T2) tup) => new(tup.Item1, tup.Item2);
     }
 
     public static class SerTupleExtensions

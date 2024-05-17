@@ -2,6 +2,9 @@ using System;
 
 namespace RealityFlow.NodeGraph
 {
+    /// <summary>
+    /// Represents every possible type in the NodeGraph type system.
+    /// </summary>
     [Serializable]
     public enum NodeValueType
     {
