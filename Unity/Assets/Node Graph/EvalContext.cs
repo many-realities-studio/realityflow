@@ -1,24 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
 {
     public class EvalContext
     {
-        public Graph graph;
+        public Stack<GraphView> graphStack = new();
         readonly Queue<NodeIndex> nodeQueue = new();
-        readonly Stack<NodeIndex> nodeStack = new();
-        readonly Dictionary<PortIndex, object> valueCache = new();
+        readonly List<NodeIndex> nodeStack = new();
+        readonly HashSet<NodeIndex> evaluated = new();
+        readonly Dictionary<PortIndex, object> nodeOutputCache = new();
 
-        public EvalContext(Graph graph)
-        {
-            this.graph = graph;
-        }
+        void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
 
         public T GetField<T>(int index)
         {
-            NodeIndex nodeIndex = nodeStack.Peek();
+            NodeIndex nodeIndex = nodeStack[^1];
+            GraphView graph = graphStack.Peek();
             Node node = graph.GetNode(nodeIndex);
             if (node.TryGetField(index, out T field))
                 return field;
@@ -26,23 +26,40 @@ namespace RealityFlow.NodeGraph
             throw new InvalidCastException();
         }
 
+        /// <summary>
+        /// Returns number of dependencies enqueued.
+        /// Throws InvalidDataFlowException if a non-pure unevaluated dependency is encountered.
+        /// </summary>
+        int EnqueueUnevaluatedPureNodeDependencies(NodeIndex index)
+        {
+            int count = 0;
+            GraphView graph = graphStack.Peek();
+            Node node = graph.GetNode(index);
+            for (int i = 0; i < node.Definition.Inputs.Count + node.VariadicInputs; i++)
+                if (graph.TryGetOutputPortOf(new(index, i), out PortIndex from))
+                    if (!nodeOutputCache.ContainsKey(from))
+                    {
+                        if (!graph.GetNode(from.Node).Definition.IsPure)
+                            throw new InvalidDataFlowException();
+
+                        nodeQueue.Enqueue(from.Node);
+                        count += 1;
+                    }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Assumes that all dependencies were already evaluated.
+        /// </summary>
         public T GetInput<T>(int port)
         {
-            NodeIndex node = nodeStack.Peek();
+            NodeIndex node = nodeStack[^1];
             PortIndex input = new(node, port);
             object value;
+            GraphView graph = graphStack.Peek();
             if (graph.TryGetOutputPortOf(input, out var outputPort))
-            {
-                if (valueCache.TryGetValue(outputPort, out value))
-                { }
-                else if (outputPort.GetNode(graph).Definition.IsPure)
-                {
-                    EvaluateNode(outputPort.Node);
-                    value = valueCache[outputPort];
-                }
-                else
-                    throw new InvalidDataFlowException();
-            }
+                value = nodeOutputCache[outputPort];
             else
                 value = input.AsInput(graph).ConstantValue;
 
@@ -54,29 +71,81 @@ namespace RealityFlow.NodeGraph
 
         public void SetOutput<T>(int port, T value)
         {
-            NodeIndex node = nodeStack.Peek();
-            valueCache[new(node, port)] = value;
+            NodeIndex node = nodeStack[^1];
+            nodeOutputCache[new(node, port)] = value;
         }
 
         public void ExecuteTargetsOfPort(int port)
         {
-            NodeIndex node = nodeStack.Peek();
+            NodeIndex node = nodeStack[^1];
+            GraphView graph = graphStack.Peek();
             List<NodeIndex> nodes = graph.GetExecutionInputPortsOf(new(node, port));
             for (int i = 0; i < nodes.Count; i++)
-                EvaluateNode(nodes[i]);
+                QueueNode(nodes[i]);
         }
 
-        public void EvaluateNode(NodeIndex node)
+        public void QueueNode(NodeIndex node)
         {
-            Action<EvalContext> evaluate = graph.GetNode(node).Definition.GetEvaluation();
-            if (evaluate is not null)
+            nodeQueue.Enqueue(node);
+        }
+
+        void Evaluate()
+        {
+            GraphView graph = graphStack.Peek();
+            while (nodeQueue.TryDequeue(out NodeIndex node))
             {
-                nodeStack.Push(node);
-                evaluate(this);
-                nodeStack.Pop();
+                try
+                {
+                    if (EnqueueUnevaluatedPureNodeDependencies(node) > 0)
+                    {
+                        nodeQueue.Enqueue(node);
+                        continue; 
+                    }
+                }
+                catch (InvalidDataFlowException)
+                {
+                    Debug.LogError("Invalid graph configuration; node had unevaluated impure dependency");
+                }
+
+                Action<EvalContext> evaluate = graph.GetNode(node).Definition.GetEvaluation();
+                if (evaluate is not null)
+                {
+                    nodeStack.Add(node);
+                    evaluate(this);
+                    PopNode();
+                }
+                else
+                    Debug.LogError("Failed to load evaluation method for node");
             }
-            else
-                Debug.LogError("Failed to load evaluation method for node");
+        }
+
+        public void EvaluateGraphFromRoot(GraphView graph, NodeIndex root)
+        {
+            graphStack.Push(graph);
+
+            Node node = graph.GetNode(root);
+            if (!node.Definition.IsRoot)
+                Debug.LogError("Attempted to evaluate starting from non-root");
+
+            QueueNode(root);
+            Evaluate();
+
+            graphStack.Pop();
+        }
+
+        public void EvaluateGraph(GraphView graph, int executionInputPort)
+        {
+            graphStack.Push(graph);
+
+            if (executionInputPort >= graph.ExecutionInputs)
+                throw new IndexOutOfRangeException();
+
+            foreach (NodeIndex node in graph.InputExecutionEdges(executionInputPort))
+                QueueNode(node);
+
+            Evaluate();
+
+            graphStack.Pop();
         }
     }
 }
