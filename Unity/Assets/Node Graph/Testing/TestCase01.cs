@@ -28,7 +28,8 @@ namespace RealityFlow.NodeGraph.Testing
         public void Start()
         {
             Graph graph = ConstructGraph();
-            graph.EvaluateFromRoot(start);
+            EvalContext ctx = new();
+            ctx.EvaluateGraphFromRoot(new(graph), start);
 
             string json = JsonUtility.ToJson(graph, true);
             Debug.Log(json);
