@@ -58,8 +58,7 @@ namespace RealityFlow.NodeGraph
             return true;
         }
         
-        // TODO: Migrate to NodeValue
-        public void SetInputConstant(int index, object value)
+        public void SetInputConstant(int index, NodeValue value)
         {
             inputs[index].ConstantValue = value;
         }

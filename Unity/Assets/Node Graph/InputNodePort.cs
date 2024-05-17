@@ -5,6 +5,6 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public class InputNodePort
     {
-        public object ConstantValue;
+        public NodeValue ConstantValue;
     }
 }

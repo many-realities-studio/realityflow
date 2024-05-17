@@ -72,6 +72,13 @@ namespace RealityFlow.NodeGraph
             bool val => new() { Type = NodeValueType.Bool, value = val },
             _ => throw new ArgumentException(),
         };
+        public static NodeValue From(int value) => new() { Type = NodeValueType.Int, value = value };
+        public static NodeValue From(float value) => new() { Type = NodeValueType.Float, value = value };
+        public static NodeValue From(Vector2 value) => new() { Type = NodeValueType.Vector2, value = value };
+        public static NodeValue From(Vector3 value) => new() { Type = NodeValueType.Vector3, value = value };
+        public static NodeValue From(Quaternion value) => new() { Type = NodeValueType.Quaternion, value = value };
+        public static NodeValue From(Graph value) => new() { Type = NodeValueType.Graph, value = value };
+        public static NodeValue From(bool value) => new() { Type = NodeValueType.Bool, value = value };
 
         public void OnBeforeSerialize() { }
 

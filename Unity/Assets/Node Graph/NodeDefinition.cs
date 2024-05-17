@@ -23,7 +23,6 @@ namespace RealityFlow.NodeGraph
         /// Stores a name and default value for each field. Allows e.g. initializing graphs.
         /// </summary>
         public List<NodeFieldDefinition> Fields;
-        // TODO: Optional inputs
         public List<NodePortDefinition> Inputs;
         public List<NodePortDefinition> Outputs;
         /// <summary>
