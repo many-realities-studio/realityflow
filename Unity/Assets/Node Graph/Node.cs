@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -11,28 +10,32 @@ namespace RealityFlow.NodeGraph
         public NodeDefinition Definition;
 
         [SerializeField]
-        List<NodeValue> FieldValues = new();
+        List<NodeValue> fieldValues = new();
         [SerializeField]
-        List<InputNodePort> Inputs = new();
+        List<InputNodePort> inputs = new();
         [SerializeField]
-        List<OutputNodePort> Outputs = new();
+        List<OutputNodePort> outputs = new();
+        [SerializeField]
+        int variadicInputs;
+
+        public int VariadicInputs => variadicInputs;
 
         public Node(NodeDefinition definition)
         {
             Definition = definition;
             for (int i = 0; i < definition.Fields.Count; i++)
-                FieldValues.Add(new());
+                fieldValues.Add(new());
             for (int i = 0; i < definition.Inputs.Count; i++)
-                Inputs.Add(new());
+                inputs.Add(new());
             for (int i = 0; i < definition.Outputs.Count; i++)
-                Outputs.Add(new());
+                outputs.Add(new());
         }
 
         public bool TryGetField<T>(int index, out T field)
         {
-            if (index < FieldValues.Count)
+            if (index < fieldValues.Count)
             {
-                NodeValue nodeValue = FieldValues[index];
+                NodeValue nodeValue = fieldValues[index];
                 if (nodeValue.TryGetValue(out field))
                     return true;
             }
@@ -40,24 +43,25 @@ namespace RealityFlow.NodeGraph
             field = default;
             return false;
         }
-        public InputNodePort GetInput(int index) => Inputs[index];
-        public OutputNodePort GetOutput(int index) => Outputs[index];
+        public InputNodePort GetInput(int index) => inputs[index];
+        public OutputNodePort GetOutput(int index) => outputs[index];
 
         public bool TrySetField<T>(int index, T value)
         {
-            if (index >= FieldValues.Count)
+            if (index >= fieldValues.Count)
                 return false;
             
             if (Definition.Fields[index].Default.GetValueType() != typeof(T))
                 return false;
 
-            FieldValues[index] = NodeValue.From(value);
+            fieldValues[index] = NodeValue.From(value);
             return true;
         }
+        
         // TODO: Migrate to NodeValue
         public void SetInputConstant(int index, object value)
         {
-            Inputs[index].ConstantValue = value;
+            inputs[index].ConstantValue = value;
         }
     }
 }
