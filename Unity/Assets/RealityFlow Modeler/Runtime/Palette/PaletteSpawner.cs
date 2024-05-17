@@ -36,6 +36,7 @@ public class PaletteSpawner : MonoBehaviour
             try
             {
                 isLeftHandDominant = GameObject.FindGameObjectsWithTag("DominantHandManager")[0].GetComponent<PressableButton>();
+                Debug.Log(GameObject.FindGameObjectsWithTag("DominantHandManager")[0]);
             }
             catch (IndexOutOfRangeException e)
             {
