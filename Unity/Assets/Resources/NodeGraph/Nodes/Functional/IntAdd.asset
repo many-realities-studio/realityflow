@@ -14,20 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields: []
   Inputs:
-  - Name: 
+  - Name: left
     Type: 0
-  - Name: 
+  - Name: right
     Type: 0
   Outputs:
-  - Name: Sum
+  - Name: sum
     Type: 0
+  IsVariadic: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'int lhs = ctx.GetInput<int>(0);
-
-    int rhs = ctx.GetInput<int>(1);
-
-    ctx.SetOutput(0,
-    lhs + rhs);'
+  EvalCode: sum = left + right;
   ExecutionInput: 0
   ExecutionOutputs: []
+  references:
+    version: 2
+    RefIds: []

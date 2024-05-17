@@ -14,20 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields: []
   Inputs:
-  - Name: 
+  - Name: left
     Type: 1
-  - Name: 
+  - Name: right
     Type: 1
   Outputs:
-  - Name: 
+  - Name: difference
     Type: 1
+  IsVariadic: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'float lhs = ctx.GetInput<float>(0);
-
-    float rhs = ctx.GetInput<float>(1);
-
-    ctx.SetOutput(0,
-    lhs - rhs);'
+  EvalCode: difference = left - right;
   ExecutionInput: 0
   ExecutionOutputs: []
+  references:
+    version: 2
+    RefIds: []

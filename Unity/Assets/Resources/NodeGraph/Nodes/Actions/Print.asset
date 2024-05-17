@@ -14,17 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields: []
   Inputs:
-  - Name: Value
-    Type: 0
+  - Name: value
+    Optional: 0
+    Type: 7
   Outputs: []
   IsVariadic: 0
+  IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'object value = ctx.GetInput<object>(0);
-
-    Debug.Log(value);'
+  EvalCode: Debug.Log(value);
   ExecutionInput: 0
   ExecutionOutputs: []
-  references:
-    version: 2
-    RefIds: []

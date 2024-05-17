@@ -14,14 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields: []
   Inputs:
-  - Name: Condition
+  - Name: condition
     Type: 6
   Outputs: []
   IsVariadic: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: "bool condition = ctx.GetInput<bool>(0);\nif (condition)\n    ctx.ExecuteTargetsOfPort(0);\nelse\n   
-    ctx.ExecuteTargetsOfPort(1);"
+  EvalCode: "if (condition)\n    Then();\nelse\n    Else();"
   ExecutionInput: 1
   ExecutionOutputs:
   - Then

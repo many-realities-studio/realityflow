@@ -12,13 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
   m_Name: Integer
   m_EditorClassIdentifier: 
-  Fields: []
+  Fields:
+  - Name: value
+    Default:
+      Type: 0
+      IntValue: 0
+      FloatValue: 0
+      Vector2Value: {x: 0, y: 0}
+      Vector3Value: {x: 0, y: 0, z: 0}
+      QuaternionValue: {x: 0, y: 0, z: 0, w: 0}
+      GraphValue:
+        rid: -2
+      BoolValue: 0
   Inputs: []
   Outputs:
-  - Name: Value
+  - Name: 
     Type: 0
+  IsVariadic: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: ctx.SetOutput(0, 12);
+  EvalCode: ctx.SetOutput(0, value);
   ExecutionInput: 0
   ExecutionOutputs: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
