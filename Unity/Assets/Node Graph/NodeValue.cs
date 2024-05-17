@@ -1,5 +1,4 @@
 using System;
-using NaughtyAttributes;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -7,19 +6,28 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public class NodeValue : ISerializationCallbackReceiver
     {
-        public NodeValueType Type;
+        [SerializeField]
+        NodeValueType type;
         
         [SerializeField]
         [SerializeReference]
         object value;
 
-        public object Value => value;
+        NodeValue() {}
+
+        public NodeValueType Type => type;
+        public object Value => value is Boxed box ? box.DynValue : value;
 
         public bool TryGetValue<T>(out T value)
         {
             if (this.value is T tValue)
             {
                 value = tValue;
+                return true;
+            }
+            else if (this.value is Boxed box && box.DynValue is T boxedValue)
+            {
+                value = boxedValue;
                 return true;
             }
             else
@@ -46,39 +54,34 @@ namespace RealityFlow.NodeGraph
 
         public static NodeValue DefaultFor(NodeValueType type) => type switch
         {
-            NodeValueType.Int
-            or NodeValueType.Float
-            or NodeValueType.Vector2
-            or NodeValueType.Vector3
-            or NodeValueType.Bool
-            => new() { Type = type },
-            NodeValueType.Quaternion => new()
-            {
-                Type = type,
-                value = Quaternion.identity
-            },
-            NodeValueType.Graph => new() { Type = type, value = new Graph() },
+            NodeValueType.Int => From(0),
+            NodeValueType.Float => From(0f),
+            NodeValueType.Vector2 => From(Vector2.zero),
+            NodeValueType.Vector3 => From(Vector3.zero),
+            NodeValueType.Quaternion => From(Quaternion.identity),
+            NodeValueType.Graph => From(new Graph()),
+            NodeValueType.Bool => From(false),
             _ => throw new ArgumentException(),
         };
 
         public static NodeValue From<T>(T value) => value switch
         {
-            int val => new() { Type = NodeValueType.Int, value = val },
-            float val => new() { Type = NodeValueType.Float, value = val },
-            Vector2 val => new() { Type = NodeValueType.Vector2, value = val },
-            Vector3 val => new() { Type = NodeValueType.Vector3, value = val },
-            Quaternion val => new() { Type = NodeValueType.Quaternion, value = val },
-            Graph val => new() { Type = NodeValueType.Graph, value = val },
-            bool val => new() { Type = NodeValueType.Bool, value = val },
+            int val => From(val),
+            float val => From(val),
+            Vector2 val => From(val),
+            Vector3 val => From(val),
+            Quaternion val => From(val),
+            Graph val => From(val),
+            bool val => From(val),
             _ => throw new ArgumentException(),
         };
-        public static NodeValue From(int value) => new() { Type = NodeValueType.Int, value = value };
-        public static NodeValue From(float value) => new() { Type = NodeValueType.Float, value = value };
-        public static NodeValue From(Vector2 value) => new() { Type = NodeValueType.Vector2, value = value };
-        public static NodeValue From(Vector3 value) => new() { Type = NodeValueType.Vector3, value = value };
-        public static NodeValue From(Quaternion value) => new() { Type = NodeValueType.Quaternion, value = value };
-        public static NodeValue From(Graph value) => new() { Type = NodeValueType.Graph, value = value };
-        public static NodeValue From(bool value) => new() { Type = NodeValueType.Bool, value = value };
+        public static NodeValue From(int value) => new() { type = NodeValueType.Int, value = new BoxedInt(value) };
+        public static NodeValue From(float value) => new() { type = NodeValueType.Float, value = new BoxedFloat(value) };
+        public static NodeValue From(Vector2 value) => new() { type = NodeValueType.Vector2, value = new BoxedVector2(value) };
+        public static NodeValue From(Vector3 value) => new() { type = NodeValueType.Vector3, value = new BoxedVector3(value) };
+        public static NodeValue From(Quaternion value) => new() { type = NodeValueType.Quaternion, value = new BoxedQuaternion(value) };
+        public static NodeValue From(Graph value) => new() { type = NodeValueType.Graph, value = value };
+        public static NodeValue From(bool value) => new() { type = NodeValueType.Bool, value = new BoxedBool(value) };
 
         public void OnBeforeSerialize() { }
 
@@ -86,6 +89,49 @@ namespace RealityFlow.NodeGraph
         {
             if (Type is NodeValueType.Graph && value is null)
                 value = new Graph();
+        }
+
+        abstract class Boxed 
+        {
+            public abstract object DynValue { get; }
+        }
+
+        [Serializable]
+        class Boxed<T> : Boxed
+        {
+            public T value;
+
+            public Boxed(T value)
+            {
+                this.value = value;
+            }
+
+            public override object DynValue => value;
+        }
+
+        class BoxedInt : Boxed<int>
+        {
+            public BoxedInt(int value) : base(value) { }
+        }
+        class BoxedFloat : Boxed<float>
+        {
+            public BoxedFloat(float value) : base(value) { }
+        }
+        class BoxedVector2 : Boxed<Vector2>
+        {
+            public BoxedVector2(Vector2 value) : base(value) { }
+        }
+        class BoxedVector3 : Boxed<Vector3>
+        {
+            public BoxedVector3(Vector3 value) : base(value) { }
+        }
+        class BoxedQuaternion : Boxed<Quaternion>
+        {
+            public BoxedQuaternion(Quaternion value) : base(value) { }
+        }
+        class BoxedBool : Boxed<bool>
+        {
+            public BoxedBool(bool value) : base(value) { }
         }
     }
 }

@@ -27,7 +27,7 @@ namespace RealityFlow.NodeGraph.Testing
 
         public void Start()
         {
-            Graph graph = ConstructGraph();
+            Graph graph = TestingUtil.SerializationRoundTrip(ConstructGraph());
             EvalContext ctx = new();
             ctx.EvaluateGraphFromRoot(new(graph), start);
 

@@ -24,7 +24,7 @@ namespace RealityFlow.NodeGraph
         {
             Definition = definition;
             for (int i = 0; i < definition.Fields.Count; i++)
-                fieldValues.Add(new());
+                fieldValues.Add(definition.Fields[i].Default);
             for (int i = 0; i < definition.Inputs.Count; i++)
                 inputs.Add(new());
             for (int i = 0; i < definition.Outputs.Count; i++)
