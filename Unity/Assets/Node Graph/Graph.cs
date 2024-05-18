@@ -101,14 +101,123 @@ namespace RealityFlow.NodeGraph
             return nodes[index];
         }
 
-        public void AddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
+        /// <summary>
+        /// Attempts to add an edge between two node ports. Fails under the following conditions:
+        /// - Both ports are the same
+        /// - Either port is out of bounds for its node
+        /// - The type of the output port is not assignable to the type of the input port 
+        /// - The edge would form a cycle (`from` is reachable from `to`)
+        /// This method considers both data and execution edges for these conditions.
+        /// </summary>
+        public bool TryAddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
         {
+            if (from == to)
+                return false;
+
+            Node fromNode = GetNode(from);
+            Node toNode = GetNode(to);
+
+            if (fromPort >= fromNode.Definition.Outputs.Count)
+                return false;
+            if (toPort >= toNode.Definition.Inputs.Count)
+                return false;
+
+            if (NodeValue.IsNotAssignableTo(
+                fromNode.Definition.Outputs[fromPort].Type,
+                toNode.Definition.Inputs[toPort].Type)
+            )
+                return false;
+
+            // Note: This is probably not the most efficient way to do this check.
+            // For maximum efficiency, a data structure similar to the following could be used:
+            // https://www.sciencedirect.com/science/article/pii/S030439751000616X?ref=pdf_download&fr=RR-2&rr=885f16a41e862888
+            // Each node would be associated to a disjoint set of the nodes reachable from it. 
+            // When an edge is added, every node reachable from `to` is now reachable from `from`,
+            // so `from` would unify its set with `to`'s. 
+            // This idea would probably take too long to implement for the time being so it's being
+            // put off, especially as graph edits should be relatively rare (relative to the 
+            // number of frames where one does not occur).
+            if (DepthFirstSearch(from, to))
+                return false;
+
             reverseEdges.Add(new(to, toPort), new(from, fromPort));
+            return true;
         }
 
-        public void AddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
+        /// <summary>
+        /// Returns true if `target` is reachable from `from` by data or execution edges.
+        /// </summary>
+        bool DepthFirstSearch(NodeIndex from, NodeIndex target)
         {
+            // because execution edges and data edges go in opposite directions, two DFS's are required.
+            HashSet<NodeIndex> visited = new();
+            Stack<NodeIndex> stack = new();
+
+            stack.Push(target);
+
+            while (stack.TryPop(out NodeIndex current))
+            {
+                Node currentNode = GetNode(current);
+
+                for (int i = 0; i < currentNode.Definition.Inputs.Count; i++)
+                    if (TryGetOutputPortOf(new(current, i), out PortIndex output))
+                    {
+                        if (output.Node == from)
+                            return true;
+                        if (!visited.Contains(output.Node))
+                        {
+                            stack.Push(output.Node);
+                            visited.Add(output.Node);
+                        }
+                    }
+            }
+
+            visited.Clear();
+            stack.Clear();
+
+            stack.Push(from);
+
+            while (stack.TryPop(out NodeIndex current))
+            {
+                Node currentNode = GetNode(current);
+
+                for (int i = 0; i < currentNode.Definition.ExecutionOutputs.Count; i++)
+                    foreach (var next in GetExecutionInputPortsOf(new(current, i)))
+                    {
+                        if (next == target)
+                            return true;
+                        if (!visited.Contains(next))
+                        {
+                            stack.Push(next);
+                            visited.Add(next);
+                        }
+                    }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to add an edge between two execution node ports. Fails under the following conditions:
+        /// - Both ports are the same
+        /// - The from port is out of bounds
+        /// - The edge would form a cycle (`from` is reachable from `to`)
+        /// This method considers both data and execution edges for these conditions.
+        /// </summary>
+        public bool TryAddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
+        {
+            if (from == to)
+                return false;
+
+            if (fromPort >= GetNode(from).Definition.ExecutionOutputs.Count)
+                return false;
+
+            if (DepthFirstSearch(from, to))
+                return false;
+
             executionEdges.Add(new(from, fromPort), to);
+
+            return true;
         }
 
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)

@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RealityFlow.Collections
@@ -37,7 +35,7 @@ namespace RealityFlow.Collections
         }
 
         [Serializable]
-        public struct Index
+        public struct Index : IEquatable<Index>
         {
             [SerializeField]
             int value;
@@ -46,6 +44,21 @@ namespace RealityFlow.Collections
             {
                 value = index;
             }
+
+            public override bool Equals(object other)
+            {
+                if (other is Index index)
+                    return Equals(index);
+                return false;
+            }
+
+            public bool Equals(Index other)
+            {
+                return value == other.value;
+            }
+
+            public static bool operator ==(Index lhs, Index rhs) => lhs.Equals(rhs);
+            public static bool operator !=(Index lhs, Index rhs) => !(lhs == rhs);
 
             public override int GetHashCode()
             {

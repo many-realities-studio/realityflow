@@ -19,7 +19,7 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         [SerializeField]
         NodeValueType type;
-        
+
         /// <summary>
         /// The stored value. If the value is a value type (aka struct or enum, as opposed to a reference type/class)
         /// then it will be boxed using the relevant Box class below. This is necessary because unity
@@ -32,7 +32,7 @@ namespace RealityFlow.NodeGraph
         [SerializeReference]
         object value;
 
-        NodeValue() {}
+        NodeValue() { }
 
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
@@ -58,6 +58,17 @@ namespace RealityFlow.NodeGraph
                 return false;
             }
         }
+
+        public static bool IsAssignableTo(NodeValueType assigned, NodeValueType to)
+        {
+            return
+                to is NodeValueType.Any
+                || assigned == to
+                || (assigned == NodeValueType.Int && to == NodeValueType.Float);
+        }
+
+        public static bool IsNotAssignableTo(NodeValueType subtype, NodeValueType supertype)
+            => !IsAssignableTo(subtype, supertype);
 
         /// <summary>
         /// Get the C# type that the given NodeValueType corresponds to.
@@ -133,7 +144,7 @@ namespace RealityFlow.NodeGraph
         /// This abstract box is used to retrieve the value of a box without branching on every possible 
         /// type, like with a switch case.
         /// </summary>
-        abstract class Boxed 
+        abstract class Boxed
         {
             public abstract object DynValue { get; }
         }

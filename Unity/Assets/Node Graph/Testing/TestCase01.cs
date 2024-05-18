@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace RealityFlow.NodeGraph.Testing
 {
@@ -20,10 +21,10 @@ namespace RealityFlow.NodeGraph.Testing
             Graph graph = new();
             start = graph.AddNode(OnInteract);
             NodeIndex print = graph.AddNode(Print);
-            graph.AddExecutionEdge(start, 0, print);
+            Assert.IsTrue(graph.TryAddExecutionEdge(start, 0, print));
             NodeIndex twelve = graph.AddNode(Integer);
-            graph.GetNode(twelve).TrySetField(0, 12);
-            graph.AddEdge(twelve, 0, print, 0);
+            Assert.IsTrue(graph.GetNode(twelve).TrySetField(0, 12));
+            Assert.IsTrue(graph.TryAddEdge(twelve, 0, print, 0));
 
             return graph;
         }
