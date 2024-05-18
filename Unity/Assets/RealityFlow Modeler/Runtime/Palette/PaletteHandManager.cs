@@ -56,14 +56,15 @@ public class PaletteHandManager : MonoBehaviour
                 }
 
                 // By default the dominant hand is assigned to the right hand
-                Transform dominantHand = avatars[i].transform.Find("Body/LeftHand IK Target");
+                // This is very dependent on Ubiq implementation but likely has to be.
+                Transform dominantHand = avatars[i].transform.Find("Body/Floating_LeftHand_A");
                 Debug.Log("PaletteHandManager domanant hand is: " + dominantHand);
                 // ^ This shows that the dominanthand is not being set.
 
                 // Update the dominant hand based on the toggle state of the Switch Hands Button
                 if (isLeftHandDominant.IsToggled)
                 {
-                    dominantHand = avatars[i].transform.Find("Body/RightHand IK Target");
+                    dominantHand = avatars[i].transform.Find("Body/Floating_RightHand_A");
 
                     // If the rotation offset y is negative then make it positive to reflect the orientation of a left hand perspective
                     if (Mathf.Sign(parentConstraint.GetRotationOffset(0).y) == -1)
@@ -80,7 +81,7 @@ public class PaletteHandManager : MonoBehaviour
                 }
                 else if (!isLeftHandDominant.IsToggled)
                 {
-                    dominantHand = avatars[i].transform.Find("Body/LeftHand IK Target");
+                    dominantHand = avatars[i].transform.Find("Body/Floating_LeftHand_A");
 
                     // If the rotation offset y is positive then make it negative to reflect the orientation of a right hand perspective
                     if (Mathf.Sign(parentConstraint.GetRotationOffset(0).y) == 1)
