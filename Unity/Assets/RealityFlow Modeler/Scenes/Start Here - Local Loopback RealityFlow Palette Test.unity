@@ -831,6 +831,16 @@ PrefabInstance:
       propertyPath: avatarManager
       value: 
       objectReference: {fileID: 7068762447081937025}
+    - target: {fileID: 1667156511549325621, guid: f119abb42e8c59147a9a4a79189da9ee,
+        type: 3}
+      propertyPath: headPositionNode
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1667156511549325621, guid: f119abb42e8c59147a9a4a79189da9ee,
+        type: 3}
+      propertyPath: headRotationNode
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5780657251764068704, guid: f119abb42e8c59147a9a4a79189da9ee,
         type: 3}
       propertyPath: rfgv
@@ -4853,6 +4863,7 @@ GameObject:
   - component: {fileID: 999065838}
   - component: {fileID: 999065841}
   - component: {fileID: 999065840}
+  - component: {fileID: 999065843}
   m_Layer: 0
   m_Name: Menu Manager
   m_TagString: Untagged
@@ -4890,7 +4901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   socialMenu: {fileID: 1082172193}
-  source: {fileID: 0}
+  source: {fileID: 999065841}
 --- !u!114 &999065840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4923,13 +4934,13 @@ MonoBehaviour:
   OnPress:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 382438890}
-        m_TargetAssemblyTypeName: Ubiq.Samples.SocialMenu, Ubiq
+      - m_Target: {fileID: 999065841}
+        m_TargetAssemblyTypeName: Ubiq.MenuRequestSource, Ubiq
         m_MethodName: Request
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1986458807}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4968,6 +4979,41 @@ MonoBehaviour:
   networkSceneOverride: {fileID: 1314753234}
   spawnRelativeTransform: {fileID: 0}
   OnStateChange:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &999065843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999065836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 2f6a5abd-8c36-40b1-8f97-cc58767dd17f
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: b694d595-23ac-4522-8921-2fb7b14252c1
+      m_Path: <XRController>{LeftHand}/secondaryButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRelease:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1001 &1048618794
