@@ -46,6 +46,18 @@ namespace RealityFlow.NodeGraph
         public InputNodePort GetInput(int index) => inputs[index];
         public OutputNodePort GetOutput(int index) => outputs[index];
 
+        /// <summary>
+        /// Attempts to set the value of the given field.
+        /// Fails if:
+        /// <list type="bullet">
+        /// <item>
+        /// index is out of bounds
+        /// </item>
+        /// <item>
+        /// the given value does not match the type of the field
+        /// </item>
+        /// </list>
+        /// </summary>
         public bool TrySetField<T>(int index, T value)
         {
             if (index >= fieldValues.Count)

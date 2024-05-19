@@ -103,10 +103,20 @@ namespace RealityFlow.NodeGraph
 
         /// <summary>
         /// Attempts to add an edge between two node ports. Fails under the following conditions:
-        /// - Both ports are the same
-        /// - Either port is out of bounds for its node
-        /// - The type of the output port is not assignable to the type of the input port 
-        /// - The edge would form a cycle (`from` is reachable from `to`)
+        /// <list type="bullet">
+        /// <item>
+        /// Both ports are the same
+        /// </item>
+        /// <item>
+        /// Either port is out of bounds for its node
+        /// </item>
+        /// <item>
+        /// The type of the output port is not assignable to the type of the input port 
+        /// </item>
+        /// <item>
+        /// The edge would form a cycle (`from` is reachable from `to`)
+        /// </item>
+        /// </list>
         /// This method considers both data and execution edges for these conditions.
         /// </summary>
         public bool TryAddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
@@ -137,7 +147,7 @@ namespace RealityFlow.NodeGraph
             // This idea would probably take too long to implement for the time being so it's being
             // put off, especially as graph edits should be relatively rare (relative to the 
             // number of frames where one does not occur).
-            if (DepthFirstSearch(from, to))
+            if (DepthFirstSearch(to, from))
                 return false;
 
             reverseEdges.Add(new(to, toPort), new(from, fromPort));
@@ -199,9 +209,17 @@ namespace RealityFlow.NodeGraph
 
         /// <summary>
         /// Attempts to add an edge between two execution node ports. Fails under the following conditions:
-        /// - Both ports are the same
-        /// - The from port is out of bounds
-        /// - The edge would form a cycle (`from` is reachable from `to`)
+        /// <list type="bullet">
+        /// <item>
+        /// Both ports are the same
+        /// </item>
+        /// <item>
+        /// The from port is out of bounds
+        /// </item>
+        /// <item>
+        /// The edge would form a cycle (`from` is reachable from `to`)
+        /// </item>
+        /// </list>
         /// This method considers both data and execution edges for these conditions.
         /// </summary>
         public bool TryAddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
@@ -212,7 +230,7 @@ namespace RealityFlow.NodeGraph
             if (fromPort >= GetNode(from).Definition.ExecutionOutputs.Count)
                 return false;
 
-            if (DepthFirstSearch(from, to))
+            if (DepthFirstSearch(to, from))
                 return false;
 
             executionEdges.Add(new(from, fromPort), to);

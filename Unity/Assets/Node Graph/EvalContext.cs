@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -68,6 +67,12 @@ namespace RealityFlow.NodeGraph
 
             if (value is T typedVal)
                 return typedVal;
+            else if (
+                    typeof(T) == typeof(float) 
+                    && value is int intValue
+                    && (float)intValue is T castValue
+                )
+                return castValue;
             else
                 throw new GraphTypeMismatchException();
         }
