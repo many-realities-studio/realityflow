@@ -18,12 +18,12 @@ public class RealityFlowAPIEditor : Editor
 
         if (GUILayout.Button("Spawn Ladder"))
         {
-            realityFlowAPI.SpawnObject("Ladder", Vector3.zero, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+            realityFlowAPI.SpawnObject("Ladder", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
         }
 
         if (GUILayout.Button("Spawn Tree Stump"))
         {
-            realityFlowAPI.SpawnObject("TreeStump", Vector3.zero, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+            realityFlowAPI.SpawnObject("TreeStump", Vector3.zero, Vector3.zero, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
         }
 
         if (GUILayout.Button("Despawn Ladder"))
@@ -71,7 +71,7 @@ public class RealityFlowAPIEditor : Editor
         if (GUILayout.Button("Undo Last Action"))
         {
             realityFlowAPI.UndoLastAction();
-            Debug.Log("Undid last action.");
+            //Debug.Log("Undid last action.");
         }
 
         // Button to test adding an in-scene game object to the catalogue
@@ -93,7 +93,7 @@ public class RealityFlowAPIEditor : Editor
         {
             if (floatAndSpinCoroutine == null)
             {
-                floatAndSpinCoroutine = realityFlowAPI.StartCoroutine(FloatAndSpin(realityFlowAPI, "Ladder(Clone)", 1f, 45f));
+                floatAndSpinCoroutine = realityFlowAPI.StartCoroutine(FloatAndSpin(realityFlowAPI, "Ladder(Clone)", 1f, 45f, 5f));
                 Debug.Log("Started floating and spinning Ladder.");
             }
         }
@@ -103,19 +103,36 @@ public class RealityFlowAPIEditor : Editor
         {
             if (floatAndSpinCoroutine != null)
             {
+                //realityFlowAPI.StopAllCoroutines();
                 realityFlowAPI.StopCoroutine(floatAndSpinCoroutine);
                 floatAndSpinCoroutine = null;
                 Debug.Log("Stopped floating and spinning Ladder.");
             }
         }
+        if (GUILayout.Button("Scale and Move"))
+        {
+            realityFlowAPI.StartCoroutine(ScaleAndMove(realityFlowAPI, "Ladder(Clone)", new Vector3(2.0f, 2.0f, 2.0f), new Vector3(2.0f, 2.0f, 2.0f), 5.0f)); // Move to (2, 2, 2) and scale to (2, 2, 2) over 5 seconds
+        }
+        if (GUILayout.Button("Build House"))
+        {
+            realityFlowAPI.StartCoroutine(BuildHouse(realityFlowAPI));
+        }
+        if (GUILayout.Button("Move characterSmall"))
+        {
+            MoveCharacterSmall(realityFlowAPI);
+        }
+
+
     }
 
-    private IEnumerator FloatAndSpin(RealityFlowAPI api, string objectName, float floatSpeed, float spinSpeed)
+    private IEnumerator FloatAndSpin(RealityFlowAPI api, string objectName, float floatSpeed, float spinSpeed, float duration)
     {
+        api.StartCompoundAction();
+
         Vector3 startPosition = api.FindSpawnedObject(objectName).transform.position;
         float elapsedTime = 0;
 
-        while (true)
+        while (elapsedTime < duration)
         {
             float newY = startPosition.y + Mathf.Sin(elapsedTime * floatSpeed) * 0.5f;
             Quaternion newRotation = Quaternion.Euler(0, elapsedTime * spinSpeed, 0);
@@ -124,7 +141,90 @@ public class RealityFlowAPIEditor : Editor
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+
+        api.EndCompoundAction();
     }
+
+    private IEnumerator ScaleAndMove(RealityFlowAPI api, string objectName, Vector3 targetPosition, Vector3 targetScale, float duration)
+    {
+        api.StartCompoundAction();
+
+        GameObject obj = api.FindSpawnedObject(objectName);
+        if (obj == null)
+        {
+            Debug.LogError($"Object named {objectName} not found.");
+            yield break;
+        }
+
+        Vector3 startPosition = obj.transform.position;
+        Vector3 startScale = obj.transform.localScale;
+        float elapsedTime = 0;
+
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+            Vector3 newPosition = Vector3.Lerp(startPosition, targetPosition, t);
+            Vector3 newScale = Vector3.Lerp(startScale, targetScale, t);
+
+            api.UpdateObjectTransform(objectName, newPosition, obj.transform.rotation, newScale);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure final position and scale are set
+        api.UpdateObjectTransform(objectName, targetPosition, obj.transform.rotation, targetScale);
+
+        api.EndCompoundAction();
+    }
+    private IEnumerator BuildHouse(RealityFlowAPI api)
+    {
+        api.StartCompoundAction();
+
+        // Create and place the walls
+        GameObject wall1 = api.SpawnObject("Climbing Wall", new Vector3(0, 0, 0), new Vector3(1, 1, 1), Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall2 = api.SpawnObject("Climbing Wall", new Vector3(0, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 90, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall3 = api.SpawnObject("Climbing Wall", new Vector3(2, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 180, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall4 = api.SpawnObject("Climbing Wall", new Vector3(2, 0, 0), new Vector3(1, 1, 1), Quaternion.Euler(0, -90, 0), RealityFlowAPI.SpawnScope.Peer);
+
+        yield return new WaitForSeconds(0.1f); // Optional: Wait for a short duration to ensure proper spawning
+
+        // Create and place the roof
+        GameObject roof = api.SpawnObject("Climbing Wall", new Vector3(1, 2, 1), new Vector3(1, 1, 1), Quaternion.Euler(90, 0, 0), RealityFlowAPI.SpawnScope.Peer);
+
+        yield return new WaitForSeconds(0.1f); // Optional: Wait for a short duration to ensure proper spawning
+
+        // Adjust the size of the walls to make them fit the structure
+        api.UpdateObjectTransform(wall1.name, new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(wall2.name, new Vector3(0, 0, 2), Quaternion.Euler(0, 90, 0), new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(wall3.name, new Vector3(2, 0, 2), Quaternion.Euler(0, 180, 0), new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(wall4.name, new Vector3(2, 0, 0), Quaternion.Euler(0, -90, 0), new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(roof.name, new Vector3(1, 2, 1), Quaternion.Euler(90, 0, 0), new Vector3(2, 2, 2));
+
+        api.EndCompoundAction();
+    }
+    private void MoveCharacterSmall(RealityFlowAPI api)
+    {
+        GameObject characterSmall = api.SpawnObject("characterSmall", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        ;
+        if (characterSmall != null)
+        {
+            Vector3 newPosition = new Vector3(5.0f, 2.0f, 3.0f); // Define the new position
+            Quaternion newRotation = Quaternion.Euler(0, 90, 0); // Define the new rotation
+            Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f); // Define the new scale
+
+            api.StartCompoundAction();
+            api.UpdateObjectTransform("characterSmall", newPosition, newRotation, newScale);
+            api.EndCompoundAction();
+
+            Debug.Log("Moved characterSmall to new position.");
+        }
+        else
+        {
+            Debug.LogError("characterSmall not found in the scene.");
+        }
+    }
+
 }
 
 

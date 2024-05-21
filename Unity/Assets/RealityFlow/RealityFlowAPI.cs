@@ -5,12 +5,17 @@ using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
 using System;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
-public class RealityFlowAPI : MonoBehaviour
+public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private NetworkSpawnManager spawnManager;
     private ActionLogger actionLogger = new ActionLogger();
+    private NetworkContext networkContext;
+
+    public NetworkId NetworkId { get; set; }
 
     // Singleton instance
     private static RealityFlowAPI _instance;
@@ -52,6 +57,40 @@ public class RealityFlowAPI : MonoBehaviour
             {
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
+            spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated);
+        }
+    }
+
+    void Start()
+    {
+
+    }
+
+    public void ProcessTransformUpdate(string propertyKey, string jsonMessage)
+    {
+        var transformMessage = JsonUtility.FromJson<TransformMessage>(jsonMessage);
+        Debug.Log($"Received transform update: {transformMessage.ObjectName}, Pos: {transformMessage.Position}, Rot: {transformMessage.Rotation}, Scale: {transformMessage.Scale}");
+        GameObject obj = FindSpawnedObject(transformMessage.ObjectName);
+        if (obj != null)
+        {
+            obj.transform.position = transformMessage.Position;
+            obj.transform.rotation = transformMessage.Rotation;
+            obj.transform.localScale = transformMessage.Scale;
+        }
+        else
+        {
+            Debug.LogError($"Object named {transformMessage.ObjectName} not found in ProcessTransformUpdate.");
+        }
+    }
+
+    private void OnRoomUpdated(IRoom room)
+    {
+        foreach (var property in room)
+        {
+            if (property.Key.StartsWith("transform."))
+            {
+                ProcessTransformUpdate(property.Key, property.Value);
+            }
         }
     }
 
@@ -69,7 +108,7 @@ public class RealityFlowAPI : MonoBehaviour
         return null;
     }
 
-    public GameObject SpawnObject(string prefabName, Vector3 position, Quaternion rotation = default, SpawnScope scope = SpawnScope.Room)
+    public GameObject SpawnObject(string prefabName, Vector3 position, Vector3 scale = default, Quaternion rotation = default, SpawnScope scope = SpawnScope.Room)
     {
         GameObject newObject = spawnManager.catalogue.prefabs.Find(prefab => prefab.name.Equals(prefabName, StringComparison.OrdinalIgnoreCase));
         if (newObject == null)
@@ -93,7 +132,14 @@ public class RealityFlowAPI : MonoBehaviour
                 break;
         }
 
-        actionLogger.LogAction(nameof(SpawnObject), prefabName, position, rotation, scope);
+        if (newObject != null)
+        {
+            newObject.transform.position = position;
+            newObject.transform.rotation = rotation;
+            newObject.transform.localScale = scale;
+        }
+
+        actionLogger.LogAction(nameof(SpawnObject), prefabName, position, scale, rotation, scope);
         return newObject;
     }
 
@@ -101,8 +147,8 @@ public class RealityFlowAPI : MonoBehaviour
     {
         if (objectToDespawn != null)
         {
+            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
             spawnManager.Despawn(objectToDespawn);
-            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn);
             Debug.Log("Despawned: " + objectToDespawn.name);
         }
         else
@@ -148,14 +194,27 @@ public class RealityFlowAPI : MonoBehaviour
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         GameObject obj = FindSpawnedObject(objectName);
+        if (obj == null)
+        {
+            obj = GetPrefabByName(objectName);
+        }
         if (obj != null)
         {
+            // Log the current transform before making changes
+            actionLogger.LogAction(nameof(UpdateObjectTransform), objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
+            Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
+
             obj.transform.position = position;
             obj.transform.rotation = rotation;
             obj.transform.localScale = scale;
-            spawnManager.roomClient.OnRoomUpdated.Invoke(spawnManager.roomClient.Room);
-            //spawnManager.roomClient.OnPeerUpdated.Invoke(spawnManager.roomClient.Room);
-            actionLogger.LogAction(nameof(UpdateObjectTransform), objectName, position, rotation, scale);
+
+            // Serialize and send the transform update
+            var message = new TransformMessage(objectName, position, rotation, scale);
+            Debug.Log($"Sending transform update: {message.ObjectName}, Pos: {message.Position}, Rot: {message.Rotation}, Scale: {message.Scale}");
+            var jsonMessage = JsonUtility.ToJson(message);
+            var propertyKey = $"transform.{objectName}";
+            spawnManager.roomClient.Room[propertyKey] = jsonMessage;
         }
         else
         {
@@ -163,6 +222,7 @@ public class RealityFlowAPI : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     public void AddPrefabToCatalogue(GameObject prefab)
     {
         if (spawnManager != null && spawnManager.catalogue != null)
@@ -206,41 +266,119 @@ public class RealityFlowAPI : MonoBehaviour
 
     private void SaveCatalogue()
     {
-#if UNITY_EDITOR
         EditorUtility.SetDirty(spawnManager.catalogue);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("Catalogue saved.");
-#endif
     }
+#endif
 
     public void UndoLastAction()
     {
-        var lastAction = actionLogger.GetLastAction();
-        if (lastAction == null) return;
+        Debug.Log("Attempting to undo last action.");
+        Debug.Log($"Action stack count before undo: {actionLogger.GetActionStackCount()}");
 
-        switch (lastAction.FunctionName)
+        actionLogger.StartUndo();
+        var lastAction = actionLogger.GetLastAction();
+        actionLogger.EndUndo();
+
+        if (lastAction == null)
+        {
+            Debug.Log("No actions to undo.");
+            return;
+        }
+
+        if (lastAction is ActionLogger.CompoundAction compoundAction)
+        {
+            foreach (var action in compoundAction.Actions)
+            {
+                UndoSingleAction(action);
+            }
+        }
+        else
+        {
+            UndoSingleAction(lastAction);
+        }
+
+        // Clear the action stack after undo
+        //actionLogger.ClearActionStack();
+        Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
+        //StopAllCoroutines();
+    }
+
+
+    private void UndoSingleAction(ActionLogger.LoggedAction action)
+    {
+        switch (action.FunctionName)
         {
             case nameof(SpawnObject):
-                string prefabName = (string)lastAction.Parameters[0];
+                string prefabName = (string)action.Parameters[0] + "(Clone)";
+                Debug.Log("The spawned object's name is " + prefabName);
                 GameObject spawnedObject = FindSpawnedObject(prefabName);
-                DespawnObject(spawnedObject);
+                if (spawnedObject != null)
+                {
+                    DespawnObject(spawnedObject);
+                }
                 break;
 
             case nameof(DespawnObject):
-                GameObject obj = (GameObject)lastAction.Parameters[0];
-                SpawnObject(obj.name, obj.transform.position, obj.transform.rotation, SpawnScope.Peer);
+                string objName = ((string)action.Parameters[0]).Replace("(Clone)", "").Trim();
+                Debug.Log("Undoing the despawn of object named " + objName);
+                Vector3 position = (Vector3)action.Parameters[1];
+                Quaternion rotation = (Quaternion)action.Parameters[2];
+                Vector3 scale = (Vector3)action.Parameters[3];
+                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
+                if (respawnedObject != null)
+                {
+                    respawnedObject.transform.localScale = scale;
+                }
                 break;
 
             case nameof(UpdateObjectTransform):
-                string objName = (string)lastAction.Parameters[0];
-                Vector3 oldPosition = (Vector3)lastAction.Parameters[1];
-                Quaternion oldRotation = (Quaternion)lastAction.Parameters[2];
-                Vector3 oldScale = (Vector3)lastAction.Parameters[3];
-                UpdateObjectTransform(objName, oldPosition, oldRotation, oldScale);
+                string objectName = (string)action.Parameters[0];
+                Vector3 oldPosition = (Vector3)action.Parameters[1];
+                Quaternion oldRotation = (Quaternion)action.Parameters[2];
+                Vector3 oldScale = (Vector3)action.Parameters[3];
+                Debug.Log("Undoing the transform of object named " + objectName);
+                GameObject obj = FindSpawnedObject(objectName);
+                if (obj != null)
+                {
+                    UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {objectName} not found during undo transform.");
+                }
                 break;
 
                 // Add cases for other functions...
         }
+    }
+
+    public void StartCompoundAction()
+    {
+        actionLogger.StartCompoundAction();
+    }
+
+    public void EndCompoundAction()
+    {
+        actionLogger.EndCompoundAction();
+    }
+}
+
+[Serializable]
+public class TransformMessage
+{
+    public string ObjectName;
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public Vector3 Scale;
+
+    public TransformMessage(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        ObjectName = objectName;
+        Position = position;
+        Rotation = rotation;
+        Scale = scale;
     }
 }

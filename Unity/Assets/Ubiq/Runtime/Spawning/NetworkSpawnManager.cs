@@ -212,7 +212,6 @@ namespace Ubiq.Spawning
         }
         public void Despawn(GameObject gameObject)
         {
-            Debug.Log("1. Inside the despawn function");
             string key = null;
             foreach (var kvp in spawnedForRoom)
             {
@@ -223,34 +222,26 @@ namespace Ubiq.Spawning
                     break;
                 }
             }
-            Debug.Log("2");
 
             // For room scope objects, despawn when we hear back from server
             if (key != null)
             {
-                Debug.Log("3 key value is" + key);
                 roomClient.Room[key] = string.Empty;
                 return;
             }
-            Debug.Log("4");
             if (key == null && spawnedForPeers.TryGetValue(roomClient.Me, out var spawned))
             {
-                Debug.Log("Debug Log 4.5");
                 foreach (var kvp in spawned)
                 {
-                    Debug.Log("Debug Log 4.6, The Key value pair value is" + kvp.Value + "The gameObject" + gameObject.name);
                     if (kvp.Value == gameObject)
                     {
-                        Debug.Log("Debug Log 4.7");
                         key = kvp.Key;
                         break;
                     }
                 }
-                Debug.Log("5");
                 // For (local) peer scope objects, despawn immediately
                 if (key != null)
                 {
-                    Debug.Log("6 About to despawn peer scope object");
                     OnDespawned(gameObject, room: null, peer: roomClient.Me);
                     GameObject.Destroy(gameObject);
                     spawned.Remove(key);
@@ -275,9 +266,6 @@ namespace Ubiq.Spawning
 
             var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
             var catalogueIdx = ResolveIndex(gameObject);
-
-            //Debug.Log($"Catalogue count: {catalogue.prefabs.Count}");
-            //Debug.Log($"Attempting to access index: {catalogueIdx}");
 
             var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
             if (!spawnedForPeers.ContainsKey(roomClient.Me))
@@ -370,7 +358,7 @@ namespace Ubiq.Spawning
             // Debug log each prefab in the catalogue for verification
             for (int curr = 0; curr < catalogue.prefabs.Count; curr++)
             {
-                Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
+                //Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
             }
 
             // Find the index of the prefab by name
