@@ -15,9 +15,11 @@ MonoBehaviour:
   Fields: []
   Inputs:
   - Name: condition
+    Optional: 0
     Type: 6
   Outputs: []
   IsVariadic: 0
+  IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
   EvalCode: "if (condition)\n    Then();\nelse\n    Else();"

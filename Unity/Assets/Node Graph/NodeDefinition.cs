@@ -7,6 +7,8 @@ using Microsoft.CodeAnalysis;
 using NaughtyAttributes;
 using System.Linq;
 using System.Text;
+using System.Dynamic;
+using UnityEditor;
 
 namespace RealityFlow.NodeGraph
 {

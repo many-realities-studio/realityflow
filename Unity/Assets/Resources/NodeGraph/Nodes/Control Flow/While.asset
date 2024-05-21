@@ -17,70 +17,74 @@ MonoBehaviour:
     Default:
       type: 5
       value:
-        rid: 6695490753717075968
+        rid: 6695490842361331722
   - Name: body
     Default:
       type: 5
       value:
-        rid: 6695490753717075969
+        rid: 6695490842361331723
   Inputs: []
   Outputs: []
   IsVariadic: 1
   IsVariadicOutput: 1
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: "while(condition.Evaluate())\n{\n    body.Evaluate();\n}\nThen();"
+  EvalCode: "ctx.EvaluateGraph(condition);\nbool continue = ctx.GetGraphOutput(condition,
+    0);\n\nwhile (continue)\n{\n    ctx.EvaluateGraph(body);\n    ctx.EvaluateGraph(condition);\n   
+    continue = ctx.GetGraphOutput(condition, 0);\n}\n\nThen();"
   ExecutionInput: 1
   ExecutionOutputs:
   - Then
   references:
     version: 2
     RefIds:
-    - rid: 6695490753717075968
-      type: {class: Graph, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+    - rid: 6695490842361331722
+      type: {class: GraphView, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
       data:
-        nodes:
-          list:
+        graph:
+          nodes:
+            list:
+              listDict: []
+            nextIndex: 0
+          reverseEdges:
             listDict: []
-          nextIndex: 0
-        reverseEdges:
-          listDict: []
-        executionEdges:
-          dict:
+          executionEdges:
+            dict:
+              listDict: []
+          inputPorts: 
+          outputPorts: 06000000
+          reverseInputPortEdges:
             listDict: []
-        inputPorts: 
-        outputPorts: 06000000
-        reverseInputPortEdges:
-          listDict: []
-        reverseOutputPortEdges:
-          listDict: []
-        executionInputs: 1
-        inputExecutionEdges:
-          dict:
+          reverseOutputPortEdges:
             listDict: []
-        variadicPassthrough: 1
-        variadicOutput: 0
-    - rid: 6695490753717075969
-      type: {class: Graph, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+          executionInputs: 1
+          inputExecutionEdges:
+            dict:
+              listDict: []
+          variadicPassthrough: 1
+          variadicOutput: 0
+    - rid: 6695490842361331723
+      type: {class: GraphView, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
       data:
-        nodes:
-          list:
+        graph:
+          nodes:
+            list:
+              listDict: []
+            nextIndex: 0
+          reverseEdges:
             listDict: []
-          nextIndex: 0
-        reverseEdges:
-          listDict: []
-        executionEdges:
-          dict:
+          executionEdges:
+            dict:
+              listDict: []
+          inputPorts: 
+          outputPorts: 
+          reverseInputPortEdges:
             listDict: []
-        inputPorts: 
-        outputPorts: 
-        reverseInputPortEdges:
-          listDict: []
-        reverseOutputPortEdges:
-          listDict: []
-        executionInputs: 1
-        inputExecutionEdges:
-          dict:
+          reverseOutputPortEdges:
             listDict: []
-        variadicPassthrough: 1
-        variadicOutput: 1
+          executionInputs: 1
+          inputExecutionEdges:
+            dict:
+              listDict: []
+          variadicPassthrough: 1
+          variadicOutput: 1

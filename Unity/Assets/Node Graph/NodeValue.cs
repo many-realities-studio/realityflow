@@ -76,7 +76,7 @@ namespace RealityFlow.NodeGraph
             value = new BoxedQuaternion(val);
         }
 
-        public NodeValue(Graph val)
+        public NodeValue(GraphView val)
         {
             type = NodeValueType.Graph;
             value = val;
@@ -134,7 +134,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Vector2 => typeof(Vector2),
             NodeValueType.Vector3 => typeof(Vector3),
             NodeValueType.Quaternion => typeof(Quaternion),
-            NodeValueType.Graph => typeof(Graph),
+            NodeValueType.Graph => typeof(GraphView),
             NodeValueType.Bool => typeof(bool),
             NodeValueType.Any => typeof(object),
             _ => throw new ArgumentException(),
@@ -152,7 +152,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Vector2 => new BoxedVector2(Vector2.zero),
             NodeValueType.Vector3 => new BoxedVector3(Vector3.zero),
             NodeValueType.Quaternion => new BoxedQuaternion(Quaternion.identity),
-            NodeValueType.Graph => new Graph(),
+            NodeValueType.Graph => new GraphView(),
             NodeValueType.Bool => new BoxedBool(false),
             _ => throw new ArgumentException(),
         };
@@ -174,7 +174,7 @@ namespace RealityFlow.NodeGraph
             Vector2 val => new(val),
             Vector3 val => new(val),
             Quaternion val => new(val),
-            Graph val => new(val),
+            GraphView val => new(val),
             bool val => new(val),
             _ => throw new ArgumentException(),
         };

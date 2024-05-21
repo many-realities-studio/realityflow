@@ -10,10 +10,11 @@ namespace RealityFlow.NodeGraph
     /// </summary>
     public class EvalContext
     {
-        public Stack<GraphView> graphStack = new();
+        readonly Stack<GraphView> graphStack = new();
         readonly Queue<NodeIndex> nodeQueue = new();
         readonly List<NodeIndex> nodeStack = new();
         readonly Dictionary<PortIndex, object> nodeOutputCache = new();
+        readonly Dictionary<(GraphView, int), object> graphOutputCache = new();
 
         void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
 
@@ -67,7 +68,8 @@ namespace RealityFlow.NodeGraph
 
             if (value is T typedVal)
                 return typedVal;
-            else if (
+            else if 
+                (
                     typeof(T) == typeof(float) 
                     && value is int intValue
                     && (float)intValue is T castValue
@@ -81,6 +83,23 @@ namespace RealityFlow.NodeGraph
         {
             NodeIndex node = nodeStack[^1];
             nodeOutputCache[new(node, port)] = value;
+        }
+
+        public T GetGraphOutput<T>(GraphView graph, int outputPort)
+        {
+            if (!graphOutputCache.TryGetValue((graph, outputPort), out object output))
+            {
+                Debug.LogError("failed to get output value of graph");
+                return default;
+            }
+
+            if (output is not T)
+            {
+                Debug.LogError($"failed to get output value of graph as type {typeof(T).Name}");
+                return default;
+            }
+
+            return (T)output;
         }
 
         public void ExecuteTargetsOfPort(int port)
@@ -124,6 +143,23 @@ namespace RealityFlow.NodeGraph
                 }
                 else
                     Debug.LogError("Failed to load evaluation method for node");
+            }
+
+            for (int i = 0; i < graph.OutputPorts.Count; i++)
+            {
+                if (!graph.TryGetGraphOutputSource(i, out PortIndex output))
+                {
+                    Debug.LogError($"failed to get output source of index {i}");
+                    continue;
+                }
+
+                if (!nodeOutputCache.TryGetValue(output, out object value))
+                {
+                    Debug.LogError($"failed to get output value");
+                    continue;
+                }
+
+                graphOutputCache[(graph, i)] = value;
             }
         }
 

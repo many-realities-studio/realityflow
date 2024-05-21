@@ -15,20 +15,16 @@ MonoBehaviour:
   Fields:
   - Name: value
     Default:
-      Type: 0
-      IntValue: 0
-      FloatValue: 0
-      Vector2Value: {x: 0, y: 0}
-      Vector3Value: {x: 0, y: 0, z: 0}
-      QuaternionValue: {x: 0, y: 0, z: 0, w: 0}
-      GraphValue:
-        rid: -2
-      BoolValue: 0
+      type: 0
+      value:
+        rid: 6695490793263595529
   Inputs: []
   Outputs:
   - Name: 
+    Optional: 0
     Type: 0
   IsVariadic: 0
+  IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
   EvalCode: ctx.SetOutput(0, value);
@@ -37,5 +33,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 6695490793263595529
+      type: {class: NodeValue/BoxedInt, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+      data:
+        value: 0

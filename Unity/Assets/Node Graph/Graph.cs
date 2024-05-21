@@ -41,6 +41,8 @@ namespace RealityFlow.NodeGraph
         [SerializeField]
         List<NodeValueType> outputPorts = new();
 
+        public List<NodeValueType> OutputPorts => outputPorts;
+
         /// <summary>
         /// Backwards edges between a node and the graph's input ports (node -> graph input).
         /// </summary>
@@ -54,6 +56,9 @@ namespace RealityFlow.NodeGraph
         [SerializeField]
         [HideInInspector]
         SerializableDict<int, PortIndex> reverseOutputPortEdges = new();
+
+        public bool TryGetGraphOutputSource(int outputIndex, out PortIndex port)
+            => reverseOutputPortEdges.TryGetValue(outputIndex, out port);
 
         [SerializeField]
         int executionInputs;
