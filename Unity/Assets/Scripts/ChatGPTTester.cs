@@ -116,6 +116,6 @@ public class ChatGPTTester : MonoBehaviour
 
     public void ProcessAndCompileResponse()
     {
-        // RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
+        RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
     }
 }
