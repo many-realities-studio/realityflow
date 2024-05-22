@@ -58,8 +58,6 @@ public class PaletteHandManager : MonoBehaviour
                 // By default the dominant hand is assigned to the right hand
                 // This is very dependent on Ubiq implementation but likely has to be.
                 Transform dominantHand = avatars[i].transform.Find("Body/Floating_LeftHand_A");
-                Debug.Log("PaletteHandManager domanant hand is: " + dominantHand);
-                // ^ This shows that the dominanthand is not being set.
 
                 // Update the dominant hand based on the toggle state of the Switch Hands Button
                 if (isLeftHandDominant.IsToggled)
