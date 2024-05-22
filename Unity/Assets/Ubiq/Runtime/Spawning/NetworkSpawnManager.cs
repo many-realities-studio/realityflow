@@ -427,7 +427,6 @@ namespace Ubiq.Spawning
             spawner = new NetworkSpawner(NetworkScene.Find(this), roomClient, catalogue);
             spawner.OnSpawned += Spawner_OnSpawned;
             spawner.OnDespawned += Spawner_OnDespawned;
-
         }
 
         private void OnDestroy()
