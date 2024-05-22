@@ -44,7 +44,7 @@ namespace Ubiq.Messaging
         {
             public NetworkContext context;
             public Action<ReferenceCountedSceneGraphMessage> processor;
-            public AutoProcessor (NetworkContext context, Action<ReferenceCountedSceneGraphMessage> processor)
+            public AutoProcessor(NetworkContext context, Action<ReferenceCountedSceneGraphMessage> processor)
             {
                 this.context = context;
                 this.processor = processor;
@@ -139,7 +139,7 @@ namespace Ubiq.Messaging
             }
         }
 
-        public IEnumerable<KeyValuePair<Action<ReferenceCountedSceneGraphMessage>,NetworkId>> GetProcessors()
+        public IEnumerable<KeyValuePair<Action<ReferenceCountedSceneGraphMessage>, NetworkId>> GetProcessors()
         {
             foreach (var pair in processorCollections)
             {
@@ -171,11 +171,11 @@ namespace Ubiq.Messaging
             context.Id = id;
             context.Component = component;
 
-            if(context.Scene == null)
+            if (context.Scene == null)
             {
                 throw new Exception($"Could not find NetworkScene to register {component.gameObject.name} to.");
             }
-            if(!context.Id.Valid)
+            if (!context.Id.Valid)
             {
                 throw new Exception($"Attempting to Register {component.gameObject.name} with an uninitialised NetworkId");
             }
@@ -188,7 +188,7 @@ namespace Ubiq.Messaging
             {
                 var method = component.GetType().GetMethod("ProcessMessage");
                 var processor = (Action<ReferenceCountedSceneGraphMessage>)Delegate.CreateDelegate(typeof(Action<ReferenceCountedSceneGraphMessage>), component, method);
-                context.Scene.autoProcessors.Add(new AutoProcessor(context,processor));
+                context.Scene.autoProcessors.Add(new AutoProcessor(context, processor));
                 context.Scene.AddProcessor(context.Id, processor);
             }
             catch
@@ -294,11 +294,11 @@ namespace Ubiq.Messaging
         public void ReceiveConnectionMessages()
         {
             // Remove any destroyed autoprocessors
-            for(int i = 0; i < autoProcessors.Count; i++)
+            for (int i = 0; i < autoProcessors.Count; i++)
             {
                 if (!autoProcessors[i].context.Component)
                 {
-                    RemoveProcessor(autoProcessors[i].context.Id,autoProcessors[i].processor);
+                    RemoveProcessor(autoProcessors[i].context.Id, autoProcessors[i].processor);
                     autoProcessors.RemoveAt(i);
                     i--;
                 }
