@@ -10,6 +10,7 @@ namespace RealityFlow.NodeGraph
     /// </summary>
     public class EvalContext
     {
+        GameObject target;
         readonly Stack<GraphView> graphStack = new();
         readonly Queue<NodeIndex> nodeQueue = new();
         readonly List<NodeIndex> nodeStack = new();
@@ -17,6 +18,8 @@ namespace RealityFlow.NodeGraph
         readonly Dictionary<(GraphView, int), object> graphOutputCache = new();
 
         void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
+
+        public GameObject GetThis() => target;
 
         public T GetField<T>(int index)
         {
@@ -85,6 +88,11 @@ namespace RealityFlow.NodeGraph
             nodeOutputCache[new(node, port)] = value;
         }
 
+        void SetNullOutput(NodeIndex node, int port)
+        {
+            nodeOutputCache[new(node, port)] = null;
+        }
+
         public T GetGraphOutput<T>(GraphView graph, int outputPort)
         {
             if (!graphOutputCache.TryGetValue((graph, outputPort), out object output))
@@ -115,9 +123,11 @@ namespace RealityFlow.NodeGraph
         {
             nodeQueue.Enqueue(node);
         }
-
-        void Evaluate()
+        
+        void Evaluate(GameObject target)
         {
+            // TODO: Use graph stack instead of recursion
+            this.target = target;
             GraphView graph = graphStack.Peek();
             while (nodeQueue.TryDequeue(out NodeIndex node))
             {
@@ -142,7 +152,10 @@ namespace RealityFlow.NodeGraph
                     PopNode();
                 }
                 else
-                    Debug.LogError("Failed to load evaluation method for node");
+                {
+                    Debug.LogError("Failed to load evaluation method for node; bailing");
+                    break;
+                }
             }
 
             for (int i = 0; i < graph.OutputPorts.Count; i++)
@@ -161,9 +174,14 @@ namespace RealityFlow.NodeGraph
 
                 graphOutputCache[(graph, i)] = value;
             }
+
+            this.target = null;
+            nodeQueue.Clear();
+            nodeOutputCache.Clear();
+            graphOutputCache.Clear();
         }
 
-        public void EvaluateGraphFromRoot(GraphView graph, NodeIndex root)
+        public void EvaluateGraphFromRoot(GameObject target, GraphView graph, NodeIndex root)
         {
             graphStack.Push(graph);
 
@@ -172,12 +190,12 @@ namespace RealityFlow.NodeGraph
                 Debug.LogError("Attempted to evaluate starting from non-root");
 
             QueueNode(root);
-            Evaluate();
+            Evaluate(target);
 
             graphStack.Pop();
         }
 
-        public void EvaluateGraph(GraphView graph, int executionInputPort)
+        public void EvaluateGraph(GameObject target, GraphView graph, int executionInputPort)
         {
             graphStack.Push(graph);
 
@@ -187,7 +205,7 @@ namespace RealityFlow.NodeGraph
             foreach (NodeIndex node in graph.InputExecutionEdges(executionInputPort))
                 QueueNode(node);
 
-            Evaluate();
+            Evaluate(target);
 
             graphStack.Pop();
         }

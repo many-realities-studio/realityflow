@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis;
 using NaughtyAttributes;
 using System.Linq;
 using System.Text;
-using System.Dynamic;
 using UnityEditor;
 
 namespace RealityFlow.NodeGraph
@@ -95,35 +94,56 @@ namespace RealityFlow.NodeGraph
         private void GetEvalWithMethodCode()
         {
             StringBuilder scriptFields = new();
+
             foreach (var (def, i) in Fields
                 .Select((def, i) => (def, i))
                 .Where(tup => !string.IsNullOrEmpty(tup.def.Name))
             )
             {
+                if (ScriptUtilities.CSharpKeywordSet.Contains(def.Name))
+                {
+                    Debug.LogError($"Name `{def.Name}` is a reserved keyword; please change it");
+                    return;
+                }
+
                 scriptFields.AppendFormat(
                     "{0} {1} => ctx.GetField<{0}>({2});",
-                    def.Default.GetValueType().FullName,
+                    def.Default.GetEvalTimeType().FullName,
                     def.Name,
                     i
                 );
             }
+
             foreach (var (def, i) in Inputs
                 .Select((def, i) => (def, i))
                 .Where(tup => !string.IsNullOrEmpty(tup.def.Name))
             )
             {
+                if (ScriptUtilities.CSharpKeywordSet.Contains(def.Name))
+                {
+                    Debug.LogError($"Name `{def.Name}` is a reserved keyword; please change it");
+                    return;
+                }
+
                 scriptFields.AppendFormat(
                     "{0} {1} => ctx.GetInput<{0}>({2});",
-                    NodeValue.GetValueType(def.Type),
+                    NodeValue.GetEvalTimeType(def.Type),
                     def.Name,
                     i
                 );
             }
+
             foreach (var (def, i) in Outputs
                 .Select((def, i) => (def, i))
                 .Where(tup => !string.IsNullOrEmpty(tup.def.Name))
             )
             {
+                if (ScriptUtilities.CSharpKeywordSet.Contains(def.Name))
+                {
+                    Debug.LogError($"Name `{def.Name}` is a reserved keyword; please change it");
+                    return;
+                }
+
                 scriptFields.AppendFormat(
                     @"
                     {0} {1} 
@@ -133,16 +153,23 @@ namespace RealityFlow.NodeGraph
                             ctx.SetOutput({2}, value);
                         }}
                     }}",
-                    NodeValue.GetValueType(def.Type),
+                    NodeValue.GetEvalTimeType(def.Type),
                     def.Name,
                     i
                 );
             }
+
             foreach (var (def, i) in ExecutionOutputs
                 .Select((def, i) => (def, i))
                 .Where(tup => !string.IsNullOrEmpty(tup.def))
             )
             {
+                if (ScriptUtilities.CSharpKeywordSet.Contains(def))
+                {
+                    Debug.LogError($"Name `{def}` is a reserved keyword; please change it");
+                    return;
+                }
+
                 scriptFields.AppendFormat(
                     @"
                     void {0}()
@@ -198,7 +225,7 @@ namespace RealityFlow.NodeGraph
             if (scriptType is null)
                 return;
 
-            dynamic script = Activator.CreateInstance(scriptType);
+            object script = Activator.CreateInstance(scriptType);
             MethodInfo scriptMethod = scriptType.GetMethod("Eval");
             eval =
                 (Action<EvalContext>)Delegate.CreateDelegate(

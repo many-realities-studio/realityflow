@@ -16,5 +16,8 @@ namespace RealityFlow.NodeGraph
         Graph,
         Bool,
         Any,
+        GameObject,
+        Prefab,
+        String,
     }
 }

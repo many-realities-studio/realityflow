@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NaughtyAttributes;
 using UnityEngine;
 
@@ -22,15 +23,15 @@ namespace RealityFlow.NodeGraph
         [Dropdown("validTypes")]
         NodeValueType type;
 
-        static readonly NodeValueType[] validTypes = {
-            NodeValueType.Int,
-            NodeValueType.Float,
-            NodeValueType.Vector2,
-            NodeValueType.Vector3,
-            NodeValueType.Quaternion,
-            NodeValueType.Graph,
-            NodeValueType.Bool,
-        };
+        /// <summary>
+        /// Used to determine which types to show in the inspector dropdown 
+        /// (just excludes the Any type)
+        /// </summary>
+        static readonly NodeValueType[] validTypes =
+            Enum.GetValues(typeof(NodeValueType))
+            .Cast<NodeValueType>()
+            .Where(ty => ty != NodeValueType.Any)
+            .ToArray();
 
         /// <summary>
         /// The stored value. If the value is a value type (aka struct or enum, as opposed to a reference type/class)
@@ -88,6 +89,12 @@ namespace RealityFlow.NodeGraph
             value = new BoxedBool(val);
         }
 
+        public NodeValue(string str)
+        {
+            type = NodeValueType.String;
+            value = str;
+        }
+
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
 
@@ -106,6 +113,17 @@ namespace RealityFlow.NodeGraph
                 value = boxedValue;
                 return true;
             }
+            else if (
+                Type is NodeValueType.GameObject
+                && this.value is string name
+                && GameObject.Find(name) is T tObj
+            )
+            {
+                value = tObj;
+                return true;
+            }
+            else if (Type is NodeValueType.Prefab)
+                throw new NotImplementedException("Prefab lookup not implemented");
             else
             {
                 value = default;
@@ -137,6 +155,9 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Graph => typeof(GraphView),
             NodeValueType.Bool => typeof(bool),
             NodeValueType.Any => typeof(object),
+            NodeValueType.GameObject => typeof(string),
+            NodeValueType.Prefab => typeof(string),
+            NodeValueType.String => typeof(string),
             _ => throw new ArgumentException(),
         };
 
@@ -144,6 +165,24 @@ namespace RealityFlow.NodeGraph
         /// Get the C# type that this value's type corresponds to.
         /// </summary>
         public Type GetValueType() => GetValueType(Type);
+
+        public static Type GetEvalTimeType(NodeValueType type) => type switch
+        {
+            NodeValueType.Int => typeof(int),
+            NodeValueType.Float => typeof(float),
+            NodeValueType.Vector2 => typeof(Vector2),
+            NodeValueType.Vector3 => typeof(Vector3),
+            NodeValueType.Quaternion => typeof(Quaternion),
+            NodeValueType.Graph => typeof(GraphView),
+            NodeValueType.Bool => typeof(bool),
+            NodeValueType.Any => typeof(object),
+            NodeValueType.GameObject => typeof(GameObject),
+            NodeValueType.Prefab => typeof(GameObject),
+            NodeValueType.String => typeof(string),
+            _ => throw new ArgumentException(),
+        };
+
+        public Type GetEvalTimeType() => GetEvalTimeType(Type);
 
         static object InternalDefaultFor(NodeValueType type) => type switch
         {
@@ -154,6 +193,9 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Quaternion => new BoxedQuaternion(Quaternion.identity),
             NodeValueType.Graph => new GraphView(),
             NodeValueType.Bool => new BoxedBool(false),
+            NodeValueType.GameObject => null,
+            NodeValueType.Prefab => null,
+            NodeValueType.String => string.Empty,
             _ => throw new ArgumentException(),
         };
 
@@ -165,7 +207,8 @@ namespace RealityFlow.NodeGraph
 
         /// <summary>
         /// Get an instance of a NodeValue from a given value. May fail if the given value is not
-        /// of a type that NodeValue may represent.
+        /// of a type that NodeValue may represent, or if the value is ambiguous between multiple
+        /// types.
         /// </summary>
         public static NodeValue From<T>(T value) => value switch
         {
@@ -176,6 +219,7 @@ namespace RealityFlow.NodeGraph
             Quaternion val => new(val),
             GraphView val => new(val),
             bool val => new(val),
+            string val => new(val),
             _ => throw new ArgumentException(),
         };
 
