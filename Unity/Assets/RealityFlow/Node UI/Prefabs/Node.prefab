@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 7715933957023350064}
   - component: {fileID: 737267628288180192}
   - component: {fileID: 4598461181225834339}
+  - component: {fileID: 2357218366132288996}
   m_Layer: 5
   m_Name: Node
   m_TagString: Untagged
@@ -244,6 +245,28 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &2357218366132288996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6998556429417446209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6d0d659a33534b449b292546399fb3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fieldPrefab: {fileID: 9132456813334538826, guid: 60bb92715bc5a064cb14fff215698885,
+    type: 3}
+  inputPortPrefab: {fileID: 2202538562950102020, guid: d5820efce744b1d4eb06144bea1f0025,
+    type: 3}
+  outputPortPrefab: {fileID: 6235771284156147087, guid: 0486ebee11f1a0b46a289fc2baa23731,
+    type: 3}
+  title: {fileID: 7628052919552575924}
+  fields: {fileID: 6811665732251671081}
+  inputPorts: {fileID: 2595751406814162385}
+  outputPorts: {fileID: 7747899972904147650}
 --- !u!1 &7377682859391781647
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,9 +518,9 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 1
   m_Spacing: 5
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1

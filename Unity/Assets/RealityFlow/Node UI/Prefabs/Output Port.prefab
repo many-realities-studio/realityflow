@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3618009043965042282}
   - component: {fileID: 6124997917058467883}
   - component: {fileID: 8425813368845061348}
+  - component: {fileID: 2246853227112365079}
   m_Layer: 5
   m_Name: Port Circle
   m_TagString: Untagged
@@ -75,6 +76,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2246853227112365079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4984469646981889305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 20
+  m_MinHeight: 20
+  m_PreferredWidth: 20
+  m_PreferredHeight: 20
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &6235771284156147087
 GameObject:
   m_ObjectHideFlags: 0
@@ -85,6 +106,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1046232449975326234}
   - component: {fileID: 2635642775212998435}
+  - component: {fileID: 1416555172114528426}
   m_Layer: 5
   m_Name: Output Port
   m_TagString: Untagged
@@ -99,7 +121,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6235771284156147087}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -139,6 +161,19 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1416555172114528426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6235771284156147087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a937ccf43de6ba4085176d00f421ffb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portName: {fileID: 1558583392243862497}
 --- !u!1 &7097130504664071172
 GameObject:
   m_ObjectHideFlags: 0
