@@ -28,7 +28,7 @@ namespace RealityFlow.NodeGraph.Testing
         {
             Graph graph = TestingUtil.SerializationRoundTrip(ConstructGraph());
             EvalContext ctx = new();
-            ctx.EvaluateGraphFromRoot(new(graph), start);
+            ctx.EvaluateGraphFromRoot(gameObject, new(graph), start);
 
             string json = JsonUtility.ToJson(graph, true);
             Debug.Log(json);
