@@ -38,12 +38,13 @@ public class ProjectContentManager : MonoBehaviour
     public static ProjectContentManager instance;
     public const string objectPath = "/savefile";
     public const string objectPathCount = "/savefile.count";
+  public string server = "http://localhost:4000/graphql"; 
     private bool _editMode = true;
     private RoomClient client;
     public NetworkContext context;
     public GameObject mainMenu;
     public GraphQLHttpClient graphQLClient;
-
+  public string accessToken;
 
     // Each of these working with just JSON serialization...
     // Loads all of the objects from the JSON file.
@@ -79,7 +80,7 @@ public class ProjectContentManager : MonoBehaviour
             instance = this;
         }
         client.OnJoinedRoom.AddListener(delegate { onRoomCreation(); });
-        string accessToken = PlayerPrefs.GetString("accessToken");
+        accessToken = PlayerPrefs.GetString("accessToken");
     //    var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
     //    graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
     //    graphQLClient = graphQLC;
@@ -92,9 +93,9 @@ public class ProjectContentManager : MonoBehaviour
 
     public async void LoadObject(IRealityFlowObject em)
     {
-        var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
-        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+        // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
+        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
         graphQLClient = graphQLC;
         var getProjectObjects = new GraphQLRequest
         {
@@ -196,9 +197,9 @@ public class ProjectContentManager : MonoBehaviour
 
         Debug.Log("Hi");
 
-        var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
-        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+        // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
+        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
         this.graphQLClient = graphQLC;
         var getUserInfoRequest = new GraphQLRequest
         {
@@ -240,9 +241,9 @@ public class ProjectContentManager : MonoBehaviour
             // Update the object position in list
             IRealityFlowObject robj = sceneObjects.Find((robj) => robj.uuid == go.GetComponent<EditableMesh>().uuid);
 
-            var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
-            String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-            graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+            // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
+            graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             this.graphQLClient = graphQLC;
             var getUserInfoRequest = new GraphQLRequest
             {
@@ -268,9 +269,9 @@ public class ProjectContentManager : MonoBehaviour
             IRealityFlowObject robj = sceneObjects.Find((robj) => robj.uuid == go.GetComponent<EditableMesh>().uuid);
             sceneObjects.Remove(robj);
 
-            var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
-            String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-            graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+            // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
+            graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             this.graphQLClient = graphQLC;
             var getUserInfoRequest = new GraphQLRequest
             {
@@ -294,29 +295,29 @@ public class ProjectContentManager : MonoBehaviour
         Debug.Log("LOADING CONTENT");
         Debug.Log(client.Room.JoinCode);
         Debug.Log(client.Room.Name);
-        string[] useText = client.Room.Name.Split('@');
-        if(useText.Length > 0)
-        {
+        // string[] useText = client.Room.Name.Split('@');
+        // if(useText.Length > 0)
+        // {
 
-            // This is extracting the project id from the room name
-            // If there isn't any, then it probably won't work
-            //If this fails, no network scene to join
-        // Error here? 
-        var publicProjectsQuery = new GraphQLRequest
-        {
-            Query = @"
-                 mutation AddRoom($input: AddRoomInput) {
-              addRoom(input: $input) {
-                joinCode
-              }
-            }
-            ",
-            OperationName = "AddRoom",
-            Variables = new { roomId = client.Room.UUID, joinCode = client.Room.JoinCode, projectId = useText[1] }
-        };
+        //     // This is extracting the project id from the room name
+        //     // If there isn't any, then it probably won't work
+        //     //If this fails, no network scene to join
+        // // Error here? 
+        // var publicProjectsQuery = new GraphQLRequest
+        // {
+        //     Query = @"
+        //          mutation AddRoom($input: AddRoomInput) {
+        //       addRoom(input: $input) {
+        //         joinCode
+        //       }
+        //     }
+        //     ",
+        //     OperationName = "AddRoom",
+        //     Variables = new { roomId = client.Room.UUID, joinCode = client.Room.JoinCode, projectId = useText[1] }
+        // };
 
-        var queryResult = await graphQLClient.SendMutationAsync<JObject>(publicProjectsQuery);
-        }
+        // var queryResult = await graphQLClient.SendMutationAsync<JObject>(publicProjectsQuery);
+        // }
     }
     
     void LoadSceneContent(string content)
