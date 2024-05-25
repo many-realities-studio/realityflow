@@ -8,7 +8,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class NetworkedVRWhiteBoard : MonoBehaviour
+public class NetworkedVRWhiteBoard : MonoBehaviour, INetworkSpawnable
 {
    public NetworkId NetworkId {get; set;}
     NetworkContext context;

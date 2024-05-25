@@ -38,7 +38,8 @@ public class ProjectContentManager : MonoBehaviour
     public static ProjectContentManager instance;
     public const string objectPath = "/savefile";
     public const string objectPathCount = "/savefile.count";
-  public string server = "http://localhost:4000/graphql"; 
+  public string server = "http://localhost:4000/graphql";
+  public string defaultProjectId;
     private bool _editMode = true;
     private RoomClient client;
     public NetworkContext context;
@@ -81,7 +82,7 @@ public class ProjectContentManager : MonoBehaviour
         }
         client.OnJoinedRoom.AddListener(delegate { onRoomCreation(); });
         accessToken = PlayerPrefs.GetString("accessToken");
-       var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
+       var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
        graphQLClient = graphQLC;
     }
@@ -110,7 +111,7 @@ public class ProjectContentManager : MonoBehaviour
                }
             ",
             OperationName = "Query",
-            Variables = new { getProjectByIdId = "641c48b86e6f8cf935cd56e3" }
+            Variables = new { getProjectByIdId = defaultProjectId }
         };
         var queryResult = await graphQLClient.SendQueryAsync<JObject>(getProjectObjects);
         Debug.Log("helloyes");
@@ -211,7 +212,7 @@ public class ProjectContentManager : MonoBehaviour
                 }
             ",
             OperationName = "SaveObject",
-            Variables = new { input = new { objectJson = em.smi, projectId = "641c48b86e6f8cf935cd56e3" } }
+            Variables = new { input = new { objectJson = em.smi, projectId = defaultProjectId } }
         };
 
         var queryResult = await graphQLClient.SendMutationAsync<JObject>(getUserInfoRequest);
