@@ -65,24 +65,24 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
                 return;
             }
 
-            if (asm.DefinedTypes.Count() < 1)
+            Type[] comps = 
+                asm
+                .GetTypes()
+                .Where(ty => ty.IsSubclassOf(typeof(MonoBehaviour)))
+                .ToArray();
+
+            if (comps.Length < 1)
             {
-                Debug.LogError("ChatGPT response didn't define a type");
+                Debug.LogError("ChatGPT response didn't define a MonoBehaviour");
                 return;
             }
-            if (asm.DefinedTypes.Count() > 1)
+            if (comps.Length > 1)
             {
-                Debug.LogError("ChatGPT response defined more than one type");
+                Debug.LogError("ChatGPT response defined more than one MonoBehaviour");
                 return;
             }
 
-            Type type = asm.DefinedTypes.Single();
-
-            if (!type.IsSubclassOf(typeof(MonoBehaviour)))
-            {
-                Debug.LogError("ChatGPT response returned non-monobehaviour");
-                return;
-            }
+            Type type = comps.Single();
 
             gameObject.AddComponent(type);
         }
