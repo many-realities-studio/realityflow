@@ -81,9 +81,9 @@ public class ProjectContentManager : MonoBehaviour
         }
         client.OnJoinedRoom.AddListener(delegate { onRoomCreation(); });
         accessToken = PlayerPrefs.GetString("accessToken");
-    //    var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
-    //    graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-    //    graphQLClient = graphQLC;
+       var graphQLC = new GraphQLHttpClient("https://beta.realityflow.io/graphql", new NewtonsoftJsonSerializer());
+       graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+       graphQLClient = graphQLC;
     }
 
     public IRealityFlowObject GetObject(GameObject obj)
@@ -95,8 +95,8 @@ public class ProjectContentManager : MonoBehaviour
     {
         var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
         // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-        graphQLClient = graphQLC;
+        // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        // graphQLClient = graphQLC;
         var getProjectObjects = new GraphQLRequest
         {
             Query = @"
@@ -197,10 +197,10 @@ public class ProjectContentManager : MonoBehaviour
 
         Debug.Log("Hi");
 
-        var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+        // var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
         // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-        graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-        this.graphQLClient = graphQLC;
+        // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        // this.graphQLClient = graphQLC;
         var getUserInfoRequest = new GraphQLRequest
         {
             Query = @"
@@ -241,10 +241,10 @@ public class ProjectContentManager : MonoBehaviour
             // Update the object position in list
             IRealityFlowObject robj = sceneObjects.Find((robj) => robj.uuid == go.GetComponent<EditableMesh>().uuid);
 
-            var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+            // var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
             // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-            graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-            this.graphQLClient = graphQLC;
+            // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+            // this.graphQLClient = graphQLC;
             var getUserInfoRequest = new GraphQLRequest
             {
                 Query = @"
@@ -269,10 +269,10 @@ public class ProjectContentManager : MonoBehaviour
             IRealityFlowObject robj = sceneObjects.Find((robj) => robj.uuid == go.GetComponent<EditableMesh>().uuid);
             sceneObjects.Remove(robj);
 
-            var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
+            // var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
             // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
-            graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-            this.graphQLClient = graphQLC;
+            // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+            // this.graphQLClient = graphQLC;
             var getUserInfoRequest = new GraphQLRequest
             {
                 Query = @"
