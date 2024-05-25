@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
+  m_Name: While
+  m_EditorClassIdentifier: 
+  Fields:
+  - Name: condition
+    Default:
+      type: 5
+      value:
+        rid: 6695490842361331722
+  - Name: body
+    Default:
+      type: 5
+      value:
+        rid: 6695490842361331723
+  Inputs: []
+  Outputs: []
+  IsVariadic: 1
+  IsVariadicOutput: 1
+  EvaluationMethod: 1
+  EvalLookup: 
+  EvalCode: "ctx.EvaluateGraph(condition);\nbool continue = ctx.GetGraphOutput(condition,
+    0);\n\nwhile (continue)\n{\n    ctx.EvaluateGraph(body);\n    ctx.EvaluateGraph(condition);\n   
+    continue = ctx.GetGraphOutput(condition, 0);\n}\n\nThen();"
+  ExecutionInput: 1
+  ExecutionOutputs:
+  - Then
+  references:
+    version: 2
+    RefIds:
+    - rid: 6695490842361331722
+      type: {class: GraphView, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+      data:
+        graph:
+          nodes:
+            list:
+              listDict: []
+            nextIndex: 0
+          reverseEdges:
+            listDict: []
+          executionEdges:
+            dict:
+              listDict: []
+          inputPorts: 
+          outputPorts: 06000000
+          reverseInputPortEdges:
+            listDict: []
+          reverseOutputPortEdges:
+            listDict: []
+          executionInputs: 1
+          inputExecutionEdges:
+            dict:
+              listDict: []
+          variadicPassthrough: 1
+          variadicOutput: 0
+    - rid: 6695490842361331723
+      type: {class: GraphView, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+      data:
+        graph:
+          nodes:
+            list:
+              listDict: []
+            nextIndex: 0
+          reverseEdges:
+            listDict: []
+          executionEdges:
+            dict:
+              listDict: []
+          inputPorts: 
+          outputPorts: 
+          reverseInputPortEdges:
+            listDict: []
+          reverseOutputPortEdges:
+            listDict: []
+          executionInputs: 1
+          inputExecutionEdges:
+            dict:
+              listDict: []
+          variadicPassthrough: 1
+          variadicOutput: 1
