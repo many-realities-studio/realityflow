@@ -114,14 +114,14 @@ namespace Ubiq.Avatars
                 }
                 avatar.IsLocal = true;
                 avatar.SetHints(hints);
-                gameObject.name = $"My Avatar #{ peer.uuid }";
+                gameObject.name = $"My Avatar #{peer.uuid}";
 
                 LocalAvatar = avatar;
             }
             else
             {
                 // Remote setup
-                avatar.gameObject.name = $"Remote Avatar #{ peer.uuid }";
+                avatar.gameObject.name = $"Remote Avatar #{peer.uuid}";
             }
 
             gameObject.transform.parent = transform;

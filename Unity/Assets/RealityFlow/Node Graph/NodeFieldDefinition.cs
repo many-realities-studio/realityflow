@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NaughtyAttributes;
+using RealityFlow.Scripting;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
