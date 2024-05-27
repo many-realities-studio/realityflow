@@ -27,7 +27,7 @@ public class PaletteHandManager : MonoBehaviour
 
     void Awake()
     {   
-        paletteManager = GameObject.Find("Network Scene/Palette Manager");
+        paletteManager = gameObject;
         leftHandRay = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor");
         leftHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor");
         rightHandRay = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Ray Interactor");
