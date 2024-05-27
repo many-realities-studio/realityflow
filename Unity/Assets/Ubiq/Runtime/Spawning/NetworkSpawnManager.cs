@@ -217,12 +217,12 @@ namespace Ubiq.Spawning
                 spawnedForPeers.Remove(peer);
             }
         }
-
         public void Despawn(GameObject gameObject)
         {
             string key = null;
             foreach (var kvp in spawnedForRoom)
             {
+                //kvp.Value.name = kvp.Value.name.Replace("(Clone)", "").Trim();
                 if (kvp.Value == gameObject)
                 {
                     key = kvp.Key;
@@ -236,7 +236,6 @@ namespace Ubiq.Spawning
                 roomClient.Room[key] = string.Empty;
                 return;
             }
-
             if (key == null && spawnedForPeers.TryGetValue(roomClient.Me, out var spawned))
             {
                 foreach (var kvp in spawned)
@@ -247,7 +246,6 @@ namespace Ubiq.Spawning
                         break;
                     }
                 }
-
                 // For (local) peer scope objects, despawn immediately
                 if (key != null)
                 {
@@ -260,6 +258,7 @@ namespace Ubiq.Spawning
             }
         }
 
+
         /// <summary>
         /// Spawn an entity with peer scope. All Components implementing the
         /// INetworkSpawnable interface will have their NetworkIDs set and
@@ -270,7 +269,9 @@ namespace Ubiq.Spawning
         /// </summary>
         public GameObject SpawnWithPeerScope(GameObject gameObject)
         {
-            var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
+
+
+            var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
             var catalogueIdx = ResolveIndex(gameObject);
 
             var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
@@ -305,13 +306,20 @@ namespace Ubiq.Spawning
         /// </summary>
         public void SpawnWithRoomScope(GameObject gameObject)
         {
-            var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
+            var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
             var catalogueIdx = ResolveIndex(gameObject);
+
+            var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
+            spawnedForRoom.Add(key, go);
+
             roomClient.Room[key] = JsonUtility.ToJson(new Message()
             {
                 creatorPeer = roomClient.Me.networkId,
                 catalogueIndex = catalogueIdx,
             });
+
+            OnSpawned(go, roomClient.Room, null, GetOrigin(local: true));
+
         }
 
         // RF (adds a return to above method)
@@ -381,12 +389,51 @@ namespace Ubiq.Spawning
             return go;
         }
 
-        private int ResolveIndex(GameObject gameObject)
+
+        /*private int ResolveIndex(GameObject gameObject)
         {
+           for (int curr = 0; curr < catalogue.prefabs.Count; curr++){
+            Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
+            }
+            
             var i = catalogue.IndexOf(gameObject);
             Debug.Assert(i >= 0, $"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
             return i;
+        }*/
+
+        //This function was edited by RealityFlow the commented out function above was the original
+        private int ResolveIndex(GameObject gameObject)
+        {
+
+            // Debug log each prefab in the catalogue for verification
+            for (int curr = 0; curr < catalogue.prefabs.Count; curr++)
+            {
+                //Debug.Log($"Prefab {curr}: {catalogue.prefabs[curr].name}");
+            }
+
+            // Find the index of the prefab by name
+            for (int i = 0; i < catalogue.prefabs.Count; i++)
+            {
+                if (catalogue.prefabs[i].name == gameObject.name)
+                {
+                    return i;
+                }
+            }
+
+            Debug.LogError($"Could not find {gameObject.name} in Catalogue. Ensure that you've added your new prefab to the Catalogue on NetworkSpawner before trying to instantiate it.");
+            return -1; // Return -1 if the prefab is not found
         }
+
+        public Dictionary<string, GameObject> GetSpawnedForRoom()
+        {
+            return spawnedForRoom;
+        }
+
+        public Dictionary<IPeer, Dictionary<string, GameObject>> GetSpawnedForPeers()
+        {
+            return spawnedForPeers;
+        }
+
     }
 
     public class NetworkSpawnManager : MonoBehaviour
@@ -448,6 +495,7 @@ namespace Ubiq.Spawning
         /// only the local peer can set values in their own properties, the
         /// object is created and immediately accessible.
         /// </summary>
+
         public GameObject SpawnWithPeerScope(GameObject gameObject)
         {
             if (spawner != null)
@@ -473,7 +521,7 @@ namespace Ubiq.Spawning
             }
         }
 
-        public void Despawn (GameObject gameObject)
+        public void Despawn(GameObject gameObject)
         {
             if (spawner != null)
             {
@@ -514,5 +562,34 @@ namespace Ubiq.Spawning
             }
             return null;
         }
+
+        public Dictionary<string, GameObject> GetSpawnedForRoom()
+        {
+            if (spawner != null)
+            {
+                return spawner.GetSpawnedForRoom();
+            }
+            return null;
+        }
+
+        public Dictionary<IPeer, Dictionary<string, GameObject>> GetSpawnedForPeers()
+        {
+            if (spawner != null)
+            {
+                return spawner.GetSpawnedForPeers();
+            }
+            return null;
+        }
+
+        public void UpdatePeerPublic(IPeer peer)
+        {
+            //spawner.UpdatePeer(peer);
+        }
+
+        public void UpdateRoomPublic(IRoom room)
+        {
+            //spawner.UpdateRoom(room);
+        }
     }
+
 }
