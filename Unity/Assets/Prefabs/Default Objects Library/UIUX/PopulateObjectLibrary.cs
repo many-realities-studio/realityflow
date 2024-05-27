@@ -42,6 +42,7 @@ public class PopulateObjectLibrary : MonoBehaviour
     // Sends the object prefab for the new buttons object to SpawnObjectAtRay when pressed
     void TriggerObjectSpawn(GameObject objectPrefab)
     {
+      Debug.Log("TriggerObjectSpawn");
         spawnScript.RaySpawnToggle(objectPrefab);
     }
 }

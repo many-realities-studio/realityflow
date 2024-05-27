@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Ubiq.Editor.XRI
 {
     public static class ImportHelperXRI

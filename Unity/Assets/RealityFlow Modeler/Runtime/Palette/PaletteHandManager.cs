@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using Ubiq.Messaging;
+using Ubiq.Networking;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Avatars;
@@ -39,10 +40,10 @@ public class PaletteHandManager : MonoBehaviour
         // Only put a parent constraint for the owner's palette (if the first avatar found is the owner)
         for (int i = 0; i < avatars.Length; i++)
         {
-            if (avatars[i].ToString().Contains(AvatarManager.UUID))
+            if (avatars[i].ToString().Contains("My Avatar"))
             {
                 GameObject[] dominantHandManagers = GameObject.FindGameObjectsWithTag("DominantHandManager");
-
+                PaletteHandManager manager = NetworkScene.Find(this).GetComponentInChildren<PaletteHandManager>();
                 if (isLeftHandDominant == null)
                 {
                     for (int j = 0; j < dominantHandManagers.Length; j++)
@@ -97,7 +98,7 @@ public class PaletteHandManager : MonoBehaviour
 
                 // By default, parent constraint is set to false in the inspector. Turn it on only for the client. If parent
                 // constraints are on for both client and server-side peers the palette will not function correctly and flicker.
-                parentConstraint.enabled = true;
+                parentConstraint.constraintActive = true;
 
                 // Add the LeftHand Controller as an argument for Parent Constraint
                 constraintSource.sourceTransform = dominantHand;

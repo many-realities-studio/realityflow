@@ -16,6 +16,7 @@ public class PaletteSpawner : MonoBehaviour
     private StatefulInteractable isLeftHandDominant;
     private GameObject palette;
     private bool paletteShown;
+    
 
     public void SpawnPalette()
     {
