@@ -15,14 +15,14 @@ public class NetworkSpawnManagerEditor : Editor
         {
             // Assuming that the prefab is at index 1
             var cubePrefab = manager.catalogue.prefabs[0];
-            manager.SpawnWithPeerScope(cubePrefab);
+            manager.SpawnWithRoomScope(cubePrefab);
         }
 
         if (GUILayout.Button("Spawn Tree"))
         {
             // Assuming that the prefab is at index 0
             var treePrefab = manager.catalogue.prefabs[1];
-            manager.SpawnWithPeerScope(treePrefab);
+            manager.SpawnWithRoomScope(treePrefab);
         }
 
 

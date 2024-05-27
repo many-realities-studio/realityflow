@@ -299,16 +299,36 @@ namespace Ubiq.Spawning
         /// conditions in the shared room dictionary the object is not
         /// immediately accessible.
         /// </summary>
-        public void SpawnWithRoomScope(GameObject gameObject)
+    public void SpawnWithRoomScope(GameObject gameObject)
+    {
+        var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
+        var catalogueIdx = ResolveIndex(gameObject);
+
+        var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
+        go.name = gameObject.name; // Removing the "(Clone)" suffix
+
+        if (!spawnedForPeers.ContainsKey(roomClient.Me))
         {
-            var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
-            var catalogueIdx = ResolveIndex(gameObject);
-            roomClient.Room[key] = JsonUtility.ToJson(new Message()
-            {
-                creatorPeer = roomClient.Me.networkId,
-                catalogueIndex = catalogueIdx,
-            });
+            spawnedForPeers.Add(roomClient.Me, new Dictionary<string, GameObject>());
         }
+        spawnedForPeers[roomClient.Me].Add(key, go);
+
+        // Debug log to display the network ID of the spawned object.
+        var networkableComponents = go.GetComponentsInChildren<INetworkSpawnable>(true);
+        foreach (var component in networkableComponents)
+        {
+            Debug.Log($"Spawned Object Network ID: {component.NetworkId}");
+        }
+
+        OnSpawned(go, room: null, roomClient.Me, GetOrigin(local: true));
+
+        roomClient.Me[key] = JsonUtility.ToJson(new Message()
+        {
+            creatorPeer = roomClient.Me.networkId,
+            catalogueIndex = catalogueIdx,
+        });
+    }
+
 
         private static NetworkId ParseNetworkId(string key, string propertyPrefix)
         {
