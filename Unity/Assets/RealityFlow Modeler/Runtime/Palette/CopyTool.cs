@@ -38,8 +38,8 @@ public class CopyTool : MonoBehaviour
         gizmoManager = gameObject.GetComponentInChildren<AttachGizmoState>();
 
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Left Controller");
-        rightHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller");
+        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
+        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (rayInteractor == null)

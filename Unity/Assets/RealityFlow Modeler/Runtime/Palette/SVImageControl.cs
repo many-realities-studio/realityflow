@@ -40,8 +40,8 @@ public class SVImageControl : MonoBehaviour
         pickerTransform = pickerImage.GetComponent<RectTransform>();
         pickerTransform.localPosition = new Vector2(-59.92683f, -57.8448f);
 
-        leftHand = GameObject.Find("Left Controller");
-        rightHand = GameObject.Find("Right Controller");
+        leftHand = GameObject.Find("MRTK LeftHand Controller");
+        rightHand = GameObject.Find("MRTK RightHand Controller");
 
         if (dominantHandButton.IsToggled)
         {

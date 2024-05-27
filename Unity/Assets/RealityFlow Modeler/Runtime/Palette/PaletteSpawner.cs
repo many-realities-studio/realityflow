@@ -26,7 +26,11 @@ public class PaletteSpawner : MonoBehaviour
         {
             // Debug.Log("SpawnPalette() was triggered to spawn a palette");
             palette = NetworkSpawnManager.Find(this).SpawnWithPeerScope(palettePrefab);
-
+            PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
+            phm.paletteManager = gameObject;
+            phm.left = GetComponents<OnButtonPress>()[0];
+            phm.right = GetComponents<OnButtonPress>()[1];
+            phm.left.enabled = false;
             paletteShown = true;
 
             // Set the ownership of the spawned palette to the user who spawned it

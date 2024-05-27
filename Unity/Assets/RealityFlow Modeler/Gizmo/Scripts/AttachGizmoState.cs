@@ -46,12 +46,12 @@ public class AttachGizmoState : MonoBehaviour
         attachedGameObject = null;
         lookForTarget = false;
         if(rightHand == null) {
-            rightHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller");
+            rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
         }
         //Debug.Log("AttachGizmoState righthand set to" + rightHand);
-        //Debug.Log(GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller"));
+        //Debug.Log(GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller"));
         if(leftHand == null) {
-            leftHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Left Controller");
+            leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
         }
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
@@ -336,7 +336,7 @@ public class AttachGizmoState : MonoBehaviour
         if (rightHand.GetComponentInChildren<XRRayInteractor>() == null)
             activeContoller = leftHand;            
 
-        return activeContoller.transform.Find("Ray Interactor").gameObject;
+        return activeContoller.transform.Find("Far Ray").gameObject;
     }
     public void EnableMeshRaySelection()
     {
