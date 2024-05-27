@@ -14,8 +14,8 @@ using Ubiq.Avatars;
 public class PaletteHandManager : MonoBehaviour
 {
     [SerializeField] private PaletteSpawner paletteSpawner;
-    private GameObject paletteManager;
-    private StatefulInteractable isLeftHandDominant;
+    public GameObject paletteManager;
+    public StatefulInteractable isLeftHandDominant;
     private ConstraintSource constraintSource;
 
     private GameObject leftHandRay;
@@ -27,11 +27,10 @@ public class PaletteHandManager : MonoBehaviour
 
     void Awake()
     {   
-        paletteManager = gameObject;
-        leftHandRay = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor");
-        leftHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor");
-        rightHandRay = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Ray Interactor");
-        rightHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Poke Interactor");
+        leftHandRay = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray");
+        leftHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor");
+        rightHandRay = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/Far Ray");
+        rightHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor");
     }
 
     public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars)
@@ -42,20 +41,6 @@ public class PaletteHandManager : MonoBehaviour
         {
             if (avatars[i].ToString().Contains("My Avatar"))
             {
-                GameObject[] dominantHandManagers = GameObject.FindGameObjectsWithTag("DominantHandManager");
-                PaletteHandManager manager = NetworkScene.Find(this).GetComponentInChildren<PaletteHandManager>();
-                if (isLeftHandDominant == null)
-                {
-                    for (int j = 0; j < dominantHandManagers.Length; j++)
-                    {
-                        if (dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().ownerName.Contains(AvatarManager.UUID))
-                        {
-                            
-                            isLeftHandDominant = dominantHandManagers[j].GetComponent<PressableButton>();
-                        }
-                    }
-                }
-
                 // By default the dominant hand is assigned to the right hand
                 // This is very dependent on Ubiq implementation but likely has to be.
                 Transform dominantHand = avatars[i].transform.Find("Body/Floating_LeftHand_A");
@@ -75,8 +60,8 @@ public class PaletteHandManager : MonoBehaviour
                     leftHandRay.SetActive(true);
                     leftHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Ray Interactor"),
-                                    GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Right Controller/Poke Interactor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/Far Ray"),
+                                    GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor")));
                 }
                 else if (!isLeftHandDominant.IsToggled)
                 {
@@ -92,8 +77,8 @@ public class PaletteHandManager : MonoBehaviour
                     rightHandRay.SetActive(true);
                     rightHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Ray Interactor"),
-                                    GameObject.Find("Player (XRI + WebXR)/XR Origin (XR Rig)/Camera Offset/Left Controller/Poke Interactor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray"),
+                                    GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor")));
                 }
 
                 // By default, parent constraint is set to false in the inspector. Turn it on only for the client. If parent
@@ -119,20 +104,24 @@ public class PaletteHandManager : MonoBehaviour
 
         OnHandChange?.Invoke(isLeftHandDominant.IsToggled);
     }
-
+    public OnButtonPress left;
+    public OnButtonPress right;
     public void ChangeGripButton()
     {
         try
         {
             if (isLeftHandDominant.IsToggled)
             {
-                paletteManager.GetComponents<OnButtonPress>()[0].enabled = false;
-                paletteManager.GetComponents<OnButtonPress>()[1].enabled = true;
+                left.enabled = false;
+                right.enabled = true;
+                // paletteManager.GetComponents<OnButtonPress>()[1].enabled = true;
             }
             else if (!isLeftHandDominant.IsToggled)
             {
-                paletteManager.GetComponents<OnButtonPress>()[0].enabled = true;
-                paletteManager.GetComponents<OnButtonPress>()[1].enabled = false;
+                left.enabled = true;
+                right.enabled = false;
+                // paletteManager.GetComponents<OnButtonPress>()[0].enabled = true;
+                // paletteManager.GetComponents<OnButtonPress>()[1].enabled = false;
             }
         }
         catch (NullReferenceException e)

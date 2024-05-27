@@ -10,7 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class NetworkedVRWhiteBoard : MonoBehaviour, INetworkSpawnable
 {
-   public NetworkId NetworkId {get; set;}
+   public NetworkId NetworkId {get; set;} = NetworkId.Unique();
     NetworkContext context;
     public bool owner;
     private GameObject obj;

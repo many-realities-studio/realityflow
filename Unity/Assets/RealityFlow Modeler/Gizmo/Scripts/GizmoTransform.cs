@@ -35,8 +35,8 @@ public class GizmoTransform : MonoBehaviour
 
     public void Awake()
     {
-        rightHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Right Controller");
-        leftHand = GameObject.Find("XR Origin (XR Rig)/Camera Offset/Left Controller");
+        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
         gizmoManager = GameObject.Find("Gizmo Manager");
         SetActiveInteractor();
         awake = true;
