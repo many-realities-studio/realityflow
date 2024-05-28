@@ -50429,7 +50429,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &1938891781405468430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50613,7 +50613,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   paletteSpawner: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
     type: 3}
+  paletteManager: {fileID: 0}
   isLeftHandDominant: {fileID: 8694294325140152420}
+  left: {fileID: 0}
+  right: {fileID: 0}
 --- !u!114 &5064402207238684043
 MonoBehaviour:
   m_ObjectHideFlags: 0
