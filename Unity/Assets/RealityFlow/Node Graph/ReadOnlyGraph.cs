@@ -10,15 +10,15 @@ namespace RealityFlow.NodeGraph
     /// invalidate the graph mid-evaluation.
     /// </summary>
     [Serializable]
-    public struct GraphView : IEquatable<GraphView>
+    public struct ReadonlyGraph : IEquatable<ReadonlyGraph>
     {
         [SerializeField]
         Graph graph;
 
-        public GraphView(Graph graph)
+        public ReadonlyGraph(Graph graph)
         {
             this.graph = graph;
-        }  
+        }
 
         public Node GetNode(NodeIndex index)
         {
@@ -43,12 +43,12 @@ namespace RealityFlow.NodeGraph
 
         public override readonly bool Equals(object obj)
         {
-            if (obj is GraphView view)
+            if (obj is ReadonlyGraph view)
                 return Equals(view);
             return false;
         }
 
-        public readonly bool Equals(GraphView other)
+        public readonly bool Equals(ReadonlyGraph other)
         {
             return graph == other.graph;
         }
@@ -58,7 +58,7 @@ namespace RealityFlow.NodeGraph
             return graph.GetHashCode();
         }
 
-        public static bool operator ==(GraphView left, GraphView right) => left.Equals(right);
-        public static bool operator !=(GraphView left, GraphView right) => !(left == right);
+        public static bool operator ==(ReadonlyGraph left, ReadonlyGraph right) => left.Equals(right);
+        public static bool operator !=(ReadonlyGraph left, ReadonlyGraph right) => !(left == right);
     }
 }

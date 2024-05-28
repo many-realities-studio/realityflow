@@ -4,24 +4,27 @@ using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
 
-public class InputPortView : MonoBehaviour
+namespace RealityFlow.NodeUI
 {
-    NodePortDefinition def;
-    public NodePortDefinition Definition 
+    public class InputPortView : MonoBehaviour
     {
-        get => def;
-        set
+        NodePortDefinition def;
+        public NodePortDefinition Definition
         {
-            def = value;
-            Render();
+            get => def;
+            set
+            {
+                def = value;
+                Render();
+            }
         }
-    }
 
-    [SerializeField]
-    TextMeshProUGUI portName;
+        [SerializeField]
+        IntegerEditor editor;
 
-    void Render()
-    {
-        portName.text = Definition.Name;
+        void Render()
+        {
+            // editor.Name = Definition.Name;
+        }
     }
 }

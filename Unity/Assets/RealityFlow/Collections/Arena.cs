@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RealityFlow.Collections
@@ -7,7 +10,7 @@ namespace RealityFlow.Collections
     /// A list with typesafe, generated indices. 
     /// </summary>
     [Serializable]
-    public class Arena<T>
+    public class Arena<T> : IEnumerable<T>
     {
         [SerializeField]
         SerializableDict<Index, T> list = new();
@@ -32,6 +35,16 @@ namespace RealityFlow.Collections
         public bool Remove(Index index)
         {
             return list.Remove(index);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return list.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return list.Values.GetEnumerator();
         }
 
         [Serializable]
