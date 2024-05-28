@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
+using Ubiq.Spawning;
 
 public class ChatGPTTester : MonoBehaviour
 {
@@ -86,6 +87,14 @@ public class ChatGPTTester : MonoBehaviour
         {
             gptPrompt = gptPrompt.Replace("{" + $"{r.replacementType}" + "}", r.value);
         });
+
+        // Add prefabs to reminders using RealityFlowAPI
+        List<string> prefabNames = RealityFlowAPI.Instance.GetPrefabNames();
+        if (prefabNames.Count > 0)
+        {
+            var reminderMessage = "Only use the following prefabs when spawning: " + string.Join(", ", prefabNames);
+            chatGPTQuestion.reminders = chatGPTQuestion.reminders.Concat(new[] { reminderMessage }).ToArray();
+        }
 
         // handle reminders
         if (chatGPTQuestion.reminders.Length > 0)

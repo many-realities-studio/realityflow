@@ -5,6 +5,7 @@ using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
 using System;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -354,6 +355,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Add cases for other functions...
         }
     }
+    public List<string> GetPrefabNames()
+    {
+        if (spawnManager != null && spawnManager.catalogue != null)
+        {
+            return spawnManager.catalogue.prefabs.Select(prefab => prefab.name).ToList();
+        }
+        return new List<string>();
+    }
+
 
     public void StartCompoundAction()
     {

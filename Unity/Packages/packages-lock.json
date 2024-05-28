@@ -63,6 +63,15 @@
       },
       "hash": "82c67f3c28b3775b12cfb9a64af7a7fee9e9ce2d"
     },
+    "com.srcnalt.openai-unity": {
+      "version": "https://github.com/srcnalt/OpenAI-Unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "f7f501c076f27a12a2cbb2fa1235a106ce7b16e3"
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.5",
       "depth": 0,
@@ -280,17 +289,6 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.unity.webrtc-no-vulkan-hook": {
-      "version": "https://github.com/UCL-VR/unity-webrtc-no-vulkan-hook.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.editorcoroutines": "1.0.0",
-        "com.unity.modules.audio": "1.0.0"
-      },
-      "hash": "7f4d3e9ab14b772e8c57b8bd846f2435f689aaae"
     },
     "com.unity.webrtc-ubiq-fork": {
       "version": "https://github.com/UCL-VR/unity-webrtc-ubiq-fork.git",
