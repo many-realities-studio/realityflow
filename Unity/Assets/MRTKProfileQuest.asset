@@ -17,6 +17,10 @@ MonoBehaviour:
   subsystemConfigs:
     entries:
     - key:
+        reference: Microsoft.MixedReality.Toolkit.Input.MRTKHandsAggregatorSubsystem,
+          Microsoft.MixedReality.Toolkit.Input
+      value: {fileID: 0}
+    - key:
         reference: Microsoft.MixedReality.Toolkit.Input.SyntheticHandsSubsystem,
           Microsoft.MixedReality.Toolkit.Input
       value: {fileID: 11400000, guid: 94361be3ad17a7943a45170d99f26ee7, type: 2}
