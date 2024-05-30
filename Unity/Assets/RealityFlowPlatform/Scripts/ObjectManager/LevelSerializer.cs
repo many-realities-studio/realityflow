@@ -57,6 +57,12 @@ namespace RealityFlowPlatform
             return jsonData;
         }
 
+        public void SendJsonToDatabase(string jsonData)
+        {
+            // Send the JSON data to the database
+            
+        }
+
         public void DeserializeJsonToLevel(string jsonData)
         {
             LevelData levelData = JsonUtility.FromJson<LevelData>(jsonData);   // Deserialize the JSON data back to LevelData
@@ -72,5 +78,6 @@ namespace RealityFlowPlatform
                 // Optionally, set other properties or add components to newObject based on objData
             }
         }
+
     }
 }

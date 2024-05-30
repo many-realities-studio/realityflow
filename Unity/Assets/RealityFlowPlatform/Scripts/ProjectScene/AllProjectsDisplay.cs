@@ -28,7 +28,7 @@ public class ProjectDisplay : MonoBehaviour
     // GraphQL client and access token variables 
     public GraphQLHttpClient graphQLHttpClient;
     private RealityFlowClient rfClient;
-        public Transform roomsContent;
+    public Transform roomsContent;
     public GameObject roomUI;
     public Button createRoomBtn;
 
