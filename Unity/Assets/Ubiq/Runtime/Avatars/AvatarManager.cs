@@ -8,6 +8,9 @@ using Ubiq.Voip;
 using UnityEngine;
 using UnityEngine.Events;
 
+// NOTE: This file has been modified for RealityFlow, All changes will be marked with
+// comments specifying "RF" near the changes that occured (directly above or inline).
+
 namespace Ubiq.Avatars
 {
     /// <summary>
@@ -71,18 +74,6 @@ namespace Ubiq.Avatars
 
         private void Start()
         {
-                if (RoomClient == null)
-                {
-                    Debug.LogError("RoomClient is not assigned!");
-                    return;
-                }
-
-                if (avatarCatalogue == null)
-                {
-                    Debug.LogError("Avatar Catalogue is not assigned!");
-                    return;
-                }
-
             spawner = new NetworkSpawner(NetworkScene.Find(this),
                 RoomClient, avatarCatalogue, "ubiq.avatars.");
             spawner.OnSpawned += OnSpawned;
@@ -108,6 +99,9 @@ namespace Ubiq.Avatars
             spawner = null;
         }
 
+        // RF - Adding string for UUID to gain access to peer.uuid to set palette ownership
+        public static string UUID;
+
         private void OnSpawned(GameObject gameObject, IRoom room,
             IPeer peer, NetworkSpawnOrigin origin)
         {
@@ -126,14 +120,20 @@ namespace Ubiq.Avatars
                 }
                 avatar.IsLocal = true;
                 avatar.SetHints(hints);
-                gameObject.name = $"My Avatar #{ peer.uuid }";
+                gameObject.name = $"My Avatar #{peer.uuid}";
+
+                // RF - where UUID is used:
+                if (UUID == null)
+                {
+                    UUID = peer.uuid;
+                } // end of RF changes
 
                 LocalAvatar = avatar;
             }
             else
             {
                 // Remote setup
-                avatar.gameObject.name = $"Remote Avatar #{ peer.uuid }";
+                avatar.gameObject.name = $"Remote Avatar #{peer.uuid}";
             }
 
             gameObject.transform.parent = transform;

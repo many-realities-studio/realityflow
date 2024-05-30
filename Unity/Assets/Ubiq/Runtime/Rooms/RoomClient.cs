@@ -653,7 +653,6 @@ namespace Ubiq.Rooms
         /// <remarks>
         /// RoomClient is one of a few components able to create new connections. Usually it will be user code that makes such connections.
         /// </remarks>
-
         public void Connect(ConnectionDefinition connection)
         {
             scene.AddConnection(Connections.Resolve(connection));

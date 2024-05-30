@@ -6,7 +6,6 @@ using UnityEditorInternal;
 using System;
 using System.Linq;
 using Ubiq.Networking;
-using UnityEngine.SceneManagement;
 
 namespace Ubiq.Rooms
 {
@@ -126,17 +125,17 @@ namespace Ubiq.Rooms
 
             if(GUILayout.Button("Create Room")) // creates a room with a random id and joins it
             {
-                Debug.Log("Creating Room...");
+                component.Join(name:$"Editor Room {IdGenerator.GenerateUnique().ToString()}",publish:true); // publish true because we probably need other Editor inspectors to see it
             }
 
             if(GUILayout.Button("Leave Room"))
             {
-                Debug.Log("Leaving Current Room...");
+                component.Join("",false);
             }
 
             if (GUILayout.Button("Refresh"))
             {
-                Debug.Log("Refreashing Current Room...");
+                component.DiscoverRooms();
             }
 
             GUI.enabled = false;
