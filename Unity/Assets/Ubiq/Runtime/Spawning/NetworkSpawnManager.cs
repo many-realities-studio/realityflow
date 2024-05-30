@@ -304,23 +304,23 @@ namespace Ubiq.Spawning
         /// conditions in the shared room dictionary the object is not
         /// immediately accessible.
         /// </summary>
-        public void SpawnWithRoomScope(GameObject gameObject)
-        {
-            var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
-            var catalogueIdx = ResolveIndex(gameObject);
+        // public void SpawnWithRoomScope(GameObject gameObject)
+        // {
+        //     var key = $"{propertyPrefix}{NetworkId.Unique()}"; // Uniquely id the whole object
+        //     var catalogueIdx = ResolveIndex(gameObject);
 
-            var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
-            spawnedForRoom.Add(key, go);
+        //     var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
+        //     spawnedForRoom.Add(key, go);
 
-            roomClient.Room[key] = JsonUtility.ToJson(new Message()
-            {
-                creatorPeer = roomClient.Me.networkId,
-                catalogueIndex = catalogueIdx,
-            });
+        //     roomClient.Room[key] = JsonUtility.ToJson(new Message()
+        //     {
+        //         creatorPeer = roomClient.Me.networkId,
+        //         catalogueIndex = catalogueIdx,
+        //     });
 
-            OnSpawned(go, roomClient.Room, null, GetOrigin(local: true));
+        //     OnSpawned(go, roomClient.Room, null, GetOrigin(local: true));
 
-        }
+        // }
 
         // RF (adds a return to above method)
         public GameObject SpawnWithRoomScopeWithReturn(GameObject gameObject)
