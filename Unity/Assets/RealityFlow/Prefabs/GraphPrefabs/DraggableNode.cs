@@ -131,11 +131,11 @@ public class DraggableNode : StatefulInteractable, ISnapInteractable
   {
     SnapToPosition = snapToPosition;
 
-    if (handleTransform == null)
-    {
-      Debug.LogWarning("DraggableNode " + name + " has no handle transform. Please fix! Using primary collider instead.");
+    // if (handleTransform == null)
+    // {
+      // Debug.LogWarning("DraggableNode " + name + " has no handle transform. Please fix! Using primary collider instead.");
       handleTransform = colliders[0].transform;
-    }
+    // }
 
     if (useDraggableNodeStepDivisions)
     {
