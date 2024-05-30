@@ -14,23 +14,23 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     {
         var url = chatGTPSettings.debug ? $"{chatGTPSettings.apiURL}?debug=true" : chatGTPSettings.apiURL;
 
-        using(UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
             var requestParams = JsonConvert.SerializeObject(new ChatGPTRequest
             {
                 Model = chatGTPSettings.apiModel,
                 Messages = new ChatGPTChatMessage[]
-                   {
-                       new ChatGPTChatMessage
-                       {
-                            role = "user",
-                            content = prompt
-                       }
-                   }
+                {
+                    new ChatGPTChatMessage
+                    {
+                         role = "user",
+                         content = prompt
+                    }
+                }
             });
 
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(requestParams);
-            
+
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.disposeDownloadHandlerOnDispose = true;
@@ -39,15 +39,19 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 
             request.SetRequestHeader("Content-Type", "application/json");
 
-            // required to authenticate against OpenAI
-            request.SetRequestHeader("Authorization", $"Bearer {chatGTPSettings.apiKey}");
-            request.SetRequestHeader("OpenAI-Organization", chatGTPSettings.apiOrganization);
+            // Retrieve the API key from the environment manager
+            string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
+            string organization = EnvConfigManager.Instance.OpenAIOrganization;
+
+            // Set the request headers
+            request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+            request.SetRequestHeader("OpenAI-Organization", organization);
 
             var requestStartDateTime = DateTime.Now;
 
             yield return request.SendWebRequest();
 
-            if(request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.DataProcessingError)
+            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.DataProcessingError)
             {
                 Debug.Log(request.error);
             }

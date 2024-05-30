@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 namespace Samples.Whisper
 {
@@ -10,6 +11,7 @@ namespace Samples.Whisper
         [SerializeField] private Button recordButton;
         [SerializeField] private Image progressBar;
         [SerializeField] private TMP_InputField message;
+        [SerializeField] private TMP_InputField apiKeyInputField;
         [SerializeField] private Dropdown dropdown;
 
         private readonly string fileName = "output.wav";
@@ -18,10 +20,26 @@ namespace Samples.Whisper
         private AudioClip clip;
         private bool isRecording;
         private float time;
-        private OpenAIApi openai = new OpenAIApi();
+        private OpenAIApi openai;
 
         private void Start()
         {
+            string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
+
+            // If the environment variable is not set, use the API key from the input field
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                apiKey = apiKeyInputField.text;
+            }
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
+                return;
+            }
+
+            openai = new OpenAIApi(apiKey);
+
 #if UNITY_WEBGL && !UNITY_EDITOR
             dropdown.options.Add(new Dropdown.OptionData("Microphone not supported on WebGL"));
 #else
@@ -67,7 +85,6 @@ namespace Samples.Whisper
             var req = new CreateAudioTranscriptionsRequest
             {
                 FileData = new FileData() { Data = data, Name = "audio.wav" },
-                // File = Application.persistentDataPath + "/" + fileName,
                 Model = "whisper-1",
                 Language = "en"
             };
