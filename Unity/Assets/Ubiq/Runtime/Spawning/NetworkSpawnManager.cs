@@ -8,6 +8,9 @@ using Ubiq.Rooms;
 using Ubiq.Logging;
 using UnityEngine.Events;
 
+// NOTE: This file has been modified for RealityFlow, comments with "RF" are
+// placed by all the changes made.
+
 namespace Ubiq.Spawning
 {
     public enum NetworkSpawnOrigin
@@ -40,6 +43,9 @@ namespace Ubiq.Spawning
         private List<string> tmpStrings = new List<string>();
         private List<INetworkSpawnable> tmpSpawnables = new List<INetworkSpawnable>();
         private List<NetworkId> tmpNetworkIds = new List<NetworkId>();
+
+        // REALITYFLOW CHANGE: Value to aid in making unique object names:
+        int j = 0; // RF
 
         [Serializable]
         private struct Message
@@ -94,6 +100,7 @@ namespace Ubiq.Spawning
 
         private void UpdateRoom(IRoom room)
         {
+            // Debug.Log("Updating Room " + room.UUID); // RF
             // Spawn all unspawned objects for this room
             foreach (var item in room)
             {
@@ -284,6 +291,11 @@ namespace Ubiq.Spawning
             return go;
         }
 
+        // RF: There was a commented out section on an old version with a SpawnWithPeerScopeCast Method
+        // Refer to Fixing-references-old-vs branch on realityflow-new repository.
+        //
+        //
+
         /// <summary>
         /// Spawn an entity with room scope. All Components implementing the
         /// INetworkSpawnable interface will have their NetworkIDs set and
@@ -310,6 +322,28 @@ namespace Ubiq.Spawning
 
         }
 
+        // RF (adds a return to above method)
+        public GameObject SpawnWithRoomScopeWithReturn(GameObject gameObject)
+        {
+            var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
+            var catalogueIdx = ResolveIndex(gameObject);
+
+            var go = InstantiateAndSetIds(key, catalogueIdx, local: true);
+            if (!spawnedForRoom.ContainsKey(key))
+            {
+                spawnedForRoom.Add(key, go);
+            }
+            OnSpawned(go, roomClient.Room, peer: null, GetOrigin(local: true));
+
+            roomClient.Room[key] = JsonUtility.ToJson(new Message()
+            {
+                creatorPeer = roomClient.Me.networkId,
+                catalogueIndex = catalogueIdx,
+            });
+
+            return go;
+        }
+
         private static NetworkId ParseNetworkId(string key, string propertyPrefix)
         {
             if (key.Length > propertyPrefix.Length)
@@ -319,6 +353,7 @@ namespace Ubiq.Spawning
             return NetworkId.Null;
         }
 
+        // RF - This method has a small modification for object naming
         private GameObject InstantiateAndSetIds(string key, int catalogueIdx, bool local)
         {
             var networkId = ParseNetworkId(key, propertyPrefix);
@@ -336,6 +371,21 @@ namespace Ubiq.Spawning
                 tmpSpawnables[i].NetworkId = NetworkId.Create(networkId, (uint)(i + 1));
             }
 
+            go.name = go.name + j++; // RF change
+            return go;
+        }
+
+        // RF - new method that helps with instantiating objects
+        private GameObject InstantiateObject(string key, int catalogueIdx, bool local)
+        {
+            var networkId = ParseNetworkId(key, propertyPrefix);
+            if (networkId == NetworkId.Null)
+            {
+                return null;
+            }
+
+            var go = GameObject.Instantiate(catalogue.prefabs[catalogueIdx]);
+            go.name = go.name + j++;
             return go;
         }
 
@@ -477,6 +527,17 @@ namespace Ubiq.Spawning
             {
                 spawner.Despawn(gameObject);
             }
+        }
+
+        // RF - new method that returns the game object it spawns
+        // Weird and recursive and not sure if it works - May go unused?
+        public GameObject SpawnWithRoomScopeWithReturn(GameObject gameObject)
+        {
+            if(spawner != null)
+            {
+               return spawner.SpawnWithRoomScopeWithReturn(gameObject);
+            }
+            return null;
         }
 
         private void Spawner_OnSpawned(GameObject gameObject, IRoom room,
