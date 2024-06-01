@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Microsoft.MixedReality.Toolkit.UX;
 using TMPro;
+using Unity.VisualScripting;
 
 public class PopulateObjectLibrary : MonoBehaviour
 {
@@ -43,6 +44,7 @@ public class PopulateObjectLibrary : MonoBehaviour
     void TriggerObjectSpawn(GameObject objectPrefab)
     {
       Debug.Log("TriggerObjectSpawn");
-        spawnScript.RaySpawnToggle(objectPrefab);
+      Debug.Log(objectPrefab);
+        spawnScript.RaySpawnToggle(Instantiate(objectPrefab));
     }
 }
