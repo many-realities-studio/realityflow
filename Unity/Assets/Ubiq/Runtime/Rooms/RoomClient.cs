@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Ubiq.Dictionaries;
 using Ubiq.Messaging;
 using Ubiq.Networking;
@@ -7,6 +8,7 @@ using Ubiq.Rooms.Messages;
 using Ubiq.XR.Notifications;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using RealityFlowPlatform;
 
 namespace Ubiq.Rooms
 {
@@ -22,6 +24,7 @@ namespace Ubiq.Rooms
         // These are the messages defined by the RoomClient/RoomServer pair.
         // These should match exactly the schema in the RoomServer.
 
+        // Add a reference to the LevelSerializer
         [Serializable]
         private class PeerInfo
         {
@@ -105,7 +108,7 @@ namespace Ubiq.Rooms
         }
 
         [Serializable]
-        private class SetRoomArgs
+           private class SetRoomArgs
         {
             public RoomInfo room;
             public PeerInfo[] peers;
@@ -163,7 +166,6 @@ namespace Ubiq.Rooms
         private AppendRoomPropertiesArgs _appendRoomPropertiesArgs = new AppendRoomPropertiesArgs();
 
         public IRoom Room { get => room; }
-
         /// <summary>
         /// A reference to the Peer that represents this local player. Me will be the same reference through the life of the RoomClient.
         /// It is valid after Awake() (can be used in Start()).
@@ -453,7 +455,7 @@ namespace Ubiq.Rooms
 
         private void Awake()
         {
-            OnJoinedRoom.AddListener((room) => Debug.Log("Joined Room " + room.Name));
+            OnJoinedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Room " + room.Name));
             OnPeerUpdated.SetExisting(me);
         }
 
@@ -617,6 +619,7 @@ namespace Ubiq.Rooms
         /// </summary>
         public void Join(string joincode)
         {
+            Debug.Log("[ROOM CLIENT] Joining room with join code: " + joincode);
             actions.Add(() =>
             {
                 SendToServerSync("Join", new JoinArgs()

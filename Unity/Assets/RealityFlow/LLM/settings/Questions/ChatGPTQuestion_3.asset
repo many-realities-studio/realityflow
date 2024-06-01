@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8f40005f71da0842b543834cc80d108, type: 3}
+  m_Name: ChatGPTQuestion_3
+  m_EditorClassIdentifier: 
+  scenarioTitle: Creating player armatures, moving, and jumping
+  promptPrefixConstant: A unity c# class script that
+  prompt: loads a PlayerArmature prefab from Resources consistently every 1/2 second,
+    get StarterAssetsInputs component, set the "move" field to a vector2 with 1.0f
+    for x and 0 for y, then set the "jump" field to true
+  replacements: []
+  reminders:
+  - do not include any explanations
+  - aways include code with markdown
+  - do not require any prefabs
+  - do not require any references
+  - all references should not be null
+  - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets; '
+  - 'Only use the RealityFlow API which is referenced here: ### RealityFlow API Functions
+    and Examples  1. **SpawnObject**    - **Description**: Spawns an object in the
+    virtual room.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.SpawnObject("Ladder",
+    new Vector3(0, 0, 0), Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);     
+    ```  2. **DespawnObject**    - **Description**: Removes an object from the virtual
+    room.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.FindSpawnedObject("Ladder(Clone)");     
+    if (ladder != null)      {          RealityFlowAPI.Instance.DespawnObject(ladder);     
+    }      ```  3. **UpdateObjectTransform**    - **Description**: Updates the position,
+    rotation, and scale of an object.    - **Usage**:       ```csharp      RealityFlowAPI.Instance.UpdateObjectTransform("Ladder(Clone)",
+    new Vector3(1, 1, 1), Quaternion.Euler(45, 45, 45), new Vector3(1.5f, 1.5f, 1.5f));     
+    ```  4. **FindSpawnedObject**    - **Description**: Finds a spawned object by
+    name.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.FindSpawnedObject("Ladder(Clone)");     
+    ```  5. **StartCompoundAction**    - **Description**: Begins a compound action
+    for batching multiple API calls.    - **Usage**:       ```csharp      RealityFlowAPI.Instance.StartCompoundAction();     
+    ```  6. **EndCompoundAction**    - **Description**: Ends a compound action, logging
+    all batched actions as a single undoable action.    - **Usage**:       ```csharp     
+    RealityFlowAPI.Instance.EndCompoundAction();      ```  7. **UndoLastAction**   
+    - **Description**: Undoes the last action or compound action.    - **Usage**:      
+    ```csharp      RealityFlowAPI.Instance.UndoLastAction();      ```  ### Example
+    Scenario  ```csharp // Start a compound action to spawn and move an object RealityFlowAPI.Instance.StartCompoundAction();
+    GameObject ladder = RealityFlowAPI.Instance.SpawnObject("Ladder", new Vector3(0,
+    0, 0), Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer); RealityFlowAPI.Instance.UpdateObjectTransform("Ladder(Clone)",
+    new Vector3(2, 2, 2), Quaternion.identity, Vector3.one); RealityFlowAPI.Instance.EndCompoundAction(); 
+    // Undo the compound action RealityFlowAPI.Instance.UndoLastAction(); ```  This
+    compact yet detailed list ensures that ChatGPT will generate code using only
+    the provided RealityFlow API functions, maintaining consistency and compatibility
+    within your project. '
+  - DO NOT USE COROUTINES
+  - 'Only use the following prefabs when spawning: Firework, TreeStump, Floating_BodyA,
+    Ladder, TestObject, characterSmall, Climbing Wall'
+  - 'Only use the following prefabs when spawning: Firework, TreeStump, Floating_BodyA,
+    Ladder, TestObject, characterSmall, Climbing Wall'
