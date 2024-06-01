@@ -1049,7 +1049,7 @@ namespace RealityFlow.NodeUI
                         hideFlags = HideFlags.DontSave,
                     };
 
-                    go.transform.SetParent(m_TextComponent.transform);
+                    go.transform.SetParent(m_TextComponent.transform, false);
                     go.layer = gameObject.layer;
 
                     caretRectTrans = go.GetComponent<RectTransform>();
