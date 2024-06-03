@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Ubiq.Voip;
+using Ubiq;
 
 namespace Samples.Whisper
 {
@@ -21,6 +23,7 @@ namespace Samples.Whisper
         private bool isRecording;
         private float time;
         private OpenAIApi openai;
+        private VoipPeerConnectionManager voipPeerConnectionManager; // Add this
 
         private void Start()
         {
@@ -39,6 +42,7 @@ namespace Samples.Whisper
             }
 
             openai = new OpenAIApi(apiKey);
+            voipPeerConnectionManager = FindObjectOfType<VoipPeerConnectionManager>(); // Initialize the manager
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             dropdown.options.Add(new Dropdown.OptionData("Microphone not supported on WebGL"));
@@ -70,6 +74,8 @@ namespace Samples.Whisper
 #if !UNITY_WEBGL
             clip = Microphone.Start(dropdown.options[index].text, false, duration, 44100);
 #endif
+
+            voipPeerConnectionManager?.MuteAll(); // Mute the VoIP microphone
         }
 
         private async void EndRecording()
@@ -93,6 +99,9 @@ namespace Samples.Whisper
             progressBar.fillAmount = 0;
             message.text = res.Text;
             recordButton.enabled = true;
+
+            Debug.Log("Unmuting all microphones after Whisper recording.");
+            voipPeerConnectionManager?.UnmuteAll(); // Unmute the VoIP microphone
         }
 
         private void Update()

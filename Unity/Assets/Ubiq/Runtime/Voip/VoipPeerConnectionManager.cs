@@ -26,7 +26,7 @@ namespace Ubiq.Voip
         private string prevIceServersString;
         private IceServerDetailsCollection iceServers = new IceServerDetailsCollection();
 
-        public class OnPeerConnectionEvent : ExistingListEvent<VoipPeerConnection> {}
+        public class OnPeerConnectionEvent : ExistingListEvent<VoipPeerConnection> { }
 
         /// <summary>
         /// Fires when a new (local) PeerConnection is created by an instance of this Component. This may be a new or replacement PeerConnection.
@@ -72,7 +72,7 @@ namespace Ubiq.Voip
             }
         }
 
-        private void UpdateIceServerCollection (IRoom room)
+        private void UpdateIceServerCollection(IRoom room)
         {
             // Update ice server list and emit event
             var iceServersString = room["ice-servers"];
@@ -81,7 +81,7 @@ namespace Ubiq.Voip
             if (iceServersString != null
                 && iceServersString != prevIceServersString)
             {
-                JsonUtility.FromJsonOverwrite(iceServersString,iceServers);
+                JsonUtility.FromJsonOverwrite(iceServersString, iceServers);
                 prevIceServersString = iceServersString;
             }
         }
@@ -96,7 +96,7 @@ namespace Ubiq.Voip
         // This is because we need to know that the remote peer is established, before beginning the exchange of messages.
         private void OnJoinedRoom(IRoom room)
         {
-            UpdateIceServerCollection (room);
+            UpdateIceServerCollection(room);
         }
 
         private void OnPeerAdded(IPeer peer)
@@ -167,7 +167,7 @@ namespace Ubiq.Voip
             var pc = new GameObject("Voip Peer Connection " + peerUuid).AddComponent<VoipPeerConnection>();
             pc.transform.SetParent(transform);
 
-            pc.Setup(networkId,networkScene,peerUuid,polite,iceServers.servers);
+            pc.Setup(networkId, networkScene, peerUuid, polite, iceServers.servers);
 
             peerUuidToConnection.Add(peerUuid, pc);
             OnPeerConnection.Invoke(pc);
@@ -202,7 +202,7 @@ namespace Ubiq.Voip
         public static void GetPeerConnectionAsync(MonoBehaviour component, string peerUUID, Action<VoipPeerConnection> then)
         {
             var manager = Find(component);
-            if(manager)
+            if (manager)
             {
                 manager.GetPeerConnectionAsync(peerUUID, then);
             }
@@ -214,7 +214,7 @@ namespace Ubiq.Voip
         /// <returns>The peer connection object, or null if it has not been established</returns>
         public VoipPeerConnection GetPeerConnection(string peerUUID)
         {
-            if(peerUuidToConnection.TryGetValue(peerUUID, out var pc))
+            if (peerUuidToConnection.TryGetValue(peerUUID, out var pc))
             {
                 return pc;
             }
@@ -229,7 +229,7 @@ namespace Ubiq.Voip
         public static VoipPeerConnection GetPeerConnection(MonoBehaviour component, string peerUUID)
         {
             var manager = Find(component);
-            if(manager && manager.peerUuidToConnection.TryGetValue(peerUUID, out var pc))
+            if (manager && manager.peerUuidToConnection.TryGetValue(peerUUID, out var pc))
             {
                 return pc;
             }
@@ -250,5 +250,24 @@ namespace Ubiq.Voip
                 return null;
             }
         }
+        //RealityFlow added functions
+        public void MuteAll()
+        {
+            foreach (var connection in peerUuidToConnection.Values)
+            {
+                connection.MuteMicrophone();
+            }
+        }
+
+        public void UnmuteAll()
+        {
+            Debug.Log("UnmuteAll called in VoipPeerConnectionManager.");
+            foreach (var connection in peerUuidToConnection.Values)
+            {
+                Debug.Log($"Unmuting microphone for connection: {connection.PeerUuid}");
+                connection.UnmuteMicrophone();
+            }
+        }
+
     }
 }

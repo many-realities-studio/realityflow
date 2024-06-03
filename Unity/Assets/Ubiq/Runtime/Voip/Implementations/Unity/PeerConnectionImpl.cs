@@ -24,8 +24,8 @@ namespace Ubiq.Voip.Implementations.Unity
             public readonly string json;
             public readonly RTCIceCandidate iceCandidate;
 
-            public Event(string json) : this(Type.SignalingMessage,json) { }
-            public Event(RTCIceCandidate iceCandidate) : this(Type.OnIceCandidate,null,iceCandidate) { }
+            public Event(string json) : this(Type.SignalingMessage, json) { }
+            public Event(RTCIceCandidate iceCandidate) : this(Type.OnIceCandidate, null, iceCandidate) { }
             public Event(Type type, string json = null, RTCIceCandidate iceCandidate = null)
             {
                 this.type = type;
@@ -76,7 +76,7 @@ namespace Ubiq.Voip.Implementations.Unity
         {
             if (ctx.behaviour)
             {
-                foreach(var coroutine in coroutinesForCleanup)
+                foreach (var coroutine in coroutinesForCleanup)
                 {
                     ctx.behaviour.StopCoroutine(coroutine);
                 }
@@ -89,7 +89,7 @@ namespace Ubiq.Voip.Implementations.Unity
                 }
             }
 
-            foreach(var obj in objectsForCleanup)
+            foreach (var obj in objectsForCleanup)
             {
                 if (obj)
                 {
@@ -205,7 +205,7 @@ namespace Ubiq.Voip.Implementations.Unity
         // https://w3c.github.io/webrtc-pc/#example-18
         private IEnumerator DoSignaling()
         {
-            while(true)
+            while (true)
             {
                 if (events.Count == 0)
                 {
@@ -218,7 +218,7 @@ namespace Ubiq.Voip.Implementations.Unity
 
                 if (e.type == Event.Type.OnIceCandidate)
                 {
-                    Send(ctx.context,e.iceCandidate);
+                    Send(ctx.context, e.iceCandidate);
                     continue;
                 }
 
@@ -226,7 +226,7 @@ namespace Ubiq.Voip.Implementations.Unity
                 {
                     var op = peerConnection.SetLocalDescription();
                     yield return op;
-                    Send(ctx.context,peerConnection.LocalDescription);
+                    Send(ctx.context, peerConnection.LocalDescription);
                     continue;
                 }
 
@@ -268,7 +268,7 @@ namespace Ubiq.Voip.Implementations.Unity
                         op = peerConnection.SetLocalDescription();
                         yield return op;
 
-                        Send(ctx.context,peerConnection.LocalDescription);
+                        Send(ctx.context, peerConnection.LocalDescription);
                     }
                     continue;
                 }
@@ -321,7 +321,7 @@ namespace Ubiq.Voip.Implementations.Unity
             objectsForCleanup.Add(restoreFilter);
         }
 
-        private void RequireReceiverAudioSource ()
+        private void RequireReceiverAudioSource()
         {
             if (receiverAudioSource)
             {
@@ -338,7 +338,7 @@ namespace Ubiq.Voip.Implementations.Unity
             // Use a clip filled with 1s
             // This helps us piggyback on Unity's spatialisation using filters
             var samples = new float[AudioSettings.outputSampleRate];
-            for(int i = 0; i < samples.Length; i++)
+            for (int i = 0; i < samples.Length; i++)
             {
                 samples[i] = 1.0f;
             }
@@ -347,13 +347,13 @@ namespace Ubiq.Voip.Implementations.Unity
                 1,
                 AudioSettings.outputSampleRate,
                 false);
-            receiverAudioSource.clip.SetData(samples,0);
+            receiverAudioSource.clip.SetData(samples, 0);
 
             objectsForCleanup.Add(receiverAudioSource.clip);
             objectsForCleanup.Add(receiverAudioSource);
         }
 
-        public void ProcessSignalingMessage (string json)
+        public void ProcessSignalingMessage(string json)
         {
             events.Add(new Event(json));
         }
@@ -362,7 +362,7 @@ namespace Ubiq.Voip.Implementations.Unity
         {
             var config = new RTCConfiguration();
             config.iceServers = new RTCIceServer[iceServers.Count];
-            for(int i = 0; i < iceServers.Count; i++)
+            for (int i = 0; i < iceServers.Count; i++)
             {
                 config.iceServers[i] = IceServerUbiqToPkg(iceServers[i]);
             }
@@ -378,7 +378,7 @@ namespace Ubiq.Voip.Implementations.Unity
 
         private static RTCIceCandidate IceCandidateUbiqToPkg(SignalingMessage msg)
         {
-            return new RTCIceCandidate (new RTCIceCandidateInit()
+            return new RTCIceCandidate(new RTCIceCandidateInit()
             {
                 candidate = msg.candidate,
                 sdpMid = msg.sdpMid,
@@ -388,7 +388,8 @@ namespace Ubiq.Voip.Implementations.Unity
 
         private static RTCSessionDescription SessionDescriptionUbiqToPkg(SignalingMessage msg)
         {
-            return new RTCSessionDescription{
+            return new RTCSessionDescription
+            {
                 sdp = msg.sdp,
                 type = StringToSdpType(msg.type)
             };
@@ -399,13 +400,15 @@ namespace Ubiq.Voip.Implementations.Unity
             if (string.IsNullOrEmpty(details.username) ||
                 string.IsNullOrEmpty(details.password))
             {
-                return new RTCIceServer {
+                return new RTCIceServer
+                {
                     urls = new string[] { details.uri }
                 };
             }
             else
             {
-                return new RTCIceServer {
+                return new RTCIceServer
+                {
                     urls = new string[] { details.uri },
                     username = details.username,
                     credential = details.password,
@@ -416,54 +419,54 @@ namespace Ubiq.Voip.Implementations.Unity
 
         private static PeerConnectionState PeerConnectionStatePkgToUbiq(RTCPeerConnectionState state)
         {
-            switch(state)
+            switch (state)
             {
-                case RTCPeerConnectionState.Closed : return PeerConnectionState.closed;
-                case RTCPeerConnectionState.Failed : return PeerConnectionState.failed;
-                case RTCPeerConnectionState.Disconnected : return PeerConnectionState.disconnected;
-                case RTCPeerConnectionState.New : return PeerConnectionState.@new;
-                case RTCPeerConnectionState.Connecting : return PeerConnectionState.connecting;
-                case RTCPeerConnectionState.Connected : return PeerConnectionState.connected;
-                default : return PeerConnectionState.failed;
+                case RTCPeerConnectionState.Closed: return PeerConnectionState.closed;
+                case RTCPeerConnectionState.Failed: return PeerConnectionState.failed;
+                case RTCPeerConnectionState.Disconnected: return PeerConnectionState.disconnected;
+                case RTCPeerConnectionState.New: return PeerConnectionState.@new;
+                case RTCPeerConnectionState.Connecting: return PeerConnectionState.connecting;
+                case RTCPeerConnectionState.Connected: return PeerConnectionState.connected;
+                default: return PeerConnectionState.failed;
             }
         }
 
         private static IceConnectionState IceConnectionStatePkgToUbiq(RTCIceConnectionState state)
         {
-            switch(state)
+            switch (state)
             {
-                case RTCIceConnectionState.Closed : return IceConnectionState.closed;
-                case RTCIceConnectionState.Failed : return IceConnectionState.failed;
-                case RTCIceConnectionState.Disconnected : return IceConnectionState.disconnected;
-                case RTCIceConnectionState.New : return IceConnectionState.@new;
-                case RTCIceConnectionState.Checking : return IceConnectionState.checking;
-                case RTCIceConnectionState.Connected : return IceConnectionState.connected;
-                case RTCIceConnectionState.Completed : return IceConnectionState.completed;
-                default : return IceConnectionState.failed;
+                case RTCIceConnectionState.Closed: return IceConnectionState.closed;
+                case RTCIceConnectionState.Failed: return IceConnectionState.failed;
+                case RTCIceConnectionState.Disconnected: return IceConnectionState.disconnected;
+                case RTCIceConnectionState.New: return IceConnectionState.@new;
+                case RTCIceConnectionState.Checking: return IceConnectionState.checking;
+                case RTCIceConnectionState.Connected: return IceConnectionState.connected;
+                case RTCIceConnectionState.Completed: return IceConnectionState.completed;
+                default: return IceConnectionState.failed;
             }
         }
 
         private static string SdpTypeToString(RTCSdpType type)
         {
-            switch(type)
+            switch (type)
             {
-                case RTCSdpType.Answer : return "answer";
-                case RTCSdpType.Offer : return "offer";
-                case RTCSdpType.Pranswer : return "pranswer";
-                case RTCSdpType.Rollback : return "rollback";
-                default : return null;
+                case RTCSdpType.Answer: return "answer";
+                case RTCSdpType.Offer: return "offer";
+                case RTCSdpType.Pranswer: return "pranswer";
+                case RTCSdpType.Rollback: return "rollback";
+                default: return null;
             }
         }
 
         private static RTCSdpType StringToSdpType(string type)
         {
-            switch(type)
+            switch (type)
             {
-                case "answer" : return RTCSdpType.Answer;
-                case "offer" : return RTCSdpType.Offer;
-                case "pranswer" : return RTCSdpType.Pranswer;
-                case "rollback" : return RTCSdpType.Rollback;
-                default : return RTCSdpType.Offer;
+                case "answer": return RTCSdpType.Answer;
+                case "offer": return RTCSdpType.Offer;
+                case "pranswer": return RTCSdpType.Pranswer;
+                case "rollback": return RTCSdpType.Rollback;
+                default: return RTCSdpType.Offer;
             }
         }
 
@@ -485,6 +488,23 @@ namespace Ubiq.Voip.Implementations.Unity
                 sdpMLineIndex: (ushort?)ic.SdpMLineIndex,
                 usernameFragment: ic.UserNameFragment
             )));
+        }
+        //RealityFlow Added
+        public void MuteMicrophone()
+        {
+            if (microphone != null)
+            {
+                microphone.Mute();
+            }
+        }
+
+        public void UnmuteMicrophone()
+        {
+            if (microphone != null)
+            {
+                Debug.Log("Unmuting microphone in PeerConnectionImpl.");
+                microphone.Unmute();
+            }
         }
     }
 }

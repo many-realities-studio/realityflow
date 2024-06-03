@@ -20,9 +20,9 @@ namespace Ubiq.Voip.Implementations.Dotnet
     {
         // IAudioSource implementation starts
         // Thread safe and can be called before Awake() and after OnDestroy()
-        public event EncodedSampleDelegate OnAudioSourceEncodedSample = delegate {};
-        public event RawAudioSampleDelegate OnAudioSourceRawSample = delegate {};
-        public event SourceErrorDelegate OnAudioSourceError = delegate {};
+        public event EncodedSampleDelegate OnAudioSourceEncodedSample = delegate { };
+        public event RawAudioSampleDelegate OnAudioSourceRawSample = delegate { };
+        public event SourceErrorDelegate OnAudioSourceError = delegate { };
         public bool IsAudioSourcePaused() => isPaused;
         public bool HasEncodedAudioSubscribers() => OnAudioSourceEncodedSample != null;
         public void RestrictFormats(Func<AudioFormat, bool> filter) => audioFormatManager?.RestrictFormats(filter);
@@ -32,7 +32,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
         public Task PauseAudio() => QueueTaskOnMainThread(GetPauseAudioTask);
         public Task ResumeAudio() => QueueTaskOnMainThread(GetResumeAudioTask);
         public Task CloseAudio() => QueueTaskOnMainThread(GetCloseAudioTask);
-        public void ExternalAudioSourceRawSample(AudioSamplingRatesEnum samplingRate, uint durationMilliseconds, short[] sample) => OnAudioSourceRawSample.Invoke(samplingRate,durationMilliseconds,sample);
+        public void ExternalAudioSourceRawSample(AudioSamplingRatesEnum samplingRate, uint durationMilliseconds, short[] sample) => OnAudioSourceRawSample.Invoke(samplingRate, durationMilliseconds, sample);
         // IAudioSource implementation ends
 
         private class MicrophoneListener
@@ -47,9 +47,9 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
             public float[] samples { get; private set; }
 
-            public bool IsRecording () => audioClip != null;
+            public bool IsRecording() => audioClip != null;
 
-            private void UpdateMicrophonePosition ()
+            private void UpdateMicrophonePosition()
             {
                 if (!IsRecording())
                 {
@@ -72,7 +72,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
                 }
             }
 
-            public bool HasSamples ()
+            public bool HasSamples()
             {
                 if (!IsRecording())
                 {
@@ -90,12 +90,12 @@ namespace Ubiq.Voip.Implementations.Dotnet
                     return false;
                 }
 
-                audioClip.GetData(samples,absReadPos % audioClip.samples);
+                audioClip.GetData(samples, absReadPos % audioClip.samples);
                 absReadPos += samples.Length;
                 return true;
             }
 
-            public void Start (string deviceName, int micBuffLengthSeconds,
+            public void Start(string deviceName, int micBuffLengthSeconds,
                 int frequency, int outBuffLengthSamples)
             {
                 if (IsRecording())
@@ -110,12 +110,12 @@ namespace Ubiq.Voip.Implementations.Dotnet
                     samples = new float[outBuffLengthSamples];
                 }
 
-                audioClip = Microphone.Start(deviceName,loop:true,
-                    micBuffLengthSeconds,frequency);
+                audioClip = Microphone.Start(deviceName, loop: true,
+                    micBuffLengthSeconds, frequency);
                 absMicPos = absReadPos = lastMicPos = Microphone.GetPosition(deviceName);
             }
 
-            public void End ()
+            public void End()
             {
                 if (audioClip)
                 {
@@ -152,7 +152,21 @@ namespace Ubiq.Voip.Implementations.Dotnet
             G722AudioEncoder.GetEncodedByteLength(SAMPLE_BUFFER_LENGTH)];
 
         // G722 has a sample rate of 16000 but a clock rate of 8000
-        private const int RTP_TIMESTAMP_PER_BUFFER = SAMPLE_BUFFER_LENGTH/2;
+        private const int RTP_TIMESTAMP_PER_BUFFER = SAMPLE_BUFFER_LENGTH / 2;
+
+        private bool isMuted = false;
+
+        // Method to mute the microphone
+        public void Mute()
+        {
+            isMuted = true;
+        }
+
+        // Method to unmute the microphone
+        public void Unmute()
+        {
+            isMuted = false;
+        }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         private bool microphoneAuthorized = false;
@@ -188,18 +202,17 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
         private void Update()
         {
-
 #if UNITY_ANDROID && !UNITY_EDITOR
-            // Wait for microphone permissions before processing any audio
-            if (!microphoneAuthorized)
-            {
-                microphoneAuthorized = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+    // Wait for microphone permissions before processing any audio
+    if (!microphoneAuthorized)
+    {
+        microphoneAuthorized = Permission.HasUserAuthorizedPermission(Permission.Microphone);
 
-                if (!microphoneAuthorized)
-                {
-                    return;
-                }
-            }
+        if (!microphoneAuthorized)
+        {
+            return;
+        }
+    }
 #endif
 
             // Run queued tasks synchronously
@@ -219,6 +232,12 @@ namespace Ubiq.Voip.Implementations.Dotnet
                 task.RunSynchronously();
             }
 
+            // If the microphone is muted, do not send audio samples to the network
+            if (isMuted)
+            {
+                return;
+            }
+
             // Send samples if we have them
             while (microphoneListener.Advance())
             {
@@ -226,25 +245,25 @@ namespace Ubiq.Voip.Implementations.Dotnet
                 for (int i = 0; i < microphoneListener.samples.Length; i++)
                 {
                     var floatSample = microphoneListener.samples[i];
-                    floatSample = Mathf.Clamp(floatSample*gain,-.999f,.999f);
+                    floatSample = Mathf.Clamp(floatSample * gain, -.999f, .999f);
                     volumeSum += floatSample;
                     pcm[i] = (short)(floatSample * short.MaxValue);
                 }
 
-                audioEncoder.Encode(encoded,pcm);
-                OnAudioSourceEncodedSample.Invoke(RTP_TIMESTAMP_PER_BUFFER,encoded);
+                audioEncoder.Encode(encoded, pcm);
+                OnAudioSourceEncodedSample.Invoke(RTP_TIMESTAMP_PER_BUFFER, encoded);
                 statsPushed?.Invoke(new AudioStats
                 (
-                    sampleCount:microphoneListener.samples.Length,
-                    volumeSum:volumeSum,
-                    sampleRate:SAMPLE_RATE
+                    sampleCount: microphoneListener.samples.Length,
+                    volumeSum: volumeSum,
+                    sampleRate: SAMPLE_RATE
                 ));
             }
         }
 
         // Thread-safe task queue - tasks eventually get executed synchronously on
         // the main thread in Update.
-        private Task QueueTaskOnMainThread (Func<Task> taskGetter)
+        private Task QueueTaskOnMainThread(Func<Task> taskGetter)
         {
             lock (taskLock)
             {
@@ -260,7 +279,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
                     // Queue is discarded when object is destroyed, so this task
                     // may never be run. Returning a WhenAny means those awaiting
                     // these tasks won't wait forever, as the all-task is completed
-                    return Task.WhenAny(allTaskTcs.Task,task);
+                    return Task.WhenAny(allTaskTcs.Task, task);
                 }
             }
         }
@@ -270,7 +289,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
             return new Task(() =>
             {
                 // Null means use the default recording device
-                microphoneListener.Start(null,10,16000,512);
+                microphoneListener.Start(null, 10, 16000, 512);
 
                 // Microphone.GetDeviceCaps(null, out var minFreq, out var maxFreq);
                 // Debug.Log("caps: min: " + minFreq + " max: " + maxFreq);
