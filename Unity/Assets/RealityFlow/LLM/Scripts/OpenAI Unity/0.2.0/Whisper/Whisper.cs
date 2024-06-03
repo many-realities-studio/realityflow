@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.Collections.Generic;
 using Ubiq.Voip;
 using Ubiq;
 
@@ -15,6 +16,7 @@ namespace Samples.Whisper
         [SerializeField] private TMP_InputField message;
         [SerializeField] private TMP_InputField apiKeyInputField;
         [SerializeField] private Dropdown dropdown;
+        [SerializeField] private Button submitButton; // Add reference to the Submit button
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 5;
@@ -23,40 +25,74 @@ namespace Samples.Whisper
         private bool isRecording;
         private float time;
         private OpenAIApi openai;
-        private VoipPeerConnectionManager voipPeerConnectionManager; // Add this
+        private VoipPeerConnectionManager voipPeerConnectionManager;
+        private string currentApiKey;
 
         private void Start()
         {
+            voipPeerConnectionManager = FindObjectOfType<VoipPeerConnectionManager>();
+
+            // Initialize the OpenAI API if the environment variable is set
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
-
-            // If the environment variable is not set, use the API key from the input field
-            if (string.IsNullOrEmpty(apiKey))
+            if (!string.IsNullOrEmpty(apiKey))
             {
-                apiKey = apiKeyInputField.text;
+                InitializeOpenAI(apiKey);
             }
-
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
-                return;
-            }
-
-            openai = new OpenAIApi(apiKey);
-            voipPeerConnectionManager = FindObjectOfType<VoipPeerConnectionManager>(); // Initialize the manager
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             dropdown.options.Add(new Dropdown.OptionData("Microphone not supported on WebGL"));
+            Debug.Log("WebGL platform detected, microphone not supported.");
 #else
-            foreach (var device in Microphone.devices)
-            {
-                dropdown.options.Add(new Dropdown.OptionData(device));
-            }
+            RefreshMicrophoneList();
+#endif
+
             recordButton.onClick.AddListener(StartRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
+            submitButton.onClick.AddListener(SubmitApiKey); // Add listener to Submit button
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
-#endif
+        }
+
+        private void InitializeOpenAI(string apiKey)
+        {
+            currentApiKey = apiKey;
+            openai = new OpenAIApi(apiKey);
+            Debug.Log("OpenAI API initialized with provided key.");
+        }
+
+        private void SubmitApiKey()
+        {
+            string apiKey = apiKeyInputField.text;
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                EnvConfigManager.Instance.UpdateApiKey(apiKey);
+                InitializeOpenAI(apiKey);
+                Debug.Log("API key submitted: " + apiKey);
+            }
+            else
+            {
+                Debug.LogError("API key is empty. Please enter a valid API key.");
+            }
+        }
+
+        private void RefreshMicrophoneList()
+        {
+            dropdown.ClearOptions();
+            List<string> devices = new List<string>(Microphone.devices);
+            if (devices.Count == 0)
+            {
+                Debug.LogError("No microphone devices found.");
+                dropdown.options.Add(new Dropdown.OptionData("No devices found"));
+            }
+            else
+            {
+                foreach (var device in devices)
+                {
+                    Debug.Log("Found device: " + device);
+                    dropdown.options.Add(new Dropdown.OptionData(device));
+                }
+            }
         }
 
         private void ChangeMicrophone(int index)
@@ -72,6 +108,7 @@ namespace Samples.Whisper
             var index = PlayerPrefs.GetInt("user-mic-device-index");
 
 #if !UNITY_WEBGL
+            Debug.Log($"Starting recording with device: {dropdown.options[index].text}");
             clip = Microphone.Start(dropdown.options[index].text, false, duration, 44100);
 #endif
 
@@ -94,6 +131,8 @@ namespace Samples.Whisper
                 Model = "whisper-1",
                 Language = "en"
             };
+
+            Debug.Log("Using API key: " + currentApiKey); // Add this log to confirm the API key being used
             var res = await openai.CreateAudioTranscription(req);
 
             progressBar.fillAmount = 0;
