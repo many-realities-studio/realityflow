@@ -47,7 +47,7 @@ namespace RealityFlow.NodeGraph
 
         NodeValue() { }
 
-        public NodeValue(int val) 
+        public NodeValue(int val)
         {
             type = NodeValueType.Int;
             value = new BoxedInt(val);
@@ -77,7 +77,7 @@ namespace RealityFlow.NodeGraph
             value = new BoxedQuaternion(val);
         }
 
-        public NodeValue(GraphView val)
+        public NodeValue(ReadonlyGraph val)
         {
             type = NodeValueType.Graph;
             value = val;
@@ -152,7 +152,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Vector2 => typeof(Vector2),
             NodeValueType.Vector3 => typeof(Vector3),
             NodeValueType.Quaternion => typeof(Quaternion),
-            NodeValueType.Graph => typeof(GraphView),
+            NodeValueType.Graph => typeof(ReadonlyGraph),
             NodeValueType.Bool => typeof(bool),
             NodeValueType.Any => typeof(object),
             NodeValueType.GameObject => typeof(string),
@@ -173,7 +173,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Vector2 => typeof(Vector2),
             NodeValueType.Vector3 => typeof(Vector3),
             NodeValueType.Quaternion => typeof(Quaternion),
-            NodeValueType.Graph => typeof(GraphView),
+            NodeValueType.Graph => typeof(ReadonlyGraph),
             NodeValueType.Bool => typeof(bool),
             NodeValueType.Any => typeof(object),
             NodeValueType.GameObject => typeof(GameObject),
@@ -191,7 +191,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Vector2 => new BoxedVector2(Vector2.zero),
             NodeValueType.Vector3 => new BoxedVector3(Vector3.zero),
             NodeValueType.Quaternion => new BoxedQuaternion(Quaternion.identity),
-            NodeValueType.Graph => new GraphView(),
+            NodeValueType.Graph => new ReadonlyGraph(),
             NodeValueType.Bool => new BoxedBool(false),
             NodeValueType.GameObject => null,
             NodeValueType.Prefab => null,
@@ -202,7 +202,7 @@ namespace RealityFlow.NodeGraph
         /// <summary>
         /// Get the default value for a NodeValue of the given type.
         /// </summary>
-        public static NodeValue DefaultFor(NodeValueType type) => 
+        public static NodeValue DefaultFor(NodeValueType type) =>
             new() { type = type, value = InternalDefaultFor(type) };
 
         /// <summary>
@@ -217,13 +217,13 @@ namespace RealityFlow.NodeGraph
             Vector2 val => new(val),
             Vector3 val => new(val),
             Quaternion val => new(val),
-            GraphView val => new(val),
+            ReadonlyGraph val => new(val),
             bool val => new(val),
             string val => new(val),
             _ => throw new ArgumentException(),
         };
 
-        public void OnBeforeSerialize() 
+        public void OnBeforeSerialize()
         {
             if (value is null || GetValueType() != Value.GetType())
                 value = InternalDefaultFor(Type);

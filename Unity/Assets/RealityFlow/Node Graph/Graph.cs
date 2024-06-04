@@ -15,6 +15,8 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         Arena<Node> nodes = new();
 
+        public IEnumerable<Node> Nodes => nodes;
+
         /// <summary>
         /// Backwards data (non-execution) edges (input -> output)
         /// </summary>
@@ -225,6 +227,9 @@ namespace RealityFlow.NodeGraph
         /// The edge would form a cycle (`from` is reachable from `to`)
         /// </item>
         /// </list>
+        /// <item>
+        /// The target does not have an input port
+        /// </item> 
         /// This method considers both data and execution edges for these conditions.
         /// </summary>
         public bool TryAddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
@@ -233,6 +238,9 @@ namespace RealityFlow.NodeGraph
                 return false;
 
             if (fromPort >= GetNode(from).Definition.ExecutionOutputs.Count)
+                return false;
+
+            if (!GetNode(to).Definition.ExecutionInput)
                 return false;
 
             if (DepthFirstSearch(to, from))
