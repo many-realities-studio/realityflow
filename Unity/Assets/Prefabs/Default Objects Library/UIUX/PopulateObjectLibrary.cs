@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using Microsoft.MixedReality.Toolkit.UX;
 using TMPro;
 using Unity.VisualScripting;
+using Ubiq.Spawning;
+using Microsoft.MixedReality.GraphicsTools;
 
 public class PopulateObjectLibrary : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class PopulateObjectLibrary : MonoBehaviour
 
     // This should be set to the SpawnObjectAtRay component atttached to one of the hands
     public SpawnObjectAtRay spawnScript;
+    
+    // Spawn the object as networked
+   [SerializeField] private NetworkSpawnManager networkSpawnManager;
 
     // These lists should be populated with all of the objects that are expected to appear
     // in the toolbox along with their icon prefabs
@@ -36,7 +41,7 @@ public class PopulateObjectLibrary : MonoBehaviour
 
         // Create a new Unity action and add it as a listener to the buttons OnClicked event
         UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
-        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(Instantiate(objectPrefab)));
     }
 
     // OnClicked event that triggers when the button is pressed
@@ -45,6 +50,10 @@ public class PopulateObjectLibrary : MonoBehaviour
     {
       Debug.Log("TriggerObjectSpawn");
       Debug.Log(objectPrefab);
-        spawnScript.RaySpawnToggle(Instantiate(objectPrefab));
+        //spawnScript.RaySpawnToggle(objectPrefab);
+        //spawnNetworkedObject.SpawnWithPeerScope(objectPrefab);
+        GameObject newObj = networkSpawnManager.SpawnWithPeerScope(objectPrefab);
+        newObj.GetComponent<NetworkedPalette>().owner = true;
+        newObj.transform.SetParent(networkSpawnManager.transform);
     }
 }

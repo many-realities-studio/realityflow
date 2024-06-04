@@ -15,6 +15,8 @@ using Ubiq.Avatars;
 public class EraserTool : MonoBehaviour
 {
     public bool isActive;
+
+    public NetworkSpawnManager spawnManager;
     private GameObject leftHand;
     private GameObject rightHand;
     private XRRayInteractor rayInteractor;
@@ -29,6 +31,7 @@ public class EraserTool : MonoBehaviour
         leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
         rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        spawnManager = NetworkSpawnManager.Find(this);
 
         if (rayInteractor == null)
         {
@@ -80,7 +83,8 @@ public class EraserTool : MonoBehaviour
         if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
-            NetworkSpawnManager.Find(this).Despawn(currentHitResult.collider.gameObject);
+            Debug.Log("Delete attempted" + currentHitResult.collider.gameObject);
+            spawnManager.Despawn(currentHitResult.collider.gameObject);
         }
     }
 
@@ -90,24 +94,24 @@ public class EraserTool : MonoBehaviour
         {
             GetRayCollision();
 
-            // // Show the bounds visuals for the object to highlight selection
-            // if (lastHitResult.collider != currentHitResult.collider)
-            // {
-            //     // Turn off the bounds visuals on hover off
-            //     if (lastHitResult.collider != null && lastHitResult.transform.gameObject.GetComponent<EditableMesh>()
-            //         && lastHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.activeInHierarchy
-            //         && !lastHitResult.transform.gameObject.GetComponent<NetworkedMesh>().isSelected)
-            //     {
-            //         lastHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.SetActive(false);
-            //     }
-            //     else if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
-            //              && !currentHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.activeInHierarchy
-            //              && !currentHitResult.transform.gameObject.GetComponent<NetworkedMesh>().isSelected)
-            //     {
-            //         currentHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.SetActive(true);
-            //     }
-            // }
-            // lastHitResult = currentHitResult;
+            /*// Show the bounds visuals for the object to highlight selection
+            if (lastHitResult.collider != currentHitResult.collider)
+            {
+                // Turn off the bounds visuals on hover off
+                if (lastHitResult.collider != null && lastHitResult.transform.gameObject.GetComponent<EditableMesh>()
+                    && lastHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.activeInHierarchy
+                    && !lastHitResult.transform.gameObject.GetComponent<NetworkedMesh>().isSelected)
+                {
+                    lastHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.SetActive(false);
+                }
+                else if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
+                         && !currentHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.activeInHierarchy
+                         && !currentHitResult.transform.gameObject.GetComponent<NetworkedMesh>().isSelected)
+                {
+                    currentHitResult.transform.gameObject.GetComponent<SelectToolManager>().boundsVisuals.SetActive(true);
+                }
+            }
+            lastHitResult = currentHitResult;*/
         }
     }
 
