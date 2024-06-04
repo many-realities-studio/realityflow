@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.MixedReality.Toolkit.Data;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
@@ -38,7 +39,7 @@ namespace RealityFlow.NodeUI
             get => title.text;
             set => title.text = value;
         }
-
+        
         public void Tick()
         {
             if (!float.TryParse(input.text, out _))
