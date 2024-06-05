@@ -6,6 +6,8 @@ using Ubiq.Rooms;
 using Ubiq.Spawning;
 using System;
 using System.Linq;
+using RealityFlow.NodeGraph;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -355,6 +357,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Add cases for other functions...
         }
     }
+
     public List<string> GetPrefabNames()
     {
         if (spawnManager != null && spawnManager.catalogue != null)
@@ -364,6 +367,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return new List<string>();
     }
 
+    public List<NodeDefinition> GetAvailableNodeDefinitions()
+    {
+        List<NodeDefinition> defs = new();
+
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/Actions/"));
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/Control Flow/"));
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/Functional/"));
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/State/"));
+
+        // In the future, this can query the DB to access online node definitions
+
+        return defs;
+    }
 
     public void StartCompoundAction()
     {
