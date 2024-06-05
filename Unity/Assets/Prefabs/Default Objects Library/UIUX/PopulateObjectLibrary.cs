@@ -52,8 +52,10 @@ public class PopulateObjectLibrary : MonoBehaviour
       Debug.Log(objectPrefab);
         //spawnScript.RaySpawnToggle(objectPrefab);
         //spawnNetworkedObject.SpawnWithPeerScope(objectPrefab);
-        GameObject newObj = networkSpawnManager.SpawnWithPeerScope(objectPrefab);
-        newObj.GetComponent<NetworkedPalette>().owner = true;
-        newObj.transform.SetParent(networkSpawnManager.transform);
+        //GameObject newObj = objectPrefab;
+        //GameObject newObj = Instantiate(objectPrefab, networkSpawnManager.transform);
+        GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
+        //newObj.GetComponent<NetworkedMesh>().owner = true;
+        //newObj.transform.SetParent(networkSpawnManager.transform);
     }
 }
