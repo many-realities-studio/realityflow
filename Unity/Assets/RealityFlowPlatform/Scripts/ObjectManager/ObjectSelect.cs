@@ -5,20 +5,11 @@ public class ObjectSelect : MonoBehaviour
 {
     [SerializeField]
     private string objectId;
-
-    // Reference to the RfObjectManager
     private RfObjectManager rfObjectManager;
-
-    // Reference to the currently selected object
+    private ObjectDelete objectDelete; // Add reference to ObjectDelete
     private GameObject selectedObject;
-
-    // Outline material or component
     public Material outlineMaterial;
-
-    // Dictionary to store the original materials of objects
     private Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
-
-    // Previous transform data to detect changes
     private Vector3 previousPosition;
     private Quaternion previousRotation;
     private Vector3 previousScale;
@@ -30,6 +21,14 @@ public class ObjectSelect : MonoBehaviour
         if (rfObjectManager == null)
         {
             Debug.LogError("RfObjectManager not found in the scene.");
+            return;
+        }
+
+        // Initialize ObjectDelete
+        objectDelete = FindObjectOfType<ObjectDelete>();
+        if (objectDelete == null)
+        {
+            Debug.LogError("ObjectDelete script is not found in the scene.");
             return;
         }
     }
@@ -56,8 +55,8 @@ public class ObjectSelect : MonoBehaviour
                     scale = selectedObject.transform.localScale
                 };
 
-                // ??? 'AWAIT' 
-                rfObjectManager.SaveObjectTransformToDatabase(objectId, transformData); 
+                // Await SaveObjectTransformToDatabase
+                rfObjectManager.SaveObjectTransformToDatabase(objectId, transformData);
             }
         }
     }
@@ -92,6 +91,18 @@ public class ObjectSelect : MonoBehaviour
         else
         {
             Debug.LogWarning("Object with ID " + id + " not found.");
+        }
+    }
+
+    public void DeleteSelectedObject()
+    {
+        if (objectDelete != null && !string.IsNullOrEmpty(objectId))
+        {
+            objectDelete.DeleteObject(objectId);
+        }
+        else
+        {
+            Debug.LogError("ObjectDelete script is not found in the scene or objectId is null/empty.");
         }
     }
 

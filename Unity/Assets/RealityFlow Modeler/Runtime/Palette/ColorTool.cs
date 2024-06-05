@@ -99,11 +99,15 @@ public class ColorTool : MonoBehaviour
             }
 
             // If the game object hit has an interactable
-            Debug.Log(currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>());
+            Debug.Log(currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>()); 
+
             if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() != null)
             {
                 if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>().IsRaySelected)
                 {
+
+                     // GetObjectId ?!?!
+
                     UpdateMeshTexture();
                 }
             }
@@ -135,6 +139,7 @@ public class ColorTool : MonoBehaviour
     {
         if (colorToolIsActive || metallicToolIsActive || smoothnessToolIsActive)
         {
+            // Checking for Object
             GetRayCollision();
         }
     }

@@ -804,9 +804,9 @@ Transform:
   m_Children:
   - {fileID: 23567667}
   - {fileID: 1698069684}
-  - {fileID: 1165061546}
   - {fileID: 2142340400}
   - {fileID: 2011802872}
+  - {fileID: 1165061546}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1913856611 stripped
@@ -827,6 +827,7 @@ GameObject:
   - component: {fileID: 2011802874}
   - component: {fileID: 2011802873}
   - component: {fileID: 2011802875}
+  - component: {fileID: 2011802876}
   m_Layer: 0
   m_Name: RfObjectManager
   m_TagString: Untagged
@@ -892,6 +893,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectId: 
   outlineMaterial: {fileID: 2100000, guid: 7bb140db64c1a904bb383b00de9d155a, type: 2}
+--- !u!114 &2011802876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011802871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea240ba5353fe2449aa54c1f35561d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2037515227
 GameObject:
   m_ObjectHideFlags: 0

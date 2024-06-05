@@ -36,5 +36,11 @@ public class ObjectManagerEditor : Editor
         {
             objectSelect.SelectAndOutlineObject(objectSelect.GetObjectId());
         }
+        
+        // Create a button that calls the deleteSelectedObject method
+        if (GUILayout.Button("Delete Object"))
+        {
+            objectSelect.DeleteSelectedObject();
+        }
     }
 }

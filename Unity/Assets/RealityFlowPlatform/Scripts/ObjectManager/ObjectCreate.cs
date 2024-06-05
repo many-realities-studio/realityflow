@@ -77,15 +77,12 @@ public class ObjectSpawn : MonoBehaviour
 
         if (prefab != null && networkSpawnManager != null)
         {
-            // Spawn the object with room scope
             networkSpawnManager.SpawnWithRoomScope(prefab);
             Debug.Log($"Spawned {prefab.name} with room scope.");
-
-            // Find the spawned object (assuming it has the same name as the prefab)
+            
             GameObject spawnedObject = GameObject.Find(prefab.name);
             if (spawnedObject != null)
             {
-                // Create a TransformData object and populate it
                 TransformData transformData = new TransformData
                 {
                     position = spawnedObject.transform.position,
@@ -93,7 +90,6 @@ public class ObjectSpawn : MonoBehaviour
                     scale = spawnedObject.transform.localScale
                 };
 
-                // Create a RfObject and populate it
                 RfObject rfObject = new RfObject
                 {
                     projectId = projectId,
@@ -103,10 +99,11 @@ public class ObjectSpawn : MonoBehaviour
                     meshJson = GetMeshJson(spawnedObject)
                 };
 
+                SaveObjectToDatabase(rfObject);
+
                 // Log the JSON to verify it
                 Debug.Log("transformJson: " + rfObject.transformJson);
                 Debug.Log("meshJson: " + rfObject.meshJson);
-                SaveObjectToDatabase(rfObject);
             }
             else
             {
@@ -192,6 +189,23 @@ public class ObjectSpawn : MonoBehaviour
             if (graphQLResponse.Data != null)
             {
                 Debug.Log("Object saved to the database successfully.");
+                
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse.Data["saveObject"]["id"].ToString();
+                rfObject.id = returnedId;
+                Debug.Log($"Assigned ID from database: {rfObject.id}");
+                
+                // Update the name of the spawned object in the scene
+                GameObject spawnedObject = GameObject.Find(rfObject.name);
+                if (spawnedObject != null)
+                {
+                    spawnedObject.name = rfObject.id;
+                    Debug.Log($"Updated spawned object name to: {spawnedObject.name}");
+                }
+                else
+                {
+                    Debug.LogError("Could not find the spawned object to update its name.");
+                }
             }
             else
             {
