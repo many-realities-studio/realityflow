@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RealityFlow.Collections;
 using UnityEngine;
 
@@ -15,7 +16,8 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         Arena<Node> nodes = new();
 
-        public IEnumerable<Node> Nodes => nodes;
+        public IEnumerable<KeyValuePair<NodeIndex, Node>> Nodes     
+            => nodes.Select(kv => new KeyValuePair<NodeIndex, Node>(new NodeIndex(kv.Key), kv.Value));
 
         /// <summary>
         /// Backwards data (non-execution) edges (input -> output)
@@ -24,12 +26,16 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         SerializableDict<PortIndex, PortIndex> reverseEdges = new();
 
+        public IEnumerable<KeyValuePair<PortIndex, PortIndex>> Edges => reverseEdges;
+
         /// <summary>
         /// Forward execution edges (output -> input)
         /// </summary>
         [SerializeField]
         [HideInInspector]
         MultiValueDictionary<PortIndex, NodeIndex> executionEdges = new();
+
+        public IEnumerable<KeyValuePair<PortIndex, List<NodeIndex>>> ExecutionEdges => executionEdges;
 
         /// <summary>
         /// Input ports, usually only present in subgraphs (such as within a for loop node)
@@ -52,12 +58,16 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         SerializableDict<PortIndex, int> reverseInputPortEdges = new();
 
+        public IEnumerable<KeyValuePair<PortIndex, int>> InputEdges => reverseInputPortEdges;
+
         /// <summary>
         /// Backwards edges between a node and the graph's output ports (graph output -> node).
         /// </summary>
         [SerializeField]
         [HideInInspector]
         SerializableDict<int, PortIndex> reverseOutputPortEdges = new();
+
+        public IEnumerable<KeyValuePair<int, PortIndex>> OutputEdges => reverseOutputPortEdges;
 
         public bool TryGetGraphOutputSource(int outputIndex, out PortIndex port)
             => reverseOutputPortEdges.TryGetValue(outputIndex, out port);
