@@ -115,7 +115,7 @@ public class PrimitiveSpawner : MonoBehaviour
         active = false;
         // Default ray cast distance when not in mesh creation mode
         rayInteractor.maxRaycastDistance = 10f;
-        rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = true;
+        rayInteractor.GetComponent<MRTKLineVisual>().enabled = true;
     }
 
     public void OnSpawnButtonRelease()
@@ -276,12 +276,12 @@ public class PrimitiveSpawner : MonoBehaviour
         if (gridTool.currentSnapModeValue == offMode)
         {
             rayInteractor.maxRaycastDistance = 0.15f;
-            rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = false;
+            rayInteractor.GetComponent<MRTKLineVisual>().enabled = false;
         }
         else if (gridTool.currentSnapModeValue == surfaceMode)
         {
             rayInteractor.maxRaycastDistance = 10f;
-            rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = true;
+            rayInteractor.GetComponent<MRTKLineVisual>().enabled = true;
         }
         else
         {
