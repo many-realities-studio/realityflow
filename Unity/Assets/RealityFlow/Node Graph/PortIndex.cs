@@ -16,6 +16,6 @@ namespace RealityFlow.NodeGraph
         }
 
         public InputNodePort AsInput(Graph graph) => graph.GetNode(Node).GetInput(Port);
-        public InputNodePort AsInput(GraphView graph) => graph.GetNode(Node).GetInput(Port);
+        public InputNodePort AsInput(ReadonlyGraph graph) => graph.GetNode(Node).GetInput(Port);
     }
 }

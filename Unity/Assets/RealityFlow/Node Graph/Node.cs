@@ -20,6 +20,8 @@ namespace RealityFlow.NodeGraph
 
         public int VariadicInputs => variadicInputs;
 
+        public Vector2 Position { get; set; }
+
         public Node(NodeDefinition definition)
         {
             Definition = definition;

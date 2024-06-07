@@ -34,9 +34,17 @@ public class PopulateNodeLibrary : MonoBehaviour
         nodeList.Add("DestroyObjectNode");
         nodeList.Add("ToggleObjectGravityNode");
 
+        /*// Instantiate a button for each node in nodeList
+        foreach (string node in nodeList)
+            InstantiateButton(buttonPrefab, gameObject.transform, node);*/
+    }
+
+
+    private void Start()
+    {
         // Instantiate a button for each node in nodeList
         foreach (string node in nodeList)
-            InstantiateButton(buttonPrefab, this.gameObject.transform, node);
+            InstantiateButton(buttonPrefab, gameObject.transform, node);
     }
 
     // Instantiate a button and set the node associated with it
@@ -44,7 +52,8 @@ public class PopulateNodeLibrary : MonoBehaviour
     {
         // Instantiate the new button and set the text
         GameObject newButton = Instantiate(buttonPrefab, parent);
-        newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(currentNode);
+        //newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(currentNode);
+        newButton.GetComponentInChildren<TextMeshProUGUI>().text = currentNode;
 
         // Create a new Unity action and add it as a listener to the buttons OnClicked event
         UnityAction<string> action = new UnityAction<string>(TriggerNodeSpawn);
