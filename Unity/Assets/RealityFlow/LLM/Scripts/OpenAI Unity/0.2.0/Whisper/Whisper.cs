@@ -16,7 +16,7 @@ namespace Samples.Whisper
         [SerializeField] private Image progressBar;
         [SerializeField] private MRTKTMPInputField message;
         [SerializeField] private MRTKTMPInputField apiKeyInputField;
-        [SerializeField] private Dropdown dropdown;
+        [SerializeField] private TMP_Dropdown dropdown; // Changed to TMP_Dropdown
         [SerializeField] private PressableButton submitButton;
 
         private readonly string fileName = "output.wav";
@@ -46,6 +46,7 @@ namespace Samples.Whisper
             else
             {
                 Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
+                return;
             }
 
             RefreshMicrophoneList();
@@ -88,14 +89,14 @@ namespace Samples.Whisper
             if (devices.Count == 0)
             {
                 Debug.LogError("No microphone devices found.");
-                dropdown.options.Add(new Dropdown.OptionData("No devices found"));
+                dropdown.options.Add(new TMP_Dropdown.OptionData("No devices found")); // TMP_Dropdown option
             }
             else
             {
                 foreach (var device in devices)
                 {
-                    Debug.Log("Found device: " + device);
-                    dropdown.options.Add(new Dropdown.OptionData(device));
+                    Debug.Log("Found device: " + device); // Log each device
+                    dropdown.options.Add(new TMP_Dropdown.OptionData(device)); // TMP_Dropdown option
                 }
             }
             dropdown.RefreshShownValue(); // Ensure the dropdown is updated
@@ -103,6 +104,7 @@ namespace Samples.Whisper
 
         private void ChangeMicrophone(int index)
         {
+            Debug.Log($"Microphone changed to: {dropdown.options[index].text}");
             PlayerPrefs.SetInt("user-mic-device-index", index);
         }
 
