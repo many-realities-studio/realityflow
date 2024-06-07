@@ -38,9 +38,6 @@ public class ChatGPTTester : MonoBehaviour
     private MRTKTMPInputField scenarioQuestionText;
 
     [SerializeField]
-    private bool immediateCompilation = false;
-
-    [SerializeField]
     private ChatGPTResponse lastChatGPTResponseCache;
 
     public string ChatGPTMessage
