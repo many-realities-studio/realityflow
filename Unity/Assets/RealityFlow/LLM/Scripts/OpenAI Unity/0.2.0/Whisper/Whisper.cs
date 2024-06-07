@@ -34,17 +34,21 @@ namespace Samples.Whisper
             voipPeerConnectionManager = FindObjectOfType<VoipPeerConnectionManager>();
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                apiKey = apiKeyInputField.text;
+            }
+
             if (!string.IsNullOrEmpty(apiKey))
             {
                 InitializeOpenAI(apiKey);
             }
+            else
+            {
+                Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
+            }
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-            dropdown.options.Add(new Dropdown.OptionData("Microphone not supported on WebGL"));
-            Debug.Log("WebGL platform detected, microphone not supported.");
-#else
             RefreshMicrophoneList();
-#endif
 
             recordButton.OnClicked.AddListener(ToggleRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
@@ -78,6 +82,7 @@ namespace Samples.Whisper
 
         private void RefreshMicrophoneList()
         {
+            Debug.Log("Refreshing microphone list...");
             dropdown.ClearOptions();
             List<string> devices = new List<string>(Microphone.devices);
             if (devices.Count == 0)
@@ -93,6 +98,7 @@ namespace Samples.Whisper
                     dropdown.options.Add(new Dropdown.OptionData(device));
                 }
             }
+            dropdown.RefreshShownValue(); // Ensure the dropdown is updated
         }
 
         private void ChangeMicrophone(int index)
@@ -119,10 +125,8 @@ namespace Samples.Whisper
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
 
-#if !UNITY_WEBGL
             Debug.Log($"Starting recording with device: {dropdown.options[index].text}");
             clip = Microphone.Start(dropdown.options[index].text, false, duration, 44100);
-#endif
 
             voipPeerConnectionManager?.MuteAll(); // Mute the VoIP microphone
         }
@@ -134,9 +138,7 @@ namespace Samples.Whisper
 
             message.text = "Transcripting...";
 
-#if !UNITY_WEBGL
             Microphone.End(null);
-#endif
 
             byte[] data = SaveWav.Save(fileName, clip);
 
