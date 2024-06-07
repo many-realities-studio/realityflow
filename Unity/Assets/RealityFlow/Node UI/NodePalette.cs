@@ -4,23 +4,30 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class NodePalette : MonoBehaviour
+namespace RealityFlow.NodeUI
 {
-    List<NodeDefinition> defs;
-    VirtualizedScrollRectList list;
-
-    void Start()
+    public class NodePalette : MonoBehaviour
     {
-        defs = RealityFlowAPI.Instance.GetAvailableNodeDefinitions();
-        list = GetComponent<VirtualizedScrollRectList>();
+        public Paginator page;
+        public GraphView graphView;
 
-        list.SetItemCount(defs.Count);
-        list.OnVisible += OnVisible;
-    }
+        List<NodeDefinition> defs;
 
-    void OnVisible(GameObject element, int index)
-    {
+        void Start()
+        {
+            defs = RealityFlowAPI.Instance.GetAvailableNodeDefinitions();
 
+            page.OnShow = (element, index) =>
+            {
+                element.name = defs[index].Name;
+                AddNodeButton button = element.GetComponent<AddNodeButton>();
+                button.displayName.text = defs[index].Name;
+                button.view = graphView;
+                button.definition = defs[index];
+            };
+            page.ItemCount = defs.Count;
+        }
     }
 }

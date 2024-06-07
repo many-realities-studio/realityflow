@@ -53,6 +53,8 @@ namespace RealityFlow.Collections
             [SerializeField]
             int value;
 
+            public int Value => value;
+
             public Index(int index)
             {
                 value = index;

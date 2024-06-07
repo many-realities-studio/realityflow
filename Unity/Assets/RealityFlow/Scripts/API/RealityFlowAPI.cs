@@ -225,6 +225,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    public void AddNodeToGraph(Graph graph, NodeDefinition def)
+    {
+        NodeIndex index = graph.AddNode(def);
+        actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
+        Debug.Log($"Adding node {def.Name} to graph at index {index}");
+    }
+
 #if UNITY_EDITOR
     public void AddPrefabToCatalogue(GameObject prefab)
     {
@@ -352,6 +359,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     Debug.LogError($"Object named {objectName} not found during undo transform.");
                 }
+                break;
+
+            case nameof(AddNodeToGraph):
+                Graph graph = (Graph)action.Parameters[0];
+                NodeIndex index = (NodeIndex)action.Parameters[2];
+
+                graph.RemoveNode(index);
+
                 break;
 
                 // Add cases for other functions...

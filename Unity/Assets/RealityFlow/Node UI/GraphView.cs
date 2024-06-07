@@ -6,42 +6,49 @@ using Microsoft.MixedReality.Toolkit.Data;
 
 namespace RealityFlow.NodeUI
 {
-    class GraphView : DataSourceGOBase
+    public class GraphView : MonoBehaviour
     {
         Graph graph;
         public Graph Graph
         {
-            get => graph;
+            get
+            {
+                graph ??= new();
+                return graph;
+            }
             set
             {
                 graph = value;
-                if (source != null)
-                {
-                    source.Graph = graph;
-                    source.NotifyAllChanged();
-                }
                 Render();
             }
         }
 
-        GraphViewSource source;
-
         public GameObject nodeUIPrefab;
         public GameObject edgeUIPrefab;
 
+        bool dirty;
         Dictionary<NodeIndex, GameObject> nodeUis = new();
         Dictionary<(PortIndex, PortIndex), GameObject> dataEdgeUis = new();
         Dictionary<(PortIndex, NodeIndex), GameObject> execEdgeUis = new();
 
-        public override IDataSource AllocateDataSource()
+        void Update()
         {
-            return new GraphViewSource { Graph = graph };
+            if (dirty)
+            {
+                Render();
+                dirty = false;
+            }
         }
 
-        void Render()
+        public void MarkDirty()
         {
-            // foreach (Transform child in transform)
-            //     Destroy(child.gameObject);
+            dirty = true;
+        }
+
+        public void Render()
+        {
+            foreach (Transform child in transform)
+                Destroy(child.gameObject);
 
             nodeUis.Clear();
             dataEdgeUis.Clear();
@@ -62,7 +69,7 @@ namespace RealityFlow.NodeUI
                 GameObject edgeUi = Instantiate(edgeUIPrefab, transform);
                 EdgeView view = edgeUi.GetComponent<EdgeView>();
 
-                // Node 
+                dataEdgeUis.Add((edge.Key, edge.Value), edgeUi);
             }
         }
     }
