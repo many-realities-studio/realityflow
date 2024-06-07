@@ -6,17 +6,18 @@ using System;
 using System.Collections.Generic;
 using Ubiq.Voip;
 using Ubiq;
+using Microsoft.MixedReality.Toolkit.UX;
 
 namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
-        [SerializeField] private Button recordButton;
+        [SerializeField] private PressableButton recordButton;
         [SerializeField] private Image progressBar;
-        [SerializeField] private TMP_InputField message;
-        [SerializeField] private TMP_InputField apiKeyInputField;
+        [SerializeField] private MRTKTMPInputField message;
+        [SerializeField] private MRTKTMPInputField apiKeyInputField;
         [SerializeField] private Dropdown dropdown;
-        [SerializeField] private Button submitButton; // Add reference to the Submit button
+        [SerializeField] private PressableButton submitButton;
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 5;
@@ -32,7 +33,6 @@ namespace Samples.Whisper
         {
             voipPeerConnectionManager = FindObjectOfType<VoipPeerConnectionManager>();
 
-            // Initialize the OpenAI API if the environment variable is set
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (!string.IsNullOrEmpty(apiKey))
             {
@@ -46,9 +46,9 @@ namespace Samples.Whisper
             RefreshMicrophoneList();
 #endif
 
-            recordButton.onClick.AddListener(StartRecording);
+            recordButton.OnClicked.AddListener(ToggleRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
-            submitButton.onClick.AddListener(SubmitApiKey); // Add listener to Submit button
+            submitButton.OnClicked.AddListener(SubmitApiKey);
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
@@ -100,6 +100,18 @@ namespace Samples.Whisper
             PlayerPrefs.SetInt("user-mic-device-index", index);
         }
 
+        private void ToggleRecording()
+        {
+            if (isRecording)
+            {
+                EndRecording();
+            }
+            else
+            {
+                StartRecording();
+            }
+        }
+
         private void StartRecording()
         {
             isRecording = true;
@@ -117,6 +129,9 @@ namespace Samples.Whisper
 
         private async void EndRecording()
         {
+            isRecording = false;
+            recordButton.enabled = true;
+
             message.text = "Transcripting...";
 
 #if !UNITY_WEBGL
@@ -132,12 +147,11 @@ namespace Samples.Whisper
                 Language = "en"
             };
 
-            Debug.Log("Using API key: " + currentApiKey); // Add this log to confirm the API key being used
+            Debug.Log("Using API key: " + currentApiKey);
             var res = await openai.CreateAudioTranscription(req);
 
             progressBar.fillAmount = 0;
             message.text = res.Text;
-            recordButton.enabled = true;
 
             Debug.Log("Unmuting all microphones after Whisper recording.");
             voipPeerConnectionManager?.UnmuteAll(); // Unmute the VoIP microphone
@@ -153,7 +167,6 @@ namespace Samples.Whisper
                 if (time >= duration)
                 {
                     time = 0;
-                    isRecording = false;
                     EndRecording();
                 }
             }
