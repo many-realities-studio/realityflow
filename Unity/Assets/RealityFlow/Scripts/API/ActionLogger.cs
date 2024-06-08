@@ -4,79 +4,67 @@ using UnityEngine;
 
 public class ActionLogger
 {
-    public class LoggedAction
+    public interface ILogAction
     {
-        public string FunctionName { get; }
-        public object[] Parameters { get; }
+        string Name();
 
-        public LoggedAction(string functionName, object[] parameters)
-        {
-            FunctionName = functionName;
-            Parameters = parameters;
-        }
+        void Undo();
     }
 
-    public class CompoundAction : LoggedAction
+    public class CompoundAction : ILogAction
     {
-        public List<LoggedAction> Actions { get; }
+        public List<ILogAction> Actions { get; } = new();
 
-        public CompoundAction() : base("CompoundAction", null)
+        public string Name() => "CompoundAction";
+
+        public void Undo()
         {
-            Actions = new List<LoggedAction>();
+            foreach (var action in Actions)
+                action.Undo();
         }
 
-        public void AddAction(LoggedAction action)
+        public void AddAction(ILogAction action)
         {
             Actions.Add(action);
         }
     }
-    private bool isUndoing = false;
 
-    private Stack<LoggedAction> actionStack = new Stack<LoggedAction>();
+    private readonly Stack<ILogAction> actionStack = new();
     private CompoundAction currentCompoundAction;
 
-    public void LogAction(string functionName, params object[] parameters)
+    public void LogAction<A>(A action)
+    where
+        A : ILogAction
     {
-
-        if (isUndoing) return;
-
-        var action = new LoggedAction(functionName, parameters);
         if (currentCompoundAction != null)
         {
             currentCompoundAction.AddAction(action);
-            Debug.Log($"Added action {functionName} to compound action.");
+            Debug.Log($"Added action {action.Name()} to compound action.");
         }
         else
         {
             actionStack.Push(action);
-            Debug.Log($"Logged action: {functionName}");
+            Debug.Log($"Logged action: {action.Name()}");
         }
     }
 
-    public LoggedAction GetLastAction()
+    public ILogAction GetLastAction()
     {
         var action = actionStack.Count > 0 ? actionStack.Pop() : null;
         if (action != null)
         {
-            Debug.Log($"Popped action: {action.FunctionName}");
+            Debug.Log($"Popped action: {action.Name()}");
         }
         else
             Debug.Log("No actions in stack to pop");
         return action;
     }
+
     public int GetActionStackCount()
     {
         return actionStack.Count;
     }
-    public void StartUndo()
-    {
-        isUndoing = true;
-    }
 
-    public void EndUndo()
-    {
-        isUndoing = false;
-    }
     public void ClearActionStack()
     {
         actionStack.Clear();

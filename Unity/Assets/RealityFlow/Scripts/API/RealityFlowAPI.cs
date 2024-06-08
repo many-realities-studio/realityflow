@@ -13,7 +13,7 @@ using UnityEditor;
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private NetworkSpawnManager spawnManager;
-    private ActionLogger actionLogger = new ActionLogger();
+    private readonly ActionLogger actionLogger = new();
     private NetworkContext networkContext;
 
     public NetworkId NetworkId { get; set; }
@@ -36,7 +36,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 if (_instance == null)
                 {
-                    _instance = FindObjectOfType<RealityFlowAPI>() ?? new GameObject("RealityFlowAPI").AddComponent<RealityFlowAPI>();
+                    RealityFlowAPI api = FindObjectOfType<RealityFlowAPI>();
+                    if (api == null)
+                        api = new GameObject("RealityFlowAPI").AddComponent<RealityFlowAPI>();
+                    _instance = api;
                 }
                 return _instance;
             }
@@ -60,11 +63,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
             spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated);
         }
-    }
-
-    void Start()
-    {
-
     }
 
     public void ProcessTransformUpdate(string propertyKey, string jsonMessage)
@@ -109,7 +107,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return null;
     }
 
-    public GameObject SpawnObject(string prefabName, Vector3 position, Vector3 scale = default, Quaternion rotation = default, SpawnScope scope = SpawnScope.Room)
+    public GameObject SpawnObject(string prefabName, Vector3 position, bool log, SpawnScope scope = SpawnScope.Room)
     {
         GameObject newObject = spawnManager.catalogue.prefabs.Find(prefab => prefab.name.Equals(prefabName, StringComparison.OrdinalIgnoreCase));
         if (newObject == null)
@@ -136,19 +134,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (newObject != null)
         {
             newObject.transform.position = position;
-            newObject.transform.rotation = rotation;
-            newObject.transform.localScale = scale;
         }
 
-        actionLogger.LogAction(nameof(SpawnObject), prefabName, position, scale, rotation, scope);
+        if (log)
+            actionLogger.LogAction(new SpawnObject() { spawned = newObject });
         return newObject;
     }
 
-    public void DespawnObject(GameObject objectToDespawn)
+    public void DespawnObject(GameObject objectToDespawn, bool log)
     {
         if (objectToDespawn != null)
         {
-            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
+            // if (log)
+                // actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
             spawnManager.Despawn(objectToDespawn);
             Debug.Log("Despawned: " + objectToDespawn.name);
         }
@@ -192,7 +190,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // Method to update the transform of a networked object
-    public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    public void UpdateObjectTransform(string objectName, bool log, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         GameObject obj = FindSpawnedObject(objectName);
         if (obj == null)
@@ -202,7 +200,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (obj != null)
         {
             // Log the current transform before making changes
-            actionLogger.LogAction(nameof(UpdateObjectTransform), objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            // if (log)
+            //     actionLogger.LogAction(nameof(UpdateObjectTransform), objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
             Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
             Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
 
@@ -279,9 +278,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Attempting to undo last action.");
         Debug.Log($"Action stack count before undo: {actionLogger.GetActionStackCount()}");
 
-        actionLogger.StartUndo();
         var lastAction = actionLogger.GetLastAction();
-        actionLogger.EndUndo();
 
         if (lastAction == null)
         {
@@ -289,72 +286,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        if (lastAction is ActionLogger.CompoundAction compoundAction)
-        {
-            foreach (var action in compoundAction.Actions)
-            {
-                UndoSingleAction(action);
-            }
-        }
-        else
-        {
-            UndoSingleAction(lastAction);
-        }
+        lastAction.Undo();
 
-        // Clear the action stack after undo
-        //actionLogger.ClearActionStack();
         Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
-        //StopAllCoroutines();
     }
 
-
-    private void UndoSingleAction(ActionLogger.LoggedAction action)
+    private void UndoSingleAction(ActionLogger.ILogAction action)
     {
-        switch (action.FunctionName)
-        {
-            case nameof(SpawnObject):
-                string prefabName = (string)action.Parameters[0] + "(Clone)";
-                Debug.Log("The spawned object's name is " + prefabName);
-                GameObject spawnedObject = FindSpawnedObject(prefabName);
-                if (spawnedObject != null)
-                {
-                    DespawnObject(spawnedObject);
-                }
-                break;
-
-            case nameof(DespawnObject):
-                string objName = ((string)action.Parameters[0]).Replace("(Clone)", "").Trim();
-                Debug.Log("Undoing the despawn of object named " + objName);
-                Vector3 position = (Vector3)action.Parameters[1];
-                Quaternion rotation = (Quaternion)action.Parameters[2];
-                Vector3 scale = (Vector3)action.Parameters[3];
-                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
-                if (respawnedObject != null)
-                {
-                    respawnedObject.transform.localScale = scale;
-                }
-                break;
-
-            case nameof(UpdateObjectTransform):
-                string objectName = (string)action.Parameters[0];
-                Vector3 oldPosition = (Vector3)action.Parameters[1];
-                Quaternion oldRotation = (Quaternion)action.Parameters[2];
-                Vector3 oldScale = (Vector3)action.Parameters[3];
-                Debug.Log("Undoing the transform of object named " + objectName);
-                GameObject obj = FindSpawnedObject(objectName);
-                if (obj != null)
-                {
-                    UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
-                }
-                else
-                {
-                    Debug.LogError($"Object named {objectName} not found during undo transform.");
-                }
-                break;
-
-                // Add cases for other functions...
-        }
+        action.Undo();
     }
+
     public List<string> GetPrefabNames()
     {
         if (spawnManager != null && spawnManager.catalogue != null)
@@ -363,7 +304,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         return new List<string>();
     }
-
 
     public void StartCompoundAction()
     {
