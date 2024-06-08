@@ -40,6 +40,9 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField]
     private ChatGPTResponse lastChatGPTResponseCache;
 
+    [SerializeField]
+    private bool immediateCompilation = false; // Ensure this field is declared
+
     public string ChatGPTMessage
     {
         get
