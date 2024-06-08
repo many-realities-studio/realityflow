@@ -31,6 +31,8 @@ namespace Samples.Whisper
 
         private void Start()
         {
+            RefreshMicrophoneList();
+
             muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
@@ -49,7 +51,6 @@ namespace Samples.Whisper
                 return;
             }
 
-            RefreshMicrophoneList();
 
             recordButton.OnClicked.AddListener(ToggleRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
@@ -109,7 +110,7 @@ namespace Samples.Whisper
             PlayerPrefs.SetInt("user-mic-device-index", index);
         }
 
-        private void ToggleRecording()
+        public void ToggleRecording()
         {
             if (isRecording)
             {
@@ -121,7 +122,7 @@ namespace Samples.Whisper
             }
         }
 
-        private void StartRecording()
+        public void StartRecording()
         {
             isRecording = true;
             recordButton.enabled = false;
@@ -134,7 +135,7 @@ namespace Samples.Whisper
             muteManager?.Mute(); // Mute the VoIP microphone
         }
 
-        private async void EndRecording()
+        public async void EndRecording()
         {
             isRecording = false;
             recordButton.enabled = true;
