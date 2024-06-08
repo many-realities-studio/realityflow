@@ -18,12 +18,14 @@ namespace Samples.Whisper
         [SerializeField] private MRTKTMPInputField apiKeyInputField;
         [SerializeField] private TMP_Dropdown dropdown; // Changed to TMP_Dropdown
         [SerializeField] private PressableButton submitButton;
+        [SerializeField] private PressableButton muteButton; // Added mute button
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 5;
 
         private AudioClip clip;
         private bool isRecording;
+        private bool isMuted = false; // Added to track mute state
         private float time;
         private OpenAIApi openai;
         private VoipPeerConnectionManager voipPeerConnectionManager;
@@ -54,6 +56,7 @@ namespace Samples.Whisper
             recordButton.OnClicked.AddListener(ToggleRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
             submitButton.OnClicked.AddListener(SubmitApiKey);
+            muteButton.OnClicked.AddListener(ToggleMute); // Add listener to mute button
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
@@ -66,7 +69,7 @@ namespace Samples.Whisper
             Debug.Log("OpenAI API initialized with provided key.");
         }
 
-        private void SubmitApiKey()
+        public void SubmitApiKey()
         {
             string apiKey = apiKeyInputField.text;
             if (!string.IsNullOrEmpty(apiKey))
@@ -174,6 +177,31 @@ namespace Samples.Whisper
                     EndRecording();
                 }
             }
+        }
+
+        public void ToggleMute()
+        {
+            if (isMuted)
+            {
+                UnMute();
+            }
+            else
+            {
+                Mute();
+            }
+            isMuted = !isMuted; // Toggle the mute state
+        }
+
+        public void Mute()
+        {
+            voipPeerConnectionManager?.MuteAll(); // Mute the VoIP microphone
+            Debug.Log("Muted");
+        }
+
+        public void UnMute()
+        {
+            voipPeerConnectionManager?.UnmuteAll(); // Unmute the VoIP microphone
+            Debug.Log("Unmuted");
         }
     }
 }
