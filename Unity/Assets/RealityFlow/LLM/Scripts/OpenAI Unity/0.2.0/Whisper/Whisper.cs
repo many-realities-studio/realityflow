@@ -18,7 +18,7 @@ namespace Samples.Whisper
         [SerializeField] private MRTKTMPInputField apiKeyInputField;
         [SerializeField] private TMP_Dropdown dropdown; // Changed to TMP_Dropdown
         [SerializeField] private PressableButton submitButton;
-        [SerializeField] private PressableButton muteButton; // Added mute button
+        [SerializeField] private Button muteButton; // Changed to regular Button
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 5;
@@ -56,7 +56,7 @@ namespace Samples.Whisper
             recordButton.OnClicked.AddListener(ToggleRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
             submitButton.OnClicked.AddListener(SubmitApiKey);
-            muteButton.OnClicked.AddListener(ToggleMute); // Add listener to mute button
+            muteButton.onClick.AddListener(ToggleMute); // Add listener to mute button
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
@@ -181,6 +181,8 @@ namespace Samples.Whisper
 
         public void ToggleMute()
         {
+            Debug.Log("ToggleMute called. Current isMuted state: " + isMuted);
+
             if (isMuted)
             {
                 UnMute();
@@ -190,6 +192,7 @@ namespace Samples.Whisper
                 Mute();
             }
             isMuted = !isMuted; // Toggle the mute state
+            Debug.Log("Toggle Mute: isMuted = " + isMuted);
         }
 
         public void Mute()

@@ -312,10 +312,10 @@ RectTransform:
   - {fileID: 1390580283}
   m_Father: {fileID: 1210841552}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 85, y: -22.5}
+  m_SizeDelta: {x: 30, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &73665653
 MonoBehaviour:
@@ -360,19 +360,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 73665654}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 156419213}
-        m_TargetAssemblyTypeName: Samples.Whisper.Whisper, RealityFlow
-        m_MethodName: ToggleMute
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &73665654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,7 +589,7 @@ MonoBehaviour:
   apiKeyInputField: {fileID: 433817392}
   dropdown: {fileID: 835899908}
   submitButton: {fileID: 1794409899}
-  muteButton: {fileID: 0}
+  muteButton: {fileID: 73665653}
 --- !u!4 &156419214
 Transform:
   m_ObjectHideFlags: 0
@@ -12039,32 +12027,32 @@ PrefabInstance:
     - target: {fileID: 4177767039380935944, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4177767039380935944, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4177767039380935944, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 4177767039380935944, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 4177767039380935944, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 4177767039380935944, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -22.5
       objectReference: {fileID: 0}
     - target: {fileID: 4828830573041065477, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
@@ -12414,32 +12402,32 @@ PrefabInstance:
     - target: {fileID: 7909306047882646314, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7909306047882646314, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7909306047882646314, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7909306047882646314, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 7909306047882646314, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 53
       objectReference: {fileID: 0}
     - target: {fileID: 7909306047882646314, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -22.5
       objectReference: {fileID: 0}
     - target: {fileID: 8081557683268782090, guid: b9ba88a92e591794a8cfdce19f7f87e9,
         type: 3}
