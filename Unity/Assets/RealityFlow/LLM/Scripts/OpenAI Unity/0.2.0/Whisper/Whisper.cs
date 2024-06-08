@@ -33,7 +33,7 @@ namespace Samples.Whisper
         {
             RefreshMicrophoneList();
 
-            muteManager = FindObjectOfType<MuteManager>();
+            muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (string.IsNullOrEmpty(apiKey))
