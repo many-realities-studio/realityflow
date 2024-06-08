@@ -5,7 +5,6 @@ using TMPro;
 using System;
 using System.Collections.Generic;
 using Ubiq.Voip;
-using Ubiq;
 using Microsoft.MixedReality.Toolkit.UX;
 
 namespace Samples.Whisper
@@ -25,15 +24,14 @@ namespace Samples.Whisper
 
         private AudioClip clip;
         private bool isRecording;
-        private bool isMuted = false; // Added to track mute state
         private float time;
         private OpenAIApi openai;
-        private VoipPeerConnectionManager voipPeerConnectionManager;
+        private MuteManager muteManager; // Add reference to MuteManager
         private string currentApiKey;
 
         private void Start()
         {
-            voipPeerConnectionManager = FindObjectOfType<VoipPeerConnectionManager>();
+            muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (string.IsNullOrEmpty(apiKey))
@@ -56,7 +54,7 @@ namespace Samples.Whisper
             recordButton.OnClicked.AddListener(ToggleRecording);
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
             submitButton.OnClicked.AddListener(SubmitApiKey);
-            muteButton.onClick.AddListener(ToggleMute); // Add listener to mute button
+            muteButton.onClick.AddListener(muteManager.ToggleMute); // Use MuteManager for mute button
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
@@ -133,7 +131,7 @@ namespace Samples.Whisper
             Debug.Log($"Starting recording with device: {dropdown.options[index].text}");
             clip = Microphone.Start(dropdown.options[index].text, false, duration, 44100);
 
-            voipPeerConnectionManager?.MuteAll(); // Mute the VoIP microphone
+            muteManager?.Mute(); // Mute the VoIP microphone
         }
 
         private async void EndRecording()
@@ -161,7 +159,7 @@ namespace Samples.Whisper
             message.text = res.Text;
 
             Debug.Log("Unmuting all microphones after Whisper recording.");
-            voipPeerConnectionManager?.UnmuteAll(); // Unmute the VoIP microphone
+            muteManager?.UnMute(); // Unmute the VoIP microphone
         }
 
         private void Update()
@@ -177,34 +175,6 @@ namespace Samples.Whisper
                     EndRecording();
                 }
             }
-        }
-
-        public void ToggleMute()
-        {
-            Debug.Log("ToggleMute called. Current isMuted state: " + isMuted);
-
-            if (isMuted)
-            {
-                UnMute();
-            }
-            else
-            {
-                Mute();
-            }
-            isMuted = !isMuted; // Toggle the mute state
-            Debug.Log("Toggle Mute: isMuted = " + isMuted);
-        }
-
-        public void Mute()
-        {
-            voipPeerConnectionManager?.MuteAll(); // Mute the VoIP microphone
-            Debug.Log("Muted");
-        }
-
-        public void UnMute()
-        {
-            voipPeerConnectionManager?.UnmuteAll(); // Unmute the VoIP microphone
-            Debug.Log("Unmuted");
         }
     }
 }
