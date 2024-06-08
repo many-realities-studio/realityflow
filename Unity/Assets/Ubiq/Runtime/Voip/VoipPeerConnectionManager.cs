@@ -250,7 +250,7 @@ namespace Ubiq.Voip
                 return null;
             }
         }
-        //RealityFlow added functions
+        //MuteAll and UnmuteAll are RealityFlow added functions
         public void MuteAll()
         {
             foreach (var connection in peerUuidToConnection.Values)

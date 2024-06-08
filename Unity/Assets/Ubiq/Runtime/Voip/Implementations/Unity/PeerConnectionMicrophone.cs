@@ -43,6 +43,8 @@ namespace Ubiq.Voip.Implementations.Unity
         private List<GameObject> users = new List<GameObject>();
         private bool microphoneAuthorized;
         private AudioStatsFilter statsFilter;
+
+        //RealityFlow added flag to track mute state
         private bool isMuted = false;
 
         private void Awake()
@@ -69,7 +71,7 @@ namespace Ubiq.Voip.Implementations.Unity
                 }
             }
 #endif
-
+            //RealityFlow added logic
             if (isMuted)
             {
                 // If muted, stop the audio source if it's running
@@ -107,6 +109,8 @@ namespace Ubiq.Voip.Implementations.Unity
                 audioStreamTrack = null;
             }
         }
+
+        //Mute and Unmute are RealityFlow added functions
 
         public void Mute()
         {

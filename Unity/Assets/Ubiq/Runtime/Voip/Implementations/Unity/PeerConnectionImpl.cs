@@ -489,7 +489,8 @@ namespace Ubiq.Voip.Implementations.Unity
                 usernameFragment: ic.UserNameFragment
             )));
         }
-        //RealityFlow Added
+        //MuteMicrophone and UnmuteMicrophone are RealityFlow added functions
+
         public void MuteMicrophone()
         {
             if (microphone != null)

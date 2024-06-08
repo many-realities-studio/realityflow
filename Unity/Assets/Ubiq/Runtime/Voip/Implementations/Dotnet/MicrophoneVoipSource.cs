@@ -153,7 +153,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
         // G722 has a sample rate of 16000 but a clock rate of 8000
         private const int RTP_TIMESTAMP_PER_BUFFER = SAMPLE_BUFFER_LENGTH / 2;
-
+        //Mute and Unmute are RealityFlow added functions so is the isMuted flag helper
         private bool isMuted = false;
 
         // Method to mute the microphone
@@ -231,7 +231,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
                 task.RunSynchronously();
             }
-
+            //RealityFlow addition
             // If the microphone is muted, do not send audio samples to the network
             if (isMuted)
             {

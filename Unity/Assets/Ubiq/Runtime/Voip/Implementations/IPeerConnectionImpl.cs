@@ -137,6 +137,7 @@ namespace Ubiq.Voip.Implementations
             Quaternion sourceRotation, Vector3 listenerPosition,
             Quaternion listenerRotation);
 
+        //MuteMicrophone and UnmuteMicrophone functions are RealityFlow added functions
         void MuteMicrophone();
         void UnmuteMicrophone();
     }

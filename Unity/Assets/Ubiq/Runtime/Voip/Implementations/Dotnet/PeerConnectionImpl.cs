@@ -554,7 +554,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
                     listenerPosition, listenerRotation);
             }
         }
-
+        //MuteMicrophone and UnmuteMicrophone are RealityFlow added functions
         public void MuteMicrophone()
         {
             if (microphone != null)

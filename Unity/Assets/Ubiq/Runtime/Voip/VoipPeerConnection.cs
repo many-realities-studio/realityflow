@@ -197,6 +197,8 @@ namespace Ubiq.Voip
             peerConnectionState = (PeerConnectionState)state;
             OnPeerConnectionStateChanged.Invoke((PeerConnectionState)state);
         }
+
+        //The MuteMicrophone and UnmuteMicrophone methods are RealityFlow added functions
         public void MuteMicrophone()
         {
             if (impl != null)

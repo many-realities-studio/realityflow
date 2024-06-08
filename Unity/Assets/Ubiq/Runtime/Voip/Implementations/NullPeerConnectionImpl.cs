@@ -17,6 +17,8 @@ namespace Ubiq.Voip.Implementations
             }
         }
         public void UpdateSpatialization(Vector3 sourcePosition, Quaternion sourceRotation, Vector3 listenerPosition, Quaternion listenerRotation) { }
+
+        //MuteMicrophone and UnmuteMicrophone are RealityFlow added functions
         public void MuteMicrophone()
         {
             // No operation for the null implementation
