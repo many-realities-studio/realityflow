@@ -11,13 +11,13 @@ namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
-        [SerializeField] private PressableButton recordButton;
+        [SerializeField] private Button recordButton; // Changed to Button for testing
         [SerializeField] private Image progressBar;
         [SerializeField] private MRTKTMPInputField message;
         [SerializeField] private MRTKTMPInputField apiKeyInputField;
-        [SerializeField] private TMP_Dropdown dropdown; // Changed to TMP_Dropdown
+        [SerializeField] private TMP_Dropdown dropdown;
         [SerializeField] private PressableButton submitButton;
-        [SerializeField] private Button muteButton; // Changed to regular Button
+        [SerializeField] private Button muteButton;
 
         private readonly string fileName = "output.wav";
         private readonly int duration = 5;
@@ -26,12 +26,14 @@ namespace Samples.Whisper
         private bool isRecording;
         private float time;
         private OpenAIApi openai;
-        private MuteManager muteManager; // Add reference to MuteManager
+        private MuteManager muteManager;
         private string currentApiKey;
 
         private void Start()
         {
-            muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
+            RefreshMicrophoneList();
+
+            muteManager = FindObjectOfType<MuteManager>();
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (string.IsNullOrEmpty(apiKey))
@@ -49,12 +51,10 @@ namespace Samples.Whisper
                 return;
             }
 
-            RefreshMicrophoneList();
-
-            recordButton.OnClicked.AddListener(ToggleRecording);
+            recordButton.onClick.AddListener(ToggleRecording); // Changed to onClick for Button
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
             submitButton.OnClicked.AddListener(SubmitApiKey);
-            muteButton.onClick.AddListener(muteManager.ToggleMute); // Use MuteManager for mute button
+            muteButton.onClick.AddListener(muteManager.ToggleMute);
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
@@ -90,17 +90,17 @@ namespace Samples.Whisper
             if (devices.Count == 0)
             {
                 Debug.LogError("No microphone devices found.");
-                dropdown.options.Add(new TMP_Dropdown.OptionData("No devices found")); // TMP_Dropdown option
+                dropdown.options.Add(new TMP_Dropdown.OptionData("No devices found"));
             }
             else
             {
                 foreach (var device in devices)
                 {
-                    Debug.Log("Found device: " + device); // Log each device
-                    dropdown.options.Add(new TMP_Dropdown.OptionData(device)); // TMP_Dropdown option
+                    Debug.Log("Found device: " + device);
+                    dropdown.options.Add(new TMP_Dropdown.OptionData(device));
                 }
             }
-            dropdown.RefreshShownValue(); // Ensure the dropdown is updated
+            dropdown.RefreshShownValue();
         }
 
         private void ChangeMicrophone(int index)
@@ -109,33 +109,39 @@ namespace Samples.Whisper
             PlayerPrefs.SetInt("user-mic-device-index", index);
         }
 
-        private void ToggleRecording()
+        public void ToggleRecording()
         {
             if (isRecording)
             {
+                Debug.Log("ToggleRecording called but already recording, stopping now.");
                 EndRecording();
             }
             else
             {
+                Debug.Log("ToggleRecording called and starting recording now.");
                 StartRecording();
             }
         }
 
-        private void StartRecording()
+        public void StartRecording()
         {
+            if (isRecording) return; // Prevent starting if already recording
             isRecording = true;
             recordButton.enabled = false;
+            time = 0; // Reset time when starting a new recording
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
 
             Debug.Log($"Starting recording with device: {dropdown.options[index].text}");
             clip = Microphone.Start(dropdown.options[index].text, false, duration, 44100);
-
+            Debug.Log(clip + " Is the clip");
             muteManager?.Mute(); // Mute the VoIP microphone
         }
 
-        private async void EndRecording()
+        public async void EndRecording()
         {
+            if (!isRecording) return; // Ensure this method is only called once
+            Debug.Log("In the EndRecording method");
             isRecording = false;
             recordButton.enabled = true;
 
@@ -171,6 +177,7 @@ namespace Samples.Whisper
 
                 if (time >= duration)
                 {
+                    Debug.Log("Recording duration reached, ending recording.");
                     time = 0;
                     EndRecording();
                 }
