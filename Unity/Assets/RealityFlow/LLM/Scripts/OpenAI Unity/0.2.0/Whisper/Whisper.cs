@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Ubiq.Voip;
 using Microsoft.MixedReality.Toolkit.UX;
+//using UnityEngine.Rendering.Universal;
 
 namespace Samples.Whisper
 {
@@ -16,7 +17,7 @@ namespace Samples.Whisper
         [SerializeField] private MRTKTMPInputField message;
         [SerializeField] private MRTKTMPInputField apiKeyInputField;
         [SerializeField] private TMP_Dropdown dropdown;
-        [SerializeField] private PressableButton submitButton;
+        [SerializeField] private Button submitButton; // Changed to Button
         [SerializeField] private Button muteButton;
 
         private readonly string fileName = "output.wav";
@@ -34,6 +35,11 @@ namespace Samples.Whisper
             RefreshMicrophoneList();
 
             muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
+            if (muteManager == null)
+            {
+                Debug.LogError("MuteManager not found in the scene.");
+                return;
+            }
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (string.IsNullOrEmpty(apiKey))
@@ -53,7 +59,7 @@ namespace Samples.Whisper
 
             recordButton.onClick.AddListener(ToggleRecording); // Changed to onClick for Button
             dropdown.onValueChanged.AddListener(ChangeMicrophone);
-            submitButton.OnClicked.AddListener(SubmitApiKey);
+            submitButton.onClick.AddListener(SubmitApiKey); // Changed to onClick for Button
             muteButton.onClick.AddListener(muteManager.ToggleMute);
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
@@ -126,30 +132,63 @@ namespace Samples.Whisper
         public void StartRecording()
         {
             if (isRecording) return; // Prevent starting if already recording
+            if (!recordButton)
+                Debug.Log("The record button is null StartRecording function");
             isRecording = true;
             recordButton.enabled = false;
+
             time = 0; // Reset time when starting a new recording
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
 
-            Debug.Log($"Starting recording with device: {dropdown.options[index].text}");
-            clip = Microphone.Start(dropdown.options[index].text, false, duration, 44100);
+            if (index >= dropdown.options.Count)
+            {
+                Debug.LogError("Invalid microphone index.");
+                return;
+            }
+
+            var micName = dropdown.options[index].text;
+            if (string.IsNullOrEmpty(micName))
+            {
+                Debug.LogError("Selected microphone name is null or empty.");
+                return;
+            }
+
+            Debug.Log($"Starting recording with device: {micName}");
+            clip = Microphone.Start(micName, false, duration, 44100);
             Debug.Log(clip + " Is the clip");
+
             muteManager?.Mute(); // Mute the VoIP microphone
         }
 
         public async void EndRecording()
         {
+            if (!recordButton)
+                Debug.Log("The record button is null EndRecording function");
+
             if (!isRecording) return; // Ensure this method is only called once
             Debug.Log("In the EndRecording method");
             isRecording = false;
             recordButton.enabled = true;
 
+            Debug.Log("Beginning transcription it should say transcribing");
             message.text = "Transcripting...";
 
             Microphone.End(null);
 
+            if (clip == null)
+            {
+                Debug.LogError("AudioClip is null. Recording might not have been started correctly.");
+                return;
+            }
+
             byte[] data = SaveWav.Save(fileName, clip);
+
+            if (data == null)
+            {
+                Debug.LogError("Failed to save audio data.");
+                return;
+            }
 
             var req = new CreateAudioTranscriptionsRequest
             {
@@ -157,6 +196,12 @@ namespace Samples.Whisper
                 Model = "whisper-1",
                 Language = "en"
             };
+
+            if (openai == null)
+            {
+                Debug.LogError("OpenAI API is not initialized.");
+                return;
+            }
 
             Debug.Log("Using API key: " + currentApiKey);
             var res = await openai.CreateAudioTranscription(req);
