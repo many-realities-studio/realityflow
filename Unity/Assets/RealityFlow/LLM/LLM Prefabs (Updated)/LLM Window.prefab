@@ -181,6 +181,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 298231834865638997, guid: cfe2ac5be0767d54ba35b565b857da35,
         type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 298231834865638997, guid: cfe2ac5be0767d54ba35b565b857da35,
+        type: 3}
       propertyPath: m_Colors.m_NormalColor.b
       value: 0.8392157
       objectReference: {fileID: 0}
@@ -283,6 +288,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4620899771130119504, guid: cfe2ac5be0767d54ba35b565b857da35,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4682064171007983177, guid: cfe2ac5be0767d54ba35b565b857da35,
         type: 3}
@@ -455,7 +465,13 @@ PrefabInstance:
       value: 31
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4682064171007983177, guid: cfe2ac5be0767d54ba35b565b857da35, type: 3}
+    - {fileID: 558148537323532708, guid: cfe2ac5be0767d54ba35b565b857da35, type: 3}
+    - {fileID: 1533017091963229942, guid: cfe2ac5be0767d54ba35b565b857da35, type: 3}
+    - {fileID: 7853036999263082756, guid: cfe2ac5be0767d54ba35b565b857da35, type: 3}
+    - {fileID: 6112634484146020314, guid: cfe2ac5be0767d54ba35b565b857da35, type: 3}
+    - {fileID: 5945822334258116728, guid: cfe2ac5be0767d54ba35b565b857da35, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5140021803450257845, guid: cfe2ac5be0767d54ba35b565b857da35,
         type: 3}
@@ -538,7 +554,7 @@ PrefabInstance:
     - target: {fileID: 8174955776655707806, guid: 72dfeb9ecf5ad884b87eff8bc5b49276,
         type: 3}
       propertyPath: onClicked.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8174955776655707806, guid: 72dfeb9ecf5ad884b87eff8bc5b49276,
         type: 3}

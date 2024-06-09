@@ -6,18 +6,18 @@ using System;
 using System.Collections.Generic;
 using Ubiq.Voip;
 using Microsoft.MixedReality.Toolkit.UX;
-//using UnityEngine.Rendering.Universal;
+using System.Collections;
 
 namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
-        [SerializeField] private Button recordButton; // Changed to Button for testing
+        [SerializeField] private Button recordButton;
         [SerializeField] private Image progressBar;
         [SerializeField] private MRTKTMPInputField message;
         [SerializeField] private MRTKTMPInputField apiKeyInputField;
         [SerializeField] private TMP_Dropdown dropdown;
-        [SerializeField] private Button submitButton; // Changed to Button
+        [SerializeField] private Button submitButton;
         [SerializeField] private Button muteButton;
 
         private readonly string fileName = "output.wav";
@@ -32,13 +32,17 @@ namespace Samples.Whisper
 
         private void Start()
         {
+            recordButton.onClick.AddListener(ToggleRecording);
+            dropdown.onValueChanged.AddListener(ChangeMicrophone);
+            submitButton.onClick.AddListener(SubmitApiKey);
+            muteButton.onClick.AddListener(() => muteManager?.ToggleMute());
+
             RefreshMicrophoneList();
 
             muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
             if (muteManager == null)
             {
                 Debug.LogError("MuteManager not found in the scene.");
-                return;
             }
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
@@ -54,13 +58,7 @@ namespace Samples.Whisper
             else
             {
                 Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
-                return;
             }
-
-            recordButton.onClick.AddListener(ToggleRecording); // Changed to onClick for Button
-            dropdown.onValueChanged.AddListener(ChangeMicrophone);
-            submitButton.onClick.AddListener(SubmitApiKey); // Changed to onClick for Button
-            muteButton.onClick.AddListener(muteManager.ToggleMute);
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
@@ -138,6 +136,7 @@ namespace Samples.Whisper
             recordButton.enabled = false;
 
             time = 0; // Reset time when starting a new recording
+            SetProgressBarColor(new Color(0.847f, 1.0f, 0.824f)); // Set color to #D8FFD2
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
 
@@ -206,7 +205,8 @@ namespace Samples.Whisper
             Debug.Log("Using API key: " + currentApiKey);
             var res = await openai.CreateAudioTranscription(req);
 
-            progressBar.fillAmount = 0;
+            StartCoroutine(AnimateProgressBarFill(0));
+            SetProgressBarColor(new Color(0.314f, 0.388f, 0.835f)); // Set color to #5063D5 after recording
             message.text = res.Text;
 
             Debug.Log("Unmuting all microphones after Whisper recording.");
@@ -218,7 +218,8 @@ namespace Samples.Whisper
             if (isRecording)
             {
                 time += Time.deltaTime;
-                progressBar.fillAmount = time / duration;
+                float fillAmount = time / duration;
+                StartCoroutine(AnimateProgressBarFill(fillAmount));
 
                 if (time >= duration)
                 {
@@ -227,6 +228,38 @@ namespace Samples.Whisper
                     EndRecording();
                 }
             }
+        }
+
+        private void SetProgressBarColor(Color color)
+        {
+            // Set color for the progress bar
+            progressBar.color = color;
+
+            // Set color for all child components of the progress bar
+            foreach (Transform child in progressBar.transform)
+            {
+                var childImage = child.GetComponent<Image>();
+                if (childImage != null)
+                {
+                    childImage.color = color;
+                }
+            }
+        }
+
+        private IEnumerator AnimateProgressBarFill(float targetFillAmount)
+        {
+            float startFillAmount = progressBar.fillAmount;
+            float elapsed = 0f;
+            float duration = 0.5f; // Animation duration
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                progressBar.fillAmount = Mathf.Lerp(startFillAmount, targetFillAmount, elapsed / duration);
+                yield return null;
+            }
+
+            progressBar.fillAmount = targetFillAmount;
         }
     }
 }
