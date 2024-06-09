@@ -10,9 +10,6 @@ using System.Linq;
 using UnityEditor;
 #endif
 
-// Include the namespace if ObjectCreate, ObjectDelete, and ObjectSelect are in a specific namespace
-// using NamespaceOfYourObjectScripts;
-
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private NetworkSpawnManager spawnManager;
@@ -46,15 +43,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    [SerializeField]
-    private ObjectSpawn objectCreate; // Reference to ObjectCreate script
-
-    [SerializeField]
-    private ObjectDelete objectDelete; // Reference to ObjectDelete script
-
-    [SerializeField]
-    private ObjectSelect objectSelect; // Reference to ObjectSelect script
-
     void Awake()
     {
         if (_instance != null && _instance != this)
@@ -71,22 +59,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
             spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated);
-
-            // Initialize the references
-            if (objectCreate == null)
-            {
-                objectCreate = FindObjectOfType<ObjectSpawn>();
-            }
-
-            if (objectDelete == null)
-            {
-                objectDelete = FindObjectOfType<ObjectDelete>();
-            }
-
-            if (objectSelect == null)
-            {
-                objectSelect = FindObjectOfType<ObjectSelect>();
-            }
         }
     }
 
@@ -335,6 +307,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         //StopAllCoroutines();
     }
 
+
     private void UndoSingleAction(ActionLogger.LoggedAction action)
     {
         switch (action.FunctionName)
@@ -382,7 +355,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Add cases for other functions...
         }
     }
-
     public List<string> GetPrefabNames()
     {
         if (spawnManager != null && spawnManager.catalogue != null)
@@ -392,6 +364,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return new List<string>();
     }
 
+
     public void StartCompoundAction()
     {
         actionLogger.StartCompoundAction();
@@ -400,43 +373,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void EndCompoundAction()
     {
         actionLogger.EndCompoundAction();
-    }
-
-    // Reference to methods in ObjectCreate, ObjectDelete, and ObjectSelect
-    public void SpawnObjectWithRoomScope(string prefabName)
-    {
-        if (objectCreate != null)
-        {
-            objectCreate.SpawnObjectWithRoomScope(prefabName);
-        }
-        else
-        {
-            Debug.LogError("ObjectCreate script is not assigned or found.");
-        }
-    }
-
-    public void DeleteObject(string objectId)
-    {
-        if (objectDelete != null)
-        {
-            objectDelete.DeleteObject(objectId);
-        }
-        else
-        {
-            Debug.LogError("ObjectDelete script is not assigned or found.");
-        }
-    }
-
-    public void SelectAndOutlineObject(string id)
-    {
-        if (objectSelect != null)
-        {
-            objectSelect.SelectAndOutlineObject(id);
-        }
-        else
-        {
-            Debug.LogError("ObjectSelect script is not assigned or found.");
-        }
     }
 }
 
