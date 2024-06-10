@@ -131,10 +131,14 @@ namespace Ubiq.Voip.Implementations
             Action<IceConnectionState> iceConnectionStateChanged,
             Action<PeerConnectionState> peerConnectionStateChanged);
 
-        void ProcessSignalingMessage (string json);
+        void ProcessSignalingMessage(string json);
 
-        void UpdateSpatialization (Vector3 sourcePosition,
+        void UpdateSpatialization(Vector3 sourcePosition,
             Quaternion sourceRotation, Vector3 listenerPosition,
             Quaternion listenerRotation);
+
+        //MuteMicrophone and UnmuteMicrophone functions are RealityFlow added functions
+        void MuteMicrophone();
+        void UnmuteMicrophone();
     }
 }

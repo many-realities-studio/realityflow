@@ -1,14 +1,7 @@
 using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
-using Ubiq.Rooms;
-using Ubiq.Messaging;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,9 +9,6 @@ using UnityEngine.UI;
 
 public class MyProjectsDisplay : MonoBehaviour
 {
-    public string accessToken;
-    // private Boolean isEditing = false;
-
     // Project UI elements
     public GameObject myProjectsPanel;
     public GameObject projectsCoOwnedPanel;
@@ -34,6 +24,7 @@ public class MyProjectsDisplay : MonoBehaviour
     private JObject data;
     public GameObject roomUI;
     public Button createRoomBtn;
+    public Button refreshRoomsBtn;
 
     // GraphQL client and access token variables 
     // public GraphQLHttpClient graphQLClient;
@@ -46,6 +37,8 @@ public class MyProjectsDisplay : MonoBehaviour
         // CREATE ROOM BUTTON LISTENER
         if (rfClient != null)
         {
+            // TODO -ReFresh Button-
+            // refreshRoomsBtn.onClick.AddListener(rfClient.GetRoomsByProjectId);
             createRoomBtn.onClick.AddListener(rfClient.CallCreateRoom);
             Debug.Log("RoomManager found and listener added.");
         }
@@ -120,9 +113,6 @@ public class MyProjectsDisplay : MonoBehaviour
     {
         if (projects.Count <= 0)
         {
-            // Transform parent = parentPanel.transform.parent;
-            // GameObject textChild = parent.GetChild(1).gameObject;
-            // textChild.GetComponent<TextMeshProUGUI>().text = "No projects found...";
             return;
         }
         for (int i = 0; i < projects.Count; i++)
