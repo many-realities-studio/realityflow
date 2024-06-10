@@ -16,7 +16,7 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         Arena<Node> nodes = new();
 
-        public IEnumerable<KeyValuePair<NodeIndex, Node>> Nodes     
+        public IEnumerable<KeyValuePair<NodeIndex, Node>> Nodes
             => nodes.Select(kv => new KeyValuePair<NodeIndex, Node>(new NodeIndex(kv.Key), kv.Value));
 
         /// <summary>
@@ -26,7 +26,8 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         SerializableDict<PortIndex, PortIndex> reverseEdges = new();
 
-        public IEnumerable<KeyValuePair<PortIndex, PortIndex>> Edges => reverseEdges;
+        public IEnumerable<KeyValuePair<PortIndex, PortIndex>> Edges =>
+            reverseEdges.Select(kv => new KeyValuePair<PortIndex, PortIndex>(kv.Value, kv.Key));
 
         /// <summary>
         /// Forward execution edges (output -> input)
@@ -133,6 +134,9 @@ namespace RealityFlow.NodeGraph
         /// <item>
         /// The edge would form a cycle (`from` is reachable from `to`)
         /// </item>
+        /// <item>
+        /// The edge already exists
+        /// </item>
         /// </list>
         /// This method considers both data and execution edges for these conditions.
         /// </summary>
@@ -165,6 +169,9 @@ namespace RealityFlow.NodeGraph
             // put off, especially as graph edits should be relatively rare (relative to the 
             // number of frames where one does not occur).
             if (DepthFirstSearch(to, from))
+                return false;
+
+            if (reverseEdges.Contains(new(new(to, toPort), new(from, fromPort))))
                 return false;
 
             reverseEdges.Add(new(to, toPort), new(from, fromPort));
@@ -236,10 +243,13 @@ namespace RealityFlow.NodeGraph
         /// <item>
         /// The edge would form a cycle (`from` is reachable from `to`)
         /// </item>
-        /// </list>
         /// <item>
         /// The target does not have an input port
         /// </item> 
+        /// <item>
+        /// The edge already exists
+        /// </item>
+        /// </list>
         /// This method considers both data and execution edges for these conditions.
         /// </summary>
         public bool TryAddExecutionEdge(NodeIndex from, int fromPort, NodeIndex to)
@@ -256,9 +266,17 @@ namespace RealityFlow.NodeGraph
             if (DepthFirstSearch(to, from))
                 return false;
 
+            if (executionEdges.Contains(new(from, fromPort), to))
+                return false;
+
             executionEdges.Add(new(from, fromPort), to);
 
             return true;
+        }
+
+        public void RemoveExecutionEdge(PortIndex from, NodeIndex to)
+        {
+            executionEdges.Remove(from, to);
         }
 
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)

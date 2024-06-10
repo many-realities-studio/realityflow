@@ -22,6 +22,8 @@ namespace RealityFlow.NodeUI
         [SerializeField]
         IntegerEditor editor;
 
+        public Transform edgeTarget;
+
         void Render()
         {
             // editor.Name = Definition.Name;

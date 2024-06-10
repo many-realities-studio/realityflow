@@ -48,6 +48,20 @@ public class EdgeView : MonoBehaviour
 
     Vector3[] linePoints;
 
+    Vector3 target1PosLastFrame;
+    Vector3 target2PosLastFrame;
+
+    public void Update()
+    {
+        if (target1PosLastFrame != target1.position)
+            Render();
+        if (target2PosLastFrame != target2.position)
+            Render();
+
+        target1PosLastFrame = transform.position;
+        target2PosLastFrame = transform.position;
+    }
+
     [NaughtyAttributes.Button]
     public void Render()
     {

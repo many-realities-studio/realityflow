@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using UnityEngine;
-using Microsoft.MixedReality.Toolkit.Data;
 
 namespace RealityFlow.NodeUI
 {
@@ -27,9 +28,14 @@ namespace RealityFlow.NodeUI
         public GameObject edgeUIPrefab;
 
         bool dirty;
-        Dictionary<NodeIndex, GameObject> nodeUis = new();
-        Dictionary<(PortIndex, PortIndex), GameObject> dataEdgeUis = new();
-        Dictionary<(PortIndex, NodeIndex), GameObject> execEdgeUis = new();
+        Dictionary<NodeIndex, NodeView> nodeUis = new();
+        Dictionary<(PortIndex, PortIndex), EdgeView> dataEdgeUis = new();
+        Dictionary<(PortIndex, NodeIndex), EdgeView> execEdgeUis = new();
+
+        public PortIndex? selectedInputEdgePort;
+        public PortIndex? selectedOutputEdgePort;
+        public NodeIndex? selectedInputExecEdgePort;
+        public PortIndex? selectedOutputExecEdgePort;
 
         void Update()
         {
@@ -53,24 +59,136 @@ namespace RealityFlow.NodeUI
             nodeUis.Clear();
             dataEdgeUis.Clear();
             execEdgeUis.Clear();
+            ClearSelectedEdgeEnds();
 
-            foreach (KeyValuePair<NodeIndex, Node> kv in graph.Nodes)
+            foreach ((NodeIndex index, Node node) in graph.Nodes)
             {
-                NodeIndex key = kv.Key;
-                Node node = kv.Value;
                 GameObject nodeUi = Instantiate(nodeUIPrefab, transform);
-                nodeUi.GetComponent<NodeView>().Node = node;
+                NodeView view = nodeUi.GetComponent<NodeView>();
+                view.NodeInfo = (index, node);
 
-                nodeUis.Add(key, nodeUi);
+                nodeUis.Add(index, view);
             }
 
-            foreach (KeyValuePair<PortIndex, PortIndex> edge in graph.Edges)
+            foreach ((PortIndex from, PortIndex to) in graph.Edges)
             {
                 GameObject edgeUi = Instantiate(edgeUIPrefab, transform);
                 EdgeView view = edgeUi.GetComponent<EdgeView>();
 
-                dataEdgeUis.Add((edge.Key, edge.Value), edgeUi);
+                NodeView fromView = nodeUis[from.Node];
+                NodeView toView = nodeUis[to.Node];
+
+                OutputPortView fromPortView = fromView.outputPortViews[from.Port];
+                InputPortView toPortView = toView.inputPortViews[to.Port];
+
+                view.target1 = fromPortView.edgeTarget;
+                view.target2 = toPortView.edgeTarget;
+
+                dataEdgeUis.Add((from, to), view);
             }
+
+            foreach ((PortIndex from, List<NodeIndex> targets) in graph.ExecutionEdges)
+                foreach (NodeIndex to in targets)
+                {
+                    GameObject edgeUi = Instantiate(edgeUIPrefab, transform);
+                    EdgeView view = edgeUi.GetComponent<EdgeView>();
+
+                    NodeView fromView = nodeUis[from.Node];
+                    NodeView toView = nodeUis[to];
+
+                    OutputExecutionPort fromPortView = fromView.outputExecutionPorts[from.Port];
+                    InputExecutionPort toPortView = toView.inputExecutionPort;
+
+                    view.target1 = fromPortView.edgeTarget;
+                    view.target2 = toPortView.edgeTarget;
+                }
+        }
+
+        void ClearSelectedEdgeEnds()
+        {
+            selectedInputEdgePort = null;
+            selectedOutputEdgePort = null;
+            selectedInputExecEdgePort = null;
+            selectedOutputExecEdgePort = null;
+
+            EnableAllPorts();
+        }
+
+        void EnableAllPorts()
+        {
+            foreach ((NodeIndex index, NodeView view) in nodeUis)
+            {
+                // foreach (var port in view.inputPortViews)
+                //     port.GetComponent<PressableButton>().enabled = true;
+                // foreach (var port in view.outputPortViews)
+                //     port.GetComponent<PressableButton>().enabled = true;
+                if (view.inputExecutionPort)
+                    view.inputExecutionPort.GetComponent<PressableButton>().enabled = true;
+                foreach (var p in view.outputExecutionPorts)
+                    p.GetComponent<PressableButton>().enabled = true;
+            }
+        }
+
+        public void SelectInputPort(PortIndex port)
+        {
+            // TODO:
+            // selectedInputEdgePort = port;
+        }
+
+        public void SelectOutputPort(PortIndex port)
+        {
+
+        }
+
+        public void SelectInputExecutionPort(NodeIndex node)
+        {
+            if (selectedOutputExecEdgePort is PortIndex port)
+            {
+                ExecEdgeConnected(port, node);
+                return;
+            }
+
+            ClearSelectedEdgeEnds();
+
+            selectedInputExecEdgePort = node;
+            foreach ((NodeIndex index, NodeView view) in nodeUis)
+            {
+                // foreach (var p in view.inputPortViews)
+                //     p.GetComponent<PressableButton>().enabled = false;
+                // foreach (var p in view.outputPortViews)
+                //     p.GetComponent<PressableButton>().enabled = false;
+                if (view.inputExecutionPort)
+                    view.inputExecutionPort.GetComponent<PressableButton>().enabled = false;
+            }
+        }
+
+        public void SelectOutputExecutionPort(PortIndex port)
+        {
+            if (selectedInputExecEdgePort is NodeIndex node)
+            {
+                ExecEdgeConnected(port, node);
+                return;
+            }
+
+            ClearSelectedEdgeEnds();
+
+            selectedOutputExecEdgePort = port;
+            foreach ((NodeIndex index, NodeView view) in nodeUis)
+            {
+                // foreach (var p in view.inputPortViews)
+                //     p.GetComponent<PressableButton>().enabled = false;
+                // foreach (var p in view.outputPortViews)
+                //     p.GetComponent<PressableButton>().enabled = false;
+                foreach (var p in view.outputExecutionPorts)
+                    p.GetComponent<PressableButton>().enabled = false;
+            }
+        }
+
+        public void ExecEdgeConnected(PortIndex from, NodeIndex to)
+        {
+            RealityFlowAPI.Instance.AddExecEdgeToGraph(graph, from, to);
+            ClearSelectedEdgeEnds();
+            MarkDirty();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,19 @@ namespace RealityFlow.NodeUI
 {
     public class NodeView : MonoBehaviour
     {
-        Node node;
-        public Node Node
+        (NodeIndex index, Node value) nodeInfo;
+        public (NodeIndex, Node) NodeInfo
         {
-            get => node;
+            get => nodeInfo;
             set
             {
-                node = value;
+                nodeInfo = value;
                 Render();
             }
         }
+
+        NodeIndex Index => nodeInfo.index;
+        Node Node => nodeInfo.value;
 
         static Dictionary<NodeValueType, GameObject> _fieldPrefabs;
         static Dictionary<NodeValueType, GameObject> FieldPrefabs
@@ -90,11 +94,25 @@ namespace RealityFlow.NodeUI
         [SerializeField]
         Transform outputPorts;
 
+        [NonSerialized]
+        public List<InputPortView> inputPortViews = new();
+        [NonSerialized]
+        public List<OutputPortView> outputPortViews = new();
+        [NonSerialized]
+        public InputExecutionPort inputExecutionPort;
+        [NonSerialized]
+        public List<OutputExecutionPort> outputExecutionPorts = new();
+
         void Render()
         {
             ClearChildren(fields);
             ClearChildren(inputPorts);
             ClearChildren(outputPorts);
+
+            inputPortViews.Clear();
+            outputPortViews.Clear();
+            inputExecutionPort = null;
+            outputExecutionPorts.Clear();
 
             title.text = Node.Definition.Name;
 
@@ -107,19 +125,28 @@ namespace RealityFlow.NodeUI
                 editor.NodeValue = def.Default;
                 editor.OnTick += value =>
                 {
-                    Assert.IsTrue(node.TrySetField(i, value));
+                    Assert.IsTrue(Node.TrySetField(i, value));
                 };
             }
 
             if (Node.Definition.ExecutionInput)
             {
                 GameObject port = Instantiate(executionInputPrefab, inputPorts);
+                InputExecutionPort portScript = port.GetComponent<InputExecutionPort>();
+                portScript.node = Index;
+
+                inputExecutionPort = portScript;
             }
 
-            foreach (var name in Node.Definition.ExecutionOutputs)
+            for (int i = 0; i < Node.Definition.ExecutionOutputs.Count; i++)
             {
+                string name = Node.Definition.ExecutionOutputs[i];
                 GameObject port = Instantiate(executionOutputPrefab, outputPorts);
-                // TODO: set name
+                OutputExecutionPort portScript = port.GetComponent<OutputExecutionPort>();
+                portScript.DisplayName.text = name;
+                portScript.port = new(Index, i);
+
+                outputExecutionPorts.Add(portScript);
             }
 
             foreach (var def in Node.Definition.Inputs)
@@ -128,6 +155,8 @@ namespace RealityFlow.NodeUI
 
                 InputPortView view = port.GetComponent<InputPortView>();
                 view.Definition = def;
+
+                inputPortViews.Add(view);
             }
 
             foreach (var def in Node.Definition.Outputs)
@@ -136,6 +165,8 @@ namespace RealityFlow.NodeUI
 
                 OutputPortView view = port.GetComponent<OutputPortView>();
                 view.Definition = def;
+
+                outputPortViews.Add(view);
             }
         }
 

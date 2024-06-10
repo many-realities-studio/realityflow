@@ -232,6 +232,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
     }
 
+    public void AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex to)
+    {
+        if (!graph.TryAddExecutionEdge(from.Node, from.Port, to))
+            Debug.LogError("Failed to add edge");
+        actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
+        Debug.Log($"Adding edge at {from}:{to}");
+    }
+
 #if UNITY_EDITOR
     public void AddPrefabToCatalogue(GameObject prefab)
     {
@@ -366,7 +374,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 NodeIndex index = (NodeIndex)action.Parameters[2];
 
                 graph.RemoveNode(index);
+                break;
 
+            case nameof(AddExecEdgeToGraph):
+                graph = (Graph)action.Parameters[0];
+                (PortIndex port, NodeIndex node) = ((PortIndex, NodeIndex))action.Parameters[1];
+
+                graph.RemoveExecutionEdge(port, node);
                 break;
 
                 // Add cases for other functions...

@@ -22,6 +22,8 @@ namespace RealityFlow.NodeUI
         [SerializeField]
         TextMeshProUGUI portName;
 
+        public Transform edgeTarget;
+
         void Render()
         {
             portName.text = Definition.Name;
