@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
+using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
 using UnityEngine;
@@ -48,7 +49,7 @@ public class PrimitiveSpawner : MonoBehaviour
     private float offMode = 0f;
     private float surfaceMode = 1f;
     private bool leftHandDominant = false;
-  private bool inMeshCreationMode = false;
+    private bool inMeshCreationMode = false;
 
     public void Awake()
     {
@@ -60,6 +61,7 @@ public class PrimitiveSpawner : MonoBehaviour
         grid = FindObjectOfType<SnapGrid>();
         gridTool = FindObjectOfType<GridTool>();
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        //rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         if (rayInteractor == null)
         {
@@ -152,13 +154,16 @@ public class PrimitiveSpawner : MonoBehaviour
         attachedObject = NetworkSpawnManager.Find(this).SpawnWithPeerScope(primitive);
         EditableMesh mesh = PrimitiveGenerator.CreatePrimitive(currentShapeType);
         EditableMesh em = attachedObject.GetComponent<EditableMesh>();
+        attachedObject.GetComponent<BoundsControl>().enabled = false;
 
         em.CreateMesh(mesh);
+        //em.CreateMesh(PrimitiveGenerator.CreatePrimitive(currentShapeType));
 
         // Disable mesh collision so the ray doesn't interact with it
         attachedObject.GetComponent<MeshCollider>().enabled = false;
 
         attachedObjectNetworkMesh = attachedObject.GetComponent<NetworkedMesh>();
+        //attachedObjectNetworkMesh.sourceMesh = true;
 
         Destroy(mesh.gameObject);
     }
@@ -185,10 +190,12 @@ public class PrimitiveSpawner : MonoBehaviour
         if(isLeftHandDominant)
         {
             rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
+            //rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
         }
         else
         {
             rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
+            //rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
         }
 
         ChangeInputButtons(isLeftHandDominant);
@@ -230,8 +237,7 @@ public class PrimitiveSpawner : MonoBehaviour
     /// </summary>
     private void DisableCancelButton(bool isLeftHandDominant)
     {
-      // This is the wrong way to do it.
-
+        // This is the wrong way to do it.
         try
         {
             if(isLeftHandDominant)
@@ -305,6 +311,8 @@ public class PrimitiveSpawner : MonoBehaviour
 
         em.CreateMesh(attachedObject.GetComponent<EditableMesh>());
         spawnedMesh.transform.position = attachedObject.transform.position;
+        //spawnedMesh.GetComponent<NetworkedMesh>().sourceMesh = true;
+        //spawnedMesh.GetComponent<BoundsControl>().enabled = true;
 
         TryEnterResizeMode();
     }

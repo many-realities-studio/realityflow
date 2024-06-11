@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +28,8 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
     public EMSharedVertex[] sharedVertices;
     internal Dictionary<int, int> sharedVertexLookup;
+
+    internal MeshOperationCache meshOperationCache;
 
     public ShapeType baseShape;
     public bool isEmpty = true;
@@ -111,9 +114,32 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
     {
         positions = otherMesh.positions;
         faces = otherMesh.faces;
+        /*positions = new Vector3[otherMesh.positions.Length];
+        Array.Copy(otherMesh.positions, positions, otherMesh.positions.Length);
+
+        faces = new EMFace[otherMesh.faces.Length];
+        Array.Copy(otherMesh.faces, faces, otherMesh.faces.Length);*/
+
         baseShape = otherMesh.baseShape;
         sharedVertices = EMSharedVertex.GetSharedVertices(positions);
         sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(sharedVertices);
+        meshOperationCache = new MeshOperationCache(this);
+
+        FinalizeMesh();
+    }
+
+    public void CreateMesh(PrimitiveData input)
+    {
+        positions = new Vector3[input.positions.Length];
+        Array.Copy(input.positions, positions, input.positions.Length);
+
+        faces = new EMFace[input.faces.Length];
+        Array.Copy(input.faces, faces, input.faces.Length);
+
+        baseShape = input.type;
+        sharedVertices = EMSharedVertex.GetSharedVertices(positions);
+        sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(sharedVertices);
+        meshOperationCache = new MeshOperationCache(this);
 
         FinalizeMesh();
     }
@@ -175,6 +201,14 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
         }
 
         return pos;
+    }
+
+    public void CacheOperation(MeshOperation operation)
+    {
+        if (meshOperationCache == null)
+            meshOperationCache = new MeshOperationCache(this);
+
+        meshOperationCache.CacheOperation(operation);
     }
 
     public void FinalizeMesh()
@@ -315,4 +349,5 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             Debug.Log(s);
         */
     }
+
 }

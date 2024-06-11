@@ -18,6 +18,9 @@ public class GizmoTranslateAxis : GizmoTransform
     public float crossThreshold = .15f;
     public float maxTranslateJump = 10;
 
+    private ComponentTranslation currentOperation;
+    private Vector3 startPos;
+
     // Update is called once per frame
     void Update()
     {
@@ -30,6 +33,7 @@ public class GizmoTranslateAxis : GizmoTransform
             EnableLineRenderer(this.transform.position, GetAxisDirection(), 100f); 
 
             lastUpdateRaySelect = true;
+            BeginMeshOperation();
         }
 
         else if (EndOfRaySelect())
@@ -37,6 +41,7 @@ public class GizmoTranslateAxis : GizmoTransform
             DisableLineRenderer();
 
             lastUpdateRaySelect = false;
+            EndMeshOperation();
         }
 
         if (lastUpdateRaySelect)
@@ -47,7 +52,7 @@ public class GizmoTranslateAxis : GizmoTransform
             if (!IsValidPosition()) return;
 
             newGizmoPosition -= GetPointInGrid(originalClosestApproach - newClosestApproach);
-            //newGizmoPosition = CheckForPlaneOffset(newGizmoPosition);
+            // newGizmoPosition = CheckForPlaneOffset(newGizmoPosition);
 
             if (!IsValidDistance(newGizmoPosition)) return;
 
@@ -156,6 +161,24 @@ public class GizmoTranslateAxis : GizmoTransform
     {
         originalClosestApproach = GetPositionFromTranslate(GetGizmoContainer().transform.position, GetAxisDirection());
         originalCrossDirection = GetCrossDirection(GetAxisDirection(), GetRayForward());
+    }
+
+    void BeginMeshOperation()
+    {
+        if (currentOperation == null)
+            currentOperation = new ComponentTranslation(HandleSelectionManager.Instance.GetUniqueSelectedIndices());
+        startPos = GetAttachedObject().transform.position;
+    }
+
+    void EndMeshOperation()
+    {
+        currentOperation.AddOffsetAmount(GetAttachedObject().transform.position - startPos);
+        try
+        {
+            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+        }
+        catch {  }
+        currentOperation = null;
     }
 }
 

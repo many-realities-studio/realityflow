@@ -169,7 +169,9 @@ public class ColorPickerControl : MonoBehaviour
     void Update()
     {
         // Update values only for the owner
-        if (NetworkedPalette.reference != null && NetworkedPalette.reference.owner)
+        if (NetworkedPalette.reference != null && NetworkedPalette.reference.owner
+            && metallicSlider.transform.parent.parent.parent.parent.parent.parent.GetComponent<NetworkedPalette>().owner
+            && smoothnessSlider.transform.parent.parent.parent.parent.parent.parent.GetComponent<NetworkedPalette>().owner)
         {
             if (lastColorValue != currentColor)
             {
@@ -177,19 +179,22 @@ public class ColorPickerControl : MonoBehaviour
                 UpdateColorValue();
             }
 
-            if (lastMetallicSliderValue != metallicSlider.SliderValue)
+            if (lastMetallicSliderValue != metallicSlider.SliderValue
+                && metallicSlider.transform.parent.parent.parent.parent.parent.parent.GetComponent<NetworkedPalette>().owner)
             {
                 lastMetallicSliderValue = metallicSlider.SliderValue;
                 UpdateMetallicValue();
             }
 
-            if (lastSmoothnessSliderValue != smoothnessSlider.SliderValue)
+            if (lastSmoothnessSliderValue != smoothnessSlider.SliderValue
+                && smoothnessSlider.transform.parent.parent.parent.parent.parent.parent.GetComponent<NetworkedPalette>().owner)
             {
+                smoothnessSlider.SliderValue = smoothnessSlider.SliderValue;
                 lastSmoothnessSliderValue = smoothnessSlider.SliderValue;
                 UpdateSmoothnessValue();
             }
         }
-
+        // We always want the following three blocks to run so every palette gets updated to the correct color in the Sat/Val panel from the networked information.
         // When the hue slider is changed, we assume the user will want to be in color mode
         if (lastHueSliderValue != hueSlider.SliderValue)
         {

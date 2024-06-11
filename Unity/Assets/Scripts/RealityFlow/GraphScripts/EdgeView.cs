@@ -35,6 +35,8 @@ public class EdgeView : MonoBehaviour
         // set small buffer positions:
         Vector3 outputBuffer = outputLoc.position + Vector3.left * (padding * 2);
         Vector3 inputBuffer = inputLoc.position + Vector3.right * padding;
+        /*Vector3 outputBuffer = outputLoc.position + Vector3.right * padding;
+        Vector3 inputBuffer = inputLoc.position + Vector3.left * padding;*/
 		Vector3 [] edgePoints = new [] {
 			outputLoc.position,
             outputBuffer,

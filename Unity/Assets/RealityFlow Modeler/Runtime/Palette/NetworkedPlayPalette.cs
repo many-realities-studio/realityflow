@@ -145,7 +145,7 @@ public class NetworkedPlayPalette : MonoBehaviour, INetworkSpawnable
         }
 
         // Initialize which hand the palette owner has for their dominant (default is right hand)
-        gameObject.GetComponent<PaletteHandManager>().UpdateHand(context, parentConstraint, otherPaletteParentConstraint, avatars, "PlayPalette", handToggleState.IsToggled);
+        gameObject.GetComponent<PaletteHandManager>().UpdateHand(context, parentConstraint, avatars, otherPaletteParentConstraint, "PlayPalette", handToggleState.IsToggled);
     }
 
     private void UpdateEditPaletteHand()

@@ -8,6 +8,8 @@ using UnityEngine;
 public class SelectTool : MonoBehaviour
 {
     public bool isActive;
+    [Tooltip("Displays the owner's UUID and should not be manually changed")]
+    public string ownerName;
 
     public void Activate(int tool, bool status)
     {
@@ -15,5 +17,10 @@ public class SelectTool : MonoBehaviour
         {
             isActive = status;
         }
+    }
+
+    public void AssignName(string name)
+    {
+        ownerName = name;
     }
 }

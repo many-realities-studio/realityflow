@@ -288,12 +288,14 @@ public class RealityFlowGraphView : MonoBehaviour {
 				StartCoroutine (AddNodeCoroutine(con));
 				break;
 			case "ModalNode":
-
+			/*
 				ModalNode mn = BaseNode.CreateFromType<ModalNode> (new Vector2 ());
 				graph.AddNode (mn);
 				mn.position = new Rect(newNodePosition, new Vector2(100,100));
 				// SetNewNodeLocation(newNodePosition);
-
+			*/
+				ModalNode mn = BaseNode.CreateFromType<ModalNode> (newNodePosition);
+				graph.AddNode (mn);
 				StartCoroutine (AddNodeCoroutine(mn));
 				break;
 			case "PrintNode":
@@ -308,6 +310,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 				gn.InitializeNodeFromObject(obj);
 				StartCoroutine (AddNodeCoroutine(gn));
 				break;
+			/*
 			case "DestroyObjectNode":
 				DestroyObjectNode don = BaseNode.CreateFromType<DestroyObjectNode> (newNodePosition);
 				graph.AddNode (don);
@@ -318,6 +321,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 				graph.AddNode (tog);
 				StartCoroutine (AddNodeCoroutine(tog));
 				break;
+			*/
 			case "FloatNode":
 				FloatNode fn = BaseNode.CreateFromType<FloatNode> (newNodePosition);
 				graph.AddNode (fn);

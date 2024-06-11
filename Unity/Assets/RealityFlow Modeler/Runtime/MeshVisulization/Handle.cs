@@ -4,6 +4,9 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
 
+/// <summary>
+/// Class Handle provides base function for OnHover and OnSelection events
+/// </summary>
 public class Handle : MonoBehaviour
 {
     public EditableMesh mesh { get; set; }
@@ -32,6 +35,9 @@ public class Handle : MonoBehaviour
             Debug.LogError("SelectionManager not found");
         }
 
+        if (!HandleSpawner.Instance.manipulationActive)
+            return;
+
         if (!isSelected)
         {
             isSelected = true;
@@ -40,6 +46,7 @@ public class Handle : MonoBehaviour
 
         if(isSelected && !deselectOnRelease)
         {
+            //selectionManager.SelectHandle(this);
             gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             selectionManager.SelectHandle(this);
             meshRenderer.material.color = selectionManager.OnSelectColor;

@@ -18,6 +18,16 @@ public class RealityFlowToolEvent : UnityEvent<int, bool>
 {
 }
 
+[System.Serializable]
+public class RealityFlowManipulationEvent : UnityEvent<int>
+{
+}
+
+[System.Serializable]
+public class RealityFlowGizmoEvent : UnityEvent<int>
+{
+}
+
 /// <summary>
 /// Class NetworkedPalette provides a set of menus and is connected to the Ubiq Network library.
 /// </summary>
@@ -28,9 +38,15 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     // Used to untick the Parent Constraint component on server-side palettes and access client-side palette
     private ParentConstraint parentConstraint;
+    private ParentConstraint otherPaletteParentConstraint;
 
     public RealityFlowToolEvent m_ToolEvent; 
     ConstraintSource constraintSource;
+    NetworkedPlayPalette[] playPalettes;
+    NetworkedPlayPalette myPlayPalette;
+
+    public RealityFlowManipulationEvent m_ManipulationEvent;
+    public RealityFlowGizmoEvent m_GizmoEvent;
 
     private NetworkedPalette myPalette;
 
@@ -42,14 +58,23 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     // Have access to all palette menu states
     [Header("Menu States")]
-    [SerializeField] private GameObject homeMenu;
+    // Code should probably be updated to following:
+    /*[SerializeField] private GameObject homeMenu;
     [SerializeField] private GameObject meshMenu;
     [SerializeField] private GameObject path3DMenu;
     [SerializeField] private GameObject manipulateMenu;
     [SerializeField] private GameObject transformMenu;
     [SerializeField] private GameObject editMenu;
     [SerializeField] private GameObject colorsMenu;
-    [SerializeField] private GameObject shadersMenu;
+    [SerializeField] private GameObject shadersMenu;*/
+    public GameObject homeMenu;
+    public GameObject meshMenu;
+    public GameObject path3DMenu;
+    public GameObject manipulateMenu;
+    public GameObject transformMenu;
+    public GameObject editMenu;
+    public GameObject colorsMenu;
+    public GameObject shadersMenu;
 
     // Boolean values to determine which menu is currently active by the owner
     private bool lastHomeMenuState;
@@ -69,6 +94,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     [SerializeField] private StatefulInteractable path3DToggleState;
     [SerializeField] private PressableButton combineToolToggleState;
     [SerializeField] private PressableButton handToggleState;
+    [SerializeField] private PressableButton xrayToggleState;
 
     // Button states (which one is currently being hovered by the owner)
     private List<bool> lastButtonStates = new List<bool>();
@@ -77,6 +103,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     private bool lastPath3DToggleState;
     private bool lastCombineToolToggleState;
     private bool lastHandToggleState;
+    private bool lastXrayToggleState;
 
     [Header("Mesh Mode States")]
     // Have access to snap mode and snap unit states
@@ -97,6 +124,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     [SerializeField] private GameObject svPicker;
 
     private RectTransform svPickerTransform;
+    private Vector3 lastSvPickerTransform;
     private Image svPickerImage;
 
     // Snap mode and snap unit states (current values that the owner has set)
@@ -111,6 +139,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     // Color menu states (current values that the owner has set)
     private float lastHueSliderState;
     private float lastMetallicSliderState;
+    private float lastSmoothnessSliderState;
 
     public NetworkContext context;
     Vector3 lastPosition, lastScale;
@@ -157,6 +186,30 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         m_ToolEvent.Invoke(8, status);
     }
 
+    public void PlayTool(bool status)
+    {
+        m_ToolEvent.Invoke(11, status);
+    }
+
+    public void XrayTool(bool status)
+    {
+        m_ToolEvent.Invoke(9, status);
+    }
+    public void GizmoTool(bool status)
+    {
+        m_ToolEvent.Invoke(10, status);
+    }
+
+    public void SetManipulationTool(int mode)
+    {
+        m_ManipulationEvent.Invoke(mode);
+    }
+
+    public void SetGizmoTool(int mode)
+    {
+        m_GizmoEvent.Invoke(mode);
+    }
+
     public void Start()
     {
         context = NetworkScene.Register(this);
@@ -191,6 +244,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         lastPath3DToggleState = path3DToggleState.IsToggled;
         lastCombineToolToggleState = combineToolToggleState.enabled;
         lastHandToggleState = handToggleState.IsToggled;
+        lastXrayToggleState = xrayToggleState.IsToggled;
 
         // Initialize "last" slider values and toggle state of any grid-related tools
         lastSnapModeState = snapModeState.SliderValue;
@@ -205,25 +259,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         {
             // Get a reference to this palette for use in scripts that need to check for ownership
             reference = gameObject.GetComponent<NetworkedPalette>();
-
-            if(m_ToolEvent == null)
-            {
-                m_ToolEvent = new RealityFlowToolEvent();
-            }
-            realityFlowTools = GameObject.Find("RealityFlow Editor");
-            SelectTool selectTool = realityFlowTools.GetComponent<SelectTool>();
-            m_ToolEvent.AddListener(selectTool.Activate);
-            EraserTool eraserTool = realityFlowTools.GetComponent<EraserTool>();
-            m_ToolEvent.AddListener(eraserTool.Activate);
-            ColorTool colorTool = realityFlowTools.GetComponent<ColorTool>();
-            m_ToolEvent.AddListener(colorTool.Activate);
-            GridTool gridTool = realityFlowTools.GetComponent<GridTool>();
-            m_ToolEvent.AddListener(gridTool.Activate);
-            ManipulationTool manipulationTool = realityFlowTools.GetComponent<ManipulationTool>();
-            m_ToolEvent.AddListener(manipulationTool.Activate);
-            CopyTool copyTool = realityFlowTools.GetComponent<CopyTool>();
-            m_ToolEvent.AddListener(copyTool.Activate);
-
+            
             Ubiq.Avatars.Avatar[] avatars = context.Scene.GetComponentsInChildren<Ubiq.Avatars.Avatar>();
         
             // Go through every avatar looking for the palette owner's avatar.
@@ -235,6 +271,54 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                 }
             }
 
+            if(m_ToolEvent == null)
+            {
+                m_ToolEvent = new RealityFlowToolEvent();
+            }
+            realityFlowTools = GameObject.Find("RealityFlow Editor");
+            SelectTool selectTool = realityFlowTools.GetComponent<SelectTool>();
+            m_ToolEvent.AddListener(selectTool.Activate);
+            try
+            {
+                selectTool.AssignName(ownerName);
+            }
+            catch (NullReferenceException e)
+            {
+                Debug.LogError(e);
+            }
+            EraserTool eraserTool = realityFlowTools.GetComponent<EraserTool>();
+            m_ToolEvent.AddListener(eraserTool.Activate);
+            ColorTool colorTool = realityFlowTools.GetComponent<ColorTool>();
+            m_ToolEvent.AddListener(colorTool.Activate);
+            GridTool gridTool = realityFlowTools.GetComponent<GridTool>();
+            m_ToolEvent.AddListener(gridTool.Activate);
+            ManipulationTool manipulationTool = realityFlowTools.GetComponent<ManipulationTool>();
+            m_ToolEvent.AddListener(manipulationTool.Activate);
+            CopyTool copyTool = realityFlowTools.GetComponent<CopyTool>();
+            m_ToolEvent.AddListener(copyTool.Activate);
+            PlayModeSpawner playTool = realityFlowTools.GetComponentInChildren<PlayModeSpawner>();
+            m_ToolEvent.AddListener(playTool.Activate);
+            XrayTool xrayTool = realityFlowTools.GetComponent<XrayTool>();
+            //m_ToolEvent.AddListener(xrayTool.Activate);
+            GizmoTool gizmoTool = realityFlowTools.GetComponent<GizmoTool>();
+            //m_ToolEvent.AddListener(gizmoTool.Activate);
+
+            m_ManipulationEvent.AddListener(manipulationTool.SetManipulationMode);
+            //m_GizmoEvent.AddListener(gizmoTool.SetGizmoMode);
+
+            /*
+            Ubiq.Avatars.Avatar[] avatars = context.Scene.GetComponentsInChildren<Ubiq.Avatars.Avatar>();
+        
+            // Go through every avatar looking for the palette owner's avatar.
+            for (int i = 0; i < avatars.Length; i++)
+            {
+                if (avatars[i].ToString().Contains(AvatarManager.UUID))
+                {
+                    ownerName = AvatarManager.UUID;
+                }
+            }
+            */
+
             UpdateDominantHand();
         }
         // Users should not be able to interact with others' palettes
@@ -242,6 +326,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         {
             Collider[] colliders = gameObject.GetComponentsInChildren<Collider>(true);
             Slider[] sliders = gameObject.GetComponentsInChildren<Slider>(true);
+            UpdateSnapMode[] snapModes = gameObject.GetComponentsInChildren<UpdateSnapMode>(true);
             UpdateSnapUnits[] snapUnits = gameObject.GetComponentsInChildren<UpdateSnapUnits>(true);
             UpdateGridToggles[] gridToggles = gameObject.GetComponentsInChildren<UpdateGridToggles>(true);
 
@@ -255,6 +340,11 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                 slider.enabled = false;
             }
 
+            foreach (UpdateSnapMode snapMode in snapModes)
+            {
+                snapMode.enabled = false;
+            }
+
             foreach (UpdateSnapUnits snapUnit in snapUnits)
             {
                 snapUnit.enabled = false;
@@ -264,6 +354,8 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             {
                 gridToggle.enabled = false;
             }
+
+            RequestPaletteData();
         }
     }
 
@@ -273,15 +365,77 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }
 
+    /// <summary>
+    /// When a user joins the room, they need to know the current state of all palettes in the room.
+    /// </summary>
+    private void RequestPaletteData()
+    {
+        // Debug.Log("Attempt to request palette data...");
+
+        // Request palette transform data
+        TransformMessage transformMsg = new TransformMessage();
+        transformMsg.needsData = true;
+
+        context.SendJson(transformMsg);
+
+        // Request palette info
+        InfoMessage infoMsg = new InfoMessage();
+        infoMsg.needsData = true;
+
+        context.SendJson(infoMsg);
+    }
+
     public void UpdateDominantHand()
     {
         parentConstraint = gameObject.GetComponent<ParentConstraint>();
+        
         Ubiq.Avatars.Avatar[] avatars = context.Scene.GetComponentsInChildren<Ubiq.Avatars.Avatar>();
 
-    // Initialize which hand the palette owner has for their dominant (default is right hand)
-    var handManager = gameObject.GetComponent<PaletteHandManager>();
-      handManager.UpdateHand(context, parentConstraint, avatars);
-        
+        if (myPlayPalette != null)
+        {
+            UpdatePlayPaletteHand();
+        }
+        else
+        {
+            // Find this owners play palette
+            playPalettes = FindObjectsOfType<NetworkedPlayPalette>();
+            foreach (NetworkedPlayPalette playPalette in playPalettes)
+            {
+                if (playPalette.ownerName == ownerName && playPalette.owner)
+                {
+                    myPlayPalette = playPalette;
+
+                    if (myPlayPalette != null)
+                    {
+                        otherPaletteParentConstraint = myPlayPalette.gameObject.GetComponent<ParentConstraint>();
+                    }
+                    // Debug.Log("Found play palette.name = " + myPlayPalette.name);
+                }
+            }
+
+            // When UpdateDominantHand() is called in Start then the play palette will be null, afterwards once this method gets called again will it be found
+            if (myPlayPalette != null)
+            {
+                UpdatePlayPaletteHand();
+            }
+        }
+
+        // Initialize which hand the palette owner has for their dominant (default is right hand)
+        gameObject.GetComponent<PaletteHandManager>().UpdateHand(context, parentConstraint, avatars, otherPaletteParentConstraint, "Palette", handToggleState.IsToggled);
+    }
+
+    private void UpdatePlayPaletteHand()
+    {
+        myPlayPalette.ForceHandToggle(handToggleState.IsToggled);
+        //myPlayPalette.UpdateDominantHand();
+    }
+
+    /// <summary>
+    /// Method ForceHandToggle is used to force the Switch Buttons toggle to reflect that of the other palette.
+    /// </summary>
+    public void ForceHandToggle(bool toggleState)
+    {
+        handToggleState.ForceSetToggled(toggleState);
     }
     
     // Update is called once per frame
@@ -298,20 +452,24 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                 }
 
                 // If any action is taken that should be reflected over the server, then fire the message. This futureproofs the palette if it will ever be stationary in the future
-                if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastHomeMenuState != homeMenu.activeInHierarchy
-                || lastMeshMenuState != meshMenu.activeInHierarchy || lastPath3DMenuState != path3DMenu.activeInHierarchy || lastManipulateMenuState != manipulateMenu.activeInHierarchy
-                || lastTransformMenuState != transformMenu.activeInHierarchy || lastEditMenuState != editMenu.activeInHierarchy || lastColorsMenuState != colorsMenu.activeInHierarchy
-                || lastShadersMenu != shadersMenu.activeInHierarchy || lastButtonStates[i] != buttonStates[i].Interactable.IsActiveHovered || lastToggleStates[j] != toggleStates[j].IsToggled
-                || lastEditToggleState != editToggleState.IsToggled || lastPath3DToggleState != path3DToggleState.IsToggled || lastCombineToolToggleState != combineToolToggleState.enabled
-                || lastSnapModeState != snapModeState.SliderValue || lastSnapUnitState != snapUnitState.SliderValue || lastTransformSnapUnitState != transformSnapUnitState.SliderValue
-                || lastManipulateSnapUnitState != manipulateSnapUnitState.SliderValue || lastMeshGridModeToggleState != meshGridModeToggleState.IsToggled
-                || lastTransformGridModeToggleState != transformGridModeToggleState.IsToggled || lastManipulateGridModeToggleState != manipulateGridModeToggleState.IsToggled
-                || lastHueSliderState != hSlider.SliderValue || lastMetallicSliderState != metallicSlider.SliderValue)
+                if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
                 {
                     lastPosition = transform.localPosition;
                     lastScale = transform.localScale;
                     lastRotation = transform.localRotation;
 
+                    BroadcastPaletteTransform();
+                }
+
+                if (lastHomeMenuState != homeMenu.activeInHierarchy || lastMeshMenuState != meshMenu.activeInHierarchy || lastPath3DMenuState != path3DMenu.activeInHierarchy || lastManipulateMenuState != manipulateMenu.activeInHierarchy
+                || lastTransformMenuState != transformMenu.activeInHierarchy || lastEditMenuState != editMenu.activeInHierarchy || lastColorsMenuState != colorsMenu.activeInHierarchy
+                || lastShadersMenu != shadersMenu.activeInHierarchy || lastButtonStates[i] != buttonStates[i].Interactable.IsActiveHovered || lastToggleStates[j] != toggleStates[j].IsToggled
+                || lastEditToggleState != editToggleState.IsToggled || lastPath3DToggleState != path3DToggleState.IsToggled || lastCombineToolToggleState != combineToolToggleState.enabled
+                || lastHandToggleState != handToggleState.IsToggled || lastXrayToggleState != xrayToggleState.IsToggled || lastSnapModeState != snapModeState.SliderValue || lastSnapUnitState != snapUnitState.SliderValue
+                || lastTransformSnapUnitState != transformSnapUnitState.SliderValue || lastManipulateSnapUnitState != manipulateSnapUnitState.SliderValue || lastMeshGridModeToggleState != meshGridModeToggleState.IsToggled
+                || lastTransformGridModeToggleState != transformGridModeToggleState.IsToggled || lastManipulateGridModeToggleState != manipulateGridModeToggleState.IsToggled
+                || lastHueSliderState != hSlider.SliderValue || lastMetallicSliderState != metallicSlider.SliderValue || lastSmoothnessSliderState != smoothnessSlider.SliderValue || lastSvPickerTransform != svPickerTransform.localPosition)
+                {
                     // Control the active menu states
                     lastHomeMenuState = homeMenu.activeInHierarchy;
                     lastMeshMenuState = meshMenu.activeInHierarchy;
@@ -333,6 +491,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                     lastPath3DToggleState = path3DToggleState.IsToggled;
                     lastCombineToolToggleState = combineToolToggleState.enabled;
                     lastHandToggleState = handToggleState.IsToggled;
+                    lastXrayToggleState = xrayToggleState.IsToggled;
 
                     // Control the snap mode and snap unit states
                     lastSnapModeState = snapModeState.SliderValue;
@@ -346,6 +505,8 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                     // Control the color menu states
                     lastHueSliderState = hSlider.SliderValue;
                     lastMetallicSliderState = metallicSlider.SliderValue;
+                    lastSmoothnessSliderState = smoothnessSlider.SliderValue;
+                    lastSvPickerTransform = svPickerTransform.localPosition;
 
                     BroadcastPaletteInfo();
                 }
@@ -354,16 +515,30 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     }
 
-    private void BroadcastPaletteInfo()
+    private void BroadcastPaletteTransform()
     {
         // Debug.Log("Sending network palette info in scene " + gameObject.transform.parent.parent.parent + " from user ID " + ownerName);
-        context.SendJson(new Message()
+        context.SendJson(new TransformMessage()
         {
+            type = "transform",
+
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
 
+            // owner = false,
+        });
+    }
+
+    private void BroadcastPaletteInfo()
+    {
+        // Debug.Log("Sending network palette info in scene " + gameObject.transform.parent.parent.parent + " from user ID " + ownerName);
+        context.SendJson(new InfoMessage()
+        {
+            type = "info",
+
             owner = false,
+
             ownerName = AvatarManager.UUID,
 
             // Control the active menu states
@@ -429,6 +604,14 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             meshBackButtonStateVisualizer = buttonStates[10].enabled,
             meshBackButtonActiveHover = buttonStates[10].Interactable.IsActiveHovered,
             meshBackButtonHover = buttonStates[10].Interactable.IsRayHovered,
+
+            wedgeButtonStateVisualizer = buttonStates[45].enabled,
+            wedgeButtonActiveHover = buttonStates[45].Interactable.IsActiveHovered,
+            wedgeButtonHover = buttonStates[45].Interactable.IsRayHovered,
+
+            pipeButtonStateVisualizer = buttonStates[46].enabled,
+            pipeButtonActiveHover = buttonStates[46].Interactable.IsActiveHovered,
+            pipeButtonHover = buttonStates[46].Interactable.IsRayHovered,
             // End of mesh related buttons
 
             teleportButtonStateVisualizer = buttonStates[11].enabled,
@@ -456,9 +639,9 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             manipulateVertexButtonActiveHover = buttonStates[16].Interactable.IsActiveHovered,
             manipulateVertexButtonHover = buttonStates[16].Interactable.IsRayHovered,
 
-            manipulateAllButtonStateVisualizer = buttonStates[17].enabled,
-            manipulateAllButtonActiveHover = buttonStates[17].Interactable.IsActiveHovered,
-            manipulateAllButtonHover = buttonStates[17].Interactable.IsRayHovered,
+            xrayButtonStateVisualizer = buttonStates[17].enabled,
+            xrayButtonActiveHover = buttonStates[17].Interactable.IsActiveHovered,
+            xrayButtonHover = buttonStates[17].Interactable.IsRayHovered,
 
             tessellationButtonStateVisualizer = buttonStates[32].enabled,
             tessellationButtonActiveHover = buttonStates[32].Interactable.IsActiveHovered,
@@ -499,13 +682,13 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             transformBackButtonHover = buttonStates[24].Interactable.IsRayHovered,
             // End of transform related buttons
 
-                        eraserButtonStateVisualizer = buttonStates[25].enabled,
-                        eraserButtonActiveHover = buttonStates[25].Interactable.IsActiveHovered,
-                        eraserButtonHover = buttonStates[25].Interactable.IsRayHovered,
+            eraserButtonStateVisualizer = buttonStates[25].enabled,
+            eraserButtonActiveHover = buttonStates[25].Interactable.IsActiveHovered,
+            eraserButtonHover = buttonStates[25].Interactable.IsRayHovered,
 
-                        copyButtonStateVisualizer = buttonStates[43].enabled,
-                        copyButtonActiveHover = buttonStates[43].Interactable.IsActiveHovered,
-                        copyButtonHover = buttonStates[43].Interactable.IsRayHovered,
+            copyButtonStateVisualizer = buttonStates[43].enabled,
+            copyButtonActiveHover = buttonStates[43].Interactable.IsActiveHovered,
+            copyButtonHover = buttonStates[43].Interactable.IsRayHovered,
 
             undoButtonStateVisualizer = buttonStates[26].enabled,
             undoButtonActiveHover = buttonStates[26].Interactable.IsActiveHovered,
@@ -518,6 +701,10 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             combineButtonStateVisualizer = buttonStates[28].enabled,
             combineButtonActiveHover = buttonStates[28].Interactable.IsActiveHovered,
             combineButtonHover = buttonStates[28].Interactable.IsRayHovered,
+
+            playButtonStateVisualizer = buttonStates[44].enabled,
+            playButtonActiveHover = buttonStates[44].Interactable.IsActiveHovered,
+            playButtonHover = buttonStates[44].Interactable.IsRayHovered,
 
             // Edit related buttons
             editButtonStateVisualizer = buttonStates[29].enabled,
@@ -564,6 +751,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             metallicSliderValue = metallicSlider.SliderValue,
             smoothnessSliderValue = smoothnessSlider.SliderValue,
             satValPicker = svPickerTransform,
+            //satValPickerTransform = svPickerTransform.localPosition,
             svPickerColor = svPickerImage.color,
             // End of color related buttons
 
@@ -572,41 +760,44 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             switchHandsButtonActiveHover = buttonStates[33].Interactable.IsActiveHovered,
             switchHandsButtonHover = buttonStates[33].Interactable.IsRayHovered,
 
-                        // Control all toggle states
-                        teleportToolState = toggleStates[0].IsToggled,
-                        selectToolState = toggleStates[1].IsToggled,
-                        eraserToolState = toggleStates[2].IsToggled,
-                        cubeState = toggleStates[3].IsToggled,
-                        sphereState = toggleStates[4].IsToggled,
-                        cylinderState = toggleStates[5].IsToggled,
-                        coneState = toggleStates[6].IsToggled,
-                        planeState = toggleStates[7].IsToggled,
-                        cubeTubeState = toggleStates[8].IsToggled,
-                        sphereTubeState = toggleStates[9].IsToggled,
-                        coneTubeState = toggleStates[10].IsToggled,
-                        faceSelectionState = toggleStates[11].IsToggled,
-                        edgeSelectionState = toggleStates[12].IsToggled,
-                        vertexSelectionState = toggleStates[13].IsToggled,
-                        manipulateAllState = toggleStates[14].IsToggled,
-                        tessellationState = toggleStates[15].IsToggled,
-                        translateToolState = toggleStates[16].IsToggled,
-                        rotateToolState = toggleStates[17].IsToggled,
-                        scaleToolState = toggleStates[18].IsToggled,
-                        transformAllState = toggleStates[19].IsToggled,
-                        torusState = toggleStates[20].IsToggled,
-                        polygon2DState = toggleStates[21].IsToggled,
-                        extrudeState = toggleStates[22].IsToggled,
-                        moreOptionsState = toggleStates[23].IsToggled,
-                        metallicState = toggleStates[24].IsToggled,
-                        smoothnessState = toggleStates[25].IsToggled,
-                        colorState = toggleStates[26].IsToggled,
-                        copyState = toggleStates[27].IsToggled,
+            // Control all toggle states
+            teleportToolState = toggleStates[0].IsToggled,
+            selectToolState = toggleStates[1].IsToggled,
+            eraserToolState = toggleStates[2].IsToggled,
+            cubeState = toggleStates[3].IsToggled,
+            sphereState = toggleStates[4].IsToggled,
+            cylinderState = toggleStates[5].IsToggled,
+            coneState = toggleStates[6].IsToggled,
+            planeState = toggleStates[7].IsToggled,
+            cubeTubeState = toggleStates[8].IsToggled,
+            sphereTubeState = toggleStates[9].IsToggled,
+            coneTubeState = toggleStates[10].IsToggled,
+            faceSelectionState = toggleStates[11].IsToggled,
+            edgeSelectionState = toggleStates[12].IsToggled,
+            vertexSelectionState = toggleStates[13].IsToggled,
+            // manipulateAllState = toggleStates[14].IsToggled,
+            tessellationState = toggleStates[14].IsToggled,
+            translateToolState = toggleStates[15].IsToggled,
+            rotateToolState = toggleStates[16].IsToggled,
+            scaleToolState = toggleStates[17].IsToggled,
+            transformAllState = toggleStates[18].IsToggled,
+            torusState = toggleStates[19].IsToggled,
+            polygon2DState = toggleStates[20].IsToggled,
+            extrudeState = toggleStates[21].IsToggled,
+            moreOptionsState = toggleStates[22].IsToggled,
+            metallicState = toggleStates[23].IsToggled,
+            smoothnessState = toggleStates[24].IsToggled,
+            colorState = toggleStates[25].IsToggled,
+            copyState = toggleStates[26].IsToggled,
+            wedgeState = toggleStates[27].IsToggled,
+            pipeState = toggleStates[28].IsToggled,
 
             // Control unique toggle states (those that do not toggle off when another button is toggled)
             editState = editToggleState.IsToggled,
             path3DState = path3DToggleState.IsToggled,
             combineToolState = combineToolToggleState.enabled,
             handState = handToggleState.IsToggled,
+            xrayState = xrayToggleState.IsToggled,
 
             // Control the snap mode and snap unit states
             snapModeValue = snapModeState.SliderValue,
@@ -619,10 +810,18 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         });
     }
 
-    private struct Message
+    private struct TransformMessage
     { 
+        public string type;
+        public bool needsData;
         public Vector3 position, scale;
         public Quaternion rotation;
+    }
+
+    private struct InfoMessage
+    { 
+        public string type;
+        public bool needsData;
 
         // The user that spawns the palette will always be the owner. This variable will always be set to false
         public bool owner;
@@ -647,6 +846,8 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public bool cylinderButtonStateVisualizer; public bool cylinderButtonActiveHover; public bool cylinderButtonHover;
         public bool coneButtonStateVisualizer; public bool coneButtonActiveHover; public bool coneButtonHover;
         public bool torusButtonStateVisualizer; public bool torusButtonActiveHover; public bool torusButtonHover;
+        public bool wedgeButtonStateVisualizer; public bool wedgeButtonActiveHover; public bool wedgeButtonHover;
+        public bool pipeButtonStateVisualizer; public bool pipeButtonActiveHover; public bool pipeButtonHover;
         public bool planeButtonStateVisualizer; public bool planeButtonActiveHover; public bool planeButtonHover;
         public bool path3DButtonStateVisualizer; public bool path3DButtonActiveHover; public bool path3DButtonHover;
         public bool polygon2DButtonStateVisualizer; public bool polygon2DButtonActiveHover; public bool polygon2DButtonHover;
@@ -663,13 +864,14 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public bool undoButtonStateVisualizer; public bool undoButtonActiveHover; public bool undoButtonHover;
         public bool redoButtonStateVisualizer; public bool redoButtonActiveHover; public bool redoButtonHover;
         public bool combineButtonStateVisualizer; public bool combineButtonActiveHover; public bool combineButtonHover;
+        public bool playButtonStateVisualizer; public bool playButtonActiveHover; public bool playButtonHover;
 
         // Manipulate related buttons
         public bool manipulateButtonStateVisualizer; public bool manipulateButtonActiveHover; public bool manipulateButtonHover;
         public bool manipulateFaceButtonStateVisualizer; public bool manipulateFaceButtonActiveHover; public bool manipulateFaceButtonHover;
         public bool manipulateEdgeButtonStateVisualizer; public bool manipulateEdgeButtonActiveHover; public bool manipulateEdgeButtonHover;
         public bool manipulateVertexButtonStateVisualizer; public bool manipulateVertexButtonActiveHover; public bool manipulateVertexButtonHover;
-        public bool manipulateAllButtonStateVisualizer; public bool manipulateAllButtonActiveHover; public bool manipulateAllButtonHover;
+        public bool xrayButtonStateVisualizer; public bool xrayButtonActiveHover; public bool xrayButtonHover;
         public bool tessellationButtonStateVisualizer; public bool tessellationButtonActiveHover; public bool tessellationButtonHover;
         public bool manipulateBackButtonStateVisualizer; public bool manipulateBackButtonActiveHover; public bool manipulateBackButtonHover;
         public bool extrudeButtonStateVisualizer; public bool extrudeButtonActiveHover; public bool extrudeButtonHover;
@@ -700,6 +902,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public float metallicSliderValue;
         public float smoothnessSliderValue;
         public RectTransform satValPicker;
+        // public Vector3 satValPicker;
         public Color svPickerColor;
 
         // Switch hands button
@@ -714,13 +917,15 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public bool cylinderState;
         public bool coneState;
         public bool planeState;
+        public bool wedgeState;
+        public bool pipeState;
         public bool cubeTubeState;
         public bool sphereTubeState;
         public bool coneTubeState;
         public bool faceSelectionState;
         public bool edgeSelectionState;
         public bool vertexSelectionState;
-        public bool manipulateAllState;
+        //public bool manipulateAllState;
         public bool tessellationState;
         public bool translateToolState;
         public bool rotateToolState;
@@ -740,6 +945,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public bool path3DState;
         public bool combineToolState;
         public bool handState;
+        public bool xrayState;
 
         // Control the snap mode and snap unit states
         public float snapModeValue;
@@ -754,140 +960,168 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {  
         // Debug.Log("Getting message from scene = " + gameObject.transform.parent.parent.parent.name + " from avatar " + ownerName);
-
         // Parse the message
-        var m = message.FromJson<Message>();
+        var tm = message.FromJson<TransformMessage>();
 
-        // Put the m properties in an array to simplify below code
-        // Arrays are in the order of { { StateVisualizer, ButtonActiveHover, ButtonHover, ButtonTouch } }
-        bool [,] buttonProperties = new bool[,]
-        { 
-            { m.meshButtonStateVisualizer, m.meshButtonActiveHover, m.meshButtonHover }, { m.cubeButtonStateVisualizer, m.cubeButtonActiveHover, m.cubeButtonHover },
-            { m.sphereButtonStateVisualizer, m.sphereButtonActiveHover, m.sphereButtonHover }, { m.cylinderButtonStateVisualizer, m.cylinderButtonActiveHover, m.cylinderButtonHover },
-            { m.coneButtonStateVisualizer, m.coneButtonActiveHover, m.coneButtonHover }, { m.path3DButtonStateVisualizer, m.path3DButtonActiveHover, m.path3DButtonHover },
-            { m.planeButtonStateVisualizer, m.planeButtonActiveHover, m.planeButtonHover }, { m.cubeTubeButtonStateVisualizer, m.cubeTubeButtonActiveHover, m.cubeTubeButtonHover },
-            { m.sphereTubeButtonStateVisualizer, m.sphereTubeButtonActiveHover, m.sphereTubeButtonHover }, { m.cylinderTubeButtonStateVisualizer, m.cylinderTubeButtonActiveHover, m.cylinderTubeButtonHover },
-            { m.meshBackButtonStateVisualizer, m.meshBackButtonActiveHover, m.meshBackButtonHover }, { m.teleportButtonStateVisualizer, m.teleportButtonActiveHover, m.teleportButtonHover },
-            { m.selectButtonStateVisualizer, m.selectButtonActiveHover, m.selectButtonHover }, { m.manipulateButtonStateVisualizer, m.manipulateButtonActiveHover, m.manipulateButtonHover },
-            { m.manipulateFaceButtonStateVisualizer, m.manipulateFaceButtonActiveHover, m.manipulateFaceButtonHover },
-            { m.manipulateEdgeButtonStateVisualizer, m.manipulateEdgeButtonActiveHover, m.manipulateEdgeButtonHover },
-            { m.manipulateVertexButtonStateVisualizer, m.manipulateVertexButtonActiveHover, m.manipulateVertexButtonHover },
-            { m.manipulateAllButtonStateVisualizer, m.manipulateAllButtonActiveHover, m.manipulateAllButtonHover },
-            { m.manipulateBackButtonStateVisualizer, m.manipulateBackButtonActiveHover, m.manipulateBackButtonHover },
-            { m.transformButtonStateVisualizer, m.transformButtonActiveHover, m.transformButtonHover }, { m.translateButtonStateVisualizer, m.translateButtonActiveHover, m.translateButtonHover },
-            { m.rotateButtonStateVisualizer, m.rotateButtonActiveHover, m.rotateButtonHover }, { m.scaleButtonStateVisualizer, m.scaleButtonActiveHover, m.scaleButtonHover },
-            { m.transformAllButtonStateVisualizer, m.transformAllButtonActiveHover, m.transformAllButtonHover }, { m.transformBackButtonStateVisualizer, m.transformBackButtonActiveHover, m.transformBackButtonHover },
-            { m.eraserButtonStateVisualizer, m.eraserButtonActiveHover, m.eraserButtonHover }, { m.undoButtonStateVisualizer, m.undoButtonActiveHover, m.undoButtonHover },
-            { m.redoButtonStateVisualizer, m.redoButtonActiveHover, m.redoButtonHover }, { m.combineButtonStateVisualizer, m.combineButtonActiveHover, m.combineButtonHover },
-            { m.editButtonStateVisualizer, m.editButtonActiveHover, m.editButtonHover }, { m.editConfirmButtonStateVisualizer, m.editConfirmButtonActiveHover, m.editConfirmButtonHover },
-            { m.editCancelButtonStateVisualizer, m.editCancelButtonActiveHover, m.editCancelButtonHover }, { m.tessellationButtonStateVisualizer, m.tessellationButtonActiveHover, m.tessellationButtonHover },
-            { m.switchHandsButtonStateVisualizer, m.switchHandsButtonActiveHover, m.switchHandsButtonHover }, { m.torusButtonStateVisualizer, m.torusButtonActiveHover, m.torusButtonHover },
-            { m.polygon2DButtonStateVisualizer, m.polygon2DButtonActiveHover, m.polygon2DButtonHover }, { m.extrudeButtonStateVisualizer, m.extrudeButtonActiveHover, m.extrudeButtonHover },
-            { m.colorsButtonStateVisualizer, m.colorsButtonActiveHover, m.colorsButtonHover }, { m.colorsBackButtonStateVisualizer, m.colorsBackButtonActiveHover, m.colorsBackButtonHover },
-            { m.moreOptionsButtonStateVisualizer, m.moreOptionsButtonActiveHover, m.moreOptionsButtonHover }, { m.metallicButtonStateVisualizer, m.metallicButtonActiveHover, m.metallicButtonHover },
-            { m.smoothnessButtonStateVisualizer, m.smoothnessButtonActiveHover, m.smoothnessButtonHover }, { m.colorButtonStateVisualizer, m.colorButtonActiveHover, m.colorButtonHover },
-            { m.copyButtonStateVisualizer, m.copyButtonActiveHover, m.copyButtonHover },
-        };
-
-        bool [] toggleProperties = new bool[]
+        if (tm.type == "transform")
         {
-            m.teleportToolState, m.selectToolState, m.eraserToolState, m.cubeState, m.sphereState, m.cylinderState, m.coneState, m.planeState, m.cubeTubeState, m.sphereTubeState, m.coneTubeState,
-            m.faceSelectionState, m.edgeSelectionState, m.vertexSelectionState, m.manipulateAllState, m.tessellationState, m.translateToolState, m.rotateToolState,
-            m.scaleToolState, m.transformAllState, m.torusState, m.polygon2DState, m.extrudeState, m.moreOptionsState, m.metallicState, m.smoothnessState, m.colorState, m.copyState,
-        };
-
-        // Use the message to update the Component
-        transform.localPosition = m.position;
-        transform.localScale = m.scale;
-        transform.localRotation = m.rotation;
-
-        owner = m.owner;
-        ownerName = m.ownerName;
-
-        // Control the active menu states
-        homeMenu.SetActive(m.homeMenuState);
-        meshMenu.SetActive(m.meshMenuState);
-        path3DMenu.SetActive(m.path3DMenuState);
-        manipulateMenu.SetActive(m.manipulateMenuState);
-        transformMenu.SetActive(m.transformMenuState);
-        editMenu.SetActive(m.editMenuState);
-        colorsMenu.SetActive(m.colorsMenuState);
-        shadersMenu.SetActive(m.shadersMenuState);
-
-        // Control the button animation states
-        for (int i = 0; i < buttonStates.Length; i++)
-        {
-            buttonStates[i].enabled = buttonProperties[i, 0];
-            buttonStates[i].Interactable.IsActiveHovered.Initialize(buttonProperties[i, 1]);
-            buttonStates[i].Interactable.IsRayHovered.Initialize(buttonProperties[i, 2]);
-
-            lastButtonStates[i] = buttonStates[i].Interactable.IsActiveHovered;
+            // Debug.Log("Transform message received");
+            transform.localPosition = tm.position;
+            transform.localScale = tm.scale;
+            transform.localRotation = tm.rotation;
+            return;
         }
 
-        // Control all toggle states
-        for (int i = 0; i < toggleStates.Length; i++)
-        { 
-            toggleStates[i].ForceSetToggled(toggleProperties[i]);
-
-            lastToggleStates[i] = toggleStates[i].IsToggled;
-        }
-
-        // Control unique toggle states (those that do not toggle off when another button is toggled)
-        editToggleState.IsToggled.Initialize(m.editState);
-        path3DToggleState.IsToggled.Initialize(m.path3DState);
-        combineToolToggleState.enabled = m.combineToolState;
-        handToggleState.ForceSetToggled(m.handState);
-
-        // Control the snap mode and snap unit states
-        snapModeState.SliderValue = m.snapModeValue;
-        snapUnitState.SliderValue = m.snapUnitValue;
-        transformSnapUnitState.SliderValue = m.transformSnapUnitValue;
-        manipulateSnapUnitState.SliderValue = m.manipulateSnapUnitValue;
-        meshGridModeToggleState.ForceSetToggled(m.meshGridModeState);
-        transformGridModeToggleState.ForceSetToggled(m.transformGridModeState);
-        manipulateGridModeToggleState.ForceSetToggled(m.manipulateGridModeState);
-
-        // Control the color states
-        colorPickerControl.currentSat = m.satValue;
-        colorPickerControl.currentVal = m.valValue;
-        hSlider.SliderValue = m.hueSliderValue;
-        metallicSlider.SliderValue = m.metallicSliderValue;
-        smoothnessSlider.SliderValue = m.smoothnessSliderValue;
-        if (svPickerTransform != null && m.satValPicker != null)
+        var m = message.FromJson<InfoMessage>();
+        if (m.type == "info")
         {
-            svPickerTransform.anchoredPosition3D = m.satValPicker.anchoredPosition3D;
+            // Debug.Log("Info message received");
+            // Put the m properties in an array to simplify below code
+            // Arrays are in the order of { { StateVisualizer, ButtonActiveHover, ButtonHover, ButtonTouch } }
+            bool [,] buttonProperties = new bool[,]
+            { 
+                { m.meshButtonStateVisualizer, m.meshButtonActiveHover, m.meshButtonHover }, { m.cubeButtonStateVisualizer, m.cubeButtonActiveHover, m.cubeButtonHover },
+                { m.sphereButtonStateVisualizer, m.sphereButtonActiveHover, m.sphereButtonHover }, { m.cylinderButtonStateVisualizer, m.cylinderButtonActiveHover, m.cylinderButtonHover },
+                { m.coneButtonStateVisualizer, m.coneButtonActiveHover, m.coneButtonHover }, { m.path3DButtonStateVisualizer, m.path3DButtonActiveHover, m.path3DButtonHover },
+                { m.planeButtonStateVisualizer, m.planeButtonActiveHover, m.planeButtonHover }, { m.cubeTubeButtonStateVisualizer, m.cubeTubeButtonActiveHover, m.cubeTubeButtonHover },
+                { m.sphereTubeButtonStateVisualizer, m.sphereTubeButtonActiveHover, m.sphereTubeButtonHover }, { m.cylinderTubeButtonStateVisualizer, m.cylinderTubeButtonActiveHover, m.cylinderTubeButtonHover },
+                { m.meshBackButtonStateVisualizer, m.meshBackButtonActiveHover, m.meshBackButtonHover }, { m.teleportButtonStateVisualizer, m.teleportButtonActiveHover, m.teleportButtonHover },
+                { m.selectButtonStateVisualizer, m.selectButtonActiveHover, m.selectButtonHover }, { m.manipulateButtonStateVisualizer, m.manipulateButtonActiveHover, m.manipulateButtonHover },
+                { m.manipulateFaceButtonStateVisualizer, m.manipulateFaceButtonActiveHover, m.manipulateFaceButtonHover },
+                { m.manipulateEdgeButtonStateVisualizer, m.manipulateEdgeButtonActiveHover, m.manipulateEdgeButtonHover },
+                { m.manipulateVertexButtonStateVisualizer, m.manipulateVertexButtonActiveHover, m.manipulateVertexButtonHover },
+                // { m.manipulateAllButtonStateVisualizer, m.manipulateAllButtonActiveHover, m.manipulateAllButtonHover },
+                { m.xrayButtonStateVisualizer, m.xrayButtonActiveHover, m.xrayButtonHover },
+                { m.manipulateBackButtonStateVisualizer, m.manipulateBackButtonActiveHover, m.manipulateBackButtonHover },
+                { m.transformButtonStateVisualizer, m.transformButtonActiveHover, m.transformButtonHover }, { m.translateButtonStateVisualizer, m.translateButtonActiveHover, m.translateButtonHover },
+                { m.rotateButtonStateVisualizer, m.rotateButtonActiveHover, m.rotateButtonHover }, { m.scaleButtonStateVisualizer, m.scaleButtonActiveHover, m.scaleButtonHover },
+                { m.transformAllButtonStateVisualizer, m.transformAllButtonActiveHover, m.transformAllButtonHover }, { m.transformBackButtonStateVisualizer, m.transformBackButtonActiveHover, m.transformBackButtonHover },
+                { m.eraserButtonStateVisualizer, m.eraserButtonActiveHover, m.eraserButtonHover }, { m.undoButtonStateVisualizer, m.undoButtonActiveHover, m.undoButtonHover },
+                { m.redoButtonStateVisualizer, m.redoButtonActiveHover, m.redoButtonHover }, { m.combineButtonStateVisualizer, m.combineButtonActiveHover, m.combineButtonHover },
+                { m.editButtonStateVisualizer, m.editButtonActiveHover, m.editButtonHover }, { m.editConfirmButtonStateVisualizer, m.editConfirmButtonActiveHover, m.editConfirmButtonHover },
+                { m.editCancelButtonStateVisualizer, m.editCancelButtonActiveHover, m.editCancelButtonHover }, { m.tessellationButtonStateVisualizer, m.tessellationButtonActiveHover, m.tessellationButtonHover },
+                { m.switchHandsButtonStateVisualizer, m.switchHandsButtonActiveHover, m.switchHandsButtonHover }, { m.torusButtonStateVisualizer, m.torusButtonActiveHover, m.torusButtonHover },
+                { m.polygon2DButtonStateVisualizer, m.polygon2DButtonActiveHover, m.polygon2DButtonHover }, { m.extrudeButtonStateVisualizer, m.extrudeButtonActiveHover, m.extrudeButtonHover },
+                { m.colorsButtonStateVisualizer, m.colorsButtonActiveHover, m.colorsButtonHover }, { m.colorsBackButtonStateVisualizer, m.colorsBackButtonActiveHover, m.colorsBackButtonHover },
+                { m.moreOptionsButtonStateVisualizer, m.moreOptionsButtonActiveHover, m.moreOptionsButtonHover }, { m.metallicButtonStateVisualizer, m.metallicButtonActiveHover, m.metallicButtonHover },
+                { m.smoothnessButtonStateVisualizer, m.smoothnessButtonActiveHover, m.smoothnessButtonHover }, { m.colorButtonStateVisualizer, m.colorButtonActiveHover, m.colorButtonHover },
+                { m.copyButtonStateVisualizer, m.copyButtonActiveHover, m.copyButtonHover }, { m.playButtonStateVisualizer, m.playButtonActiveHover, m.playButtonHover },
+                {m.wedgeButtonStateVisualizer, m.wedgeButtonActiveHover, m.wedgeButtonHover }, {m.pipeButtonStateVisualizer, m.pipeButtonActiveHover, m.pipeButtonHover}
+            };
+
+            bool [] toggleProperties = new bool[]
+            {
+                m.teleportToolState, m.selectToolState, m.eraserToolState, m.cubeState, m.sphereState, m.cylinderState, m.coneState, m.planeState, m.cubeTubeState, m.sphereTubeState, m.coneTubeState,
+                m.faceSelectionState, m.edgeSelectionState, m.vertexSelectionState, /*m.manipulateAllState,*/ m.tessellationState, m.translateToolState, m.rotateToolState,
+                m.scaleToolState, m.transformAllState, m.torusState, m.polygon2DState, m.extrudeState, m.moreOptionsState, m.metallicState, m.smoothnessState, m.colorState, m.copyState,
+                m.wedgeState, m.pipeState
+            };
+
+            // Use the message to update the Component
+            owner = m.owner;
+            ownerName = m.ownerName;
+
+            // Control the active menu states
+            homeMenu.SetActive(m.homeMenuState);
+            meshMenu.SetActive(m.meshMenuState);
+            path3DMenu.SetActive(m.path3DMenuState);
+            manipulateMenu.SetActive(m.manipulateMenuState);
+            transformMenu.SetActive(m.transformMenuState);
+            editMenu.SetActive(m.editMenuState);
+            colorsMenu.SetActive(m.colorsMenuState);
+            shadersMenu.SetActive(m.shadersMenuState);
+
+            // Control the button animation states
+            for (int i = 0; i < buttonStates.Length; i++)
+            {
+                buttonStates[i].enabled = buttonProperties[i, 0];
+                buttonStates[i].Interactable.IsActiveHovered.Initialize(buttonProperties[i, 1]);
+                buttonStates[i].Interactable.IsRayHovered.Initialize(buttonProperties[i, 2]);
+
+                lastButtonStates[i] = buttonStates[i].Interactable.IsActiveHovered;
+            }
+
+            // Control all toggle states
+            for (int i = 0; i < toggleStates.Length; i++)
+            { 
+                toggleStates[i].ForceSetToggled(toggleProperties[i]);
+
+                lastToggleStates[i] = toggleStates[i].IsToggled;
+            }
+
+            // Control unique toggle states (those that do not toggle off when another button is toggled)
+            editToggleState.IsToggled.Initialize(m.editState);
+            path3DToggleState.IsToggled.Initialize(m.path3DState);
+            combineToolToggleState.enabled = m.combineToolState;
+            handToggleState.ForceSetToggled(m.handState);
+            xrayToggleState.ForceSetToggled(m.xrayState);
+
+            // Control the snap mode and snap unit states
+            snapModeState.SliderValue = m.snapModeValue;
+            snapUnitState.SliderValue = m.snapUnitValue;
+            transformSnapUnitState.SliderValue = m.transformSnapUnitValue;
+            manipulateSnapUnitState.SliderValue = m.manipulateSnapUnitValue;
+            meshGridModeToggleState.ForceSetToggled(m.meshGridModeState);
+            transformGridModeToggleState.ForceSetToggled(m.transformGridModeState);
+            manipulateGridModeToggleState.ForceSetToggled(m.manipulateGridModeState);
+
+            // Control the color states
+            colorPickerControl.currentSat = m.satValue;
+            colorPickerControl.currentVal = m.valValue;
+            hSlider.SliderValue = m.hueSliderValue;
+            metallicSlider.SliderValue = m.metallicSliderValue;
+            smoothnessSlider.SliderValue = m.smoothnessSliderValue;
+            if (svPickerTransform != null && m.satValPicker != null)
+            {
+                svPickerTransform.anchoredPosition3D = m.satValPicker.anchoredPosition3D;
+            }
+            //svPickerTransform.localPosition = m.satValPickerTransform;
+            
+            svPickerImage.color = m.svPickerColor;
+
+            // Make sure the logic in Update doesn't trigger as a result of this message
+            lastPosition = transform.localPosition;
+            lastScale = transform.localScale;
+            lastRotation = transform.localRotation;
+
+            lastHomeMenuState = homeMenu.activeInHierarchy;
+            lastMeshMenuState = meshMenu.activeInHierarchy;
+            lastPath3DMenuState = path3DMenu.activeInHierarchy;
+            lastManipulateMenuState = manipulateMenu.activeInHierarchy;
+            lastTransformMenuState = transformMenu.activeInHierarchy;
+            lastEditMenuState = editMenu.activeInHierarchy;
+            lastColorsMenuState = colorsMenu.activeInHierarchy;
+            lastShadersMenu = shadersMenu.activeInHierarchy;
+
+            // Control unique toggle states (those that do not toggle off when another button is toggled)
+            lastEditToggleState = editToggleState.IsToggled;
+            lastPath3DToggleState = path3DToggleState.IsToggled;
+            lastCombineToolToggleState = combineToolToggleState.enabled;
+            lastHandToggleState = handToggleState.IsToggled;
+            lastXrayToggleState = xrayToggleState.IsToggled;
+
+            // Control the snap mode and snap unit states
+            lastSnapModeState = snapModeState.SliderValue;
+            lastSnapUnitState = snapUnitState.SliderValue;
+            lastTransformSnapUnitState = transformSnapUnitState.SliderValue;
+            lastManipulateSnapUnitState = manipulateSnapUnitState.SliderValue;
+            lastMeshGridModeToggleState = meshGridModeToggleState.IsToggled;
+
+            // Control the color menu states
+            lastHueSliderState = hSlider.SliderValue;
+            lastMetallicSliderState = metallicSlider.SliderValue;
+            lastSmoothnessSliderState = smoothnessSlider.SliderValue;
+            lastSvPickerTransform = svPickerTransform.localPosition;
         }
-        svPickerImage.color = m.svPickerColor;
 
-        // Make sure the logic in Update doesn't trigger as a result of this message
-        lastPosition = transform.localPosition;
-        lastScale = transform.localScale;
-        lastRotation = transform.localRotation;
+        /*if (tm.needsData == true && owner)
+        {
+            BroadcastPaletteTransform();
+        }
 
-        lastHomeMenuState = homeMenu.activeInHierarchy;
-        lastMeshMenuState = meshMenu.activeInHierarchy;
-        lastPath3DMenuState = path3DMenu.activeInHierarchy;
-        lastManipulateMenuState = manipulateMenu.activeInHierarchy;
-        lastTransformMenuState = transformMenu.activeInHierarchy;
-        lastEditMenuState = editMenu.activeInHierarchy;
-        lastColorsMenuState = colorsMenu.activeInHierarchy;
-        lastShadersMenu = shadersMenu.activeInHierarchy;
-
-        // Control unique toggle states (those that do not toggle off when another button is toggled)
-        lastEditToggleState = editToggleState.IsToggled;
-        lastPath3DToggleState = path3DToggleState.IsToggled;
-        lastCombineToolToggleState = combineToolToggleState.enabled;
-        lastHandToggleState = handToggleState.IsToggled;
-
-        // Control the snap mode and snap unit states
-        lastSnapModeState = snapModeState.SliderValue;
-        lastSnapUnitState = snapUnitState.SliderValue;
-        lastTransformSnapUnitState = transformSnapUnitState.SliderValue;
-        lastManipulateSnapUnitState = manipulateSnapUnitState.SliderValue;
-        lastMeshGridModeToggleState = meshGridModeToggleState.IsToggled;
-
-        // Control the color menu states
-        lastHueSliderState = hSlider.SliderValue;
-        lastMetallicSliderState = metallicSlider.SliderValue;
+        if (m.needsData == true && owner)
+        {
+            BroadcastPaletteInfo();
+        }*/ 
     }
 }
