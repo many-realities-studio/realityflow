@@ -10,7 +10,7 @@ namespace RealityFlow.Collections
     /// A list with typesafe, generated indices. 
     /// </summary>
     [Serializable]
-    public class Arena<T> : IEnumerable<T>
+    public class Arena<T> : IEnumerable<KeyValuePair<Arena<T>.Index, T>>
     {
         [SerializeField]
         SerializableDict<Index, T> list = new();
@@ -37,14 +37,14 @@ namespace RealityFlow.Collections
             return list.Remove(index);
         }
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<KeyValuePair<Index, T>> GetEnumerator()
         {
-            return list.Values.GetEnumerator();
+            return list.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return list.Values.GetEnumerator();
+            return list.GetEnumerator();
         }
 
         [Serializable]
@@ -52,6 +52,8 @@ namespace RealityFlow.Collections
         {
             [SerializeField]
             int value;
+
+            public int Value => value;
 
             public Index(int index)
             {
