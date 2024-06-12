@@ -7,6 +7,8 @@ using Ubiq.Spawning;
 using System;
 using System.Linq;
 using RealityFlow.NodeGraph;
+using UnityEngine.Assertions;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -244,6 +246,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding edge at {from}:{to}");
     }
 
+    public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
+    {
+        graph.RemoveDataEdge(from, to);
+        actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to);
+        Debug.Log($"Deleted edge from {from} to {to}");
+    }
+
     public void AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex to)
     {
         if (!graph.TryAddExecutionEdge(from.Node, from.Port, to))
@@ -253,6 +262,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
+    }
+
+    public void RemoveExecEdgeFromGraph(Graph graph, PortIndex from, NodeIndex to)
+    {
+        graph.RemoveExecutionEdge(from, to);
+        actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
+        Debug.Log($"Deleted exec edge from {from} to {to}");
     }
 
     public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
@@ -407,8 +423,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             case nameof(AddDataEdgeToGraph):
                 graph = (Graph)action.Parameters[0];
                 (PortIndex from, PortIndex to) = ((PortIndex, PortIndex))action.Parameters[1];
-                
+
                 graph.RemoveDataEdge(from, to);
+                break;
+
+            case nameof(RemoveDataEdgeFromGraph):
+                graph = (Graph)action.Parameters[0];
+                from = (PortIndex)action.Parameters[1];
+                to = (PortIndex)action.Parameters[2];
+
+                if (!graph.TryAddEdge(from.Node, from.Port, to.Node, to.Port))
+                    Debug.LogError($"Failed to undo delete edge from {from} to {to}");
                 break;
 
             case nameof(AddExecEdgeToGraph):
@@ -416,6 +441,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 (PortIndex port, NodeIndex node) = ((PortIndex, NodeIndex))action.Parameters[1];
 
                 graph.RemoveExecutionEdge(port, node);
+                break;
+
+            case nameof(RemoveExecEdgeFromGraph):
+                graph = (Graph)action.Parameters[0];
+                from = (PortIndex)action.Parameters[1];
+                NodeIndex toNode = (NodeIndex)action.Parameters[2];
+
+                if (!graph.TryAddExecutionEdge(from.Node, from.Port, toNode))
+                    Debug.LogError($"Failed to undo delete exec edge from {from} to {toNode}");
                 break;
 
             case nameof(SetNodePosition):

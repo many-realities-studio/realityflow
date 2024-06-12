@@ -80,6 +80,9 @@ namespace RealityFlow.NodeUI
                 OutputPortView fromPortView = fromView.outputPortViews[from.Port];
                 InputPortView toPortView = toView.inputPortViews[to.Port];
 
+                view.from = from;
+                view.toNode = to.Node;
+                view.toPort = to.Port;
                 view.target1 = fromPortView.edgeTarget;
                 view.target2 = toPortView.edgeTarget;
 
@@ -98,6 +101,8 @@ namespace RealityFlow.NodeUI
                     OutputExecutionPort fromPortView = fromView.outputExecutionPorts[from.Port];
                     InputExecutionPort toPortView = toView.inputExecutionPort;
 
+                    view.from = from;
+                    view.toNode = to;
                     view.target1 = fromPortView.edgeTarget;
                     view.target2 = toPortView.edgeTarget;
 
