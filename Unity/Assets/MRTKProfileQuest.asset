@@ -13,9 +13,17 @@ MonoBehaviour:
   m_Name: MRTKProfileQuest
   m_EditorClassIdentifier: 
   isCustomProfile: 0
-  loadedSubsystems: []
+  loadedSubsystems:
+  - reference: Microsoft.MixedReality.Toolkit.Input.OpenXRHandsSubsystem, Microsoft.MixedReality.Toolkit.Input
+  - reference: Microsoft.MixedReality.Toolkit.Input.SyntheticHandsSubsystem, Microsoft.MixedReality.Toolkit.Input
+  - reference: Microsoft.MixedReality.Toolkit.Accessibility.MRTKAccessibilitySubsystem,
+      Microsoft.MixedReality.Toolkit.Accessibility
   subsystemConfigs:
     entries:
+    - key:
+        reference: Microsoft.MixedReality.Toolkit.Accessibility.MRTKAccessibilitySubsystem,
+          Microsoft.MixedReality.Toolkit.Accessibility
+      value: {fileID: 0}
     - key:
         reference: Microsoft.MixedReality.Toolkit.Input.SyntheticHandsSubsystem,
           Microsoft.MixedReality.Toolkit.Input
