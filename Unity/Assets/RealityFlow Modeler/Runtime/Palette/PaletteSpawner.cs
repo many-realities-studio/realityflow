@@ -27,7 +27,7 @@ public class PaletteSpawner : MonoBehaviour
     private Vector3 paletteSize;
     private Vector3 playPaletteSize;
 
-    public void SpawnPalette()
+    /*public void SpawnPalette()
     {
         Vector3 paletteSize = palettePrefab.transform.localScale;
 
@@ -69,7 +69,7 @@ public class PaletteSpawner : MonoBehaviour
             palette.transform.localScale = paletteSize;
             paletteShown = true;
         }
-    }
+    }*/
 
     void Start()
     {
@@ -93,7 +93,7 @@ public class PaletteSpawner : MonoBehaviour
         gameObject.GetComponents<OnButtonPress>()[0].enabled = true;
     }
 
-    private void ControlPalette()
+    public void ControlPalette()
     {
         paletteSize = palettePrefab.transform.localScale;
         playPaletteSize = playPalettePrefab.transform.localScale;
