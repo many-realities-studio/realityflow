@@ -1,15 +1,22 @@
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Ubiq.Rooms;
 using UnityEngine;
 using Ubiq.Messaging;
 
+
+// Structure for GraphQL Requests
+public class Request : System.Object
+{
+    [JsonPropertyAttribute(PropertyName = "query")]
+    public string Query;
+    public string OperationName;
+    public System.Object Variables;
+}
 
 public class RealityFlowClient : MonoBehaviour
 {
@@ -17,8 +24,7 @@ public class RealityFlowClient : MonoBehaviour
     public RoomClient roomClient;
     private string currentProjectId;
 
-    // GraphQL client and access token variables 
-    public GraphQLHttpClient graphQLClient;
+    // GraphQL client and access token variables
     public Dictionary<string, string> userDecoded;
     public string server = "http://localhost:4000";
     public event Action<JArray> OnRoomsReceived;
@@ -172,6 +178,40 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
+    }
+
+    public async Task<JObject> SendRequestAsync(Request request)
+    {
+        // Describe request
+        UnityWebRequest request = UnityWebRequest(server,
+            JsonConvert.SerializeObject(request), "application/json");
+        if (accessToken != null)
+            request.SetRequestHeader("Authorization", "Bearer " + AccessToken);
+        
+        // Send request
+        bool waiting = true;
+        request.SendWebRequest().completed += _ => waiting = false;
+        await Task.Run(async () => {
+            while (waiting)
+                await Task.Yield();
+        });
+
+        // Handle response
+        if (request.result != UnityWebRequest.Result.Success) {
+            Debug.LogError("Bad Request |\n\tError: " + request.error
+                + "\n\tResponse: " + request.downloadHandler.text);
+            return null;
+        }
+
+        var result = JsonConvert.DeserializeObject<JObject>(request.downloadHandler.text);
+        var errors = result["errors"];
+        if (errors == null) {
+            return result;
+        } else {
+            Debug.Log("Bad Request. Error(s) in following print.");
+            Debug.Log(errors);
+            return null;
+        }
     }
 
     public void LeaveRoom()
