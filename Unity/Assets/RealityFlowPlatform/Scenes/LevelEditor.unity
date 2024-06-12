@@ -1543,7 +1543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d130b5e3e15d62f4aa0dff764b312fd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NGI2NDkzZWMyNmVjZWFhOGNkNGIwZiIsInVzZXJuYW1lIjoiSjBuIiwiZW1haWwiOiJraW5nLjE5NDVAeWFob28uY29tIiwiZmlyc3ROYW1lIjoiSm9uYXRoYW4iLCJsYXN0TmFtZSI6Ik8nTGVhcnkiLCJkZWZhdWx0UHJvamVjdElkIjoiIiwiaWF0IjoxNzE4MDI0MDMyLCJleHAiOjE3MTkyMzM2MzJ9.kyCSWDNn58KV5mkUwLdAczsUSLpNHSvcTge86WcgU78
+  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDNiYjFkMWE3OWI4MmZmOWI4MTQwMiIsInVzZXJuYW1lIjoibHVjaWRiYXJkIiwiZW1haWwiOiJqb2huQGx1Y2lkYmFyZC5jb20iLCJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJNdXJyYXkiLCJkZWZhdWx0UHJvamVjdElkIjoiIiwiaWF0IjoxNzE4MjEyNDczLCJleHAiOjE3MTk0MjIwNzN9.CgLg_lnXVOlyfY8QgSFVdxIHZWiUF-DAfWbAeqtEt0o
   roomClient: {fileID: 2142340402}
   server: http://localhost:4000
 --- !u!114 &2142340402
@@ -1638,6 +1638,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7949997706999308421, guid: c89c6abe83bae094ab4495486f1ebea0,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.99999964
+      objectReference: {fileID: 0}
+    - target: {fileID: 7949997706999308421, guid: c89c6abe83bae094ab4495486f1ebea0,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 2.2508302
+      objectReference: {fileID: 0}
+    - target: {fileID: 7949997706999308421, guid: c89c6abe83bae094ab4495486f1ebea0,
+        type: 3}
+      propertyPath: m_Center.y
+      value: -0.6254151
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

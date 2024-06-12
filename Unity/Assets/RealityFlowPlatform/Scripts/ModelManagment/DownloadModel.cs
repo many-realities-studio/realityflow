@@ -36,6 +36,7 @@ public class DownloadModel : MonoBehaviour
         // Start parsing the data, leave coroutine till the parsing finishes
         var gltf = new GltfImport();
         var success_task = gltf.LoadGltfBinary(data, null);
+        // gltf.Load
         yield return new WaitUntil(() => success_task.IsCompleted);
 
         // Check if the parsing had failed
@@ -48,7 +49,7 @@ public class DownloadModel : MonoBehaviour
         Debug.Log("Successfully parsed the downloaded file");
 
         // Make an instance of the model
-        var scene = gltf.InstantiateMainSceneAsync(transform);
+        var scene = gltf.InstantiateMainSceneAsync(transform.parent);
         yield return scene;
 
         // Debug components of the instantiated model
@@ -60,9 +61,9 @@ public class DownloadModel : MonoBehaviour
             var meshRenderer = instantiatedModel.GetComponentInChildren<MeshRenderer>();
 
             // Ensure the model retains its original shape
-            instantiatedModel.localPosition = Vector3.zero;
-            instantiatedModel.localRotation = Quaternion.identity;
-            instantiatedModel.localScale = Vector3.one;
+            // instantiatedModel.localPosition = Vector3.zero;
+            // instantiatedModel.localRotation = Quaternion.identity;
+            // instantiatedModel.localScale = Vector3.one;
 
             if (meshFilter != null)
             {
@@ -96,7 +97,7 @@ public class DownloadModel : MonoBehaviour
 
             // Optional: Configure Rigidbody properties
             rb.mass = 1.0f; // Example: Set mass to 1
-            rb.useGravity = true; // Enable gravity
+            rb.useGravity = false; // Enable gravity
             rb.isKinematic = false; // Allow physics interactions
 
             Debug.Log("Rigidbody and Collider added to the model.");
