@@ -32,6 +32,11 @@ namespace RealityFlow.Collections
             return index;
         }
 
+        public void Set(Index index, T value)
+        {
+            list[index] = value;
+        }
+
         public bool Remove(Index index)
         {
             return list.Remove(index);

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Org.BouncyCastle.Asn1.Ess;
+using PlasticGui;
 using RealityFlow.Collections;
 using UnityEngine;
 
@@ -25,7 +27,7 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        SerializableDict<PortIndex, PortIndex> reverseEdges = new();
+        BiDict<PortIndex, PortIndex> reverseEdges = new();
 
         public IEnumerable<KeyValuePair<PortIndex, PortIndex>> Edges =>
             reverseEdges.Select(kv => new KeyValuePair<PortIndex, PortIndex>(kv.Value, kv.Key));
@@ -35,7 +37,7 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         [SerializeField]
         [HideInInspector]
-        MultiValueDictionary<PortIndex, NodeIndex> executionEdges = new();
+        BiMultiValueDict<PortIndex, NodeIndex> executionEdges = new();
 
         public IEnumerable<KeyValuePair<PortIndex, List<NodeIndex>>> ExecutionEdges => executionEdges;
 
@@ -100,7 +102,7 @@ namespace RealityFlow.NodeGraph
         [SerializeField]
         bool variadicOutput;
 
-        public List<NodeIndex> InputExecutionEdges(int index)
+        public ImmutableList<NodeIndex> InputExecutionEdges(int index)
             => inputExecutionEdges[index];
 
         public NodeIndex AddNode(NodeDefinition definition)
@@ -110,8 +112,60 @@ namespace RealityFlow.NodeGraph
             return index;
         }
 
+        /// <summary>
+        /// Returns a token asserting that this node once existed in this graph at the given index.
+        /// Can be used to re-add a node to a graph with confidence that it will be valid to do so.
+        /// </summary>
+        public NodeMemory GetMemory(NodeIndex index)
+            => new(this, index, GetNode(index));
+
+        // TODO: Replace Graph with RealityFlowID of this graph
+        public record NodeMemory(Graph Graph, NodeIndex Index, Node Node);
+
+        public bool RememberNode(NodeMemory node, out NodeIndex index)
+        {
+            if (node.Graph != this)
+            {
+                index = default;
+                return false;
+            }
+
+            nodes.Set(node.Index, node.Node);
+            index = node.Index;
+            return true;
+        }
+
         public bool RemoveNode(NodeIndex index)
         {
+            Node node = GetNode(index);
+
+            for (int i = 0; i < node.Definition.Inputs.Count; i++)
+            {
+                PortIndex to = new(index, i);
+                if (reverseEdges.ContainsKey(to))
+                    reverseEdges.Remove(to);
+            }
+
+            for (int i = 0; i < node.Definition.Outputs.Count; i++)
+            {
+                PortIndex from = new(index, i);
+                if (reverseEdges.TryGetKeys(from, out ImmutableList<PortIndex> targets))
+                    foreach (PortIndex to in targets)
+                        reverseEdges.Remove(to);
+            }
+
+            for (int i = 0; i < node.Definition.ExecutionOutputs.Count; i++)
+            {
+                PortIndex from = new(index, i);
+                if (executionEdges.ContainsKey(from))
+                    executionEdges.RemoveAll(from);
+            }
+
+            if (node.Definition.ExecutionInput)
+                if (executionEdges.TryGetKeys(index, out ImmutableList<PortIndex> ports))
+                    foreach (PortIndex from in ports)
+                        executionEdges.Remove(from, index);
+
             return nodes.Remove(index);
         }
 
@@ -122,6 +176,42 @@ namespace RealityFlow.NodeGraph
 
         public bool ContainsNode(NodeIndex index)
             => nodes.Contains(index);
+
+        public void EdgesOf(NodeIndex nodeIndex, List<(PortIndex, PortIndex)> data, List<(PortIndex, NodeIndex)> exec)
+        {
+            data.Clear();
+            exec.Clear();
+
+            Node node = GetNode(nodeIndex);
+
+            for (int i = 0; i < node.Definition.Inputs.Count; i++)
+            {
+                PortIndex to = new(nodeIndex, i);
+                if (reverseEdges.TryGetValue(to, out PortIndex from))
+                    data.Add((from, to));
+            }
+
+            for (int i = 0; i < node.Definition.Outputs.Count; i++)
+            {
+                PortIndex from = new(nodeIndex, i);
+                if (reverseEdges.TryGetKeys(from, out ImmutableList<PortIndex> targets))
+                    foreach (PortIndex to in targets)
+                        data.Add((from, to));
+            }
+
+            for (int i = 0; i < node.Definition.ExecutionOutputs.Count; i++)
+            {
+                PortIndex from = new(nodeIndex, i);
+                if (executionEdges.TryGetValues(from, out ImmutableList<NodeIndex> tos))
+                    foreach (NodeIndex to in tos)
+                        exec.Add((from, to));
+            }
+
+            if (node.Definition.ExecutionInput)
+                if (executionEdges.TryGetKeys(nodeIndex, out ImmutableList<PortIndex> ports))
+                    foreach (PortIndex from in ports)
+                        exec.Add((from, nodeIndex));
+        }
 
         /// <summary>
         /// Attempts to add an edge between two node ports. Fails under the following conditions:
@@ -205,7 +295,7 @@ namespace RealityFlow.NodeGraph
 
         public bool EdgeExists(PortIndex from, PortIndex to)
         {
-            return reverseEdges.Contains(new(from, to));
+            return reverseEdges.Contains(new(to, from));
         }
 
         /// <summary>
@@ -326,7 +416,7 @@ namespace RealityFlow.NodeGraph
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)
             => reverseEdges.TryGetValue(inputPort, out outputPort);
 
-        public List<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
+        public ImmutableList<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => executionEdges[outputPort];
     }
 }

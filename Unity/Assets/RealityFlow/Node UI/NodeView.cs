@@ -90,6 +90,13 @@ namespace RealityFlow.NodeUI
             RealityFlowAPI.Instance.SetNodePosition(view.Graph, Index, pos);
         }
 
+        public void Delete()
+        {
+            GraphView view = GetComponentInParent<GraphView>();
+            RealityFlowAPI.Instance.RemoveNodeFromGraph(view.Graph, Index);
+            view.MarkDirty();
+        }
+
         void Render()
         {
             ClearChildren(fields);
@@ -141,7 +148,7 @@ namespace RealityFlow.NodeUI
                 outputExecutionPorts.Add(portScript);
             }
 
-            for (int i = 0;  i < Node.Definition.Inputs.Count;  i++)
+            for (int i = 0; i < Node.Definition.Inputs.Count; i++)
             {
                 var def = Node.Definition.Inputs[i];
                 GameObject port = Instantiate(inputPortPrefab, inputPorts);

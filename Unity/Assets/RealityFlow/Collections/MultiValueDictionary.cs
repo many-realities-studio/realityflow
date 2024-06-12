@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UnityEngine;
 
 namespace RealityFlow.Collections
@@ -27,6 +28,18 @@ namespace RealityFlow.Collections
             list.Add(value);
         }
 
+        public bool TryGetValues(TKey key, out ImmutableList<TValue> values)
+        {
+            if (dict.TryGetValue(key, out List<TValue> vals))
+            {
+                values = vals.ToImmutableList();
+                return true;
+            }
+
+            values = null;
+            return false;
+        }
+
         public bool Remove(TKey key, TValue value)
         {
             if (dict.TryGetValue(key, out List<TValue> values))
@@ -42,6 +55,8 @@ namespace RealityFlow.Collections
             return false;
         }
 
+        public bool RemoveAll(TKey key) => dict.Remove(key);
+
         public bool Contains(TKey key, TValue value)
         {
             return dict.TryGetValue(key, out List<TValue> values) && values.Contains(value);
@@ -56,6 +71,6 @@ namespace RealityFlow.Collections
         IEnumerator IEnumerable.GetEnumerator()
             => dict.GetEnumerator();
 
-        public List<TValue> this[TKey key] => GetOrCreateList(key);
+        public ImmutableList<TValue> this[TKey key] => GetOrCreateList(key).ToImmutableList();
     }
 }

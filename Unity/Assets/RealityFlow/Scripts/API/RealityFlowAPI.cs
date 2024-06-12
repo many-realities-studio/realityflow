@@ -235,6 +235,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
     }
 
+    public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
+    {
+        Graph.NodeMemory nodeMem = graph.GetMemory(node);
+        List<(PortIndex, PortIndex)> dataEdges = new();
+        List<(PortIndex, NodeIndex)> execEdges = new();
+        graph.EdgesOf(node, dataEdges, execEdges);
+        graph.RemoveNode(node);
+        actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
+        Debug.Log("Removed node from graph");
+    }
+
     public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
     {
         if (!graph.TryAddEdge(from.Node, from.Port, to.Node, to.Port))
@@ -418,6 +429,22 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 NodeIndex index = (NodeIndex)action.Parameters[2];
 
                 graph.RemoveNode(index);
+                break;
+
+            case nameof(RemoveNodeFromGraph):
+                graph = (Graph)action.Parameters[0];
+                Graph.NodeMemory mem = (Graph.NodeMemory)action.Parameters[1];
+                List<(PortIndex, PortIndex)> data = (List<(PortIndex, PortIndex)>)action.Parameters[2];
+                List<(PortIndex, NodeIndex)> exec = (List<(PortIndex, NodeIndex)>)action.Parameters[3];
+
+                graph.RememberNode(mem, out _);
+                foreach ((PortIndex fromData, PortIndex toData) in data)
+                    if (!graph.TryAddEdge(fromData.Node, fromData.Port, toData.Node, toData.Port))
+                        Debug.LogError("Failed to restore edge of deleted node");
+                foreach ((PortIndex fromExec, NodeIndex toExec) in exec)
+                    if (!graph.TryAddExecutionEdge(fromExec.Node, fromExec.Port, toExec))
+                        Debug.LogError("Failed to restore execution edge of deleted node");
+
                 break;
 
             case nameof(AddDataEdgeToGraph):

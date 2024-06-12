@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -88,11 +89,6 @@ namespace RealityFlow.NodeGraph
             nodeOutputCache[new(node, port)] = value;
         }
 
-        void SetNullOutput(NodeIndex node, int port)
-        {
-            nodeOutputCache[new(node, port)] = null;
-        }
-
         public T GetGraphOutput<T>(ReadonlyGraph graph, int outputPort)
         {
             if (!graphOutputCache.TryGetValue((graph, outputPort), out object output))
@@ -114,7 +110,7 @@ namespace RealityFlow.NodeGraph
         {
             NodeIndex node = nodeStack[^1];
             ReadonlyGraph graph = graphStack.Peek();
-            List<NodeIndex> nodes = graph.GetExecutionInputPortsOf(new(node, port));
+            ImmutableList<NodeIndex> nodes = graph.GetExecutionInputPortsOf(new(node, port));
             for (int i = 0; i < nodes.Count; i++)
                 QueueNode(nodes[i]);
         }
