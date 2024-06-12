@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace RealityFlow.Collections
     /// A simple wrapper over a Dictionary<Key, List<Value>> which is also serializable.
     /// </summary>
     [Serializable]
-    public class MultiValueDictionary<TKey, TValue>
+    public class MultiValueDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, List<TValue>>>
     {
         [SerializeField]
         SerializableDict<TKey, List<TValue>> dict = new();
@@ -25,6 +26,12 @@ namespace RealityFlow.Collections
             List<TValue> list = GetOrCreateList(key);
             list.Add(value);
         }
+
+        public IEnumerator<KeyValuePair<TKey, List<TValue>>> GetEnumerator()
+            => dict.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => dict.GetEnumerator();
 
         public List<TValue> this[TKey key] => GetOrCreateList(key);
     }

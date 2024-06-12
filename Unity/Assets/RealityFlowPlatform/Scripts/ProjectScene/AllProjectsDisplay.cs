@@ -1,7 +1,6 @@
 // Purpose: This script is responsible for displaying all the projects available on the platform.
 using GraphQL;
 using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,8 +10,6 @@ using TMPro;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.UI;
-using Ubiq.Rooms;
-using Ubiq.Messaging;
 
 public class ProjectDisplay : MonoBehaviour
 {

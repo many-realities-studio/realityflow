@@ -44,6 +44,9 @@ namespace Ubiq.Voip.Implementations.Unity
         private bool microphoneAuthorized;
         private AudioStatsFilter statsFilter;
 
+        //RealityFlow added flag to track mute state
+        private bool isMuted = false;
+
         private void Awake()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -68,11 +71,22 @@ namespace Ubiq.Voip.Implementations.Unity
                 }
             }
 #endif
+            //RealityFlow added logic
+            if (isMuted)
+            {
+                // If muted, stop the audio source if it's running
+                if (audioSource != null && audioSource.isPlaying)
+                {
+                    audioSource.Stop();
+                    Debug.Log("Microphone is muted. Audio source stopped.");
+                }
+                return;
+            }
 
             if (state == State.Idle && users.Count > 0)
             {
                 RequireAudioSource();
-                audioSource.clip = Microphone.Start("",true,1,AudioSettings.outputSampleRate);
+                audioSource.clip = Microphone.Start("", true, 1, AudioSettings.outputSampleRate);
             }
 
             if (state == State.Starting)
@@ -96,6 +110,44 @@ namespace Ubiq.Voip.Implementations.Unity
             }
         }
 
+        //Mute and Unmute are RealityFlow added functions
+
+        public void Mute()
+        {
+            isMuted = true;
+            Debug.Log("Microphone muted.");
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+                Debug.Log("Audio source stopped due to muting.");
+            }
+        }
+
+        public void Unmute()
+        {
+            isMuted = false;
+            Debug.Log("Microphone unmuted.");
+            if (audioSource != null)
+            {
+                if (!Microphone.IsRecording(null))
+                {
+                    Debug.Log("Restarting microphone.");
+                    audioSource.clip = Microphone.Start("", true, 1, AudioSettings.outputSampleRate);
+                    while (!(Microphone.GetPosition(null) > 0)) { } // Wait until the recording has started
+                    audioSource.Play();
+                }
+                else
+                {
+                    audioSource.Play();
+                    Debug.Log("Audio source started playing due to unmuting.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Audio source is null in Unmute.");
+            }
+        }
+
         private void StatsFilter_StatsPushed(AudioStats stats)
         {
             statsPushed?.Invoke(stats);
@@ -103,7 +155,7 @@ namespace Ubiq.Voip.Implementations.Unity
 
         private void RequireAudioSource()
         {
-            if(!audioSource)
+            if (!audioSource)
             {
                 audioSource = GetComponent<AudioSource>();
 
@@ -117,12 +169,6 @@ namespace Ubiq.Voip.Implementations.Unity
             }
         }
 
-        /// <summary>
-        /// Indicate a new user to the microphone, with an optional callback
-        /// for audio stats. If run as part of a coroutine, this will complete
-        /// when the microphone is ready to be used. If the user has already
-        /// been added, the callback will be replaced.
-        /// </summary>
         public IEnumerator AddUser(GameObject user)
         {
             if (!users.Contains(user))
@@ -136,10 +182,6 @@ namespace Ubiq.Voip.Implementations.Unity
             }
         }
 
-        /// <summary>
-        /// Remove a user from the microphone. If user count reaches zero, the
-        /// microphone will be stopped.
-        /// </summary>
         public void RemoveUser(GameObject user)
         {
             users.Remove(user);

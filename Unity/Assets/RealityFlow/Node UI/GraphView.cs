@@ -1,15 +1,21 @@
+using System.Collections.Generic;
 using System.Linq;
 using RealityFlow.NodeGraph;
 using UnityEngine;
+using Microsoft.MixedReality.Toolkit.Data;
 
 namespace RealityFlow.NodeUI
 {
-    class GraphView : MonoBehaviour
+    public class GraphView : MonoBehaviour
     {
         Graph graph;
         public Graph Graph
         {
-            get => graph;
+            get
+            {
+                graph ??= new();
+                return graph;
+            }
             set
             {
                 graph = value;
@@ -18,21 +24,52 @@ namespace RealityFlow.NodeUI
         }
 
         public GameObject nodeUIPrefab;
+        public GameObject edgeUIPrefab;
 
-        void Start()
+        bool dirty;
+        Dictionary<NodeIndex, GameObject> nodeUis = new();
+        Dictionary<(PortIndex, PortIndex), GameObject> dataEdgeUis = new();
+        Dictionary<(PortIndex, NodeIndex), GameObject> execEdgeUis = new();
+
+        void Update()
         {
-            graph ??= new();
+            if (dirty)
+            {
+                Render();
+                dirty = false;
+            }
         }
 
-        void Render()
+        public void MarkDirty()
+        {
+            dirty = true;
+        }
+
+        public void Render()
         {
             foreach (Transform child in transform)
                 Destroy(child.gameObject);
 
-            foreach (Node node in graph.Nodes)
+            nodeUis.Clear();
+            dataEdgeUis.Clear();
+            execEdgeUis.Clear();
+
+            foreach (KeyValuePair<NodeIndex, Node> kv in graph.Nodes)
             {
+                NodeIndex key = kv.Key;
+                Node node = kv.Value;
                 GameObject nodeUi = Instantiate(nodeUIPrefab, transform);
                 nodeUi.GetComponent<NodeView>().Node = node;
+
+                nodeUis.Add(key, nodeUi);
+            }
+
+            foreach (KeyValuePair<PortIndex, PortIndex> edge in graph.Edges)
+            {
+                GameObject edgeUi = Instantiate(edgeUIPrefab, transform);
+                EdgeView view = edgeUi.GetComponent<EdgeView>();
+
+                dataEdgeUis.Add((edge.Key, edge.Value), edgeUi);
             }
         }
     }

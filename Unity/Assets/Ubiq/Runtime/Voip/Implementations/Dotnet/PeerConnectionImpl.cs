@@ -12,6 +12,8 @@ namespace Ubiq.Voip.Implementations.Dotnet
 {
     public class PeerConnectionImpl : IPeerConnectionImpl
     {
+        private PeerConnectionMicrophone microphone;
+
         private class Event
         {
             // Ideally we'd let the implementation guide us on when to negotiate
@@ -26,7 +28,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
             public readonly Type type;
             public readonly string json;
 
-            public Event(string json) : this(Type.SignalingMessage,json) { }
+            public Event(string json) : this(Type.SignalingMessage, json) { }
             public Event(Type type, string json = null, RTCIceCandidate iceCandidate = null)
             {
                 this.type = type;
@@ -87,7 +89,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
             if (ctx != null && ctx.behaviour)
             {
-                foreach(var coroutine in coroutinesForCleanup)
+                foreach (var coroutine in coroutinesForCleanup)
                 {
                     ctx.behaviour.StopCoroutine(coroutine);
                 }
@@ -139,12 +141,12 @@ namespace Ubiq.Voip.Implementations.Dotnet
             RequireSource();
             RequireSink();
 
-            setupTask = Task.Run(() => DoSetup(polite,iceServersCopy));
+            setupTask = Task.Run(() => DoSetup(polite, iceServersCopy));
 
             coroutinesForCleanup.Add(ctx.behaviour.StartCoroutine(DoUpdate()));
         }
 
-        private void RequireSource ()
+        private void RequireSource()
         {
             if (source != null)
             {
@@ -179,7 +181,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
             source.statsPushed += Source_StatsPushed;
         }
 
-        private void RequireSink ()
+        private void RequireSink()
         {
             if (sink != null)
             {
@@ -208,17 +210,17 @@ namespace Ubiq.Voip.Implementations.Dotnet
             sink.statsPushed += Sink_StatsPushed;
         }
 
-        public void ProcessSignalingMessage (string json)
+        public void ProcessSignalingMessage(string json)
         {
             events.Enqueue(new Event(json));
         }
 
-        private void Source_StatsPushed (AudioStats stats)
+        private void Source_StatsPushed(AudioStats stats)
         {
             ctx.recordStatsPushed?.Invoke(stats);
         }
 
-        private void Sink_StatsPushed (AudioStats stats)
+        private void Sink_StatsPushed(AudioStats stats)
         {
             ctx.playbackStatsPushed?.Invoke(stats);
         }
@@ -233,13 +235,15 @@ namespace Ubiq.Voip.Implementations.Dotnet
                 if (string.IsNullOrEmpty(iceServers[i].username) ||
                     string.IsNullOrEmpty(iceServers[i].password))
                 {
-                    ssIceServers.Add(new RTCIceServer {
+                    ssIceServers.Add(new RTCIceServer
+                    {
                         urls = iceServers[i].uri
                     });
                 }
                 else
                 {
-                    ssIceServers.Add(new RTCIceServer {
+                    ssIceServers.Add(new RTCIceServer
+                    {
                         urls = iceServers[i].uri,
                         username = iceServers[i].username,
                         credential = iceServers[i].password,
@@ -263,14 +267,14 @@ namespace Ubiq.Voip.Implementations.Dotnet
             {
                 mainThreadActions.Enqueue(() =>
                 {
-                    switch(state)
+                    switch (state)
                     {
-                        case RTCPeerConnectionState.closed : ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.closed); break;
-                        case RTCPeerConnectionState.failed : ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.failed); break;
-                        case RTCPeerConnectionState.disconnected : ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.disconnected); break;
-                        case RTCPeerConnectionState.@new : ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.@new); break;
-                        case RTCPeerConnectionState.connecting : ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.connecting); break;
-                        case RTCPeerConnectionState.connected : ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.connected); break;
+                        case RTCPeerConnectionState.closed: ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.closed); break;
+                        case RTCPeerConnectionState.failed: ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.failed); break;
+                        case RTCPeerConnectionState.disconnected: ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.disconnected); break;
+                        case RTCPeerConnectionState.@new: ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.@new); break;
+                        case RTCPeerConnectionState.connecting: ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.connecting); break;
+                        case RTCPeerConnectionState.connected: ctx.peerConnectionStateChanged?.Invoke(PeerConnectionState.connected); break;
                     }
                 });
 
@@ -310,14 +314,14 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
             pc.oniceconnectionstatechange += (state) => mainThreadActions.Enqueue(() =>
             {
-                switch(state)
+                switch (state)
                 {
-                    case RTCIceConnectionState.closed : ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.closed); break;
-                    case RTCIceConnectionState.failed : ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.failed); break;
-                    case RTCIceConnectionState.disconnected : ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.disconnected); break;
-                    case RTCIceConnectionState.@new : ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.@new); break;
-                    case RTCIceConnectionState.checking : ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.checking); break;
-                    case RTCIceConnectionState.connected : ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.connected); break;
+                    case RTCIceConnectionState.closed: ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.closed); break;
+                    case RTCIceConnectionState.failed: ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.failed); break;
+                    case RTCIceConnectionState.disconnected: ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.disconnected); break;
+                    case RTCIceConnectionState.@new: ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.@new); break;
+                    case RTCIceConnectionState.checking: ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.checking); break;
+                    case RTCIceConnectionState.connected: ctx.iceConnectionStateChanged?.Invoke(IceConnectionState.connected); break;
                 }
             });
 
@@ -328,7 +332,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
         private IEnumerator DoUpdate()
         {
-            while(setupTask == null || !setupTask.IsCompleted)
+            while (setupTask == null || !setupTask.IsCompleted)
             {
                 yield return null;
             }
@@ -336,10 +340,10 @@ namespace Ubiq.Voip.Implementations.Dotnet
             peerConnection = setupTask.Result;
 
             // Send id message as this implementation needs special workarounds
-            Send(implementation:"dotnet");
+            Send(implementation: "dotnet");
 
             var time = Time.realtimeSinceStartup;
-            while(true)
+            while (true)
             {
                 while (mainThreadActions.TryDequeue(out Action action))
                 {
@@ -433,7 +437,7 @@ namespace Ubiq.Voip.Implementations.Dotnet
         {
             if (hasSentLocalSdp)
             {
-                InternalSend(ctx.context,ic);
+                InternalSend(ctx.context, ic);
             }
             else
             {
@@ -443,13 +447,13 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
         private void Send(RTCSessionDescription sd)
         {
-            InternalSend(ctx.context,sd);
+            InternalSend(ctx.context, sd);
             hasSentLocalSdp = true;
             while (bufferedIceCandidates.Count > 0)
             {
                 var ic = bufferedIceCandidates[0];
                 bufferedIceCandidates.RemoveAt(0);
-                InternalSend(ctx.context,ic);
+                InternalSend(ctx.context, ic);
             }
         }
 
@@ -480,25 +484,25 @@ namespace Ubiq.Voip.Implementations.Dotnet
 
         private static string SdpTypeToString(RTCSdpType type)
         {
-            switch(type)
+            switch (type)
             {
-                case RTCSdpType.answer : return "answer";
-                case RTCSdpType.offer : return "offer";
-                case RTCSdpType.pranswer : return "pranswer";
-                case RTCSdpType.rollback : return "rollback";
-                default : return null;
+                case RTCSdpType.answer: return "answer";
+                case RTCSdpType.offer: return "offer";
+                case RTCSdpType.pranswer: return "pranswer";
+                case RTCSdpType.rollback: return "rollback";
+                default: return null;
             }
         }
 
         private static RTCSdpType StringToSdpType(string type)
         {
-            switch(type)
+            switch (type)
             {
-                case "answer" : return RTCSdpType.answer;
-                case "offer" : return RTCSdpType.offer;
-                case "pranswer" : return RTCSdpType.pranswer;
-                case "rollback" : return RTCSdpType.rollback;
-                default : return RTCSdpType.offer;
+                case "answer": return RTCSdpType.answer;
+                case "offer": return RTCSdpType.offer;
+                case "pranswer": return RTCSdpType.pranswer;
+                case "rollback": return RTCSdpType.rollback;
+                default: return RTCSdpType.offer;
             }
         }
 
@@ -546,8 +550,24 @@ namespace Ubiq.Voip.Implementations.Dotnet
         {
             if (sink != null)
             {
-                sink.UpdateSpatialization(sourcePosition,sourceRotation,
-                    listenerPosition,listenerRotation);
+                sink.UpdateSpatialization(sourcePosition, sourceRotation,
+                    listenerPosition, listenerRotation);
+            }
+        }
+        //MuteMicrophone and UnmuteMicrophone are RealityFlow added functions
+        public void MuteMicrophone()
+        {
+            if (microphone != null)
+            {
+                microphone.Mute();
+            }
+        }
+
+        public void UnmuteMicrophone()
+        {
+            if (microphone != null)
+            {
+                microphone.Unmute();
             }
         }
     }

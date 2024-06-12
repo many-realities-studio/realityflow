@@ -58,4 +58,25 @@ public class EnvConfigManager : MonoBehaviour
             Debug.LogWarning(".env file not found.");
         }
     }
+
+    public void UpdateApiKey(string newApiKey)
+    {
+        OpenAIApiKey = newApiKey;
+        Environment.SetEnvironmentVariable("OPENAI_API_KEY", newApiKey);
+        WriteEnvFile();
+        Debug.Log("API key updated: " + newApiKey);
+    }
+
+    private void WriteEnvFile()
+    {
+        string envPath = Path.Combine(Application.dataPath, "../.env");
+        var envLines = new[]
+        {
+            $"OPENAI_API_KEY={OpenAIApiKey}",
+            $"OPENAI_ORGANIZATION={OpenAIOrganization}"
+        };
+
+        File.WriteAllLines(envPath, envLines);
+        Debug.Log(".env file updated.");
+    }
 }

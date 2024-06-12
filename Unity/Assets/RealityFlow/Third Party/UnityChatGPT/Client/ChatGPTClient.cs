@@ -44,8 +44,23 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
             string organization = EnvConfigManager.Instance.OpenAIOrganization;
 
             // Set the request headers
-            request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
-            request.SetRequestHeader("OpenAI-Organization", organization);
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+            }
+            else
+            {
+                Debug.LogError("API key is null or empty.");
+            }
+
+            if (!string.IsNullOrEmpty(organization))
+            {
+                request.SetRequestHeader("OpenAI-Organization", organization);
+            }
+            else
+            {
+                Debug.LogWarning("OpenAI-Organization is null or empty.");
+            }
 
             var requestStartDateTime = DateTime.Now;
 
@@ -53,7 +68,7 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.DataProcessingError)
             {
-                Debug.Log(request.error);
+                Debug.LogError("Request error: " + request.error);
             }
             else
             {
