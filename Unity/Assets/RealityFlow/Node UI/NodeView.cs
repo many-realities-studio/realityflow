@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.AffordanceSystem.Receiver.Primitives;
 
 namespace RealityFlow.NodeUI
 {
@@ -28,7 +29,7 @@ namespace RealityFlow.NodeUI
         Node Node => nodeInfo.value;
 
         static Dictionary<NodeValueType, GameObject> _fieldPrefabs;
-        static Dictionary<NodeValueType, GameObject> FieldPrefabs
+        public static Dictionary<NodeValueType, GameObject> FieldPrefabs
         {
             get
             {
@@ -49,35 +50,13 @@ namespace RealityFlow.NodeUI
                 [NodeValueType.Vector3] = Resources.Load<GameObject>(basePath + "Vector3 Editor"),
                 [NodeValueType.String] = Resources.Load<GameObject>(basePath + "String Editor"),
                 [NodeValueType.GameObject] = Resources.Load<GameObject>(basePath + "GameObject Editor"),
+                [NodeValueType.Any] = Resources.Load<GameObject>(basePath + "Any Editor"),
+                [NodeValueType.Bool] = Resources.Load<GameObject>(basePath + "Bool Editor"),
             };
         }
 
-        static Dictionary<NodeValueType, GameObject> _inputPortPrefabs;
-        static Dictionary<NodeValueType, GameObject> InputPortPrefabs
-        {
-            get
-            {
-                if (_inputPortPrefabs is null)
-                    InitInputPortPrefabs();
-                return _inputPortPrefabs;
-            }
-        }
-
-        static void InitInputPortPrefabs()
-        {
-            const string basePath = "NodeUI/InputPorts/";
-            _inputPortPrefabs = new()
-            {
-                [NodeValueType.Int] = Resources.Load<GameObject>(basePath + "Integer Port"),
-                [NodeValueType.Float] = Resources.Load<GameObject>(basePath + "Float Port"),
-                [NodeValueType.Vector2] = Resources.Load<GameObject>(basePath + "Vector2 Port"),
-                [NodeValueType.Vector3] = Resources.Load<GameObject>(basePath + "Vector3 Port"),
-                [NodeValueType.String] = Resources.Load<GameObject>(basePath + "String Port"),
-                [NodeValueType.GameObject] = Resources.Load<GameObject>(basePath + "GameObject Port"),
-                [NodeValueType.Any] = Resources.Load<GameObject>(basePath + "Any Port"),
-            };
-        }
-
+        [SerializeField]
+        GameObject inputPortPrefab;
         [SerializeField]
         GameObject outputPortPrefab;
         [SerializeField]
@@ -103,6 +82,14 @@ namespace RealityFlow.NodeUI
         [NonSerialized]
         public List<OutputExecutionPort> outputExecutionPorts = new();
 
+        public void Move()
+        {
+            RectTransform rect = (RectTransform)transform;
+            Vector2 pos = rect.localPosition;
+            GraphView view = GetComponentInParent<GraphView>();
+            RealityFlowAPI.Instance.SetNodePosition(view.Graph, Index, pos);
+        }
+
         void Render()
         {
             ClearChildren(fields);
@@ -115,6 +102,11 @@ namespace RealityFlow.NodeUI
             outputExecutionPorts.Clear();
 
             title.text = Node.Definition.Name;
+            transform.localPosition = new(
+                Node.Position.x,
+                Node.Position.y,
+                transform.localPosition.z
+            );
 
             for (int i = 0; i < Node.Definition.Fields.Count; i++)
             {
@@ -149,22 +141,26 @@ namespace RealityFlow.NodeUI
                 outputExecutionPorts.Add(portScript);
             }
 
-            foreach (var def in Node.Definition.Inputs)
+            for (int i = 0;  i < Node.Definition.Inputs.Count;  i++)
             {
-                GameObject port = Instantiate(InputPortPrefabs[def.Type], inputPorts);
+                var def = Node.Definition.Inputs[i];
+                GameObject port = Instantiate(inputPortPrefab, inputPorts);
 
                 InputPortView view = port.GetComponent<InputPortView>();
                 view.Definition = def;
+                view.port = new(Index, i);
 
                 inputPortViews.Add(view);
             }
 
-            foreach (var def in Node.Definition.Outputs)
+            for (int i = 0; i < Node.Definition.Outputs.Count; i++)
             {
+                var def = Node.Definition.Outputs[i];
                 GameObject port = Instantiate(outputPortPrefab, outputPorts);
 
                 OutputPortView view = port.GetComponent<OutputPortView>();
                 view.Definition = def;
+                view.port = new(Index, i);
 
                 outputPortViews.Add(view);
             }

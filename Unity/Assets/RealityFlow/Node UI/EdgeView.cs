@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 public class EdgeView : MonoBehaviour
 {
@@ -53,9 +54,7 @@ public class EdgeView : MonoBehaviour
 
     public void Update()
     {
-        if (target1PosLastFrame != target1.position)
-            Render();
-        if (target2PosLastFrame != target2.position)
+        if (target1PosLastFrame != target1.position || target2PosLastFrame != target2.position)
             Render();
 
         target1PosLastFrame = transform.position;
@@ -70,6 +69,9 @@ public class EdgeView : MonoBehaviour
         EnsureValidPointArray();
 
         Assert.IsFalse(line.useWorldSpace, "Line renderers for edge views should use local space");
+
+        Vector3 centerPoint = (target1.position + target2.position) / 2;
+        transform.position = centerPoint;
 
         GeneratePoints();
 

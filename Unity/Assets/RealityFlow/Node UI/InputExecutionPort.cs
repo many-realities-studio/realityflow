@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using RealityFlow.NodeGraph;
+using TMPro;
 using UnityEngine;
 
 namespace RealityFlow.NodeUI

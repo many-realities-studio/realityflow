@@ -227,17 +227,45 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void AddNodeToGraph(Graph graph, NodeDefinition def)
     {
+        // TODO: Add node to GraphQL
         NodeIndex index = graph.AddNode(def);
         actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
     }
 
+    public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
+    {
+        if (!graph.TryAddEdge(from.Node, from.Port, to.Node, to.Port))
+        {
+            Debug.LogError("Failed to add edge");
+            return;
+        }
+        actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
+        Debug.Log($"Adding edge at {from}:{to}");
+    }
+
     public void AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex to)
     {
         if (!graph.TryAddExecutionEdge(from.Node, from.Port, to))
+        {
             Debug.LogError("Failed to add edge");
+            return;
+        }
         actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
+    }
+
+    public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
+    {
+        if (!graph.ContainsNode(node))
+        {
+            Debug.LogError("Failed to move node because it does not exist");
+            return;
+        }
+        Vector2 prevPosition = graph.GetNode(node).Position;
+        graph.GetNode(node).Position = position;
+        actionLogger.LogAction(nameof(SetNodePosition), graph, node, prevPosition, position);
+        Debug.Log($"Moved node {node} to {position}");
     }
 
 #if UNITY_EDITOR
@@ -376,11 +404,27 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 graph.RemoveNode(index);
                 break;
 
+            case nameof(AddDataEdgeToGraph):
+                graph = (Graph)action.Parameters[0];
+                (PortIndex from, PortIndex to) = ((PortIndex, PortIndex))action.Parameters[1];
+                
+                graph.RemoveDataEdge(from, to);
+                break;
+
             case nameof(AddExecEdgeToGraph):
                 graph = (Graph)action.Parameters[0];
                 (PortIndex port, NodeIndex node) = ((PortIndex, NodeIndex))action.Parameters[1];
 
                 graph.RemoveExecutionEdge(port, node);
+                break;
+
+            case nameof(SetNodePosition):
+                graph = (Graph)action.Parameters[0];
+                node = (NodeIndex)action.Parameters[1];
+                Vector2 prevPos = (Vector2)action.Parameters[2];
+                Vector2 pos = (Vector2)action.Parameters[3];
+
+                graph.GetNode(node).Position = prevPos;
                 break;
 
                 // Add cases for other functions...

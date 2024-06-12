@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Org.BouncyCastle.Asn1.Ess;
 using RealityFlow.Collections;
 using UnityEngine;
 
@@ -119,6 +120,9 @@ namespace RealityFlow.NodeGraph
             return nodes[index];
         }
 
+        public bool ContainsNode(NodeIndex index)
+            => nodes.Contains(index);
+
         /// <summary>
         /// Attempts to add an edge between two node ports. Fails under the following conditions:
         /// <list type="bullet">
@@ -142,6 +146,18 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         public bool TryAddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
         {
+            if (!CanAddEdge(from, fromPort, to, toPort))
+                return false;
+
+            reverseEdges.Add(new(to, toPort), new(from, fromPort));
+            return true;
+        }
+
+        public bool CanAddEdge(NodeIndex from, int fromPort, NodeIndex to, int toPort)
+        {
+            PortIndex fromIdx = new(from, fromPort);
+            PortIndex toIdx = new(to, toPort);
+
             if (from == to)
                 return false;
 
@@ -153,12 +169,28 @@ namespace RealityFlow.NodeGraph
             if (toPort >= toNode.Definition.Inputs.Count)
                 return false;
 
-            if (NodeValue.IsNotAssignableTo(
-                fromNode.Definition.Outputs[fromPort].Type,
-                toNode.Definition.Inputs[toPort].Type)
-            )
+            if (!PortsCompatible(fromIdx, toIdx))
                 return false;
 
+            if (EdgeWouldFormCycle(from, to))
+                return false;
+
+            if (EdgeExists(fromIdx, toIdx))
+                return false;
+
+            return true;
+        }
+
+        public bool PortsCompatible(PortIndex from, PortIndex to)
+        {
+            return NodeValue.IsAssignableTo(
+                GetNode(from.Node).Definition.Outputs[from.Port].Type,
+                GetNode(to.Node).Definition.Inputs[to.Port].Type
+            );
+        }
+
+        public bool EdgeWouldFormCycle(NodeIndex from, NodeIndex to)
+        {
             // Note: This is probably not the most efficient way to do this check.
             // For maximum efficiency, a data structure similar to the following could be used:
             // https://www.sciencedirect.com/science/article/pii/S030439751000616X?ref=pdf_download&fr=RR-2&rr=885f16a41e862888
@@ -168,21 +200,23 @@ namespace RealityFlow.NodeGraph
             // This idea would probably take too long to implement for the time being so it's being
             // put off, especially as graph edits should be relatively rare (relative to the 
             // number of frames where one does not occur).
-            if (DepthFirstSearch(to, from))
-                return false;
+            return DepthFirstSearch(to, from);
+        }
 
-            if (reverseEdges.Contains(new(new(to, toPort), new(from, fromPort))))
-                return false;
-
-            reverseEdges.Add(new(to, toPort), new(from, fromPort));
-            return true;
+        public bool EdgeExists(PortIndex from, PortIndex to)
+        {
+            return reverseEdges.Contains(new(from, to));
         }
 
         /// <summary>
         /// Returns true if `target` is reachable from `from` by data or execution edges.
+        /// Also returns true if from == target.
         /// </summary>
         bool DepthFirstSearch(NodeIndex from, NodeIndex target)
         {
+            if (from == target)
+                return true;
+
             // because execution edges and data edges go in opposite directions, two DFS's are required.
             HashSet<NodeIndex> visited = new();
             Stack<NodeIndex> stack = new();
@@ -263,15 +297,25 @@ namespace RealityFlow.NodeGraph
             if (!GetNode(to).Definition.ExecutionInput)
                 return false;
 
-            if (DepthFirstSearch(to, from))
+            if (EdgeWouldFormCycle(from, to))
                 return false;
 
-            if (executionEdges.Contains(new(from, fromPort), to))
+            if (ExecEdgeExists(new(from, fromPort), to))
                 return false;
 
             executionEdges.Add(new(from, fromPort), to);
 
             return true;
+        }
+
+        public bool ExecEdgeExists(PortIndex from, NodeIndex to)
+        {
+            return executionEdges.Contains(from, to);
+        }
+
+        public void RemoveDataEdge(PortIndex from, PortIndex to)
+        {
+            reverseEdges.Remove(to);
         }
 
         public void RemoveExecutionEdge(PortIndex from, NodeIndex to)

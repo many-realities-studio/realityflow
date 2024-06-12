@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using RealityFlow.NodeGraph;
@@ -19,14 +20,36 @@ namespace RealityFlow.NodeUI
             }
         }
 
-        [SerializeField]
-        IntegerEditor editor;
+        [NonSerialized]
+        public PortIndex port;
 
+        [SerializeField]
+        Transform editorParent;
         public Transform edgeTarget;
+
+        IValueEditor editor;
+        bool init;
+
+        public void Select()
+        {
+            GraphView view = GetComponentInParent<GraphView>();
+            view.SelectInputPort(port);
+        }
+
+        void Init()
+        {
+            GameObject editorPrefab = NodeView.FieldPrefabs[def.Type];
+            editor = Instantiate(editorPrefab, editorParent).GetComponent<IValueEditor>();
+
+            init = true;
+        }
 
         void Render()
         {
-            // editor.Name = Definition.Name;
+            if (!init)
+                Init();
+
+            editor.Name.text = Definition.Name;
         }
     }
 }

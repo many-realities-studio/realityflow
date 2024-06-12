@@ -223,6 +223,12 @@ namespace RealityFlow.NodeGraph
             _ => throw new ArgumentException(),
         };
 
+        public static NodeValue Null => new()
+        {
+            value = null,
+            type = NodeValueType.Any,
+        };
+
         public void OnBeforeSerialize()
         {
             if (value is null || GetValueType() != Value.GetType())

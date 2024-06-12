@@ -59,7 +59,6 @@ namespace RealityFlow.NodeUI
             nodeUis.Clear();
             dataEdgeUis.Clear();
             execEdgeUis.Clear();
-            ClearSelectedEdgeEnds();
 
             foreach ((NodeIndex index, Node node) in graph.Nodes)
             {
@@ -101,7 +100,11 @@ namespace RealityFlow.NodeUI
 
                     view.target1 = fromPortView.edgeTarget;
                     view.target2 = toPortView.edgeTarget;
+
+                    execEdgeUis.Add((from, to), view);
                 }
+
+            SetPortsActive();
         }
 
         void ClearSelectedEdgeEnds()
@@ -110,34 +113,105 @@ namespace RealityFlow.NodeUI
             selectedOutputEdgePort = null;
             selectedInputExecEdgePort = null;
             selectedOutputExecEdgePort = null;
-
-            EnableAllPorts();
         }
 
-        void EnableAllPorts()
+        /// <summary>
+        /// Reasons a port will be disabled:
+        /// <list>
+        /// <item>
+        /// The selected port isn't also data/execution
+        /// </item>
+        /// <item>
+        /// Side mismatch (in/out)
+        /// </item>
+        /// <item>
+        /// Data type mismatch
+        /// </item>
+        /// <item>
+        /// The combined port edge already exists
+        /// </item>
+        /// <item>
+        /// The edge would form a cycle
+        /// </item>
+        /// </list>
+        /// </summary>
+        void SetPortsActive()
         {
+            bool noneSelected =
+                selectedInputEdgePort == null &&
+                selectedOutputEdgePort == null &&
+                selectedInputExecEdgePort == null &&
+                selectedOutputExecEdgePort == null;
             foreach ((NodeIndex index, NodeView view) in nodeUis)
             {
-                // foreach (var port in view.inputPortViews)
-                //     port.GetComponent<PressableButton>().enabled = true;
-                // foreach (var port in view.outputPortViews)
-                //     port.GetComponent<PressableButton>().enabled = true;
+                foreach (var port in view.inputPortViews)
+                    port.GetComponent<PressableButton>().enabled =
+                        noneSelected ||
+                        (
+                            selectedOutputEdgePort is PortIndex from
+                            && graph.PortsCompatible(from, port.port)
+                            && !graph.EdgeWouldFormCycle(from.Node, port.port.Node)
+                            && !graph.EdgeExists(from, port.port)
+                        );
+
+                foreach (var port in view.outputPortViews)
+                    port.GetComponent<PressableButton>().enabled =
+                        noneSelected ||
+                        (
+                            selectedInputEdgePort is PortIndex to
+                            && graph.PortsCompatible(port.port, to)
+                            && !graph.EdgeWouldFormCycle(port.port.Node, to.Node)
+                            && !graph.EdgeExists(port.port, to)
+                        );
+
                 if (view.inputExecutionPort)
-                    view.inputExecutionPort.GetComponent<PressableButton>().enabled = true;
-                foreach (var p in view.outputExecutionPorts)
-                    p.GetComponent<PressableButton>().enabled = true;
+                    view.inputExecutionPort.GetComponent<PressableButton>().enabled =
+                        noneSelected ||
+                        (
+                            selectedOutputExecEdgePort is PortIndex from
+                            && !graph.EdgeWouldFormCycle(from.Node, index)
+                            && !graph.ExecEdgeExists(from, index)
+                        );
+
+                foreach (var port in view.outputExecutionPorts)
+                    port.GetComponent<PressableButton>().enabled =
+                        noneSelected ||
+                        (
+                            selectedInputExecEdgePort is NodeIndex node
+                            && !graph.EdgeWouldFormCycle(port.port.Node, node)
+                            && !graph.ExecEdgeExists(port.port, node)
+                        );
             }
         }
 
         public void SelectInputPort(PortIndex port)
         {
-            // TODO:
-            // selectedInputEdgePort = port;
+            if (selectedOutputEdgePort is PortIndex otherPort)
+            {
+                DataEdgeConnected(otherPort, port);
+                return;
+            }
+
+            ClearSelectedEdgeEnds();
+
+            selectedInputEdgePort = port;
+
+            SetPortsActive();
         }
 
         public void SelectOutputPort(PortIndex port)
         {
+            if (selectedInputEdgePort is PortIndex otherPort)
+            {
+                DataEdgeConnected(port, otherPort);
+                return;
+            }
 
+            ClearSelectedEdgeEnds();
+
+            selectedOutputEdgePort = port;
+
+            SetPortsActive();
         }
 
         public void SelectInputExecutionPort(NodeIndex node)
@@ -151,15 +225,8 @@ namespace RealityFlow.NodeUI
             ClearSelectedEdgeEnds();
 
             selectedInputExecEdgePort = node;
-            foreach ((NodeIndex index, NodeView view) in nodeUis)
-            {
-                // foreach (var p in view.inputPortViews)
-                //     p.GetComponent<PressableButton>().enabled = false;
-                // foreach (var p in view.outputPortViews)
-                //     p.GetComponent<PressableButton>().enabled = false;
-                if (view.inputExecutionPort)
-                    view.inputExecutionPort.GetComponent<PressableButton>().enabled = false;
-            }
+
+            SetPortsActive();
         }
 
         public void SelectOutputExecutionPort(PortIndex port)
@@ -173,21 +240,23 @@ namespace RealityFlow.NodeUI
             ClearSelectedEdgeEnds();
 
             selectedOutputExecEdgePort = port;
-            foreach ((NodeIndex index, NodeView view) in nodeUis)
-            {
-                // foreach (var p in view.inputPortViews)
-                //     p.GetComponent<PressableButton>().enabled = false;
-                // foreach (var p in view.outputPortViews)
-                //     p.GetComponent<PressableButton>().enabled = false;
-                foreach (var p in view.outputExecutionPorts)
-                    p.GetComponent<PressableButton>().enabled = false;
-            }
+
+            SetPortsActive();
+        }
+
+        public void DataEdgeConnected(PortIndex from, PortIndex to)
+        {
+            RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, from, to);
+            ClearSelectedEdgeEnds();
+            SetPortsActive();
+            MarkDirty();
         }
 
         public void ExecEdgeConnected(PortIndex from, NodeIndex to)
         {
             RealityFlowAPI.Instance.AddExecEdgeToGraph(graph, from, to);
             ClearSelectedEdgeEnds();
+            SetPortsActive();
             MarkDirty();
         }
     }

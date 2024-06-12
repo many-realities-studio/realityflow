@@ -154,7 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d0d659a33534b449b292546399fb3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outputPortPrefab: {fileID: 6235771284156147087, guid: 0486ebee11f1a0b46a289fc2baa23731,
+  inputPortPrefab: {fileID: 3966544123239844846, guid: 66ff4ead756cc5244b4f472f7bce04c1,
+    type: 3}
+  outputPortPrefab: {fileID: 6908741058620860531, guid: 0486ebee11f1a0b46a289fc2baa23731,
     type: 3}
   executionInputPrefab: {fileID: 1833047603766700043, guid: a9818a64610a1704ba6672645920bbba,
     type: 3}
@@ -634,8 +636,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: Node Title
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: fea6b26abeefbc547b6aca1dbda0a34d, type: 2}
+  m_sharedMaterial: {fileID: -2049848100760321927, guid: fea6b26abeefbc547b6aca1dbda0a34d,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -659,8 +662,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 14
+  m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -767,7 +770,7 @@ PrefabInstance:
     - target: {fileID: 5361997495109441036, guid: 2b0eb91d74a1a604da64c50606580053,
         type: 3}
       propertyPath: m_Size.x
-      value: 146.12
+      value: 48.260002
       objectReference: {fileID: 0}
     - target: {fileID: 5361997495109441036, guid: 2b0eb91d74a1a604da64c50606580053,
         type: 3}
@@ -894,6 +897,41 @@ PrefabInstance:
       propertyPath: hostTransform
       value: 
       objectReference: {fileID: 322547854396158195}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7788459948049145155}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Move
+      objectReference: {fileID: 0}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RealityFlow.NodeUI.NodeView, RealityFlow
+      objectReference: {fileID: 0}
+    - target: {fileID: 7952091198289398942, guid: 2b0eb91d74a1a604da64c50606580053,
+        type: 3}
+      propertyPath: m_LastSelectExited.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3284849198104829147, guid: 2b0eb91d74a1a604da64c50606580053, type: 3}
     m_RemovedGameObjects: []

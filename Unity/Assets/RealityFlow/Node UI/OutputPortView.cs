@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using RealityFlow.NodeGraph;
@@ -19,10 +20,19 @@ namespace RealityFlow.NodeUI
             }
         }
 
+        [NonSerialized]
+        public PortIndex port;
+
         [SerializeField]
         TextMeshProUGUI portName;
 
         public Transform edgeTarget;
+
+        public void Select()
+        {
+            GraphView view = GetComponentInParent<GraphView>();
+            view.SelectOutputPort(port);
+        }
 
         void Render()
         {

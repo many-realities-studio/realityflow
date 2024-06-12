@@ -2,16 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit.Data;
+using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
 
 namespace RealityFlow.NodeUI
 {
-    public class FloatEditor : MonoBehaviour, IValueEditor
+    public class BoolEditor : MonoBehaviour, IValueEditor
     {
         [SerializeField]
-        Custom_InputField input;
+        PressableButton button;
         [SerializeField]
         TMP_Text title;
 
@@ -19,28 +20,28 @@ namespace RealityFlow.NodeUI
 
         public Action<NodeValue> OnTick { get; set; }
 
-        public float Value
+        public bool Value
         {
-            get => float.TryParse(input.text, out float val) ? val : default;
-            set => input.text = value.ToString();
+            get => button.IsToggled;
+            set
+            {
+                button.ForceSetToggled(value);
+            }
         }
 
         public NodeValue NodeValue
         {
             set
             {
-                if (value.TryGetValue(out float val))
+                if (value.TryGetValue(out bool val))
                     Value = val;
                 else
                     Debug.LogError("incorrect value type assigned to FloatEditor");
             }
         }
-        
+
         public void Tick()
         {
-            if (!float.TryParse(input.text, out _))
-                input.text = "0";
-
             OnTick(new(Value));
         }
     }

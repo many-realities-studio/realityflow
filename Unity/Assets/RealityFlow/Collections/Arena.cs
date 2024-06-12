@@ -37,6 +37,11 @@ namespace RealityFlow.Collections
             return list.Remove(index);
         }
 
+        public bool Contains(Index index)
+        {
+            return list.ContainsKey(index);
+        }
+
         public IEnumerator<KeyValuePair<Index, T>> GetEnumerator()
         {
             return list.GetEnumerator();
