@@ -15,6 +15,8 @@ public class Logger : Singleton<Logger>
     [SerializeField]
     private int maxLines = 15;
 
+    private int actionCount = 0; // Counter for numbering actions
+
     void Awake()
     {
         if (debugAreaText == null)
@@ -31,7 +33,7 @@ public class Logger : Singleton<Logger>
 
         if (enabled)
         {
-            debugAreaText.text += $"<color=\"white\">{DateTime.Now.ToString("HH:mm:ss.fff")} {this.GetType().Name} enabled</color>\n";
+            debugAreaText.text += $"<color=\"white\">Logger enabled</color>\n";
         }
     }
 
@@ -40,20 +42,20 @@ public class Logger : Singleton<Logger>
     public void LogInfo(string message)
     {
         ClearLines();
-
-        debugAreaText.text += $"<color=\"green\">{DateTime.Now.ToString("HH:mm:ss.fff")} {message}</color>\n";
+        actionCount++;
+        debugAreaText.text += $"<size=150%><color=\"green\">{actionCount}. {message}</color></size>\n";
     }
 
     public void LogError(string message)
     {
         ClearLines();
-        debugAreaText.text += $"<color=\"red\">{DateTime.Now.ToString("HH:mm:ss.fff")} {message}</color>\n";
+        debugAreaText.text += $"<color=\"red\">{message}</color>\n";
     }
 
     public void LogWarning(string message)
     {
         ClearLines();
-        debugAreaText.text += $"<color=\"yellow\">{DateTime.Now.ToString("HH:mm:ss.fff")} {message}</color>\n";
+        debugAreaText.text += $"<color=\"yellow\">{message}</color>\n";
     }
 
     private void ClearLines()
@@ -61,6 +63,7 @@ public class Logger : Singleton<Logger>
         if (debugAreaText.text.Split('\n').Count() >= maxLines)
         {
             debugAreaText.text = string.Empty;
+            actionCount = 0; // Reset action counter when clearing
         }
     }
 }

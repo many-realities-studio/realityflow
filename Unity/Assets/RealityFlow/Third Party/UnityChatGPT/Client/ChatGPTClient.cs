@@ -2,6 +2,7 @@ using DilmerGames.Core.Singletons;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,23 +11,25 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     [SerializeField]
     private ChatGTPSettings chatGTPSettings;
 
+    private List<ChatGPTChatMessage> conversationHistory = new List<ChatGPTChatMessage>();
+
     public IEnumerator Ask(string prompt, Action<ChatGPTResponse> callBack)
     {
         var url = chatGTPSettings.debug ? $"{chatGTPSettings.apiURL}?debug=true" : chatGTPSettings.apiURL;
+
+        // Add the user message to the conversation history
+        conversationHistory.Add(new ChatGPTChatMessage
+        {
+            role = "user",
+            content = prompt
+        });
 
         using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
             var requestParams = JsonConvert.SerializeObject(new ChatGPTRequest
             {
                 Model = chatGTPSettings.apiModel,
-                Messages = new ChatGPTChatMessage[]
-                {
-                    new ChatGPTChatMessage
-                    {
-                         role = "user",
-                         content = prompt
-                    }
-                }
+                Messages = conversationHistory.ToArray() // Pass the conversation history
             });
 
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(requestParams);
@@ -77,6 +80,13 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
                     .CodeCleanUp();
 
                 response.ResponseTotalTime = (DateTime.Now - requestStartDateTime).TotalMilliseconds;
+
+                // Add the assistant message to the conversation history
+                conversationHistory.Add(new ChatGPTChatMessage
+                {
+                    role = "assistant",
+                    content = response.Choices[0].Message.content
+                });
 
                 callBack(response);
             }

@@ -1,0 +1,74 @@
+{
+    "name": "RealityFlow Actions",
+    "maps": [
+        {
+            "name": "RealityFlowXRActions",
+            "id": "1d0e97c5-fcec-4033-9a16-aa55ea99f9c1",
+            "actions": [
+                {
+                    "name": "ToggleRecording",
+                    "type": "Button",
+                    "id": "5456f297-fbe0-45bf-aebf-67bd27bf636c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "OpenLLMMenu",
+                    "type": "Button",
+                    "id": "3db29b92-65c3-41ce-9f49-779fd3fc7c4e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Execute",
+                    "type": "Button",
+                    "id": "273a882f-2067-4c24-a4d1-c145e03ac09f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "820f9921-3903-457a-89aa-e02739e701ab",
+                    "path": "<XRController>{LeftHand}/secondaryButton",
+                    "interactions": "Hold(duration=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleRecording",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bc8cfafc-186d-4c3b-b35c-8f6395f10455",
+                    "path": "<XRController>{LeftHand}/secondaryButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenLLMMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fc725d5f-60ab-4afc-b725-a66083e154d5",
+                    "path": "<XRController>{LeftHand}/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Execute",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

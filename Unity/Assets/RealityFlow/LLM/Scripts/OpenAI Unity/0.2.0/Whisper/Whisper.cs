@@ -2,11 +2,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
 using System.Collections.Generic;
 using Ubiq.Voip;
 using Microsoft.MixedReality.Toolkit.UX;
 using System.Collections;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 
 namespace Samples.Whisper
 {
@@ -19,9 +20,13 @@ namespace Samples.Whisper
         [SerializeField] private TMP_Dropdown dropdown;
         [SerializeField] private Button submitButton;
         [SerializeField] private Button muteButton;
+        [SerializeField] private TextMeshProUGUI progressText;
+        [SerializeField] private GameObject flashingLight; // Reference to the flashing light GameObject
+        [SerializeField] private GameObject nearmenutoolbox; // Reference to the nearmenutoolbox
+        [SerializeField] private GameObject LLMWindow; // Reference to the LLMWindow
 
         private readonly string fileName = "output.wav";
-        private readonly int duration = 5;
+        private readonly int maxDuration = 60; // 5 minutes in seconds
 
         private AudioClip clip;
         private bool isRecording;
@@ -29,6 +34,65 @@ namespace Samples.Whisper
         private OpenAIApi openai;
         private MuteManager muteManager;
         private string currentApiKey;
+
+        private RealityFlowActions inputActions;
+        private ChatGPTTester chatGPTTester; // Reference to the ChatGPTTester
+
+        private Coroutine countdownCoroutine;
+
+        private void Awake()
+        {
+            inputActions = new RealityFlowActions();
+            chatGPTTester = FindObjectOfType<ChatGPTTester>(); // Initialize the ChatGPTTester reference
+        }
+
+        private void OnEnable()
+        {
+            inputActions.RealityFlowXRActions.ToggleRecording.started += OnRecordingStarted;
+            inputActions.RealityFlowXRActions.ToggleRecording.canceled += OnRecordingCanceled;
+            inputActions.RealityFlowXRActions.OpenLLMMenu.started += OnOpenLLMMenu;
+            inputActions.RealityFlowXRActions.Execute.started += OnExecute; // Register the Execute action
+            inputActions.Enable();
+        }
+
+        private void OnDisable()
+        {
+            inputActions.RealityFlowXRActions.ToggleRecording.started -= OnRecordingStarted;
+            inputActions.RealityFlowXRActions.ToggleRecording.canceled -= OnRecordingCanceled;
+            inputActions.RealityFlowXRActions.OpenLLMMenu.started -= OnOpenLLMMenu;
+            inputActions.RealityFlowXRActions.Execute.started -= OnExecute; // Unregister the Execute action
+            inputActions.Disable();
+        }
+
+        private void OnRecordingStarted(InputAction.CallbackContext context)
+        {
+            Debug.Log("OnRecordingStarted: " + context.control + " at " + Time.time);
+            StartRecording();
+        }
+
+        private void OnRecordingCanceled(InputAction.CallbackContext context)
+        {
+            Debug.Log("OnRecordingCanceled: " + context.control + " at " + Time.time);
+            EndRecording();
+        }
+
+        private void OnOpenLLMMenu(InputAction.CallbackContext context)
+        {
+            ToggleLLMWindow();
+        }
+
+        private void OnExecute(InputAction.CallbackContext context)
+        {
+            ExecuteLoggedActions();
+        }
+
+        private void ToggleLLMWindow()
+        {
+            if (LLMWindow != null)
+            {
+                LLMWindow.SetActive(!LLMWindow.activeSelf);
+            }
+        }
 
         private void Start()
         {
@@ -39,7 +103,7 @@ namespace Samples.Whisper
 
             RefreshMicrophoneList();
 
-            muteManager = FindObjectOfType<MuteManager>(); // Initialize MuteManager
+            muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
             {
                 Debug.LogError("MuteManager not found in the scene.");
@@ -62,6 +126,21 @@ namespace Samples.Whisper
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
             dropdown.SetValueWithoutNotify(index);
+
+            if (flashingLight != null)
+            {
+                flashingLight.SetActive(false); // Ensure the flashing light is initially off
+            }
+
+            if (nearmenutoolbox != null)
+            {
+                nearmenutoolbox.SetActive(false); // Ensure the nearmenutoolbox is initially off
+            }
+
+            if (LLMWindow != null)
+            {
+                LLMWindow.SetActive(false); // Ensure the LLMWindow is initially off
+            }
         }
 
         private void InitializeOpenAI(string apiKey)
@@ -129,14 +208,14 @@ namespace Samples.Whisper
 
         public void StartRecording()
         {
-            if (isRecording) return; // Prevent starting if already recording
-            if (!recordButton)
-                Debug.Log("The record button is null StartRecording function");
+            if (isRecording) return;
             isRecording = true;
             recordButton.enabled = false;
 
-            time = 0; // Reset time when starting a new recording
+            time = 0;
             SetProgressBarColor(new Color(0.847f, 1.0f, 0.824f)); // Set color to #D8FFD2
+
+            progressText.text = "Talking to Whisper"; // Update progress text
 
             var index = PlayerPrefs.GetInt("user-mic-device-index");
 
@@ -154,24 +233,25 @@ namespace Samples.Whisper
             }
 
             Debug.Log($"Starting recording with device: {micName}");
-            clip = Microphone.Start(micName, false, duration, 44100);
+            clip = Microphone.Start(micName, false, maxDuration, 44100); // Set duration to 10 minutes
             Debug.Log(clip + " Is the clip");
 
-            muteManager?.Mute(); // Mute the VoIP microphone
+            muteManager?.Mute();
+
+            if (flashingLight != null)
+            {
+                StartCoroutine(FlashLight());
+            }
         }
 
         public async void EndRecording()
         {
-            if (!recordButton)
-                Debug.Log("The record button is null EndRecording function");
-
-            if (!isRecording) return; // Ensure this method is only called once
-            Debug.Log("In the EndRecording method");
+            if (!isRecording) return;
             isRecording = false;
             recordButton.enabled = true;
 
-            Debug.Log("Beginning transcription it should say transcribing");
-            message.text = "Transcripting...";
+            Debug.Log("In the EndRecording method");
+            progressText.text = "Transcripting..."; // Update progress text
 
             Microphone.End(null);
 
@@ -207,10 +287,32 @@ namespace Samples.Whisper
 
             StartCoroutine(AnimateProgressBarFill(0));
             SetProgressBarColor(new Color(0.314f, 0.388f, 0.835f)); // Set color to #5063D5 after recording
-            message.text = res.Text;
+            progressText.text = "In the Whisper menu"; // Update progress text
+
+            // Write the transcribed text to the MRTKTMPInputField
+            //message.text = $"This is what we heard you say, is this correct:\n\n \"{res.Text}\"?";
+
+            // Print the transcribed message to the debug log
+            Debug.Log("Transcribed message: " + res.Text);
 
             Debug.Log("Unmuting all microphones after Whisper recording.");
-            muteManager?.UnMute(); // Unmute the VoIP microphone
+            muteManager?.UnMute();
+
+            if (flashingLight != null)
+            {
+                StopCoroutine(FlashLight());
+                flashingLight.SetActive(false); // Turn off the flashing light
+            }
+
+            if (nearmenutoolbox != null)
+            {
+                nearmenutoolbox.SetActive(true); // Enable the nearmenutoolbox
+                if (countdownCoroutine != null)
+                {
+                    StopCoroutine(countdownCoroutine);
+                }
+                countdownCoroutine = StartCoroutine(StartCountdown(res.Text));
+            }
         }
 
         private void Update()
@@ -218,24 +320,15 @@ namespace Samples.Whisper
             if (isRecording)
             {
                 time += Time.deltaTime;
-                float fillAmount = time / duration;
+                float fillAmount = time / maxDuration; // Fill amount based on 10 minutes duration
                 StartCoroutine(AnimateProgressBarFill(fillAmount));
-
-                if (time >= duration)
-                {
-                    Debug.Log("Recording duration reached, ending recording.");
-                    time = 0;
-                    EndRecording();
-                }
             }
         }
 
         private void SetProgressBarColor(Color color)
         {
-            // Set color for the progress bar
             progressBar.color = color;
 
-            // Set color for all child components of the progress bar
             foreach (Transform child in progressBar.transform)
             {
                 var childImage = child.GetComponent<Image>();
@@ -250,7 +343,7 @@ namespace Samples.Whisper
         {
             float startFillAmount = progressBar.fillAmount;
             float elapsed = 0f;
-            float duration = 0.5f; // Animation duration
+            float duration = 0.5f;
 
             while (elapsed < duration)
             {
@@ -260,6 +353,51 @@ namespace Samples.Whisper
             }
 
             progressBar.fillAmount = targetFillAmount;
+        }
+
+        private IEnumerator FlashLight()
+        {
+            while (isRecording)
+            {
+                flashingLight.SetActive(!flashingLight.activeSelf); // Toggle light on and off
+                yield return new WaitForSeconds(0.5f); // Wait for half a second
+            }
+        }
+
+        private IEnumerator StartCountdown(string transcribedText)
+        {
+            int countdown = 10;
+            while (countdown > 0)
+            {
+                message.text = $"This is what we heard you say, is this correct:\n\n \"{transcribedText}\"?\n\nMessage will be sent in {countdown} seconds unless canceled or re-recorded.";
+                yield return new WaitForSeconds(1);
+                countdown--;
+            }
+
+            SendMessageToChatGPT();
+        }
+
+        private void SendMessageToChatGPT()
+        {
+            // Reference to the ChatGPTTester instance
+            ChatGPTTester chatGPTTester = FindObjectOfType<ChatGPTTester>();
+            if (chatGPTTester != null)
+            {
+                chatGPTTester.Execute(); // Call the Execute method from ChatGPTTester
+            }
+
+            if (nearmenutoolbox != null)
+            {
+                nearmenutoolbox.SetActive(false); // Disable the nearmenutoolbox
+            }
+        }
+
+        private void ExecuteLoggedActions()
+        {
+            if (chatGPTTester != null)
+            {
+                chatGPTTester.ExecuteLoggedActions();
+            }
         }
     }
 }

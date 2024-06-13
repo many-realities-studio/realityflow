@@ -7,6 +7,7 @@ using Ubiq.Spawning;
 using System;
 using System.Linq;
 using RealityFlow.NodeGraph;
+using System.IO;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,7 +16,7 @@ using UnityEditor;
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private NetworkSpawnManager spawnManager;
-    private ActionLogger actionLogger = new ActionLogger();
+    public ActionLogger actionLogger = new ActionLogger();
     private NetworkContext networkContext;
 
     public NetworkId NetworkId { get; set; }
@@ -404,6 +405,33 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void EndCompoundAction()
     {
         actionLogger.EndCompoundAction();
+    }
+    public string ExportSpawnedObjectsData()
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+        foreach (var kvp in spawnManager.GetSpawnedForRoom())
+        {
+            var obj = kvp.Value;
+            if (obj != null)
+            {
+                sb.AppendLine("Object: " + obj.name);
+                Component[] components = obj.GetComponents<Component>();
+                foreach (Component component in components)
+                {
+                    sb.AppendLine("  Component: " + component.GetType().Name);
+                    if (component is Transform transform)
+                    {
+                        sb.AppendLine("    Position: " + transform.position);
+                        sb.AppendLine("    Rotation: " + transform.rotation);
+                        sb.AppendLine("    Scale: " + transform.localScale);
+                    }
+                }
+                sb.AppendLine();
+            }
+        }
+
+        return sb.ToString();
     }
 }
 

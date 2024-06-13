@@ -30,14 +30,15 @@ public class ActionLogger
             Actions.Add(action);
         }
     }
-    private bool isUndoing = false;
 
+    private bool isUndoing = false;
     private Stack<LoggedAction> actionStack = new Stack<LoggedAction>();
     private CompoundAction currentCompoundAction;
 
+    private List<string> codeQueue = new List<string>(); // To hold generated code snippets
+
     public void LogAction(string functionName, params object[] parameters)
     {
-
         if (isUndoing) return;
 
         var action = new LoggedAction(functionName, parameters);
@@ -53,6 +54,22 @@ public class ActionLogger
         }
     }
 
+    public void LogGeneratedCode(string code)
+    {
+        codeQueue.Add(code);
+        Debug.Log($"Logged generated code.");
+    }
+
+    public void ExecuteLoggedCode()
+    {
+        foreach (var code in codeQueue)
+        {
+            RoslynCodeRunner.Instance.RunCode(code);
+        }
+        codeQueue.Clear();
+        Debug.Log("Executed all logged code sequentially.");
+    }
+
     public LoggedAction GetLastAction()
     {
         var action = actionStack.Count > 0 ? actionStack.Pop() : null;
@@ -64,10 +81,12 @@ public class ActionLogger
             Debug.Log("No actions in stack to pop");
         return action;
     }
+
     public int GetActionStackCount()
     {
         return actionStack.Count;
     }
+
     public void StartUndo()
     {
         isUndoing = true;
@@ -77,6 +96,7 @@ public class ActionLogger
     {
         isUndoing = false;
     }
+
     public void ClearActionStack()
     {
         actionStack.Clear();
