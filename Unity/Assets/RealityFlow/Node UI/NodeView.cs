@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.XR.Interaction.Toolkit.AffordanceSystem.Receiver.Primitives;
 
 namespace RealityFlow.NodeUI
 {
@@ -115,16 +114,25 @@ namespace RealityFlow.NodeUI
                 transform.localPosition.z
             );
 
+            GraphView view = GetComponentInParent<GraphView>();
+
             for (int i = 0; i < Node.Definition.Fields.Count; i++)
             {
+                int current = i;
                 NodeFieldDefinition def = Node.Definition.Fields[i];
                 GameObject field = Instantiate(FieldPrefabs[def.Default.Type], fields);
 
                 IValueEditor editor = field.GetComponent<IValueEditor>();
-                editor.NodeValue = def.Default;
+                if (!Node.TryGetField(i, out NodeValue fieldValue))
+                {
+                    Debug.LogError("Failed to get field value on Render()");
+                    fieldValue = def.Default;
+                }
+
+                editor.NodeValue = fieldValue;
                 editor.OnTick += value =>
                 {
-                    Assert.IsTrue(Node.TrySetField(i, value));
+                    RealityFlowAPI.Instance.SetNodeFieldValue(view.Graph, Index, current, value);
                 };
             }
 
@@ -153,11 +161,10 @@ namespace RealityFlow.NodeUI
                 var def = Node.Definition.Inputs[i];
                 GameObject port = Instantiate(inputPortPrefab, inputPorts);
 
-                InputPortView view = port.GetComponent<InputPortView>();
-                view.Definition = def;
-                view.port = new(Index, i);
+                InputPortView portView = port.GetComponent<InputPortView>();
+                portView.Init(def, new(Index, i), view, Node.GetInput(i).ConstantValue);
 
-                inputPortViews.Add(view);
+                inputPortViews.Add(portView);
             }
 
             for (int i = 0; i < Node.Definition.Outputs.Count; i++)
@@ -165,11 +172,11 @@ namespace RealityFlow.NodeUI
                 var def = Node.Definition.Outputs[i];
                 GameObject port = Instantiate(outputPortPrefab, outputPorts);
 
-                OutputPortView view = port.GetComponent<OutputPortView>();
-                view.Definition = def;
-                view.port = new(Index, i);
+                OutputPortView portView = port.GetComponent<OutputPortView>();
+                portView.Definition = def;
+                portView.port = new(Index, i);
 
-                outputPortViews.Add(view);
+                outputPortViews.Add(portView);
             }
         }
 

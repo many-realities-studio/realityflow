@@ -295,6 +295,40 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Moved node {node} to {position}");
     }
 
+    public void SetNodeFieldValue(Graph graph, NodeIndex node, int field, NodeValue value)
+    {
+        Node nodeData = graph.GetNode(node);
+        if (!nodeData.TryGetField(field, out NodeValue oldValue))
+        {
+            Debug.LogError("Failed to get old field value when setting node field");
+            oldValue = NodeValue.Null;
+        }
+        if (!nodeData.TrySetFieldValue(field, value))
+        {
+            Debug.LogError("Failed to set node field value");
+            return;
+        }
+        actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, oldValue);
+        Debug.Log($"Set node {node} field {field} to {value}");
+    }
+
+    public void SetNodeInputConstantValue(Graph graph, NodeIndex node, int port, NodeValue value)
+    {
+        Node nodeData = graph.GetNode(node);
+        if (!nodeData.TryGetInputValue(port, out NodeValue oldValue))
+        {
+            Debug.LogError("Failed to get old input port constant value when setting input port constant");
+            oldValue = NodeValue.Null;
+        }
+        if (!nodeData.TrySetInputValue(port, value))
+        {
+            Debug.LogError("Failed to set node input port constant value");
+            return;
+        }
+        actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
+        Debug.Log($"Set node {node} input port {port} to {value}");
+    }
+
 #if UNITY_EDITOR
     public void AddPrefabToCatalogue(GameObject prefab)
     {
@@ -486,6 +520,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Vector2 pos = (Vector2)action.Parameters[3];
 
                 graph.GetNode(node).Position = prevPos;
+                break;
+
+            case nameof(SetNodeFieldValue):
+                graph = (Graph)action.Parameters[0];
+                node = (NodeIndex)action.Parameters[1];
+                int field = (int)action.Parameters[2];
+                NodeValue oldValue = (NodeValue)action.Parameters[3];
+
+                if (!graph.GetNode(node).TrySetField(field, oldValue))
+                    Debug.LogError("Failed to undo set field");
+
                 break;
 
                 // Add cases for other functions...

@@ -40,7 +40,8 @@ namespace RealityFlow.NodeUI
             if (!int.TryParse(input.text, out _))
                 input.text = "0";
 
-            OnTick(new(Value));
+            if (OnTick != null)
+                OnTick(new(Value));
         }
     }
 }

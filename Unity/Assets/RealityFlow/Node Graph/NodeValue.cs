@@ -205,6 +205,20 @@ namespace RealityFlow.NodeGraph
         public static NodeValue DefaultFor(NodeValueType type) =>
             new() { type = type, value = InternalDefaultFor(type) };
 
+        public static bool TryGetDefaultFor(NodeValueType type, out NodeValue value) 
+        {
+            try
+            {
+                value = DefaultFor(type);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                value = default;
+                return false;
+            }
+        }
+
         /// <summary>
         /// Get an instance of a NodeValue from a given value. May fail if the given value is not
         /// of a type that NodeValue may represent, or if the value is ambiguous between multiple
