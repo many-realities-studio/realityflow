@@ -105,6 +105,13 @@ public class PaletteSpawner : MonoBehaviour
             palette = networkSpawnManager.SpawnWithPeerScope(palettePrefab);
             playPalette = networkSpawnManager.SpawnWithPeerScope(playPalettePrefab);
 
+            // responsible for palette being attached to hand.
+            PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
+            phm.paletteManager = gameObject;
+            phm.left = GetComponents<OnButtonPress>()[0];
+            phm.right = GetComponents<OnButtonPress>()[1];
+            phm.left.enabled = false;
+
             paletteShown = true;
 
             networkedPalette = palette.GetComponent<NetworkedPalette>();
@@ -112,6 +119,16 @@ public class PaletteSpawner : MonoBehaviour
             // Set the ownership of the spawned palette to the user who spawned it
             networkedPalette.owner = true;
             playPalette.GetComponent<NetworkedPlayPalette>().owner = true;
+
+            try
+            {
+                isLeftHandDominant = GameObject.FindGameObjectsWithTag("DominantHandManager")[0].GetComponent<PressableButton>();
+                Debug.Log(GameObject.FindGameObjectsWithTag("DominantHandManager")[0]);
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                Debug.Log(e + " Has the palette been spawned in your scene?");
+            }
 
             // Hide the opposite palette when spawning in palette for the first time
             if (paletteSwitcher.networkedPlayManager.playMode)
