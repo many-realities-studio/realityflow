@@ -6,52 +6,44 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TMPro;
 using Ubiq.Rooms;
-using Unity.XR.CoreUtils;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Ubiq.Messaging;
-using System.Globalization;
+
 
 public class RealityFlowClient : MonoBehaviour
 {
     public string accessToken;
     public RoomClient roomClient;
-    // private Boolean isEditing = false;
     private string currentProjectId;
-
-    // Room Variables
-    private string roomName;
-    private string roomJoinCode;
-    private string roomUUID;
-    private bool roomPublish;
 
     // GraphQL client and access token variables 
     public GraphQLHttpClient graphQLClient;
-    private JObject data;
     public Dictionary<string, string> userDecoded;
     public string server = "http://localhost:4000";
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
+
     private void Awake()
     {
+        //Debug.Log("RealityFlowClient Awake");
+        
+        // Ensure only one instance
         if (transform.parent == null)
         {
             if (rootRealityFlowClient == null)
             {
                 rootRealityFlowClient = this;
                 DontDestroyOnLoad(gameObject);
-                // Extensions.MonoBehaviourExtensions.DontDestroyOnLoadGameObjects.Add(gameObject);
             }
-            else // Only one networkscene can exist at the top level of the hierarchy
+            else
             {
-                gameObject.SetActive(false); // Deactivate the branch to avoid Start() being called until the branch is destroyed
+                gameObject.SetActive(false);
                 Destroy(gameObject);
+                return;
             }
         }
-        else // the network scene is in a forest
+        else
         {
             foreach (var item in GetComponents<RealityFlowClient>())
             {
@@ -61,34 +53,47 @@ public class RealityFlowClient : MonoBehaviour
                 }
             }
         }
+
+        // Initialize GraphQL client
         graphQLClient = new GraphQLHttpClient(server + "/graphql", new NewtonsoftJsonSerializer());
 
-        if (accessToken == "" || accessToken == null)
+        if (string.IsNullOrEmpty(accessToken))
         {
             accessToken = PlayerPrefs.GetString("accessToken");
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                Debug.LogError("Access token is not set.");
+                return;
+            }
         }
-        userDecoded = DecodeJwt(accessToken);
-        Debug.Log("User decoded");
-        graphQLClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-        // graphQLClient = graphQLC;
 
-        // Initialize roomClient at the start
-        // roomClient = GetComponent<RoomClient>();
-        roomClient = NetworkScene.Find(this).GetComponent<RoomClient>();
+        userDecoded = DecodeJwt(accessToken);
+        // Debug.Log("User decoded: " + userDecoded);
+        graphQLClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+
+        // Attempt to find RoomClient manually if not assigned
         if (roomClient == null)
         {
-            Debug.LogError("RoomClient component not found on this GameObject");
+            // Debug.LogWarning("RoomClient is not assigned in the inspector, trying to find it in the scene.");
+            roomClient = NetworkScene.Find(this)?.GetComponent<RoomClient>();
+            if (roomClient == null)
+            {
+                //Debug.LogWarning("Attempting to find RoomClient directly in the hierarchy.");
+                roomClient = FindObjectOfType<RoomClient>();
+            }
         }
-        else
-        {
 
-            roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
+        if (roomClient == null)
+        {
+            Debug.LogError("RoomClient component not found on this GameObject or in the scene.");
+            return;
         }
+
+        roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
+        // Debug.Log("RoomClient successfully initialized and listener added.");
     }
     private static RealityFlowClient rootRealityFlowClient;
 
-
-    // Create a room
     public async void CreateRoom(string ProjectId)
     {
         Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
@@ -107,44 +112,12 @@ public class RealityFlowClient : MonoBehaviour
 
     }
 
-    // Join a room
-    public void JoinRoom(string joinCode)
-    {
-        Debug.Log("Joining room found in the Database. . .");
-
-
-        // Join the room using the roomClient
-        roomClient.Join(joinCode);
-
-        // !!LOAD OBJECTS FROM PROJECT HERE!!
-    }
-
-    // Placeholder for LeaveRoom method
-    public void LeaveRoom()
-    {
-        // Implementation for leaving a room
-
-    }
-
-    // Placeholder for DeleteRoom method
-    private void OnJoinedRoom(IRoom room)
-    {
-        Debug.Log("Joined room: " + room.Name);
-        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
-        Debug.Log(room.Name + " UUID: " + room.UUID);
-        Debug.Log(room.Name + " Publish: " + room.Publish);
-    }
-    // Placeholder for DeleteRoom method
     private async void OnJoinedRoomCreate(IRoom room)
     {
-        Debug.Log("Joined room: " + room.Name);
+        Debug.Log("Created Room: " + room.Name);
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
-        // Create Room In Ubiq
-        // debug log for room join code
-
-        Debug.Log("[CREATE ROOM]Join code!: " + room.JoinCode);
 
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
@@ -182,15 +155,41 @@ public class RealityFlowClient : MonoBehaviour
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedRoomCreate);
     }
 
+    public void JoinRoom(string joinCode)
+    {
+        Debug.Log("Joining room found in the Database. . .");
+
+
+        // Join the room using the roomClient
+        roomClient.Join(joinCode);
+
+        // !!LOAD OBJECTS FROM PROJECT HERE!!
+    }
+
+    private void OnJoinedRoom(IRoom room)
+    {
+        Debug.Log("Joined room: " + room.Name);
+        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
+        Debug.Log(room.Name + " UUID: " + room.UUID);
+        Debug.Log(room.Name + " Publish: " + room.Publish);
+    }
+
+    public void LeaveRoom()
+    {
+        // Implementation for leaving a room
+
+    }
     
+    public string GetCurrentProjectId()
+    {
+        return currentProjectId;
+    }
     public void SetCurrentProject(string projectId)
     {
         //Debug.Log("Setting current project ID to: " + projectId);
         currentProjectId = projectId;
         PlayerPrefs.SetString("currentProjectId", currentProjectId);
     }
-
-
     // Function to decode the JWT token
     public static Dictionary<string, string> DecodeJwt(string jwt)
     {
@@ -244,7 +243,7 @@ public class RealityFlowClient : MonoBehaviour
         return null;
     }
 
-        public async void OpenProject(string id)
+    public async void OpenProject(string id)
     {
         Debug.Log("Opening project with ID: " + id);
         
@@ -302,7 +301,6 @@ public class RealityFlowClient : MonoBehaviour
         }
     }
 
-    
     // Function to get the rooms associated with the project
     public async void GetRoomsByProjectId(string projectId)
     {
