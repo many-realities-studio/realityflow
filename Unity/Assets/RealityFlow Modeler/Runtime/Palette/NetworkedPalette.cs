@@ -1114,7 +1114,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             lastSvPickerTransform = svPickerTransform.localPosition;
         }
 
-        /*if (tm.needsData == true && owner)
+        if (tm.needsData == true && owner)
         {
             BroadcastPaletteTransform();
         }
@@ -1122,6 +1122,6 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         if (m.needsData == true && owner)
         {
             BroadcastPaletteInfo();
-        }*/ 
+        }
     }
 }
