@@ -102,8 +102,10 @@ public class PaletteSpawner : MonoBehaviour
         if(palette == null)
         {
             // Debug.Log("ControlPalette() was triggered to spawn a palette");
-            palette = networkSpawnManager.SpawnWithPeerScope(palettePrefab);
-            playPalette = networkSpawnManager.SpawnWithPeerScope(playPalettePrefab);
+            palette = NetworkSpawnManager.Find(this).SpawnWithPeerScope(palettePrefab);
+            playPalette = NetworkSpawnManager.Find(this).SpawnWithPeerScope(playPalettePrefab);
+            //palette = networkSpawnManager.SpawnWithPeerScope(palettePrefab);
+            //playPalette = networkSpawnManager.SpawnWithPeerScope(playPalettePrefab);
 
             // responsible for palette being attached to hand.
             PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();

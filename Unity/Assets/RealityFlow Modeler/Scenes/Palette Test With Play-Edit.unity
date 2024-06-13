@@ -8982,7 +8982,7 @@ PrefabInstance:
     - target: {fileID: 939732352738646038, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
         type: 3}
@@ -9007,7 +9007,8 @@ PrefabInstance:
       propertyPath: networkSpawnManager
       value: 
       objectReference: {fileID: 1421314484}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 939732352738646032, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
