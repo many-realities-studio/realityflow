@@ -25,6 +25,9 @@ public class StayWithinRect : TransformConstraint
     readonly Matrix4x4[] cornerLocalMatrices = new Matrix4x4[4];
     public override void OnManipulationStarted(MixedRealityTransform worldPose)
     {
+        if (container == null)
+            container = (RectTransform)contained.parent;
+
         contained.GetWorldCorners(corners);
 
         for (int i = 0; i < 4; i++)

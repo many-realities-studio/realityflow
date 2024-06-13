@@ -3,16 +3,16 @@ using System.Linq;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
 
 public class ChatGPTTester : MonoBehaviour
 {
     [SerializeField]
-    private UnityEngine.UI.Button askButton;
+    private PressableButton askButton;
 
     [SerializeField]
-    private UnityEngine.UI.Button compilerButton;
+    private PressableButton compilerButton;
 
     [SerializeField]
     private TextMeshProUGUI responseTimeText;
@@ -32,15 +32,16 @@ public class ChatGPTTester : MonoBehaviour
     private TextMeshProUGUI scenarioTitleText;
 
     [SerializeField]
-    private TMP_InputField promptText;
-    [SerializeField]
-    private TMP_InputField scenarioQuestionText;
+    private MRTKTMPInputField promptText;
 
     [SerializeField]
-    private bool immediateCompilation = false;
+    private MRTKTMPInputField scenarioQuestionText;
 
     [SerializeField]
     private ChatGPTResponse lastChatGPTResponseCache;
+
+    [SerializeField]
+    private bool immediateCompilation = false; // Ensure this field is declared
 
     public string ChatGPTMessage
     {
@@ -54,21 +55,30 @@ public class ChatGPTTester : MonoBehaviour
     {
         set
         {
-            compilerButton.GetComponent<UnityEngine.UI.Image>().color = value;
+            var renderer = compilerButton.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material.color = value;
+            }
         }
     }
 
     private void Awake()
     {
         responseTimeText.text = string.Empty;
-        // compilerButton.interactable = false;
+        SetButtonEnabled(compilerButton, false);
 
-        askButton.onClick.AddListener(() =>
+        askButton.OnClicked.AddListener(() =>
         {
-            compilerButton.interactable = false;
+            SetButtonEnabled(compilerButton, false);
             CompileButtonColor = Color.white;
 
             Execute();
+        });
+
+        compilerButton.OnClicked.AddListener(() =>
+        {
+            ProcessAndCompileResponse();
         });
     }
 
@@ -78,11 +88,11 @@ public class ChatGPTTester : MonoBehaviour
 
         scenarioTitleText.text = chatGPTQuestion.scenarioTitle;
 
-        askButton.interactable = false;
+        SetButtonEnabled(askButton, false);
 
-        ChatGPTProgress.Instance.StartProgress("Generating source code please wait");
+        ChatGPTProgress.Instance.StartProgress("Generating source code, please wait");
 
-        // handle replacements
+        // Handle replacements
         Array.ForEach(chatGPTQuestion.replacements, r =>
         {
             gptPrompt = gptPrompt.Replace("{" + $"{r.replacementType}" + "}", r.value);
@@ -96,7 +106,7 @@ public class ChatGPTTester : MonoBehaviour
             chatGPTQuestion.reminders = chatGPTQuestion.reminders.Concat(new[] { reminderMessage }).ToArray();
         }
 
-        // handle reminders
+        // Handle reminders
         if (chatGPTQuestion.reminders.Length > 0)
         {
             gptPrompt += $", {string.Join(',', chatGPTQuestion.reminders)}";
@@ -106,11 +116,11 @@ public class ChatGPTTester : MonoBehaviour
 
         StartCoroutine(ChatGPTClient.Instance.Ask(gptPrompt, (response) =>
         {
-            askButton.interactable = true;
+            SetButtonEnabled(askButton, true);
 
-            CompileButtonColor = Color.green;
+            CompileButtonColor = Color.blue;
 
-            compilerButton.interactable = true;
+            SetButtonEnabled(compilerButton, true);
             lastChatGPTResponseCache = response;
             responseTimeText.text = $"Time: {response.ResponseTotalTime} ms";
 
@@ -118,13 +128,20 @@ public class ChatGPTTester : MonoBehaviour
 
             Logger.Instance.LogInfo(ChatGPTMessage);
 
-            // if (immediateCompilation)
-            //     ProcessAndCompileResponse();
+            if (immediateCompilation)
+            {
+                ProcessAndCompileResponse();
+            }
         }));
     }
 
     public void ProcessAndCompileResponse()
     {
         RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
+    }
+
+    private void SetButtonEnabled(PressableButton button, bool isEnabled)
+    {
+        button.enabled = isEnabled;
     }
 }
