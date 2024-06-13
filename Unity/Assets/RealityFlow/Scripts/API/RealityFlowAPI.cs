@@ -10,6 +10,7 @@ using RealityFlow.NodeGraph;
 using UnityEngine.Assertions;
 
 
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -327,6 +328,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
         Debug.Log($"Set node {node} input port {port} to {value}");
+    }
+
+    public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)
+    {
+        // TODO: Punted implementation until rewrite for less to rewrite
+        // ^ also punting undo functionality
     }
 
 #if UNITY_EDITOR
