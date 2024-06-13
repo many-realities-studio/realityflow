@@ -17,6 +17,9 @@ namespace RealityFlow.NodeGraph
         readonly List<NodeIndex> nodeStack = new();
         readonly Dictionary<PortIndex, object> nodeOutputCache = new();
         readonly Dictionary<(ReadonlyGraph, int), object> graphOutputCache = new();
+        readonly Dictionary<string, NodeValue> startArguments = new();
+
+        public ImmutableDictionary<string, NodeValue> StartArguments => startArguments.ToImmutableDictionary();
 
         void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
 
@@ -177,8 +180,11 @@ namespace RealityFlow.NodeGraph
             graphOutputCache.Clear();
         }
 
-        public void EvaluateGraphFromRoot(GameObject target, ReadonlyGraph graph, NodeIndex root)
+        public void EvaluateGraphFromRoot(GameObject target, ReadonlyGraph graph, NodeIndex root, params (string, NodeValue)[] startArguments)
         {
+            foreach ((string name, NodeValue value) in startArguments)
+                this.startArguments.Add(name, value);
+
             graphStack.Push(graph);
 
             Node node = graph.GetNode(root);
@@ -189,6 +195,7 @@ namespace RealityFlow.NodeGraph
             Evaluate(target);
 
             graphStack.Pop();
+            this.startArguments.Clear();
         }
 
         public void EvaluateGraph(GameObject target, ReadonlyGraph graph, int executionInputPort)

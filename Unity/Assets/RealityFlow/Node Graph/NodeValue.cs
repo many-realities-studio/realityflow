@@ -95,6 +95,12 @@ namespace RealityFlow.NodeGraph
             value = str;
         }
 
+        public NodeValue(GameObject go)
+        {
+            type = NodeValueType.GameObject;
+            value = go.name;
+        }
+
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
 
@@ -129,6 +135,14 @@ namespace RealityFlow.NodeGraph
                 value = default;
                 return false;
             }
+        }
+
+        public T UnwrapValue<T>()
+        {
+            if (TryGetValue(out T value))
+                return value;
+            else
+                throw new ArgumentException($"Could not read NodeValue as type {typeof(T).FullName}");
         }
 
         public static bool IsAssignableTo(NodeValueType assigned, NodeValueType to)
@@ -205,7 +219,7 @@ namespace RealityFlow.NodeGraph
         public static NodeValue DefaultFor(NodeValueType type) =>
             new() { type = type, value = InternalDefaultFor(type) };
 
-        public static bool TryGetDefaultFor(NodeValueType type, out NodeValue value) 
+        public static bool TryGetDefaultFor(NodeValueType type, out NodeValue value)
         {
             try
             {

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace RealityFlow.NodeGraph
 {
     [Serializable]
-    public class Graph
+    public class Graph : ISerializationCallbackReceiver
     {
         /// <summary>
         /// The arena of nodes in this graph.
@@ -102,6 +102,30 @@ namespace RealityFlow.NodeGraph
         [SerializeField]
         bool variadicOutput;
 
+        [NonSerialized]
+        readonly Dictionary<string, HashSet<NodeIndex>> nodeTypes = new();
+        /// <summary>
+        /// A mapping of node definition names to node indices. Useful for looking up all nodes
+        /// of a given type.
+        /// </summary>
+        public ImmutableDictionary<string, HashSet<NodeIndex>> NodeTypes
+        {
+            get => nodeTypes.ToImmutableDictionary();
+        }
+
+        HashSet<NodeIndex> MutableNodesOfType(string type)
+        {
+            if (nodeTypes.TryGetValue(type, out var list))
+                return list;
+
+            list = new();
+            nodeTypes.Add(type, list);
+            return list;
+        }
+
+        public ImmutableHashSet<NodeIndex> NodesOfType(string type) =>
+            MutableNodesOfType(type).ToImmutableHashSet();
+
         public ImmutableList<NodeIndex> InputExecutionEdges(int index)
             => inputExecutionEdges[index];
 
@@ -109,6 +133,7 @@ namespace RealityFlow.NodeGraph
         {
             Node node = new(definition);
             NodeIndex index = nodes.Add(node);
+            MutableNodesOfType(definition.Name).Add(index);
             return index;
         }
 
@@ -418,5 +443,13 @@ namespace RealityFlow.NodeGraph
 
         public ImmutableList<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => executionEdges[outputPort];
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize()
+        {
+            foreach ((NodeIndex index, Node node) in nodes)
+                MutableNodesOfType(node.Definition.Name).Add(index);
+        }
     }
 }
