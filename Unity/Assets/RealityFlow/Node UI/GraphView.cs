@@ -142,6 +142,15 @@ namespace RealityFlow.NodeUI
         /// </summary>
         void SetPortsActive()
         {
+            if (selectedInputEdgePort is PortIndex selectedInData && !graph.ContainsNode(selectedInData.Node))
+                selectedInputEdgePort = null;
+            if (selectedOutputEdgePort is PortIndex selectedOutData && !graph.ContainsNode(selectedOutData.Node))
+                selectedOutputEdgePort = null;
+            if (selectedInputExecEdgePort is NodeIndex selectedInExec && !graph.ContainsNode(selectedInExec))
+                selectedInputExecEdgePort = null;
+            if (selectedOutputExecEdgePort is PortIndex selectedOutExec && !graph.ContainsNode(selectedOutExec.Node))
+                selectedOutputExecEdgePort = null;
+
             bool noneSelected =
                 selectedInputEdgePort == null &&
                 selectedOutputEdgePort == null &&
