@@ -23,6 +23,9 @@ public class HandleSpawner : MonoBehaviour
 
     public ManipulationMode mode { get; private set; }
 
+    private XrayTool xrayTool;
+    private ManipulationTool manipulationTool;
+
     public bool xrayActive => xrayTool.isActive;
     public bool manipulationActive => manipulationTool.isActive;
 
@@ -31,8 +34,7 @@ public class HandleSpawner : MonoBehaviour
     private XRRayInteractor rayInteractor;
     private RaycastHit currentHitResult;
 
-    private XrayTool xrayTool;
-    private ManipulationTool manipulationTool;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -47,8 +49,8 @@ public class HandleSpawner : MonoBehaviour
         }
 
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK RightHand Controller");
+        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
+        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
         rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         handles = new List<Handle>();
