@@ -9,6 +9,7 @@ namespace RealityFlow.NodeGraph
     /// The primary class used to evaluate graphs/nodes.
     /// Stores relevant information during evaluation, such as intermediate results.
     /// </summary>
+    [Serializable]
     public class EvalContext
     {
         GameObject target;
@@ -18,8 +19,27 @@ namespace RealityFlow.NodeGraph
         readonly Dictionary<PortIndex, object> nodeOutputCache = new();
         readonly Dictionary<(ReadonlyGraph, int), object> graphOutputCache = new();
         readonly Dictionary<string, NodeValue> startArguments = new();
+        [SerializeField]
+        readonly Dictionary<string, NodeValue> variables = new();
 
         public ImmutableDictionary<string, NodeValue> StartArguments => startArguments.ToImmutableDictionary();
+
+        public void AddVariable(string name, NodeValueType type)
+        {
+            variables.Add(name, NodeValue.DefaultFor(type));
+        }
+
+        public T GetVariable<T>(string name)
+        {
+            return variables[name].UnwrapValue<T>();
+        }
+
+        public void SetVariable<T>(string name, T value)
+        {
+            NodeValue oldValue = variables[name];
+            NodeValue nodeValue = NodeValue.From(value, oldValue.Type);
+            variables[name] = nodeValue;
+        }
 
         void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
 
@@ -82,6 +102,8 @@ namespace RealityFlow.NodeGraph
                     && (float)intValue is T castValue
                 )
                 return castValue;
+            else if (typeof(T) == typeof(string) && value.ToString() is T tString)
+                return tString;
             else
                 throw new GraphTypeMismatchException();
         }

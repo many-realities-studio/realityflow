@@ -14,14 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields: []
   Inputs: []
-  Outputs: []
+  Outputs:
+  - Name: collided
+    Optional: 0
+    Type: 8
   IsVariadic: 0
   IsVariadicOutput: 0
-  EvaluationMethod: 0
+  EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 
+  EvalCode: 'collided = ctx.StartArguments["collidedWith"].UnwrapValue<GameObject>();
+
+    then();'
   ExecutionInput: 0
-  ExecutionOutputs: []
+  ExecutionOutputs:
+  - then
   references:
     version: 2
     RefIds: []

@@ -10,32 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
-  m_Name: Impulse
+  m_Name: OnSelectExit
   m_EditorClassIdentifier: 
   Fields: []
-  Inputs:
-  - Name: target
-    Optional: 0
-    Type: 8
-  - Name: direction
-    Optional: 0
-    Type: 3
-  - Name: magnitude
-    Optional: 0
-    Type: 1
+  Inputs: []
   Outputs: []
   IsVariadic: 0
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'Vector3 dirMag = direction.normalized * magnitude;
-
-    RealityFlowAPI.Instance.GameObjectAddLocalImpulse(target,
-    dirMag);
-
-
-    then();'
-  ExecutionInput: 1
+  EvalCode: then();
+  ExecutionInput: 0
   ExecutionOutputs:
   - then
   references:
