@@ -69,6 +69,17 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""ea831c0e-fe08-4173-a9c9-3ae88ecb5744"",
+                    ""path"": ""<Keyboard>/#(J)"",
+                    ""interactions"": ""Hold"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleRecording"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""bc8cfafc-186d-4c3b-b35c-8f6395f10455"",
                     ""path"": ""<XRController>{LeftHand}/secondaryButton"",
                     ""interactions"": ""Press"",
