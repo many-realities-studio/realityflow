@@ -29,6 +29,9 @@ public class MRTKRayRotationAdjustments : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        //if(UnityEngine.XR.XRSettings.enabled == true)
+        //{
+        //    gameObject.transform.rotation = Quaternion.Euler(60, 0, 0);
+        //}
     }
 }
