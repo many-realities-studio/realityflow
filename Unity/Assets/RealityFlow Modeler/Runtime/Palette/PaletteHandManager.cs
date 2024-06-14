@@ -33,27 +33,35 @@ public class PaletteHandManager : MonoBehaviour
         rightHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor");
     }
 
-     public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars, ParentConstraint otherPaletteParentConstraint, string paletteType, bool handStateAlreadyFound)
+    public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars, ParentConstraint otherPaletteParentConstraint, string paletteType, bool handStateAlreadyFound)
     {
         // Debug.Log("Called UpdateHand() from palette " + gameObject.name + " in scene " + gameObject.transform.parent.parent.parent.name);
         // Go through every avatar looking for the palette owner's avatar.
         // Only put a parent constraint for the owner's palette (if the first avatar found is the owner)
         for (int i = 0; i < avatars.Length; i++)
         {
-            /*
+            if (avatars[i].ToString().Contains("My Avatar"))
+            {
+                GameObject[] dominantHandManagers = GameObject.FindGameObjectsWithTag("DominantHandManager");
+
+                // foreach (GameObject go in dominantHandManagers)
+                // {
+                //     Debug.Log(go.name + " in palette " + go.transform.parent.parent.parent.name);
+                // }
+
                 if (isLeftHandDominant == null && !handStateAlreadyFound)
                 {
                     for (int j = 0; j < dominantHandManagers.Length; j++)
                     {                      
-                        if (paletteType == "Palette" && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>() != null && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().ownerName.Contains(AvatarManager.UUID)
+                        if (paletteType == "Palette" && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>() != null && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().ownerName.Contains("My Avatar")
                             && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPalette>().gameObject == gameObject)
                         {
-                            // Debug.Log("Successfully got the right hand manager");
+                            Debug.Log("Successfully got the right hand manager");
                             isLeftHandDominant = dominantHandManagers[j].GetComponent<PressableButton>();
                             // return;
                         }
 
-                        if (paletteType == "PlayPalette" && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>() != null && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>().ownerName.Contains(AvatarManager.UUID)
+                        if (paletteType == "PlayPalette" && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>() != null && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>().ownerName.Contains("My Avatar")
                             && dominantHandManagers[j].transform.parent.parent.parent.GetComponent<NetworkedPlayPalette>().gameObject == gameObject)
                         {
                             // Debug.Log("Successfully got the right hand manager");
@@ -96,8 +104,8 @@ public class PaletteHandManager : MonoBehaviour
                     leftHandRay.SetActive(true);
                     leftHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/Far Ray"),
-                                    GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray"),
+                                    GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor")));
                 }
                 else if (!isLeftHandDominant.IsToggled)
                 {
@@ -123,8 +131,8 @@ public class PaletteHandManager : MonoBehaviour
                     rightHandRay.SetActive(true);
                     rightHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray"),
-                                    GameObject.Find("MRTK Player/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor")));
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray"),
+                                    GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor")));
                 }
 
                 // By default, parent constraint is set to false in the inspector. Turn it on only for the client. If parent
@@ -151,16 +159,18 @@ public class PaletteHandManager : MonoBehaviour
             {
                 i++;
             }
+        }
 
-            if (avatars[i].ToString().Contains(AvatarManager.UUID))
-            {
-                GameObject[] dominantHandManagers = GameObject.FindGameObjectsWithTag("DominantHandManager");
+        OnHandChange?.Invoke(isLeftHandDominant.IsToggled);
+    }
 
-                // foreach (GameObject go in dominantHandManagers)
-                // {
-                //     Debug.Log(go.name + " in palette " + go.transform.parent.parent.parent.name);
-                // }
-            */
+    /*public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars, ParentConstraint otherPaletteParentConstraint, string paletteType, bool handStateAlreadyFound)
+    {
+        // Debug.Log("Called UpdateHand() from palette " + gameObject.name + " in scene " + gameObject.transform.parent.parent.parent.name);
+        // Go through every avatar looking for the palette owner's avatar.
+        // Only put a parent constraint for the owner's palette (if the first avatar found is the owner)
+        for (int i = 0; i < avatars.Length; i++)
+        {
             if (avatars[i].ToString().Contains("My Avatar"))
             {
                 // By default the dominant hand is assigned to the right hand
@@ -226,7 +236,7 @@ public class PaletteHandManager : MonoBehaviour
         }
 
         OnHandChange?.Invoke(isLeftHandDominant.IsToggled);
-    }
+    }*/
 
     public OnButtonPress left;
     public OnButtonPress right;
