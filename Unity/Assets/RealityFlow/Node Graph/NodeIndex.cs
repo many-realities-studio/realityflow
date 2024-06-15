@@ -19,6 +19,11 @@ namespace RealityFlow.NodeGraph
             this.index = index;
         }
 
+        public override string ToString()
+        {
+            return $"NodeIndex({index.Value})";
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is NodeIndex index)

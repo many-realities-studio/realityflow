@@ -16,7 +16,7 @@ namespace Ubiq.Voip
 
             private VoipPeerConnection peerConnection;
 
-            public PeerConnectionContext (VoipPeerConnection peerConnection)
+            public PeerConnectionContext(VoipPeerConnection peerConnection)
             {
                 this.peerConnection = peerConnection;
             }
@@ -117,7 +117,7 @@ namespace Ubiq.Voip
         {
             if (networkScene)
             {
-                networkScene.RemoveProcessor(networkId,ProcessMessage);
+                networkScene.RemoveProcessor(networkId, ProcessMessage);
             }
 
             if (impl != null)
@@ -131,11 +131,11 @@ namespace Ubiq.Voip
             Quaternion sourceRotation, Vector3 listenerPosition,
             Quaternion listenerRotation)
         {
-            impl.UpdateSpatialization(sourcePosition,sourceRotation,
-                listenerPosition,listenerRotation);
+            impl.UpdateSpatialization(sourcePosition, sourceRotation,
+                listenerPosition, listenerRotation);
         }
 
-        public void Setup (NetworkId networkId, NetworkScene scene,
+        public void Setup(NetworkId networkId, NetworkScene scene,
             string peerUuid, bool polite, List<IceServerDetails> iceServers)
         {
             if (isSetup)
@@ -152,9 +152,9 @@ namespace Ubiq.Voip
 
             networkScene.AddProcessor(networkId, ProcessMessage);
 
-            impl.Setup(new PeerConnectionContext(this),polite,iceServers,
-                Impl_PlaybackStatsPushed,Impl_RecordStatsPushed,
-                Impl_IceConnectionStateChanged,Impl_PeerConnectionStateChanged);
+            impl.Setup(new PeerConnectionContext(this), polite, iceServers,
+                Impl_PlaybackStatsPushed, Impl_RecordStatsPushed,
+                Impl_IceConnectionStateChanged, Impl_PeerConnectionStateChanged);
             isSetup = true;
         }
 
@@ -168,34 +168,52 @@ namespace Ubiq.Voip
 
         private void SendFromImpl(string json)
         {
-            networkScene.Send(networkId,json);
+            networkScene.Send(networkId, json);
         }
 
         private static AudioStats ConvertStats(Implementations.AudioStats stats)
         {
-            return new AudioStats(stats.sampleCount,stats.volumeSum,stats.sampleRate);
+            return new AudioStats(stats.sampleCount, stats.volumeSum, stats.sampleRate);
         }
 
-        private void Impl_PlaybackStatsPushed (Implementations.AudioStats stats)
+        private void Impl_PlaybackStatsPushed(Implementations.AudioStats stats)
         {
             playbackStatsPushed?.Invoke(ConvertStats(stats));
         }
 
-        private void Impl_RecordStatsPushed (Implementations.AudioStats stats)
+        private void Impl_RecordStatsPushed(Implementations.AudioStats stats)
         {
             recordStatsPushed?.Invoke(ConvertStats(stats));
         }
 
-        private void Impl_IceConnectionStateChanged (Implementations.IceConnectionState state)
+        private void Impl_IceConnectionStateChanged(Implementations.IceConnectionState state)
         {
             iceConnectionState = (IceConnectionState)state;
             OnIceConnectionStateChanged.Invoke((IceConnectionState)state);
         }
 
-        private void Impl_PeerConnectionStateChanged (Implementations.PeerConnectionState state)
+        private void Impl_PeerConnectionStateChanged(Implementations.PeerConnectionState state)
         {
             peerConnectionState = (PeerConnectionState)state;
             OnPeerConnectionStateChanged.Invoke((PeerConnectionState)state);
         }
+
+        //The MuteMicrophone and UnmuteMicrophone methods are RealityFlow added functions
+        public void MuteMicrophone()
+        {
+            if (impl != null)
+            {
+                impl.MuteMicrophone();
+            }
+        }
+
+        public void UnmuteMicrophone()
+        {
+            if (impl != null)
+            {
+                impl.UnmuteMicrophone();
+            }
+        }
+
     }
 }

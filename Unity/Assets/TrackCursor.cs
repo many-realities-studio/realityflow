@@ -14,7 +14,6 @@ public class TrackCursor : MonoBehaviour
     public IXRInteractable interactable;
     public Image reticle;
     public Vector2 cursorPosition;
-    public SpawnNodeAtRay spawnScript;
     public bool isHovering = false;
 
     // Start is called before the first frame update

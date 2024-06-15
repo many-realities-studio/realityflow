@@ -6,6 +6,8 @@ using Ubiq.Rooms;
 using Ubiq.Spawning;
 using System;
 using System.Linq;
+using RealityFlow.NodeGraph;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -223,6 +225,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    public void AddNodeToGraph(Graph graph, NodeDefinition def)
+    {
+        NodeIndex index = graph.AddNode(def);
+        actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
+        Debug.Log($"Adding node {def.Name} to graph at index {index}");
+    }
+
 #if UNITY_EDITOR
     public void AddPrefabToCatalogue(GameObject prefab)
     {
@@ -352,9 +361,18 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 break;
 
+            case nameof(AddNodeToGraph):
+                Graph graph = (Graph)action.Parameters[0];
+                NodeIndex index = (NodeIndex)action.Parameters[2];
+
+                graph.RemoveNode(index);
+
+                break;
+
                 // Add cases for other functions...
         }
     }
+
     public List<string> GetPrefabNames()
     {
         if (spawnManager != null && spawnManager.catalogue != null)
@@ -364,6 +382,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return new List<string>();
     }
 
+    public List<NodeDefinition> GetAvailableNodeDefinitions()
+    {
+        List<NodeDefinition> defs = new();
+
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/Actions/"));
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/Control Flow/"));
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/Functional/"));
+        defs.AddRange(Resources.LoadAll<NodeDefinition>("NodeGraph/Nodes/State/"));
+
+        // In the future, this can query the DB to access online node definitions
+
+        return defs;
+    }
 
     public void StartCompoundAction()
     {
