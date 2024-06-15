@@ -6,6 +6,13 @@ namespace RealityFlow.NodeUI
 {
     public class AttachedWhiteboard : MonoBehaviour
     {
+        [SerializeField]
+        GameObject whiteboardPrefab; 
         public GameObject whiteboard;
+
+        void Start()
+        {
+            
+        }
     }
 }
