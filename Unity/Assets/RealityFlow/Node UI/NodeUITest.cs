@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using RealityFlow.NodeGraph;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -8,12 +9,12 @@ namespace RealityFlow.NodeUI
 {
     public class NodeUITest : MonoBehaviour
     {
-        public NodeDefinition Activate;
-        public NodeDefinition Print;
-        public NodeDefinition AddDef;
-        public NodeDefinition Integer;
-        public NodeDefinition This;
-        public NodeDefinition Name;
+        NodeDefinition Activate;
+        NodeDefinition Print;
+        NodeDefinition AddDef;
+        NodeDefinition Integer;
+        NodeDefinition This;
+        NodeDefinition Name;
 
         GraphView view;
 
@@ -38,6 +39,15 @@ namespace RealityFlow.NodeUI
 
         void Start()
         {
+            List<NodeDefinition> nodes = RealityFlowAPI.Instance.GetAvailableNodeDefinitions();
+            Dictionary<string, NodeDefinition> dict = nodes.ToDictionary(def => def.Name);
+            Activate = dict["Activate"];
+            Print = dict["Print"];
+            AddDef = dict["IntAdd"];
+            Integer = dict["Integer"];
+            This = dict["ThisObject"];
+            Name = dict["ObjectName"];
+
             view = GetComponent<GraphView>();
 
             Graph graph = ConstructGraph();

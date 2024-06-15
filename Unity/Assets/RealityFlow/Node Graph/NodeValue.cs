@@ -95,6 +95,15 @@ namespace RealityFlow.NodeGraph
             value = str;
         }
 
+        public NodeValue(GameObject go)
+        {
+            type = NodeValueType.GameObject;
+            value = go.name;
+        }
+
+        public static NodeValue TemplateObject(GameObject template)
+            => new() { type = NodeValueType.TemplateObject, value = template };
+
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
 
@@ -114,16 +123,24 @@ namespace RealityFlow.NodeGraph
                 return true;
             }
             else if (
+                // TODO: RealityFlowId Lookup
                 Type is NodeValueType.GameObject
-                && this.value is string name
-                && GameObject.Find(name) is T tObj
+                && this.value is string goName
+                && GameObject.Find(goName) is T gameObj
             )
             {
-                value = tObj;
+                value = gameObj;
                 return true;
             }
-            else if (Type is NodeValueType.Prefab)
-                throw new NotImplementedException("Prefab lookup not implemented");
+            else if (
+                Type is NodeValueType.TemplateObject
+                && this.value is string toName
+                && GameObject.Find(toName) is T tempObj
+            )
+            {
+                value = tempObj;
+                return true;
+            }
             else
             {
                 value = default;
@@ -131,16 +148,54 @@ namespace RealityFlow.NodeGraph
             }
         }
 
+        public T UnwrapValue<T>()
+        {
+            if (TryGetValue(out T value))
+                return value;
+            else
+                throw new ArgumentException($"Could not read NodeValue as type {typeof(T).FullName}");
+        }
+
         public static bool IsAssignableTo(NodeValueType assigned, NodeValueType to)
         {
             return
                 to is NodeValueType.Any
+                || to is NodeValueType.String
                 || assigned == to
                 || (assigned == NodeValueType.Int && to == NodeValueType.Float);
         }
 
         public static bool IsNotAssignableTo(NodeValueType subtype, NodeValueType supertype)
             => !IsAssignableTo(subtype, supertype);
+
+        public string CastToString()
+        {
+            switch (Type)
+            {
+                case NodeValueType.Int:
+                    return UnwrapValue<int>().ToString();
+                case NodeValueType.Float:
+                    return UnwrapValue<float>().ToString();
+                case NodeValueType.Bool:
+                    return UnwrapValue<bool>().ToString();
+                case NodeValueType.GameObject:
+                    return UnwrapValue<GameObject>().name;
+                case NodeValueType.Graph:
+                    return UnwrapValue<ReadonlyGraph>().ToString();
+                case NodeValueType.Quaternion:
+                    return UnwrapValue<Quaternion>().ToString();
+                case NodeValueType.String:
+                    return UnwrapValue<string>().ToString();
+                case NodeValueType.Vector2:
+                    return UnwrapValue<Vector2>().ToString();
+                case NodeValueType.Vector3:
+                    return UnwrapValue<Vector3>().ToString();
+                case NodeValueType.TemplateObject:
+                    return UnwrapValue<GameObject>().name;
+            }
+
+            throw new ArgumentException();
+        }
 
         /// <summary>
         /// Get the C# type that the given NodeValueType corresponds to.
@@ -156,7 +211,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Bool => typeof(bool),
             NodeValueType.Any => typeof(object),
             NodeValueType.GameObject => typeof(string),
-            NodeValueType.Prefab => typeof(string),
+            NodeValueType.TemplateObject => typeof(string),
             NodeValueType.String => typeof(string),
             _ => throw new ArgumentException(),
         };
@@ -177,7 +232,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Bool => typeof(bool),
             NodeValueType.Any => typeof(object),
             NodeValueType.GameObject => typeof(GameObject),
-            NodeValueType.Prefab => typeof(GameObject),
+            NodeValueType.TemplateObject => typeof(GameObject),
             NodeValueType.String => typeof(string),
             _ => throw new ArgumentException(),
         };
@@ -194,7 +249,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.Graph => new ReadonlyGraph(),
             NodeValueType.Bool => new BoxedBool(false),
             NodeValueType.GameObject => null,
-            NodeValueType.Prefab => null,
+            NodeValueType.TemplateObject => null,
             NodeValueType.String => string.Empty,
             _ => throw new ArgumentException(),
         };
@@ -204,6 +259,20 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         public static NodeValue DefaultFor(NodeValueType type) =>
             new() { type = type, value = InternalDefaultFor(type) };
+
+        public static bool TryGetDefaultFor(NodeValueType type, out NodeValue value)
+        {
+            try
+            {
+                value = DefaultFor(type);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                value = default;
+                return false;
+            }
+        }
 
         /// <summary>
         /// Get an instance of a NodeValue from a given value. May fail if the given value is not
@@ -221,6 +290,32 @@ namespace RealityFlow.NodeGraph
             bool val => new(val),
             string val => new(val),
             _ => throw new ArgumentException(),
+        };
+
+        /// <summary>
+        /// Get an instance of a NodeValue from a given value. May fail if the given value is not
+        /// of a type that NodeValue may represent, or if the value is ambiguous between multiple
+        /// types.
+        /// </summary>
+        public static NodeValue From<T>(T value, NodeValueType type) => type switch
+        {
+            NodeValueType.Int => new(value.CastTo<T, int>()),
+            NodeValueType.Float => new(value.CastTo<T, float>()),
+            NodeValueType.Vector2 => new(value.CastTo<T, Vector2>()),
+            NodeValueType.Vector3 => new(value.CastTo<T, Vector3>()),
+            NodeValueType.Quaternion => new(value.CastTo<T, Quaternion>()),
+            NodeValueType.Graph => new(value.CastTo<T, ReadonlyGraph>()),
+            NodeValueType.Bool => new(value.CastTo<T, bool>()),
+            NodeValueType.GameObject => new(value.CastTo<T, GameObject>()),
+            NodeValueType.TemplateObject => TemplateObject(value.CastTo<T, GameObject>()),
+            NodeValueType.String => new(value.CastTo<T, string>()),
+            _ => throw new ArgumentException(),
+        };
+
+        public static NodeValue Null => new()
+        {
+            value = null,
+            type = NodeValueType.Any,
         };
 
         public void OnBeforeSerialize()

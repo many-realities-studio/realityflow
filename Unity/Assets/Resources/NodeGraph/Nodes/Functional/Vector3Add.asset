@@ -17,12 +17,12 @@ MonoBehaviour:
     Default:
       type: 3
       value:
-        rid: -2
+        rid: 4204108339390971920
   - Name: right
     Default:
       type: 3
       value:
-        rid: -2
+        rid: 4204108339390971921
   Inputs: []
   Outputs: []
   IsVariadic: 0
@@ -35,5 +35,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 4204108339390971920
+      type: {class: NodeValue/BoxedVector3, ns: RealityFlow.NodeGraph, asm: RealityFlow}
+      data:
+        value: {x: 0, y: 0, z: 0}
+    - rid: 4204108339390971921
+      type: {class: NodeValue/BoxedVector3, ns: RealityFlow.NodeGraph, asm: RealityFlow}
+      data:
+        value: {x: 0, y: 0, z: 0}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -29,7 +30,7 @@ namespace RealityFlow.NodeGraph
 
         public int ExecutionInputs => graph.ExecutionInputs;
 
-        public List<NodeIndex> InputExecutionEdges(int index)
+        public ImmutableList<NodeIndex> InputExecutionEdges(int index)
             => graph.InputExecutionEdges(index);
 
         public bool TryGetOutputPortOf(PortIndex input, out PortIndex output)
@@ -38,7 +39,7 @@ namespace RealityFlow.NodeGraph
         public bool TryGetGraphOutputSource(int outputIndex, out PortIndex port)
             => graph.TryGetGraphOutputSource(outputIndex, out port);
 
-        public List<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
+        public ImmutableList<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => graph.GetExecutionInputPortsOf(outputPort);
 
         public override readonly bool Equals(object obj)
