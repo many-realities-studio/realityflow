@@ -42,6 +42,7 @@ public class PaletteHandManager : MonoBehaviour
         {
             if (avatars[i].ToString().Contains("My Avatar"))
             {
+
                 GameObject[] dominantHandManagers = GameObject.FindGameObjectsWithTag("DominantHandManager");
 
                 // foreach (GameObject go in dominantHandManagers)
@@ -49,6 +50,7 @@ public class PaletteHandManager : MonoBehaviour
                 //     Debug.Log(go.name + " in palette " + go.transform.parent.parent.parent.name);
                 // }
 
+                // If the left hand is not set, and there is no handstate yet, search each avatar to set the correct dominant hand.
                 if (isLeftHandDominant == null && !handStateAlreadyFound)
                 {
                     for (int j = 0; j < dominantHandManagers.Length; j++)
@@ -70,19 +72,21 @@ public class PaletteHandManager : MonoBehaviour
                         }
                     }
                 }
-                // if (handStateAlreadyFound)
-                // {
-                //     Debug.Log("handStateAlreadyFound");
-                //     isLeftHandDominant.ForceSetToggled(handStateAlreadyFound);
-                // }
+
+                // if the handState already exists, toggle the dominant hand to active.
+                if (handStateAlreadyFound)
+                {
+                    Debug.Log("handStateAlreadyFound");
+                    isLeftHandDominant.ForceSetToggled(handStateAlreadyFound);
+                }
 
                 // By default the dominant hand is assigned to the right hand
-                Transform dominantHand = avatars[i].transform.Find("Body/LeftHand IK Target");
+                Transform dominantHand = avatars[i].transform.Find("Body/Floating_LeftHand_A");
 
                 // Update the dominant hand based on the toggle state of the Switch Hands Button
                 if (isLeftHandDominant.IsToggled)
                 {
-                    dominantHand = avatars[i].transform.Find("Body/RightHand IK Target");
+                    dominantHand = avatars[i].transform.Find("Body/Floating_RightHand_A");
 
                     // If the rotation offset y is negative then make it positive to reflect the orientation of a left hand perspective
                     if (Mathf.Sign(parentConstraint.GetRotationOffset(0).y) == -1)
@@ -109,7 +113,7 @@ public class PaletteHandManager : MonoBehaviour
                 }
                 else if (!isLeftHandDominant.IsToggled)
                 {
-                    dominantHand = avatars[i].transform.Find("Body/LeftHand IK Target");
+                    dominantHand = avatars[i].transform.Find("Body/Floating_LeftHand_A");
 
                     // If the rotation offset y is positive then make it negative to reflect the orientation of a right hand perspective
                     if (Mathf.Sign(parentConstraint.GetRotationOffset(0).y) == 1)
