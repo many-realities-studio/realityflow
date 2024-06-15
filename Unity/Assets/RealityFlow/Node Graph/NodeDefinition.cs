@@ -181,6 +181,8 @@ namespace RealityFlow.NodeGraph
                 );
             }
 
+            string scriptName = $"Script_{Name.Replace(" ", "")}";
+
             string definition = @$"
                             #pragma warning disable CS8019
                             using System;
@@ -189,7 +191,7 @@ namespace RealityFlow.NodeGraph
                             using Ubiq;
                             using RealityFlow.NodeGraph;
 
-                            public class Script
+                            public class {scriptName}
                             {{
                                 {scriptFields}
                                 
@@ -203,9 +205,8 @@ namespace RealityFlow.NodeGraph
                             }}
                         ";
 
-            Type scriptType = ScriptUtilities
-                .CompileToAssembly(definition, diagnostics)
-                ?.GetType("Script");
+            Assembly asm = ScriptUtilities.CompileToAssembly(definition, diagnostics);
+            Type scriptType = asm?.GetType(scriptName);
 
             foreach (var diag in diagnostics)
                 switch (diag.Severity)
@@ -223,16 +224,17 @@ namespace RealityFlow.NodeGraph
             diagnostics.Clear();
 
             if (scriptType is null)
+            {
+                Debug.LogError("Failed to load script type");
                 return;
+            }
 
-            object script = Activator.CreateInstance(scriptType);
+            object script = ScriptUtilities.CreateInstance(scriptType);
             MethodInfo scriptMethod = scriptType.GetMethod("Eval");
-            eval =
-                (Action<EvalContext>)Delegate.CreateDelegate(
-                    typeof(Action<EvalContext>),
-                    script,
-                    scriptMethod
-                );
+            eval = ctx =>
+            {
+                scriptMethod.Invoke(script, new[] { ctx });
+            };
         }
 
         [Serializable]
