@@ -10,7 +10,8 @@ namespace RealityFlow.NodeGraph
     /// Specially built to be serialized correctly despite containing polymorphic values.
     /// A weird class, because unfortunately C# lacks good discriminated unions.
     /// Is immutable.
-    /// Improvements to this class' design welcome.
+    /// Improvements to this class' design welcome, but be careful; its strange design balances
+    /// a lot of real constraints and it can break violently in subtle ways.
     /// </summary>
     [Serializable]
     public class NodeValue : ISerializationCallbackReceiver
@@ -104,6 +105,9 @@ namespace RealityFlow.NodeGraph
         public static NodeValue TemplateObject(GameObject template)
             => new() { type = NodeValueType.TemplateObject, value = template };
 
+        public static NodeValue VariableType(string variable)
+            => new() { type = NodeValueType.Variable(variable), value = variable };
+
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
 
@@ -124,7 +128,7 @@ namespace RealityFlow.NodeGraph
             }
             else if (
                 // TODO: RealityFlowId Lookup
-                Type is NodeValueType.GameObject
+                Type == NodeValueType.GameObject
                 && this.value is string goName
                 && GameObject.Find(goName) is T gameObj
             )
@@ -133,7 +137,7 @@ namespace RealityFlow.NodeGraph
                 return true;
             }
             else if (
-                Type is NodeValueType.TemplateObject
+                Type == NodeValueType.TemplateObject
                 && this.value is string toName
                 && GameObject.Find(toName) is T tempObj
             )
@@ -159,8 +163,8 @@ namespace RealityFlow.NodeGraph
         public static bool IsAssignableTo(NodeValueType assigned, NodeValueType to)
         {
             return
-                to is NodeValueType.Any
-                || to is NodeValueType.String
+                to == NodeValueType.Any
+                || to == NodeValueType.String
                 || assigned == to
                 || (assigned == NodeValueType.Int && to == NodeValueType.Float);
         }
@@ -202,17 +206,17 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         public static Type GetValueType(NodeValueType type) => type switch
         {
-            NodeValueType.Int => typeof(int),
-            NodeValueType.Float => typeof(float),
-            NodeValueType.Vector2 => typeof(Vector2),
-            NodeValueType.Vector3 => typeof(Vector3),
-            NodeValueType.Quaternion => typeof(Quaternion),
-            NodeValueType.Graph => typeof(ReadonlyGraph),
-            NodeValueType.Bool => typeof(bool),
-            NodeValueType.Any => typeof(object),
-            NodeValueType.GameObject => typeof(string),
-            NodeValueType.TemplateObject => typeof(string),
-            NodeValueType.String => typeof(string),
+            _ when type == NodeValueType.Int => typeof(int),
+            _ when type == NodeValueType.Float => typeof(float),
+            _ when type == NodeValueType.Vector2 => typeof(Vector2),
+            _ when type == NodeValueType.Vector3 => typeof(Vector3),
+            _ when type == NodeValueType.Quaternion => typeof(Quaternion),
+            _ when type == NodeValueType.Graph => typeof(ReadonlyGraph),
+            _ when type == NodeValueType.Bool => typeof(bool),
+            _ when type == NodeValueType.Any => typeof(object),
+            _ when type == NodeValueType.GameObject => typeof(string),
+            _ when type == NodeValueType.TemplateObject => typeof(string),
+            _ when type == NodeValueType.String => typeof(string),
             _ => throw new ArgumentException(),
         };
 
@@ -223,17 +227,17 @@ namespace RealityFlow.NodeGraph
 
         public static Type GetEvalTimeType(NodeValueType type) => type switch
         {
-            NodeValueType.Int => typeof(int),
-            NodeValueType.Float => typeof(float),
-            NodeValueType.Vector2 => typeof(Vector2),
-            NodeValueType.Vector3 => typeof(Vector3),
-            NodeValueType.Quaternion => typeof(Quaternion),
-            NodeValueType.Graph => typeof(ReadonlyGraph),
-            NodeValueType.Bool => typeof(bool),
-            NodeValueType.Any => typeof(object),
-            NodeValueType.GameObject => typeof(GameObject),
-            NodeValueType.TemplateObject => typeof(GameObject),
-            NodeValueType.String => typeof(string),
+            _ when type == NodeValueType.Int => typeof(int),
+            _ when type == NodeValueType.Float => typeof(float),
+            _ when type == NodeValueType.Vector2 => typeof(Vector2),
+            _ when type == NodeValueType.Vector3 => typeof(Vector3),
+            _ when type == NodeValueType.Quaternion => typeof(Quaternion),
+            _ when type == NodeValueType.Graph => typeof(ReadonlyGraph),
+            _ when type == NodeValueType.Bool => typeof(bool),
+            _ when type == NodeValueType.Any => typeof(object),
+            _ when type == NodeValueType.GameObject => typeof(GameObject),
+            _ when type == NodeValueType.TemplateObject => typeof(GameObject),
+            _ when type == NodeValueType.String => typeof(string),
             _ => throw new ArgumentException(),
         };
 
@@ -241,16 +245,16 @@ namespace RealityFlow.NodeGraph
 
         static object InternalDefaultFor(NodeValueType type) => type switch
         {
-            NodeValueType.Int => new BoxedInt(0),
-            NodeValueType.Float => new BoxedFloat(0f),
-            NodeValueType.Vector2 => new BoxedVector2(Vector2.zero),
-            NodeValueType.Vector3 => new BoxedVector3(Vector3.zero),
-            NodeValueType.Quaternion => new BoxedQuaternion(Quaternion.identity),
-            NodeValueType.Graph => new ReadonlyGraph(),
-            NodeValueType.Bool => new BoxedBool(false),
-            NodeValueType.GameObject => null,
-            NodeValueType.TemplateObject => null,
-            NodeValueType.String => string.Empty,
+            _ when type == NodeValueType.Int => new BoxedInt(0),
+            _ when type == NodeValueType.Float => new BoxedFloat(0f),
+            _ when type == NodeValueType.Vector2 => new BoxedVector2(Vector2.zero),
+            _ when type == NodeValueType.Vector3 => new BoxedVector3(Vector3.zero),
+            _ when type == NodeValueType.Quaternion => new BoxedQuaternion(Quaternion.identity),
+            _ when type == NodeValueType.Graph => new ReadonlyGraph(),
+            _ when type == NodeValueType.Bool => new BoxedBool(false),
+            _ when type == NodeValueType.GameObject => null,
+            _ when type == NodeValueType.TemplateObject => null,
+            _ when type == NodeValueType.String => string.Empty,
             _ => throw new ArgumentException(),
         };
 
@@ -299,16 +303,16 @@ namespace RealityFlow.NodeGraph
         /// </summary>
         public static NodeValue From<T>(T value, NodeValueType type) => type switch
         {
-            NodeValueType.Int => new(value.CastTo<T, int>()),
-            NodeValueType.Float => new(value.CastTo<T, float>()),
-            NodeValueType.Vector2 => new(value.CastTo<T, Vector2>()),
-            NodeValueType.Vector3 => new(value.CastTo<T, Vector3>()),
-            NodeValueType.Quaternion => new(value.CastTo<T, Quaternion>()),
-            NodeValueType.Graph => new(value.CastTo<T, ReadonlyGraph>()),
-            NodeValueType.Bool => new(value.CastTo<T, bool>()),
-            NodeValueType.GameObject => new(value.CastTo<T, GameObject>()),
-            NodeValueType.TemplateObject => TemplateObject(value.CastTo<T, GameObject>()),
-            NodeValueType.String => new(value.CastTo<T, string>()),
+            _ when type == NodeValueType.Int => new(value.CastTo<T, int>()),
+            _ when type == NodeValueType.Float => new(value.CastTo<T, float>()),
+            _ when type == NodeValueType.Vector2 => new(value.CastTo<T, Vector2>()),
+            _ when type == NodeValueType.Vector3 => new(value.CastTo<T, Vector3>()),
+            _ when type == NodeValueType.Quaternion => new(value.CastTo<T, Quaternion>()),
+            _ when type == NodeValueType.Graph => new(value.CastTo<T, ReadonlyGraph>()),
+            _ when type == NodeValueType.Bool => new(value.CastTo<T, bool>()),
+            _ when type == NodeValueType.GameObject => new(value.CastTo<T, GameObject>()),
+            _ when type == NodeValueType.TemplateObject => TemplateObject(value.CastTo<T, GameObject>()),
+            _ when type == NodeValueType.String => new(value.CastTo<T, string>()),
             _ => throw new ArgumentException(),
         };
 

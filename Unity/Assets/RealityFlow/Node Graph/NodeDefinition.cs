@@ -26,18 +26,18 @@ namespace RealityFlow.NodeGraph
         /// Stores a name and default value for each field. Allows e.g. initializing graphs.
         /// </summary>
         public List<NodeFieldDefinition> Fields;
-        public List<NodePortDefinition> Inputs;
-        public List<NodePortDefinition> Outputs;
-        /// <summary>
-        /// Indicates that a node has a variable number of dynamic (untyped) input ports after
-        /// its normal input ports.
-        /// </summary>
-        public bool IsVariadic;
-        /// <summary>
-        /// Indicates that a node which has variadic input ports should also have an equal number
-        /// of output ports with the same types.
-        /// </summary>
-        public bool IsVariadicOutput;
+        public List<NodeInputPortDefinition> Inputs;
+        public List<NodeOutputPortDefinition> Outputs;
+        // /// <summary>
+        // /// Indicates that a node has a variable number of dynamic (untyped) input ports after
+        // /// its normal input ports.
+        // /// </summary>
+        // public bool IsVariadic;
+        // /// <summary>
+        // /// Indicates that a node which has variadic input ports should also have an equal number
+        // /// of output ports with the same types.
+        // /// </summary>
+        // public bool IsVariadicOutput;
 
         public EvalMethod EvaluationMethod;
         [ShowIf("EvaluationMethod", EvalMethod.MethodLookup)]
