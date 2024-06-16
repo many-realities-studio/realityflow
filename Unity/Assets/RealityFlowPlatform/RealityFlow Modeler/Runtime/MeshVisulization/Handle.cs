@@ -35,8 +35,8 @@ public class Handle : MonoBehaviour
             Debug.LogError("SelectionManager not found");
         }
 
-        if (!HandleSpawner.Instance.manipulationActive)
-            return;
+        //if (!HandleSpawner.Instance.manipulationActive)
+        //    return;
 
         if (!isSelected)
         {
