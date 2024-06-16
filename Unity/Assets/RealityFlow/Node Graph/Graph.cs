@@ -45,17 +45,15 @@ namespace RealityFlow.NodeGraph
         /// Input ports, usually only present in subgraphs (such as within a for loop node)
         /// </summary>
         [SerializeField]
-        List<NodeValueType> inputPortsSerial;
-        List<INodeInputType> inputPorts = new();
+        List<NodeValueType> inputPorts = new();
 
         /// <summary>
         /// Output ports, usually only present in subgraphs (such as within a for loop node)
         /// </summary>
         [SerializeField]
-        List<NodeValueType> outputPortsSerial;
-        List<INodeOutputType> outputPorts = new();
+        List<NodeValueType> outputPorts = new();
 
-        public List<INodeOutputType> OutputPorts => outputPorts;
+        public List<NodeValueType> OutputPorts => outputPorts;
 
         /// <summary>
         /// Backwards edges between a node and the graph's input ports (node -> graph input).
@@ -127,29 +125,6 @@ namespace RealityFlow.NodeGraph
 
         public ImmutableHashSet<NodeIndex> NodesOfType(string type) =>
             MutableNodesOfType(type).ToImmutableHashSet();
-
-
-        [SerializeField]
-        readonly Dictionary<string, NodeValue> variables = new();
-
-        public void AddVariable(string name, NodeValueType type)
-        {
-            variables.Add(name, NodeValue.DefaultFor(type));
-        }
-
-        public bool RemoveVariable(string name) => variables.Remove(name);
-
-        public T GetVariable<T>(string name)
-        {
-            return variables[name].UnwrapValue<T>();
-        }
-
-        public void SetVariable<T>(string name, T value)
-        {
-            NodeValue oldValue = variables[name];
-            NodeValue nodeValue = NodeValue.From(value, oldValue.Type);
-            variables[name] = nodeValue;
-        }
 
         public ImmutableList<NodeIndex> InputExecutionEdges(int index)
             => inputExecutionEdges[index];
