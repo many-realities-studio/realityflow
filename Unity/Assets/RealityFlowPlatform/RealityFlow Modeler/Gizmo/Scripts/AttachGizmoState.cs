@@ -351,7 +351,7 @@ public class AttachGizmoState : MonoBehaviour
 
         farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;
         // 6 is gizmo layer
-        SetLayerOfFarRay(farRay, 6);
+        //SetLayerOfFarRay(farRay, 6);
     }
 
     public void DisableMeshRaySelection()
@@ -363,7 +363,7 @@ public class AttachGizmoState : MonoBehaviour
 
         farRay.GetComponent<XRRayInteractor>().raycastMask = everything;
         // 0 is default layer
-        SetLayerOfFarRay(farRay, 0);
+        //SetLayerOfFarRay(farRay, 0);
     }
 
     private void SetLayerOfFarRay(GameObject farRay, int layer)
