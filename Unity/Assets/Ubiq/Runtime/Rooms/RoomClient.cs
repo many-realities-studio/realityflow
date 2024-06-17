@@ -454,7 +454,7 @@ namespace Ubiq.Rooms
 
         private void Awake()
         {
-            OnJoinedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Room " + room.Name));
+            OnJoinedRoom.AddListener((room) => Debug.Log("[UbiqRoomClient] Joined Room " + room.Name));
             OnPeerUpdated.SetExisting(me);
         }
 
