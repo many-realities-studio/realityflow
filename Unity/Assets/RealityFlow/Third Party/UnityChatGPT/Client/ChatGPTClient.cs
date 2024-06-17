@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.IO;
 
 public class ChatGPTClient : Singleton<ChatGPTClient>
 {
@@ -12,8 +13,53 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     private ChatGTPSettings chatGTPSettings;
 
     private List<ChatGPTChatMessage> conversationHistory = new List<ChatGPTChatMessage>();
+    private string screenshotPath;
+    public bool IsScreenshotReady { get; private set; }
+    private string base64Screenshot;
+
+    // Method to capture and encode screenshot
+    public void CaptureScreenshot()
+    {
+        IsScreenshotReady = false;
+        screenshotPath = Path.Combine(Application.persistentDataPath, "screenshot.png");
+        Debug.Log("CaptureScreenshot called. Path: " + screenshotPath);
+        ScreenCapture.CaptureScreenshot(screenshotPath);
+        Debug.Log("Screenshot capture requested: " + screenshotPath);
+        StartCoroutine(WaitForScreenshot());
+    }
+
+    private IEnumerator WaitForScreenshot()
+    {
+        Debug.Log("WaitForScreenshot coroutine started.");
+        yield return new WaitForEndOfFrame(); // Ensure the screenshot is fully captured
+        Debug.Log("End of frame reached, attempting to load and encode screenshot...");
+        LoadAndEncodeScreenshot();
+    }
+
+    private void LoadAndEncodeScreenshot()
+    {
+        Debug.Log("LoadAndEncodeScreenshot called. Path: " + screenshotPath);
+        if (File.Exists(screenshotPath))
+        {
+            Debug.Log("Screenshot file found at: " + screenshotPath);
+            byte[] screenshotBytes = File.ReadAllBytes(screenshotPath);
+            base64Screenshot = Convert.ToBase64String(screenshotBytes);
+            Debug.Log("Screenshot encoded to Base64.");
+            IsScreenshotReady = true;
+        }
+        else
+        {
+            Debug.LogError("Screenshot file not found: " + screenshotPath);
+            IsScreenshotReady = true; // Set to true to prevent hanging in case of error
+        }
+    }
 
     public IEnumerator Ask(string prompt, Action<ChatGPTResponse> callBack)
+    {
+        yield return AskInternal(prompt, base64Screenshot, callBack);
+    }
+
+    private IEnumerator AskInternal(string prompt, string base64Screenshot, Action<ChatGPTResponse> callBack)
     {
         var url = chatGTPSettings.debug ? $"{chatGTPSettings.apiURL}?debug=true" : chatGTPSettings.apiURL;
 
@@ -23,6 +69,16 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
             role = "user",
             content = prompt
         });
+
+        // Optionally add the screenshot context
+        if (!string.IsNullOrEmpty(base64Screenshot))
+        {
+            conversationHistory.Add(new ChatGPTChatMessage
+            {
+                role = "system",
+                content = base64Screenshot
+            });
+        }
 
         using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {

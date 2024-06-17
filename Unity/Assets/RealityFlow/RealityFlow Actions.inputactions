@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Undo",
+                    "type": "Button",
+                    "id": "38602135-bee1-4ac8-8493-b1843187151d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -59,7 +68,18 @@
                 {
                     "name": "",
                     "id": "bc8cfafc-186d-4c3b-b35c-8f6395f10455",
-                    "path": "<XRController>{LeftHand}/secondaryButton",
+                    "path": "<XRController>{LeftHand}/{Primary2DAxisClick}",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenLLMMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e5c36642-cb43-462a-b117-f509d3b9cf73",
+                    "path": "<Keyboard>/h",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
@@ -75,6 +95,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Execute",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a7440b53-b797-4d43-9342-4a250657b52c",
+                    "path": "<XRController>{LeftHand}/primary2DAxisClick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Undo",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -7,7 +7,6 @@ using Ubiq.Voip;
 using Microsoft.MixedReality.Toolkit.UX;
 using System.Collections;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 namespace Samples.Whisper
 {
@@ -39,6 +38,7 @@ namespace Samples.Whisper
         private ChatGPTTester chatGPTTester; // Reference to the ChatGPTTester
 
         private Coroutine countdownCoroutine;
+        private bool isCountdownActive;
 
         private void Awake()
         {
@@ -50,8 +50,8 @@ namespace Samples.Whisper
         {
             inputActions.RealityFlowXRActions.ToggleRecording.started += OnRecordingStarted;
             inputActions.RealityFlowXRActions.ToggleRecording.canceled += OnRecordingCanceled;
-            inputActions.RealityFlowXRActions.OpenLLMMenu.started += OnOpenLLMMenu;
             inputActions.RealityFlowXRActions.Execute.started += OnExecute; // Register the Execute action
+            inputActions.RealityFlowXRActions.OpenLLMMenu.started += OnOpenLLMMenu; // Register the OpenLLMMenu action
             inputActions.Enable();
         }
 
@@ -59,8 +59,8 @@ namespace Samples.Whisper
         {
             inputActions.RealityFlowXRActions.ToggleRecording.started -= OnRecordingStarted;
             inputActions.RealityFlowXRActions.ToggleRecording.canceled -= OnRecordingCanceled;
-            inputActions.RealityFlowXRActions.OpenLLMMenu.started -= OnOpenLLMMenu;
             inputActions.RealityFlowXRActions.Execute.started -= OnExecute; // Unregister the Execute action
+            inputActions.RealityFlowXRActions.OpenLLMMenu.started -= OnOpenLLMMenu; // Unregister the OpenLLMMenu action
             inputActions.Disable();
         }
 
@@ -76,32 +76,28 @@ namespace Samples.Whisper
             EndRecording();
         }
 
-        private void OnOpenLLMMenu(InputAction.CallbackContext context)
-        {
-            ToggleLLMWindow();
-        }
-
         private void OnExecute(InputAction.CallbackContext context)
         {
             ExecuteLoggedActions();
         }
 
-        private void ToggleLLMWindow()
+        private void OnOpenLLMMenu(InputAction.CallbackContext context)
         {
             if (LLMWindow != null)
             {
-                LLMWindow.SetActive(!LLMWindow.activeSelf);
+                LLMWindow.SetActive(!LLMWindow.activeSelf); // Toggle the LLMWindow's active state
             }
         }
 
         private void Start()
         {
             recordButton.onClick.AddListener(ToggleRecording);
-            dropdown.onValueChanged.AddListener(ChangeMicrophone);
+            //dropdown.onValueChanged.AddListener(ChangeMicrophone);
             submitButton.onClick.AddListener(SubmitApiKey);
             muteButton.onClick.AddListener(() => muteManager?.ToggleMute());
 
-            RefreshMicrophoneList();
+            // Comment out the microphone list refresh and selection
+            //RefreshMicrophoneList();
 
             muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
@@ -117,6 +113,7 @@ namespace Samples.Whisper
 
             if (!string.IsNullOrEmpty(apiKey))
             {
+                Debug.Log("In whisper API key is :" + apiKey);
                 InitializeOpenAI(apiKey);
             }
             else
@@ -165,6 +162,8 @@ namespace Samples.Whisper
             }
         }
 
+        /* 
+        // Commented out the microphone list refresh and selection
         private void RefreshMicrophoneList()
         {
             Debug.Log("Refreshing microphone list...");
@@ -191,6 +190,7 @@ namespace Samples.Whisper
             Debug.Log($"Microphone changed to: {dropdown.options[index].text}");
             PlayerPrefs.SetInt("user-mic-device-index", index);
         }
+        */
 
         public void ToggleRecording()
         {
@@ -201,6 +201,12 @@ namespace Samples.Whisper
             }
             else
             {
+                if (isCountdownActive)
+                {
+                    Debug.Log("ToggleRecording called during countdown, canceling countdown and restarting recording.");
+                    StopCoroutine(countdownCoroutine);
+                    isCountdownActive = false;
+                }
                 Debug.Log("ToggleRecording called and starting recording now.");
                 StartRecording();
             }
@@ -217,22 +223,15 @@ namespace Samples.Whisper
 
             progressText.text = "Talking to Whisper"; // Update progress text
 
-            var index = PlayerPrefs.GetInt("user-mic-device-index");
-
-            if (index >= dropdown.options.Count)
-            {
-                Debug.LogError("Invalid microphone index.");
-                return;
-            }
-
-            var micName = dropdown.options[index].text;
+            // Use the default microphone
+            string micName = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
             if (string.IsNullOrEmpty(micName))
             {
-                Debug.LogError("Selected microphone name is null or empty.");
+                Debug.LogError("No microphone devices found.");
                 return;
             }
 
-            Debug.Log($"Starting recording with device: {micName}");
+            Debug.Log($"Starting recording with default device: {micName}");
             clip = Microphone.Start(micName, false, maxDuration, 44100); // Set duration to 10 minutes
             Debug.Log(clip + " Is the clip");
 
@@ -366,6 +365,7 @@ namespace Samples.Whisper
 
         private IEnumerator StartCountdown(string transcribedText)
         {
+            isCountdownActive = true;
             int countdown = 10;
             while (countdown > 0)
             {
@@ -373,6 +373,7 @@ namespace Samples.Whisper
                 yield return new WaitForSeconds(1);
                 countdown--;
             }
+            isCountdownActive = false;
 
             SendMessageToChatGPT();
         }
@@ -389,6 +390,11 @@ namespace Samples.Whisper
             if (nearmenutoolbox != null)
             {
                 nearmenutoolbox.SetActive(false); // Disable the nearmenutoolbox
+            }
+
+            if (LLMWindow != null)
+            {
+                LLMWindow.SetActive(true); // Enable the LLMWindow
             }
         }
 

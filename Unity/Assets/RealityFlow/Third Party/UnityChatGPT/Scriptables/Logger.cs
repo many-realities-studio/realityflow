@@ -33,7 +33,7 @@ public class Logger : Singleton<Logger>
 
         if (enabled)
         {
-            debugAreaText.text += $"<color=\"white\">Logger enabled</color>\n";
+            //debugAreaText.text += $"<color=\"white\">Logger enabled</color>\n";
         }
     }
 

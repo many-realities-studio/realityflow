@@ -53,6 +53,15 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Undo"",
+                    ""type"": ""Button"",
+                    ""id"": ""38602135-bee1-4ac8-8493-b1843187151d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -81,7 +90,18 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""bc8cfafc-186d-4c3b-b35c-8f6395f10455"",
-                    ""path"": ""<XRController>{LeftHand}/secondaryButton"",
+                    ""path"": ""<XRController>{LeftHand}/{Primary2DAxisClick}"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenLLMMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e5c36642-cb43-462a-b117-f509d3b9cf73"",
+                    ""path"": ""<Keyboard>/h"",
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
@@ -99,6 +119,17 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                     ""action"": ""Execute"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7440b53-b797-4d43-9342-4a250657b52c"",
+                    ""path"": ""<XRController>{LeftHand}/primary2DAxisClick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Undo"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -110,6 +141,7 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
         m_RealityFlowXRActions_ToggleRecording = m_RealityFlowXRActions.FindAction("ToggleRecording", throwIfNotFound: true);
         m_RealityFlowXRActions_OpenLLMMenu = m_RealityFlowXRActions.FindAction("OpenLLMMenu", throwIfNotFound: true);
         m_RealityFlowXRActions_Execute = m_RealityFlowXRActions.FindAction("Execute", throwIfNotFound: true);
+        m_RealityFlowXRActions_Undo = m_RealityFlowXRActions.FindAction("Undo", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -174,6 +206,7 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_RealityFlowXRActions_ToggleRecording;
     private readonly InputAction m_RealityFlowXRActions_OpenLLMMenu;
     private readonly InputAction m_RealityFlowXRActions_Execute;
+    private readonly InputAction m_RealityFlowXRActions_Undo;
     public struct RealityFlowXRActionsActions
     {
         private @RealityFlowActions m_Wrapper;
@@ -181,6 +214,7 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
         public InputAction @ToggleRecording => m_Wrapper.m_RealityFlowXRActions_ToggleRecording;
         public InputAction @OpenLLMMenu => m_Wrapper.m_RealityFlowXRActions_OpenLLMMenu;
         public InputAction @Execute => m_Wrapper.m_RealityFlowXRActions_Execute;
+        public InputAction @Undo => m_Wrapper.m_RealityFlowXRActions_Undo;
         public InputActionMap Get() { return m_Wrapper.m_RealityFlowXRActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -199,6 +233,9 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
             @Execute.started += instance.OnExecute;
             @Execute.performed += instance.OnExecute;
             @Execute.canceled += instance.OnExecute;
+            @Undo.started += instance.OnUndo;
+            @Undo.performed += instance.OnUndo;
+            @Undo.canceled += instance.OnUndo;
         }
 
         private void UnregisterCallbacks(IRealityFlowXRActionsActions instance)
@@ -212,6 +249,9 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
             @Execute.started -= instance.OnExecute;
             @Execute.performed -= instance.OnExecute;
             @Execute.canceled -= instance.OnExecute;
+            @Undo.started -= instance.OnUndo;
+            @Undo.performed -= instance.OnUndo;
+            @Undo.canceled -= instance.OnUndo;
         }
 
         public void RemoveCallbacks(IRealityFlowXRActionsActions instance)
@@ -234,5 +274,6 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
         void OnToggleRecording(InputAction.CallbackContext context);
         void OnOpenLLMMenu(InputAction.CallbackContext context);
         void OnExecute(InputAction.CallbackContext context);
+        void OnUndo(InputAction.CallbackContext context);
     }
 }

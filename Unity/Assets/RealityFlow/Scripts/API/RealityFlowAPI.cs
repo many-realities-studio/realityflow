@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
@@ -65,9 +66,30 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    void Start()
+    void Update()
     {
+        HandleInput();
+    }
 
+    private void HandleInput()
+    {
+        List<InputDevice> devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, devices);
+
+        foreach (var device in devices)
+        {
+            if (device.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 primary2DAxisValue))
+            {
+                if (primary2DAxisValue.x < -0.5f)
+                {
+                    UndoLastAction();
+                }
+                else if (primary2DAxisValue.x > 0.5f)
+                {
+                    RedoLastAction();
+                }
+            }
+        }
     }
 
     public void ProcessTransformUpdate(string propertyKey, string jsonMessage)
@@ -194,7 +216,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return null;
     }
 
-    // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         GameObject obj = FindSpawnedObject(objectName);
@@ -289,89 +310,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Attempting to undo last action.");
         Debug.Log($"Action stack count before undo: {actionLogger.GetActionStackCount()}");
 
-        actionLogger.StartUndo();
-        var lastAction = actionLogger.GetLastAction();
-        actionLogger.EndUndo();
+        actionLogger.UndoLastAction();
 
-        if (lastAction == null)
-        {
-            Debug.Log("No actions to undo.");
-            return;
-        }
-
-        if (lastAction is ActionLogger.CompoundAction compoundAction)
-        {
-            foreach (var action in compoundAction.Actions)
-            {
-                UndoSingleAction(action);
-            }
-        }
-        else
-        {
-            UndoSingleAction(lastAction);
-        }
-
-        // Clear the action stack after undo
-        //actionLogger.ClearActionStack();
         Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
-        //StopAllCoroutines();
     }
 
-
-    private void UndoSingleAction(ActionLogger.LoggedAction action)
+    public void RedoLastAction()
     {
-        switch (action.FunctionName)
-        {
-            case nameof(SpawnObject):
-                string prefabName = (string)action.Parameters[0] + "(Clone)";
-                Debug.Log("The spawned object's name is " + prefabName);
-                GameObject spawnedObject = FindSpawnedObject(prefabName);
-                if (spawnedObject != null)
-                {
-                    DespawnObject(spawnedObject);
-                }
-                break;
+        Debug.Log("Attempting to redo last action.");
+        Debug.Log($"Redo stack count before redo: {actionLogger.GetRedoStackCount()}");
 
-            case nameof(DespawnObject):
-                string objName = ((string)action.Parameters[0]).Replace("(Clone)", "").Trim();
-                Debug.Log("Undoing the despawn of object named " + objName);
-                Vector3 position = (Vector3)action.Parameters[1];
-                Quaternion rotation = (Quaternion)action.Parameters[2];
-                Vector3 scale = (Vector3)action.Parameters[3];
-                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
-                if (respawnedObject != null)
-                {
-                    respawnedObject.transform.localScale = scale;
-                }
-                break;
+        actionLogger.RedoLastAction();
 
-            case nameof(UpdateObjectTransform):
-                string objectName = (string)action.Parameters[0];
-                Vector3 oldPosition = (Vector3)action.Parameters[1];
-                Quaternion oldRotation = (Quaternion)action.Parameters[2];
-                Vector3 oldScale = (Vector3)action.Parameters[3];
-                Debug.Log("Undoing the transform of object named " + objectName);
-                GameObject obj = FindSpawnedObject(objectName);
-                if (obj != null)
-                {
-                    UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
-                }
-                else
-                {
-                    Debug.LogError($"Object named {objectName} not found during undo transform.");
-                }
-                break;
-
-            case nameof(AddNodeToGraph):
-                Graph graph = (Graph)action.Parameters[0];
-                NodeIndex index = (NodeIndex)action.Parameters[2];
-
-                graph.RemoveNode(index);
-
-                break;
-
-                // Add cases for other functions...
-        }
+        Debug.Log($"Redo stack after redo: {actionLogger.GetRedoStackCount()}");
     }
 
     public List<string> GetPrefabNames()
@@ -406,6 +357,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         actionLogger.EndCompoundAction();
     }
+
     public string ExportSpawnedObjectsData()
     {
         System.Text.StringBuilder sb = new System.Text.StringBuilder();
