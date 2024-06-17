@@ -69,7 +69,7 @@ public class ComponentSelectManipulator : MonoBehaviour
         Vector3 offset = transform.localPosition - lastPosition;
         ComponentTransformations.TranslateVertices(mesh, offset);
         selectionManager.handleSpawner.UpdateHandlePositions();
-        // selectionManager.handleSelector.UpdateHandlePositions();
+        //selectionManager.handleSelector.UpdateHandlePositions();
         //UpdateHandlePosition();
     }
 
