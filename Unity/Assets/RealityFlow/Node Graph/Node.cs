@@ -126,10 +126,7 @@ namespace RealityFlow.NodeGraph
             if (index >= fieldValues.Count)
                 return false;
 
-            if (Definition.Fields[index].Default.GetValueType() != typeof(T))
-                return false;
-
-            fieldValues[index] = NodeValue.From(value);
+            fieldValues[index] = NodeValue.From(value, Definition.Fields[index].Default.Type);
             return true;
         }
 

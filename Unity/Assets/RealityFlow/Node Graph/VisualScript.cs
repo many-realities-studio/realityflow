@@ -2,29 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace RealityFlow.NodeGraph
 {
-    [RequireComponent(typeof(XRGrabInteractable))]
     public class VisualScript : MonoBehaviour
     {
         public Graph graph;
         readonly EvalContext ctx = new();
         public bool isTemplate;
 
-        XRGrabInteractable interactable;
+        ObjectManipulator interactable;
 
         void Start()
         {
-            interactable = GetComponent<XRGrabInteractable>();
+            interactable = GetComponent<ObjectManipulator>();
             if (interactable)
             {
                 interactable.activated.AddListener(OnActivate);
                 interactable.selectEntered.AddListener(OnSelect);
                 interactable.selectExited.AddListener(OnSelectExit);
             }
+            else
+                Debug.LogError("Couldn't find an object manipulator!");
         }
 
         public void OnEnterPlayMode()

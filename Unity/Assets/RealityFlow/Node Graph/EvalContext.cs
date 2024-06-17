@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using RealityFlow.Collections;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -13,47 +14,76 @@ namespace RealityFlow.NodeGraph
     public class EvalContext
     {
         GameObject target;
-        readonly Stack<ReadonlyGraph> graphStack = new();
+        readonly List<ReadonlyGraph> graphStack = new();
         readonly Queue<NodeIndex> nodeQueue = new();
         readonly List<NodeIndex> nodeStack = new();
         readonly Dictionary<PortIndex, object> nodeOutputCache = new();
         readonly Dictionary<(ReadonlyGraph, int), object> graphOutputCache = new();
         readonly Dictionary<string, NodeValue> startArguments = new();
-        [SerializeField]
-        readonly Dictionary<string, NodeValue> variables = new();
+        readonly Dictionary<(ReadonlyGraph, string), NodeValue> variableValues = new();
 
         public ImmutableDictionary<string, NodeValue> StartArguments => startArguments.ToImmutableDictionary();
-
-        public void AddVariable(string name, NodeValueType type)
-        {
-            variables.Add(name, NodeValue.DefaultFor(type));
-        }
-
-        public T GetVariable<T>(string name)
-        {
-            return variables[name].UnwrapValue<T>();
-        }
-
-        public void SetVariable<T>(string name, T value)
-        {
-            NodeValue oldValue = variables[name];
-            NodeValue nodeValue = NodeValue.From(value, oldValue.Type);
-            variables[name] = nodeValue;
-        }
-
-        void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
 
         public GameObject GetThis() => target;
 
         public T GetField<T>(int index)
         {
-            NodeIndex nodeIndex = nodeStack[^1];
+            NodeIndex nodeIndex = nodeStack.Peek();
             ReadonlyGraph graph = graphStack.Peek();
             Node node = graph.GetNode(nodeIndex);
             if (node.TryGetField(index, out T field))
                 return field;
 
             throw new InvalidCastException();
+        }
+
+        bool TryFindVariableGraph(string name, out ReadonlyGraph graph)
+        {
+            for (int i = graphStack.Count - 1; i >= 0; i--)
+            {
+                ReadonlyGraph currentGraph = graphStack[i];
+
+                if (variableValues.TryGetValue((currentGraph, name), out _))
+                {
+                    graph = currentGraph;
+                    return true;
+                }
+
+                if (currentGraph.TryGetVariableType(name, out NodeValueType type))
+                {
+                    variableValues[(currentGraph, name)] = NodeValue.DefaultFor(type);
+                    graph = currentGraph;
+                    return true;
+                }
+            }
+
+            graph = default;
+            return false;
+        }
+
+        NodeValue GetVariableOrDefault(string name)
+        {
+            if (TryFindVariableGraph(name, out ReadonlyGraph graph))
+                return variableValues[(graph, name)];
+
+            throw new ArgumentException($"{name} is not a variable in scope");
+        }
+
+        public T GetVariable<T>(string name)
+        {
+            return GetVariableOrDefault(name).UnwrapValue<T>();
+        }
+
+        public void SetVariable<T>(string name, T value)
+        {
+            if (TryFindVariableGraph(name, out ReadonlyGraph graph))
+            {
+                NodeValue oldValue = variableValues[(graph, name)];
+                NodeValue nodeValue = NodeValue.From(value, oldValue.Type);
+                variableValues[(graph, name)] = nodeValue;
+            }
+            else
+                throw new ArgumentException($"{name} is not a variable in scope");
         }
 
         /// <summary>
@@ -170,7 +200,7 @@ namespace RealityFlow.NodeGraph
                 {
                     nodeStack.Add(node);
                     evaluate(this);
-                    PopNode();
+                    nodeStack.Pop();
                 }
                 else
                 {

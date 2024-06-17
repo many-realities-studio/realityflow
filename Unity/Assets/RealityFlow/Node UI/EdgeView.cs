@@ -68,7 +68,6 @@ namespace RealityFlow.NodeUI
             target2PosLastFrame = transform.position;
         }
 
-        [NaughtyAttributes.Button]
         public void Render()
         {
             if (!line)
