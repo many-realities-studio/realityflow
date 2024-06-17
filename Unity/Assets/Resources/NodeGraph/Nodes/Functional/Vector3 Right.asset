@@ -10,27 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
-  m_Name: SetPosition
+  m_Name: Vector3 Right
   m_EditorClassIdentifier: 
   Fields: []
-  Inputs:
-  - Name: target
-    Optional: 0
-    Type: 8
-  - Name: position
+  Inputs: []
+  Outputs:
+  - Name: forward
     Optional: 0
     Type: 3
-  Outputs: []
   IsVariadic: 0
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'RealityFlowAPI.Instance.UpdateObjectTransform(target.name, position);
-
-    then();'
+  EvalCode: forward = Vector3.right;
   ExecutionInput: 0
-  ExecutionOutputs:
-  - then
+  ExecutionOutputs: []
   references:
     version: 2
     RefIds: []

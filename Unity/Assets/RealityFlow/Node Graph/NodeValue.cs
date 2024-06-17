@@ -104,6 +104,9 @@ namespace RealityFlow.NodeGraph
         public static NodeValue TemplateObject(GameObject template)
             => new() { type = NodeValueType.TemplateObject, value = template };
 
+        public static NodeValue Variable(string name)
+            => new() { type = NodeValueType.Variable, value = name };
+
         public NodeValueType Type => type;
         public object Value => value is Boxed box ? box.DynValue : value;
 
@@ -192,6 +195,8 @@ namespace RealityFlow.NodeGraph
                     return UnwrapValue<Vector3>().ToString();
                 case NodeValueType.TemplateObject:
                     return UnwrapValue<GameObject>().name;
+                case NodeValueType.Variable:
+                    return UnwrapValue<string>();
             }
 
             throw new ArgumentException();
@@ -213,6 +218,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.GameObject => typeof(string),
             NodeValueType.TemplateObject => typeof(string),
             NodeValueType.String => typeof(string),
+            NodeValueType.Variable => typeof(string),
             _ => throw new ArgumentException(),
         };
 
@@ -234,6 +240,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.GameObject => typeof(GameObject),
             NodeValueType.TemplateObject => typeof(GameObject),
             NodeValueType.String => typeof(string),
+            NodeValueType.Variable => typeof(string),
             _ => throw new ArgumentException(),
         };
 
@@ -251,6 +258,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.GameObject => null,
             NodeValueType.TemplateObject => null,
             NodeValueType.String => string.Empty,
+            NodeValueType.Variable => string.Empty,
             _ => throw new ArgumentException(),
         };
 
@@ -279,36 +287,19 @@ namespace RealityFlow.NodeGraph
         /// of a type that NodeValue may represent, or if the value is ambiguous between multiple
         /// types.
         /// </summary>
-        public static NodeValue From<T>(T value) => value switch
-        {
-            int val => new(val),
-            float val => new(val),
-            Vector2 val => new(val),
-            Vector3 val => new(val),
-            Quaternion val => new(val),
-            ReadonlyGraph val => new(val),
-            bool val => new(val),
-            string val => new(val),
-            _ => throw new ArgumentException(),
-        };
-
-        /// <summary>
-        /// Get an instance of a NodeValue from a given value. May fail if the given value is not
-        /// of a type that NodeValue may represent, or if the value is ambiguous between multiple
-        /// types.
-        /// </summary>
         public static NodeValue From<T>(T value, NodeValueType type) => type switch
         {
-            NodeValueType.Int => new(value.CastTo<T, int>()),
-            NodeValueType.Float => new(value.CastTo<T, float>()),
-            NodeValueType.Vector2 => new(value.CastTo<T, Vector2>()),
-            NodeValueType.Vector3 => new(value.CastTo<T, Vector3>()),
-            NodeValueType.Quaternion => new(value.CastTo<T, Quaternion>()),
-            NodeValueType.Graph => new(value.CastTo<T, ReadonlyGraph>()),
-            NodeValueType.Bool => new(value.CastTo<T, bool>()),
-            NodeValueType.GameObject => new(value.CastTo<T, GameObject>()),
-            NodeValueType.TemplateObject => TemplateObject(value.CastTo<T, GameObject>()),
-            NodeValueType.String => new(value.CastTo<T, string>()),
+            NodeValueType.Int => new(value.AsType<T, int>()),
+            NodeValueType.Float => new(value.AsType<T, float>()),
+            NodeValueType.Vector2 => new(value.AsType<T, Vector2>()),
+            NodeValueType.Vector3 => new(value.AsType<T, Vector3>()),
+            NodeValueType.Quaternion => new(value.AsType<T, Quaternion>()),
+            NodeValueType.Graph => new(value.AsType<T, ReadonlyGraph>()),
+            NodeValueType.Bool => new(value.AsType<T, bool>()),
+            NodeValueType.GameObject => new(value.AsType<T, GameObject>()),
+            NodeValueType.TemplateObject => TemplateObject(value.AsType<T, GameObject>()),
+            NodeValueType.String => new(value.AsType<T, string>()),
+            NodeValueType.Variable => Variable(value.AsType<T, string>()),
             _ => throw new ArgumentException(),
         };
 

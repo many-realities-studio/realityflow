@@ -88,6 +88,9 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         MultiValueDictionary<int, NodeIndex> inputExecutionEdges = new();
 
+        public ImmutableList<NodeIndex> InputExecutionEdges(int index)
+            => inputExecutionEdges[index];
+
         /// <summary>
         /// True if this graph, when a subgraph of a node, should have an input port for each
         /// variadic input to its containing node.
@@ -126,8 +129,21 @@ namespace RealityFlow.NodeGraph
         public ImmutableHashSet<NodeIndex> NodesOfType(string type) =>
             MutableNodesOfType(type).ToImmutableHashSet();
 
-        public ImmutableList<NodeIndex> InputExecutionEdges(int index)
-            => inputExecutionEdges[index];
+        [SerializeField]
+        readonly Dictionary<string, NodeValueType> variables = new();
+
+        public ImmutableDictionary<string, NodeValueType> Variables 
+            => variables.ToImmutableDictionary();
+
+        public void AddVariable(string name, NodeValueType type)
+        {
+            variables.Add(name, type);
+        }
+
+        public bool TryGetVariableType(string name, out NodeValueType type)
+        {
+            return variables.TryGetValue(name, out type);
+        }
 
         public NodeIndex AddNode(NodeDefinition definition)
         {
@@ -157,6 +173,7 @@ namespace RealityFlow.NodeGraph
 
             nodes.Set(node.Index, node.Node);
             index = node.Index;
+            MutableNodesOfType(node.Node.Definition.name).Add(index);
             return true;
         }
 
@@ -191,6 +208,7 @@ namespace RealityFlow.NodeGraph
                     foreach (PortIndex from in ports)
                         executionEdges.Remove(from, index);
 
+            MutableNodesOfType(node.Definition.name).Remove(index);
             return nodes.Remove(index);
         }
 

@@ -36,7 +36,7 @@ namespace RealityFlow.NodeUI
                 if (value.TryGetValue(out bool val))
                     Value = val;
                 else
-                    Debug.LogError("incorrect value type assigned to FloatEditor");
+                    Debug.LogError("incorrect value type assigned to BoolEditor");
             }
         }
 

@@ -19,5 +19,6 @@ namespace RealityFlow.NodeGraph
         GameObject,
         TemplateObject,
         String,
+        Variable,
     }
 }
