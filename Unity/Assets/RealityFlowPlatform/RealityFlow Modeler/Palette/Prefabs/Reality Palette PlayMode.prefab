@@ -1715,7 +1715,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &1938891781405468430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1728,6 +1728,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1c38e75cad308646bb665565f79b580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &3125946294675701286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1804,6 +1805,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   paletteSpawner: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
     type: 3}
+  paletteManager: {fileID: 0}
+  isLeftHandDominant: {fileID: 0}
+  left: {fileID: 0}
+  right: {fileID: 0}
 --- !u!1 &4713160273974547987
 GameObject:
   m_ObjectHideFlags: 0

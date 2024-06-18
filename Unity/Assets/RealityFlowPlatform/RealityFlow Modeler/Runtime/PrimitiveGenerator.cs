@@ -11,8 +11,8 @@ public enum ShapeType
     Cylinder,
     Cone,
     Sphere,
-    Torus//,
-    //Pipe
+    Torus,
+    Pipe
 };
 
 public struct PrimitiveCreationParams
@@ -63,8 +63,8 @@ public static class PrimitiveGenerator
                 return CreateUVSphere(8, 8, 0.1f);
             case ShapeType.Torus:
                 return CreateTorus(8, 8, 0.2f, 0.1f);
-            //case ShapeType.Pipe:
-                //return CreatePipe(8, 1, 0.1f, 0.1f, 0.05f);
+            case ShapeType.Pipe:
+                return CreatePipe(8, 1, 0.1f, 0.1f, 0.05f);
             default:
                 Debug.LogError("Invalid ShapeType input!");
                 break;
@@ -87,7 +87,7 @@ public static class PrimitiveGenerator
             points[i] = Vector3.Scale(points[i], size);
         }
 
-        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points);
+        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points, ShapeType.Plane);
         mesh.baseShape = ShapeType.Plane;
 
         return mesh;
@@ -118,7 +118,7 @@ public static class PrimitiveGenerator
             points[i] = Vector3.Scale(cubeVertices[cubeFaces[i]], size);
         }
 
-        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points);
+        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points, ShapeType.Cube);
         mesh.baseShape = ShapeType.Cube;
 
         return mesh;
@@ -163,15 +163,8 @@ public static class PrimitiveGenerator
             points[4], points[0], points[1]               // Side 2
         };
 
-        EMFace[] f = new EMFace[5];
-
-        f[0] = new EMFace(new int[6] { 0, 2, 1, 1, 2, 3 });
-        f[1] = new EMFace(new int[6] { 4, 5, 6, 5, 7, 6 });
-        f[2] = new EMFace(new int[6] { 8, 9, 10, 9, 11, 10 });
-        f[3] = new EMFace(new int[3] { 12, 13, 14 });
-        f[4] = new EMFace(new int[3] { 15, 16, 17 });
-
-        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points);
+        // create mesh from verticies??
+        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(verts, ShapeType.Wedge);
         mesh.baseShape = ShapeType.Wedge;
 
         return mesh;
@@ -784,7 +777,7 @@ public static class PrimitiveGenerator
         return data;*/
     }
 
-    /*public static PrimitiveData CreatePipe(int numSides, int heightCuts, float height, float radius, float thickness)
+    public static EditableMesh CreatePipe(int numSides, int heightCuts, float height, float radius, float thickness)
     {
         int numQuadFaces = (numSides * 2) + (2 * numSides * (heightCuts + 1)); // (num top and bottom faces + num of side faces)
         int numVertices = numQuadFaces * 6; // Every face is a quad
@@ -898,9 +891,14 @@ public static class PrimitiveGenerator
             index += 8;
         }
 
-        PrimitiveData data = new PrimitiveData(ShapeType.Pipe, points, f);
-        return data;
-    }*/
+        //PrimitiveData data = new PrimitiveData(ShapeType.Pipe, points, f);
+        //return data;
+
+        EditableMesh mesh = EditableMesh.CreateMesh(points, f);
+        mesh.baseShape = ShapeType.Pipe;
+
+        return mesh;
+    }
 
     /// <summary>
     /// Generates a set of Vector3's on the circumference of a circle

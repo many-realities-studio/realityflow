@@ -158,25 +158,41 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
     }
 
     // Converts a list of points into faces and sets their indicies
-    public static EditableMesh CreateMeshFromVertices(Vector3[] points)
+    public static EditableMesh CreateMeshFromVertices(Vector3[] points, ShapeType sType)
     {
         GameObject go = new GameObject();
 
         EditableMesh em = go.AddComponent<EditableMesh>();
 
-        EMFace[] f = new EMFace[points.Length / 4];
-
-        for (int i = 0; i < points.Length; i += 4)
+        if (sType == ShapeType.Cube || sType == ShapeType.Plane)
         {
-            f[i/4] = new EMFace(new int[6]
-            {
-                i + 0, i + 1, i + 2,
-                i + 1, i + 3, i + 2
-            });
-        }
+            EMFace[] f = new EMFace[points.Length / 4];
 
-        em.positions = points;
-        em.faces = f;
+            for (int i = 0; i < points.Length; i += 4)
+            {
+                f[i/4] = new EMFace(new int[6]
+                {
+                    i + 0, i + 1, i + 2,
+                    i + 1, i + 3, i + 2
+                });
+            }
+
+            em.positions = points;
+            em.faces = f;
+
+        } else if (sType == ShapeType.Wedge)
+        {
+            EMFace[] f = new EMFace[5];
+
+            f[0] = new EMFace(new int[6] { 0, 2, 1, 1, 2, 3 });
+            f[1] = new EMFace(new int[6] { 4, 5, 6, 5, 7, 6 });
+            f[2] = new EMFace(new int[6] { 8, 9, 10, 9, 11, 10 });
+            f[3] = new EMFace(new int[3] { 12, 13, 14 });
+            f[4] = new EMFace(new int[3] { 15, 16, 17 });
+
+            em.positions = points;
+            em.faces = f;
+        }
 
         em.sharedVertices = EMSharedVertex.GetSharedVertices(em.positions);
         em.sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(em.sharedVertices);

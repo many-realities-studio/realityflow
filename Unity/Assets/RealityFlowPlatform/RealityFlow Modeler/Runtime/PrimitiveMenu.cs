@@ -23,10 +23,10 @@ public class PrimitiveMenu : MonoBehaviour
         SpawnPrimitive(ShapeType.Cube);
     }
 
-    /*public void SpawnWedge()
+    public void SpawnWedge()
     {
         SpawnPrimitive(ShapeType.Wedge);
-    }*/
+    }
 
     public void SpawnCylinder()
     {
@@ -48,10 +48,10 @@ public class PrimitiveMenu : MonoBehaviour
         SpawnPrimitive(ShapeType.Torus);
     }
 
-    /* public void SpawnPipe()
+    public void SpawnPipe()
     {
         SpawnPrimitive(ShapeType.Pipe);
-    }*/
+    }
     
     public void ExitMeshMode()
     {
