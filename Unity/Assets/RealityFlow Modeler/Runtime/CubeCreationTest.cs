@@ -12,6 +12,7 @@ public class CubeCreationTest : MonoBehaviour
     GameObject cubePrefab;
 
     private GameObject spawnedObject;
+    private EditableMesh objEM;
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +33,9 @@ public class CubeCreationTest : MonoBehaviour
             EditableMesh mesh = PrimitiveGenerator.CreatePlane(new Vector3(2, 2, 2));
 
             EditableMesh em = go.GetComponent<EditableMesh>();
+            /*em.CreateMesh(PrimitiveGenerator.CreatePrimitive(ShapeType.Wedge));
+            go.GetComponent<NetworkedMesh>().SetSize(2.0f);
+            objEM = em;*/
             spawnedObject = go;
             em.CreateMesh(mesh);
 
@@ -44,16 +48,23 @@ public class CubeCreationTest : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.K))
         {
             spawnedObject.GetComponent<MeshVisulization>().DisplayFaceHandles();
+            /*int[] arr = { 0 };
+            objEM.TranslateVerticesWithNetworking(arr, new Vector3(0.0f, 0.5f, 0.0f));
+            objEM.RefreshMesh();*/
         }
 
         if (Input.GetKeyDown(KeyCode.J))
         {
             spawnedObject.GetComponent<MeshVisulization>().DisplayVertexHandles();
+            /*objEM.TransformVertex(0, new Vector3(0.0f, -0.5f, 0.0f));
+            objEM.RefreshMesh();*/
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
             spawnedObject.GetComponent<MeshVisulization>().DisplayEdgeHandles();
+            /*int[] indices = { 4, 5, 6, 7 };
+            //objEM.ScaleVertices(indices, );*/
         }
     }
 }

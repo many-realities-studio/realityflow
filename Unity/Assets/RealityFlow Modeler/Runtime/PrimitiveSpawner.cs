@@ -48,6 +48,7 @@ public class PrimitiveSpawner : MonoBehaviour
     private float offMode = 0f;
     private float surfaceMode = 1f;
     private bool leftHandDominant = false;
+    private bool inMeshCreationMode = false;
 
     public void Awake()
     {

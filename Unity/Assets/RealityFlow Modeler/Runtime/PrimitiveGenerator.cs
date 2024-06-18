@@ -7,10 +7,12 @@ public enum ShapeType
     NoShape,
     Plane,
     Cube,
+    Wedge,
     Cylinder,
     Cone,
     Sphere,
-    Torus
+    Torus,
+    Pipe
 };
 
 public struct PrimitiveCreationParams
@@ -51,8 +53,9 @@ public static class PrimitiveGenerator
                 return CreatePlane(new Vector3(0.1f, 0.1f, 0.1f));
             case ShapeType.Cube:
                 return CreateCube(new Vector3(0.1f, 0.1f, 0.1f));
+            case ShapeType.Wedge:
+                return CreateWedge(new Vector3(0.1f, 0.1f, 0.1f));
             case ShapeType.Cylinder:
-                //return CreateCylinder(20, 1);
                 return CreateCylinder(16, 1, 0.1f);
             case ShapeType.Cone:
                 return CreateCone(16, 0.1f);
@@ -60,6 +63,8 @@ public static class PrimitiveGenerator
                 return CreateUVSphere(8, 8, 0.1f);
             case ShapeType.Torus:
                 return CreateTorus(8, 8, 0.2f, 0.1f);
+            case ShapeType.Pipe:
+                return CreatePipe(8, 1, 0.1f, 0.1f, 0.05f);
             default:
                 Debug.LogError("Invalid ShapeType input!");
                 break;
@@ -82,10 +87,26 @@ public static class PrimitiveGenerator
             points[i] = Vector3.Scale(points[i], size);
         }
 
-        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points);
+        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points, ShapeType.Plane);
         mesh.baseShape = ShapeType.Plane;
 
         return mesh;
+        /*
+        EMFace[] f = new EMFace[points.Length / 4];
+
+        for (int i = 0; i < points.Length; i += 4)
+        {
+            f[i/4] = new EMFace(new int[6]
+            {
+                i + 0, i + 1, i + 2,
+                i + 1, i + 3, i + 2
+            });
+        }
+
+        PrimitiveData data = new PrimitiveData(ShapeType.Plane, points, f);
+
+        return data;
+        */
     }
 
     public static EditableMesh CreateCube(Vector3 size)
@@ -97,10 +118,59 @@ public static class PrimitiveGenerator
             points[i] = Vector3.Scale(cubeVertices[cubeFaces[i]], size);
         }
 
-        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points);
+        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(points, ShapeType.Cube);
         mesh.baseShape = ShapeType.Cube;
 
         return mesh;
+
+        /*EMFace[] f = new EMFace[points.Length / 4];
+        for (int i = 0; i < points.Length; i += 4)
+        {
+            f[i/4] = new EMFace(new int[6]
+            {
+                i + 0, i + 1, i + 2,
+                i + 1, i + 3, i + 2
+            });
+        }
+
+        PrimitiveData data = new PrimitiveData(ShapeType.Cube, points, f);
+        return data;
+        */
+    }
+
+    public static EditableMesh CreateWedge(Vector3 size)
+    {
+        Vector3[] points = new Vector3[6];
+
+        points[0] = new Vector3(-.5f, 0, .5f);
+        points[1] = new Vector3(.5f, 0, .5f);
+        points[2] = new Vector3(-.5f, 0, -.5f);
+        points[3] = new Vector3(.5f, 0, -.5f);
+        points[4] = new Vector3(-0.5f, 0.5f, 0.5f);
+        points[5] = new Vector3(-0.5f, 0.5f, -0.5f);
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i] = Vector3.Scale(points[i], size);
+        }
+
+        Vector3[] verts = new Vector3[18]
+        {
+            points[0], points[1], points[2], points[3],   // Bottom
+            points[4], points[5], points[0], points[2],   // Front
+            points[4], points[1], points[5], points[3],   // Rear
+            points[5], points[3], points[2],              // Side 1
+            points[4], points[0], points[1]               // Side 2
+        };
+
+        // create mesh from verticies??
+        EditableMesh mesh = EditableMesh.CreateMeshFromVertices(verts, ShapeType.Wedge);
+        mesh.baseShape = ShapeType.Wedge;
+
+        return mesh;
+        
+        //PrimitiveData data = new PrimitiveData(ShapeType.Wedge, verts, f);
+        //return data;
     }
 
     public static EditableMesh CreateCylinder(int numSides, float radius)
@@ -202,6 +272,7 @@ public static class PrimitiveGenerator
     //  height divisions, and doesn't rely entirely on unique vertices. Some lighting issues.
     public static EditableMesh CreateCylinder(int numSides, int heightCuts, float radius)
     {
+        
         if (numSides < 3)
             numSides = 3;
 
@@ -214,6 +285,7 @@ public static class PrimitiveGenerator
         if (heightCuts > 32)
             heightCuts = 32;
 
+
         Vector3[] circle = GetCirclePoints(numSides, radius);
 
         int numVertices = (3 * numSides) + (numSides * heightCuts) + 2;
@@ -223,6 +295,13 @@ public static class PrimitiveGenerator
 
         Vector3[] vertices = new Vector3[numVertices];
         EMFace[] faces = new EMFace[numFaces];
+        /*Vector2[] circle = GetCirclePoints(numSides, radius);
+
+        int numQuadFaces = numSides * (heightCuts + 1);
+        Vector3[] vertices = new Vector3[(numQuadFaces * 4) + (numSides * 6)];
+        EMFace[] faces = new EMFace[(numSides * 2) + (numSides * (heightCuts + 1))];
+
+        int off = 0;*/
 
         float lower = -radius;
         float upper = radius;
@@ -328,6 +407,95 @@ public static class PrimitiveGenerator
         mesh.baseShape = ShapeType.Cylinder;
 
         return mesh;
+       
+        /*
+        float step = (upper - lower) / (heightCuts + 1);
+
+        for (int i = 0; i < heightCuts + 1; i++)
+        {
+            float bottom = lower + (i * step);
+            float top = lower + ((i + 1) * step);
+
+            for (int j = 0; j < numSides; j++)
+            {
+                vertices[off] = new Vector3(circle[j].x, bottom, circle[j].y);
+                vertices[off + 1] = new Vector3(circle[j].x, top, circle[j].y);
+
+                if (j != numSides - 1)
+                {
+                    // Construct quad face from (n, n + 1)
+                    vertices[off + 2] = new Vector3(circle[j + 1].x, bottom, circle[j + 1].y);
+                    vertices[off + 3] = new Vector3(circle[j + 1].x, top, circle[j + 1].y);
+                }
+                else
+                {
+                    // Construct quad face with verts (n-1, 0)
+                    vertices[off + 2] = new Vector3(circle[0].x, bottom, circle[0].y);
+                    vertices[off + 3] = new Vector3(circle[0].x, top, circle[0].y);
+                }
+
+                off += 4;
+            }
+        }
+
+        int face = 0;
+        for (int i = 0; i < heightCuts + 1; i++)
+        {
+            for (int j = 0; j < numSides * 4; j += 4)
+            {
+                int index = (i * (numSides * 4)) + j;
+                faces[face++] = new EMFace(new int[6]
+                {
+                index, index + 1, index + 2,
+                index + 1, index + 3, index + 2
+                });
+            }
+        }
+
+        // Quad vertices have already been set, start from ending point of that
+        int f = numQuadFaces * 4;
+        int face_index = numQuadFaces;
+
+        // Wind top and bottom faces
+        for (int i = 0; i < numSides; i++)
+        {
+            // Bottom face
+            vertices[f] = new Vector3(circle[i].x, lower, circle[i].y);
+            vertices[f + 1] = new Vector3(0.0f, lower, 0.0f);
+
+            if (i != numSides - 1)
+            {
+                vertices[f + 2] = new Vector3(circle[i + 1].x, lower, circle[i + 1].y);
+            }
+            else
+            {
+                vertices[f + 2] = new Vector3(circle[0].x, lower, circle[0].y);
+            }
+
+            faces[face_index + i] = new EMFace(new int[3] { f + 2, f + 1, f });
+            f += 3;
+
+            // Top
+            vertices[f + 0] = new Vector3(circle[i].x, upper, circle[i].y);
+            vertices[f + 1] = new Vector3(0f, upper, 0f);
+
+            if (i != numSides - 1)
+            {
+                vertices[f + 2] = new Vector3(circle[i + 1].x, upper, circle[i + 1].y);
+            }
+            else
+            {
+                vertices[f + 2] = new Vector3(circle[0].x, upper, circle[0].y);
+            }
+
+            faces[face_index + i + numSides] = new EMFace(new int[3] { f, f + 1, f + 2 });
+            f += 3;
+        }
+
+        PrimitiveData data = new PrimitiveData(ShapeType.Cylinder, vertices, faces);
+
+        return data;
+        */
     }
 
     public static EditableMesh CreateCone(int numSides, float radius)
@@ -338,7 +506,8 @@ public static class PrimitiveGenerator
         if (numSides > 64)
             numSides = 64;
 
-        Vector3[] circle = GetCirclePoints(numSides, radius);
+         Vector3[] circle = GetCirclePoints(numSides, radius);
+        //Vector2[] circle = GetCirclePoints(numSides, radius);
 
         Vector3[] vertices = new Vector3[(numSides * 6)];
         EMFace[] faces = new EMFace[numSides * 2];
@@ -353,15 +522,18 @@ public static class PrimitiveGenerator
         {
             // Bottom face
             vertices[index] = new Vector3(circle[i].x, bottom, circle[i].z);
+            //vertices[index] = new Vector3(circle[i].x, bottom, circle[i].y);
             vertices[index + 1] = Vector3.zero;
 
             if (i != numSides - 1)
             {
                 vertices[index + 2] = new Vector3(circle[i + 1].x, bottom, circle[i + 1].z);
+                //vertices[index + 2] = new Vector3(circle[i + 1].x, bottom, circle[i + 1].y);
             }
             else
             {
                 vertices[index + 2] = new Vector3(circle[0].x, bottom, circle[0].z);
+                //vertices[index + 2] = new Vector3(circle[0].x, bottom, circle[0].y);
             }
 
             faces[face_index + i] = new EMFace(new int[3] { index + 2, index + 1, index });
@@ -369,15 +541,18 @@ public static class PrimitiveGenerator
 
             // Top 
             vertices[index] = new Vector3(circle[i].x, bottom, circle[i].z);
+            //vertices[index] = new Vector3(circle[i].x, bottom, circle[i].y);
             vertices[index + 1] = new Vector3(0f, top, 0f); ;
 
             if (i != numSides - 1)
             {
                 vertices[index + 2] = new Vector3(circle[i + 1].x, bottom, circle[i + 1].z);
+                //vertices[index + 2] = new Vector3(circle[i + 1].x, bottom, circle[i + 1].y);
             }
             else
             {
                 vertices[index + 2] = new Vector3(circle[0].x, bottom, circle[0].z);
+                //vertices[index + 2] = new Vector3(circle[0].x, bottom, circle[0].y);
             }
 
             faces[face_index + i + numSides] = new EMFace(new int[3] { index, index + 1, index + 2 });
@@ -388,6 +563,9 @@ public static class PrimitiveGenerator
         mesh.baseShape = ShapeType.Cone;
 
         return mesh;
+        /*PrimitiveData data = new PrimitiveData(ShapeType.Cone, vertices, faces);
+
+        return data;*/
     }
 
     /// <summary>
@@ -506,6 +684,9 @@ public static class PrimitiveGenerator
         mesh.baseShape = ShapeType.Sphere;
 
         return mesh;
+        /*PrimitiveData data = new PrimitiveData(ShapeType.Sphere, vertices, faces);
+
+        return data;*/
     }
 
     /// <summary>
@@ -523,6 +704,7 @@ public static class PrimitiveGenerator
 
         // Generate cross section circle points
         Vector3[] circle = GetCirclePoints(minorSegments, minorRadius);
+        //Vector3[] circle = GetCirclePoints3D(minorSegments, minorRadius);
 
         RotateCirclePointsX(ref circle);
 
@@ -590,11 +772,157 @@ public static class PrimitiveGenerator
         mesh.baseShape = ShapeType.Torus;
 
         return mesh;
+        /*PrimitiveData data = new PrimitiveData(ShapeType.Torus, vertices, faces);
+
+        return data;*/
+    }
+
+    public static EditableMesh CreatePipe(int numSides, int heightCuts, float height, float radius, float thickness)
+    {
+        int numQuadFaces = (numSides * 2) + (2 * numSides * (heightCuts + 1)); // (num top and bottom faces + num of side faces)
+        int numVertices = numQuadFaces * 6; // Every face is a quad
+
+        Vector3[] innerCircle = GetCirclePoints(numSides, radius);
+        Vector3[] outerCircle = GetCirclePoints(numSides, radius + thickness);
+
+        float lower = height * -0.5f;
+        float upper = height * 0.5f;
+        float step = height / (heightCuts + 1);
+
+        EMFace[] f = new EMFace[numQuadFaces];
+        Vector3[] points = new Vector3[numVertices];
+
+        int zero, one, two, three;
+        int index = 0;
+
+        int f_index = 0;
+        int n = 0;
+        // Wind the exterior and interior side faces
+        for(int i = 0; i < heightCuts + 1; i++)
+        {
+            float y1 = lower + (i * step);
+            float y2 = lower + ((i + 1) * step);
+            for(int j = 0; j < numSides; j++)
+            {
+                n = index + 4;
+                // Inner
+                points[index] = new Vector3(innerCircle[j].x, y1, innerCircle[j].y);
+                points[index + 1] = new Vector3(innerCircle[j].x, y2, innerCircle[j].y);
+
+                // Outer
+                points[n] = new Vector3(outerCircle[j].x, y1, outerCircle[j].y);
+                points[n + 1] = new Vector3(outerCircle[j].x, y2, outerCircle[j].y);
+
+                if(j !=  numSides - 1)
+                {
+                    points[index + 2] = new Vector3(innerCircle[j + 1].x, y1, innerCircle[j + 1].y);
+                    points[index + 3] = new Vector3(innerCircle[j + 1].x, y2, innerCircle[j + 1].y);
+
+                    points[n + 2] = new Vector3(outerCircle[j + 1].x, y1, outerCircle[j + 1].y);
+                    points[n + 3] = new Vector3(outerCircle[j + 1].x, y2, outerCircle[j + 1].y);
+
+                }
+                else
+                {
+                    points[index + 2] = new Vector3(innerCircle[0].x, y1, innerCircle[0].y);
+                    points[index + 3] = new Vector3(innerCircle[0].x, y2, innerCircle[0].y);
+
+                    points[n + 2] = new Vector3(outerCircle[0].x, y1, outerCircle[0].y);
+                    points[n + 3] = new Vector3(outerCircle[0].x, y2, outerCircle[0].y);
+                }
+
+                // Inner
+                f[f_index++] = new EMFace(new int[6]{
+                    index, index + 2, index + 1,
+                    index + 1, index + 2, index + 3
+                });
+
+                // Outer
+                f[f_index++] = new EMFace(new int[6]{
+                    n, n + 1, n + 2,
+                    n + 1, n + 3, n + 2
+                });
+
+                index += 8;
+            }
+        }
+
+        // Build the top and bottom faces
+        for(int i = 0; i < numSides; i ++)
+        {
+            n = index + 4;
+            // Bottom faces
+            points[index] = new Vector3(innerCircle[i].x, lower, innerCircle[i].y);
+            points[index + 1] = new Vector3(outerCircle[i].x, lower, outerCircle[i].y);
+
+            // Top faces
+            points[n] = new Vector3(innerCircle[i].x, upper, innerCircle[i].y);
+            points[n + 1] = new Vector3(outerCircle[i].x, upper, outerCircle[i].y);
+
+            if(i != numSides - 1)
+            {
+                points[index + 2] = new Vector3(innerCircle[i + 1].x, lower, innerCircle[i + 1].y);
+                points[index + 3] = new Vector3(outerCircle[i + 1].x, lower, outerCircle[i + 1].y);
+
+                points[n + 2] = new Vector3(innerCircle[i + 1].x, upper, innerCircle[i + 1].y);
+                points[n + 3] = new Vector3(outerCircle[i + 1].x, upper, outerCircle[i + 1].y);
+            }
+            else
+            {
+                points[index + 2] = new Vector3(innerCircle[0].x, lower, innerCircle[0].y);
+                points[index + 3] = new Vector3(outerCircle[0].x, lower, outerCircle[0].y);
+
+                points[n + 2] = new Vector3(innerCircle[0].x, upper, innerCircle[0].y);
+                points[n + 3] = new Vector3(outerCircle[0].x, upper, outerCircle[0].y);
+            }
+
+            // Bottom face, reverse the winding order
+            f[f_index++] = new EMFace(new int[6] {
+                index, index + 1, index + 3,
+                index, index + 3, index + 2
+            });
+
+            // Top face
+            f[f_index++] = new EMFace(new int[6] {
+                n, n + 3, n + 1,
+                n, n + 2, n + 3
+            });
+
+            index += 8;
+        }
+
+        //PrimitiveData data = new PrimitiveData(ShapeType.Pipe, points, f);
+        //return data;
+
+        EditableMesh mesh = EditableMesh.CreateMesh(points, f);
+        mesh.baseShape = ShapeType.Pipe;
+
+        return mesh;
     }
 
     /// <summary>
     /// Generates a set of Vector3's on the circumference of a circle
     /// </summary>
+    /*public static Vector2[] GetCirclePoints(int numSides, float radius)
+    {
+        Vector2[] points = new Vector2[numSides];
+
+        float rotationAmountDegrees = 360 / numSides;
+
+        for (int i = 0; i < numSides; i++)
+        {
+            float angle = rotationAmountDegrees * i * Mathf.Deg2Rad;
+
+            float x = Mathf.Cos(angle) * radius;
+            float z = Mathf.Sin(angle) * radius;
+
+            points[i] = new Vector2(x, z);
+        }
+
+
+        return points;
+    }*/
+
     public static Vector3[] GetCirclePoints(int numSides, float radius)
     {
         Vector3[] points = new Vector3[numSides];
@@ -609,6 +937,7 @@ public static class PrimitiveGenerator
             float z = Mathf.Sin(angle) * radius;
 
             points[i] = new Vector3(x, 0f, z);
+            //points[i] = new Vector3(x, 0.0f, z);
         }
 
 

@@ -10,7 +10,7 @@ public class SetPrefabIcon : MonoBehaviour
     // Said instantiated prefab acts as the icon for that objects button in the toolbox
     public void Start()
     {
-
+        
         /*turn off prefab phsyics? (it literally modifies the prefab even outside playmode???)
         prefab.GetComponent<Rigidbody>().useGravity = false;
         prefab.GetComponent<Rigidbody>().isKinematic = true;*/

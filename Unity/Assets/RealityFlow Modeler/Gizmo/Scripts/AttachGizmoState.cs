@@ -53,6 +53,8 @@ public class AttachGizmoState : MonoBehaviour
         if(leftHand == null) {
             leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
         }
+        //rightHand = GameObject.Find("MRTK RightHand Controller");
+        //leftHand = GameObject.Find("MRTK LeftHand Controller");
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
     }
@@ -198,11 +200,12 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if an interactor was found, otherwise, false</returns>
     bool SetActiveInteractor()
     {
-        Debug.Log(rightHand);
         interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
-        Debug.Log(interactor);
+        //interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+
         if (interactor == null)
             interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
+            //interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
 
         else if (interactor == null)
             return false;
@@ -346,7 +349,9 @@ public class AttachGizmoState : MonoBehaviour
         LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
         LayerMask ui = 1 << LayerMask.NameToLayer("UI");
 
-        farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;       
+        farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;
+        // 6 is gizmo layer
+        //SetLayerOfFarRay(farRay, 6);
     }
 
     public void DisableMeshRaySelection()
@@ -357,5 +362,18 @@ public class AttachGizmoState : MonoBehaviour
         LayerMask everything = ~0;
 
         farRay.GetComponent<XRRayInteractor>().raycastMask = everything;
+        // 0 is default layer
+        //SetLayerOfFarRay(farRay, 0);
+    }
+
+    private void SetLayerOfFarRay(GameObject farRay, int layer)
+    {
+        farRay.layer = layer;
+        foreach (Transform child in farRay.transform)
+        {
+            child.gameObject.layer = layer;
+            if (child.name == "RayReticle") 
+                SetLayerOfFarRay(child.gameObject, layer);
+        }
     }
 }

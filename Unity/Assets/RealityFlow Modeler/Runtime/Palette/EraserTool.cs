@@ -85,6 +85,10 @@ public class EraserTool : MonoBehaviour
         {
             Debug.Log("Delete attempted" + currentHitResult.collider.gameObject);
             spawnManager.Despawn(currentHitResult.collider.gameObject);
+            // You should no longer be able to interact with this mesh
+            //currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled = false;
+
+            //NetworkSpawnManager.Find(this).Despawn(currentHitResult.collider.gameObject);
         }
     }
 
