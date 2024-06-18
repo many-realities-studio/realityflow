@@ -1,6 +1,4 @@
 // Purpose: This script is responsible for displaying all the projects available on the platform.
-using GraphQL;
-using GraphQL.Client.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -22,8 +20,7 @@ public class ProjectDisplay : MonoBehaviour
     public Transform parentContent; 
     private JObject data;
 
-    // GraphQL client and access token variables 
-    public GraphQLHttpClient graphQLHttpClient;
+    // GraphQL client and access token variables
     private RealityFlowClient rfClient;
     public Transform roomsContent;
     public GameObject roomUI;
@@ -35,7 +32,6 @@ public class ProjectDisplay : MonoBehaviour
         rfClient = RealityFlowClient.Find(this);
         GetProjectsData();
         rfClient.OnProjectUpdated += UpdateProject;
-
     }
 
     private void UpdateProject(JObject project) {
@@ -67,8 +63,8 @@ public class ProjectDisplay : MonoBehaviour
         };
 
         // Send the query request asynchronously and wait for the response.
-        var queryResult = await rfClient.graphQLClient.SendQueryAsync<JObject>(publicProjectsQuery);
-        data = queryResult.Data;  // Store the data received from the query
+        var queryResult = await rfClient.SendQueryAsync(publicProjectsQuery);
+        var data = queryResult["data"];  // Store the data received from the query
 
         // If the data is not null, display the projects on the platform.
         if (data != null)
@@ -126,9 +122,9 @@ public class ProjectDisplay : MonoBehaviour
             //     .GetComponent<RectTransform>().sizeDelta = 
             //         new Vector2(1001, (numRows > 2) ? 168 * numRows : 168 * 2);
         }
-        if (queryResult.Errors != null)
+        if (queryResult["errors"] != null)
         {
-            Debug.Log(queryResult.Errors[0].Message);
+            Debug.Log(queryResult["errors"][0]["message"]);
         }
 
     }
@@ -184,6 +180,4 @@ public class ProjectDisplay : MonoBehaviour
         Debug.Log("[JOIN ROOM]Join code!: " + joinCode);
         rfClient.roomClient.Join(joinCode);
     }
-
-
 }

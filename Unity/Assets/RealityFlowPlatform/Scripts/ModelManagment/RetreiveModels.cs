@@ -1,9 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Newtonsoft.Json.Linq;
 
 public class RetrieveModel : MonoBehaviour
@@ -43,21 +40,23 @@ public class RetrieveModel : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await rfClient.graphQLClient.SendQueryAsync<JObject>(getUserRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getUserRequest);
+            var data = graphQLResponse["data"];
 
-            if (graphQLResponse.Data != null && graphQLResponse.Data["getUserById"] != null)
+            if (data != null && data["getUserById"] != null)
             {
-                string username = graphQLResponse.Data["getUserById"]["username"].ToString();
+                string username = data["getUserById"]["username"].ToString();
                 Debug.Log("Username for user ID " + userId + ": " + username);
             }
             else
             {
                 Debug.LogError("Failed to fetch username for user ID: " + userId);
-                if (graphQLResponse.Errors != null)
+                var errors = graphQLResponse["errors"];
+                if (errors != null)
                 {
-                    foreach (var error in graphQLResponse.Errors)
+                    foreach (var error in errors)
                     {
-                        Debug.LogError("GraphQL Error: " + error.Message);
+                        Debug.LogError("GraphQL Error: " + error["message"]);
                     }
                 }
             }
@@ -87,11 +86,11 @@ public class RetrieveModel : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await rfClient.graphQLClient.SendQueryAsync<JObject>(getModelsRequest);
-
-            if (graphQLResponse.Data != null && graphQLResponse.Data["getUserModelsForUnity"] != null)
+            var graphQLResponse = await rfClient.SendQueryAsync(getModelsRequest);
+            var data = graphQLResponse["data"];
+            if (data != null && data["getUserModelsForUnity"] != null)
             {
-                JArray models = (JArray)graphQLResponse.Data["getUserModelsForUnity"];
+                JArray models = (JArray)data["getUserModelsForUnity"];
                 if (models.Count > 0)
                 {
                     Debug.Log("Models found for user ID: " + userId);
@@ -120,11 +119,13 @@ public class RetrieveModel : MonoBehaviour
             else
             {
                 Debug.LogError("Failed to fetch models for user ID: " + userId);
-                if (graphQLResponse.Errors != null)
+                Debug.Log(graphQLResponse);
+                var errors = graphQLResponse["errors"];
+                if (errors != null)
                 {
-                    foreach (var error in graphQLResponse.Errors)
+                    foreach (var error in errors)
                     {
-                        Debug.LogError("GraphQL Error: " + error.Message);
+                        Debug.LogError("GraphQL Error: " + error["message"]);
                     }
                 }
             }
