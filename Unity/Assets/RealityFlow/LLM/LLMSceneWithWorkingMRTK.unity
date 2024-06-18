@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17593624, g: 0.22017018, b: 0.3024987, a: 1}
+  m_IndirectSpecularColor: {r: 0.17593586, g: 0.22016944, b: 0.3024974, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2511,7 +2511,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 140100165}
         m_TargetAssemblyTypeName: PaletteSpawner, Assembly-CSharp
-        m_MethodName: SpawnPalette
+        m_MethodName: ControlPalette
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9772,7 +9772,7 @@ PrefabInstance:
     - target: {fileID: 939732352738646038, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
         type: 3}
@@ -9784,7 +9784,13 @@ PrefabInstance:
         type: 3}
       propertyPath: palettePrefab
       value: 
-      objectReference: {fileID: 3591269374014152013, guid: 028d82201fe89d548b68f1bcdef55859,
+      objectReference: {fileID: 3591269374014152013, guid: 14d17975aba744310a0b87db76f1739e,
+        type: 3}
+    - target: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
+        type: 3}
+      propertyPath: playPalettePrefab
+      value: 
+      objectReference: {fileID: 3591269374014152013, guid: c27a9f3aa06e141c78b4a6ae2e57fa8a,
         type: 3}
     - target: {fileID: 939732352738646039, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
         type: 3}
@@ -9792,8 +9798,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1421314484}
     m_RemovedComponents:
-    - {fileID: 939732352738646038, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
     - {fileID: 939732352738646032, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
+    - {fileID: 939732352738646038, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -9805,6 +9811,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 140100166}
+    - targetCorrespondingSourceObject: {fileID: 939732352738646036, guid: 2ec66dc7ffe37874a9b4183e32448fb8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 140100167}
   m_SourcePrefab: {fileID: 100100000, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
 --- !u!4 &140100164 stripped
 Transform:
@@ -9866,7 +9876,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 140100165}
         m_TargetAssemblyTypeName: PaletteSpawner, Assembly-CSharp
-        m_MethodName: SpawnPalette
+        m_MethodName: ControlPalette
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9879,6 +9889,19 @@ MonoBehaviour:
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &140100167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29359737}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c1c8f510386da941847401d7f8a1a7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkedPlayManager: {fileID: 0}
 --- !u!1 &140202546
 GameObject:
   m_ObjectHideFlags: 0
@@ -42521,6 +42544,7 @@ Transform:
   - {fileID: 140100164}
   - {fileID: 366575788}
   - {fileID: 1330673939}
+  - {fileID: 1330376610}
   m_Father: {fileID: 1707694649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &713581436
@@ -42568,6 +42592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 0
+  ownerName: 
 --- !u!114 &713581439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42596,6 +42621,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 0
+  otherMode: 0
 --- !u!114 &713581441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72197,6 +72223,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 255914824}
     m_Modifications:
+    - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
+        type: 3}
+      propertyPath: leftControllerSettings.anchorPoint
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
+        type: 3}
+      propertyPath: rightControllerSettings.anchorPoint
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
+        type: 3}
+      propertyPath: leftControllerSettings.simulationMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
+        type: 3}
+      propertyPath: rightControllerSettings.simulationMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3493013819197874656, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -79153,6 +79199,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1326970208}
   m_CullTransparentMesh: 0
+--- !u!1 &1330376609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1330376610}
+  - component: {fileID: 1330376611}
+  m_Layer: 0
+  m_Name: Play Mode Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1330376610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330376609}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 713581435}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1330376611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330376609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 633fed891da23504c901f1225c3b1c2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkSpawnManager: {fileID: 1421314484}
+  paletteSwitcher: {fileID: 140100167}
+  managerPrefab: {fileID: 7216947932749903627, guid: 10691b72ad457be4e8d7ff6278521c59,
+    type: 3}
+  isActive: 0
 --- !u!1 &1330673938
 GameObject:
   m_ObjectHideFlags: 0
@@ -107086,6 +107181,11 @@ PrefabInstance:
       propertyPath: m_ModelPrefab
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 142007140022173312, guid: 4d7e2f87fefe0ba468719b15288b46e7,
+        type: 3}
+      propertyPath: m_EnableInputActions
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 315131386078964330, guid: 4d7e2f87fefe0ba468719b15288b46e7,
         type: 3}
       propertyPath: m_InteractionManager
@@ -107345,6 +107445,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ModelPrefab
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8243387927138557102, guid: 4d7e2f87fefe0ba468719b15288b46e7,
+        type: 3}
+      propertyPath: m_EnableInputActions
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8629307323091863620, guid: 4d7e2f87fefe0ba468719b15288b46e7,
         type: 3}
@@ -116277,18 +116382,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rayInteractor: {fileID: 0}
---- !u!114 &2029801446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2029801442}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd5a5e517df2a6e4285550afcf930f87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2029801447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123537,10 +123630,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 7068762447081937021}
-    - targetCorrespondingSourceObject: {fileID: 3296437958450568961, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2029801446}
     - targetCorrespondingSourceObject: {fileID: 3296437958450568961, guid: 2fb578800afc87244b5ba3a0fbbd11c0,
         type: 3}
       insertIndex: -1
