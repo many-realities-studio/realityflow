@@ -1545,7 +1545,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDNiYjFkMWE3OWI4MmZmOWI4MTQwMiIsInVzZXJuYW1lIjoibHVjaWRiYXJkIiwiZW1haWwiOiJqb2huQGx1Y2lkYmFyZC5jb20iLCJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJNdXJyYXkiLCJkZWZhdWx0UHJvamVjdElkIjoiIiwiaWF0IjoxNzE4MjEyNDczLCJleHAiOjE3MTk0MjIwNzN9.CgLg_lnXVOlyfY8QgSFVdxIHZWiUF-DAfWbAeqtEt0o
   roomClient: {fileID: 2142340402}
-  server: http://localhost:4000
+  server: http://localhost:4000/
+  graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:
   m_ObjectHideFlags: 0

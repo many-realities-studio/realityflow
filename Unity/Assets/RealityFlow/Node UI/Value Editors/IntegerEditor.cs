@@ -14,6 +14,8 @@ namespace RealityFlow.NodeUI
         [SerializeField]
         TMP_Text title;
 
+        public TMP_Text Name => title;
+
         public Action<NodeValue> OnTick { get; set; }
 
         public int Value
@@ -33,18 +35,13 @@ namespace RealityFlow.NodeUI
             }
         }
 
-        public string Name
-        {
-            get => title.text;
-            set => title.text = value;
-        }
-
         public void Tick()
         {
             if (!int.TryParse(input.text, out _))
                 input.text = "0";
 
-            OnTick(new(Value));
+            if (OnTick != null)
+                OnTick(new(Value));
         }
     }
 }

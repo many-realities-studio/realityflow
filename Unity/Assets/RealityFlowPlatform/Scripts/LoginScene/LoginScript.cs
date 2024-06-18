@@ -4,9 +4,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Newtonsoft.Json.Linq;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using TMPro;
 public class LoginScript : MonoBehaviour
 {
@@ -16,13 +13,13 @@ public class LoginScript : MonoBehaviour
     public GameObject loginCanvas;  // Canvas for the login screen
     public GameObject submitBtn;  // Button to submit the OTP
     public Text errorMessage;   // Text field to display error messages
-    public GraphQLHttpClient graphQLClient;  // GraphQL client for sending requests
+    public RealityFlowClient rfClient;
 
     void Start()
     {
         // The client uses "http://localhost:4000/graphql" as the endpoint and NewtonsoftJsonSerializer for serialization.
-        var graphQLC = new GraphQLHttpClient("http://localhost:4000/graphql", new NewtonsoftJsonSerializer());
-        graphQLClient = graphQLC;
+        rfClient = RealityFlowClient.Find(this);
+
 
         // listeners for the input fields
         OTPInput.GetComponent<TMP_InputField>().onValueChanged.AddListener(delegate { handleSearchChange(); });
@@ -56,24 +53,25 @@ public class LoginScript : MonoBehaviour
         };
 
         // Send the mutation request asynchronously and wait for the response.
-        var queryResult = await graphQLClient.SendMutationAsync<JObject>(verifyOTP);
-        var data = queryResult.Data;
-        if (data != null)  // Success in retrieving Data
+        var queryResult = await rfClient.SendQueryAsync(verifyOTP);
+        var data = queryResult["data"];
+        var errors = queryResult["errors"];
+        if (data != null && errors == null)  // Success in retrieving Data
         {
             Debug.Log(data);
             string accessToken = (string)data["verifyOTP"]["accessToken"];
             PlayerPrefs.SetString("accessToken", accessToken);
         }
-        else if (queryResult.Errors != null) // Failure to retrieve data
+        else if (errors != null) // Failure to retrieve data
         {
-            if ((string)queryResult.Errors[0].Extensions["code"] == "INTERNAL_SERVER_ERROR")
+            if ((string)errors[0]["extensions"]["code"] == "INTERNAL_SERVER_ERROR")
             {
                 errorMessage.text = "Error Occured! Please try again";
             }
             else
             {
-                Debug.Log(queryResult.Errors[0].Message);
-                errorMessage.text = queryResult.Errors[0].Message;
+                Debug.Log(errors[0]["message"]);
+                errorMessage.text = (string)errors[0]["message"];
             }
         }
     }

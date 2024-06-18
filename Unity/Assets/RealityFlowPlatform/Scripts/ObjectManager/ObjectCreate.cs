@@ -1,7 +1,4 @@
 using UnityEngine;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Newtonsoft.Json.Linq;
 using Ubiq.Spawning;
 using System;
@@ -11,7 +8,6 @@ using System.Net.Sockets;
 
 public class ObjectSpawn : MonoBehaviour
 {
-    private GraphQLHttpClient graphQLClient;
     private NetworkSpawnManager networkSpawnManager;
     private RealityFlowClient realityFlowClient;
     private RfObjectManager rfObjectManager; // Add reference to RfObjectManager
@@ -48,27 +44,9 @@ public class ObjectSpawn : MonoBehaviour
         // For Testing Purpses the project ID is a string field in Editor
         // NOTE: Ideally this function should get the current projectID from the RealityFlowClient
         // Obtain the Access Token from realityFlowClient
-        InitializeGraphQLClient();
         // Debug.Log("ACESS TOKEN: " + realityFlowClient.accessToken);
         // Debug.Log("SERVER: " + realityFlowClient.server + "/graphql");
         // Debug.Log("PROJECT ID: " + projectId);
-    }
-    
-    private void InitializeGraphQLClient()
-    {
-        if (realityFlowClient == null)
-        {
-            Debug.LogError("RealityFlowClient is not initialized.");
-            return;
-        }
-
-        var options = new GraphQLHttpClientOptions
-        {
-            EndPoint = new Uri(realityFlowClient.server + "/graphql")
-        };
-
-        graphQLClient = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());
-        graphQLClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {realityFlowClient.accessToken}");
     }
 
     public void SpawnObjectWithRoomScope(string prefabName)
@@ -185,13 +163,15 @@ public class ObjectSpawn : MonoBehaviour
             Debug.Log("Sending GraphQL request to: " + realityFlowClient.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
 
-            var graphQLResponse = await graphQLClient.SendMutationAsync<JObject>(saveObject);
-            if (graphQLResponse.Data != null)
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(saveObject);
+            var data = graphQLResponse["data"];
+            var errors = graphQLResponse["errors"];
+            if (data != null)
             {
                 Debug.Log("Object saved to the database successfully.");
                 
                 // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse.Data["saveObject"]["id"].ToString();
+                var returnedId = data["saveObject"]["id"].ToString();
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
                 
@@ -210,12 +190,12 @@ public class ObjectSpawn : MonoBehaviour
             else
             {
                 Debug.LogError("Failed to save object to the database.");
-                foreach (var error in graphQLResponse.Errors)
+                foreach (var error in errors)
                 {
-                    Debug.LogError($"GraphQL Error: {error.Message}");
-                    if (error.Extensions != null)
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["Extensions"] != null)
                     {
-                        Debug.LogError($"Error Extensions: {error.Extensions}");
+                        Debug.LogError($"Error Extensions: {error["Extensions"]}");
                     }
                 }
             }

@@ -1,4 +1,3 @@
-using GraphQL;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using TMPro;
@@ -51,7 +50,10 @@ public class MyProjectsDisplay : MonoBehaviour
 
     private async void getProjectsData()
     {
-        if(rfClient) {
+        if(rfClient == null) {
+            return;
+        }
+
         // Create a new GraphQL query request to get the projects owned, co-owned, and joined by the user.
         var projectsQuery = new GraphQLRequest
         {
@@ -85,8 +87,8 @@ public class MyProjectsDisplay : MonoBehaviour
         };
 
         // Send the query request to the GraphQL server
-        var queryResult = await rfClient.graphQLClient.SendQueryAsync<JObject>(projectsQuery);
-        data = queryResult.Data;  //Get the data from the query result
+        var queryResult = await rfClient.SendQueryAsync(projectsQuery);
+        var data = queryResult["data"];  //Get the data from the query result
         if (data != null)
         {
             // Get the projects owned, co-owned, and joined by the user
@@ -99,12 +101,9 @@ public class MyProjectsDisplay : MonoBehaviour
             displayProjects(projectsCoOwned, projectsCoOwnedPanel);
             displayProjects(projectsJoined, projectsJoinedPanel);
         }
-        if (queryResult.Errors != null)
+        if (queryResult["errors"] != null)
         {
-            Debug.Log(queryResult.Errors[0].Message);
-        }
-
-            
+            Debug.Log(queryResult["errors"][0]["message"]);
         }
     }
 
@@ -184,9 +183,9 @@ public class MyProjectsDisplay : MonoBehaviour
             Variables = new { getProjectByIdId = id }
         };
 
-        var graphQL = await rfClient.graphQLClient.SendQueryAsync<JObject>(getProjectData);
+        var graphQL = await rfClient.SendQueryAsync(getProjectData);
 
-        var projectdata = graphQL.Data;
+        var projectdata = graphQL["data"];
         if (projectdata != null)
         {
             // Debug.Log("Fetched project data: " + projectdata.ToString());

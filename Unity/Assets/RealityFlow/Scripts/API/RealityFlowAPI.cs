@@ -8,6 +8,7 @@ using Ubiq.Spawning;
 using System;
 using System.Linq;
 using RealityFlow.NodeGraph;
+using UnityEngine.Assertions;
 using System.IO;
 
 #if UNITY_EDITOR
@@ -249,9 +250,110 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void AddNodeToGraph(Graph graph, NodeDefinition def)
     {
+        // TODO: Add node to GraphQL
         NodeIndex index = graph.AddNode(def);
         actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
+    }
+
+    public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
+    {
+        Graph.NodeMemory nodeMem = graph.GetMemory(node);
+        List<(PortIndex, PortIndex)> dataEdges = new();
+        List<(PortIndex, NodeIndex)> execEdges = new();
+        graph.EdgesOf(node, dataEdges, execEdges);
+        graph.RemoveNode(node);
+        actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
+        Debug.Log("Removed node from graph");
+    }
+
+    public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
+    {
+        if (!graph.TryAddEdge(from.Node, from.Port, to.Node, to.Port))
+        {
+            Debug.LogError("Failed to add edge");
+            return;
+        }
+        actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
+        Debug.Log($"Adding edge at {from}:{to}");
+    }
+
+    public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
+    {
+        graph.RemoveDataEdge(from, to);
+        actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to);
+        Debug.Log($"Deleted edge from {from} to {to}");
+    }
+
+    public void AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex to)
+    {
+        if (!graph.TryAddExecutionEdge(from.Node, from.Port, to))
+        {
+            Debug.LogError("Failed to add edge");
+            return;
+        }
+        actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
+        Debug.Log($"Adding edge at {from}:{to}");
+    }
+
+    public void RemoveExecEdgeFromGraph(Graph graph, PortIndex from, NodeIndex to)
+    {
+        graph.RemoveExecutionEdge(from, to);
+        actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
+        Debug.Log($"Deleted exec edge from {from} to {to}");
+    }
+
+    public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
+    {
+        if (!graph.ContainsNode(node))
+        {
+            Debug.LogError("Failed to move node because it does not exist");
+            return;
+        }
+        Vector2 prevPosition = graph.GetNode(node).Position;
+        graph.GetNode(node).Position = position;
+        actionLogger.LogAction(nameof(SetNodePosition), graph, node, prevPosition, position);
+        Debug.Log($"Moved node {node} to {position}");
+    }
+
+    public void SetNodeFieldValue(Graph graph, NodeIndex node, int field, NodeValue value)
+    {
+        Node nodeData = graph.GetNode(node);
+        if (!nodeData.TryGetField(field, out NodeValue oldValue))
+        {
+            Debug.LogError("Failed to get old field value when setting node field");
+            oldValue = NodeValue.Null;
+        }
+        if (!nodeData.TrySetFieldValue(field, value))
+        {
+            Debug.LogError("Failed to set node field value");
+            return;
+        }
+        actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, oldValue);
+        Debug.Log($"Set node {node} field {field} to {value}");
+    }
+
+    public void SetNodeInputConstantValue(Graph graph, NodeIndex node, int port, NodeValue value)
+    {
+        Node nodeData = graph.GetNode(node);
+        if (!nodeData.TryGetInputValue(port, out NodeValue oldValue))
+        {
+            Debug.LogError("Failed to get old input port constant value when setting input port constant");
+            oldValue = NodeValue.Null;
+        }
+        if (!nodeData.TrySetInputValue(port, value))
+        {
+            Debug.LogError("Failed to set node input port constant value");
+            return;
+        }
+        actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
+        Debug.Log($"Set node {node} input port {port} to {value}");
+    }
+
+    public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)
+    {
+        // TODO: Punted implementation until rewrite for less to rewrite
+        // ^ also punting undo functionality
     }
 
 #if UNITY_EDITOR

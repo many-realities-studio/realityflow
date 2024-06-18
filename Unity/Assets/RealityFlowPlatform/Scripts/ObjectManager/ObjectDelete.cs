@@ -1,9 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
@@ -12,7 +9,6 @@ using System.Net.Sockets;
 
 public class ObjectDelete : MonoBehaviour
 {
-    private GraphQLHttpClient graphQLClient;
     private RealityFlowClient realityFlowClient;
 
     void Start()
@@ -24,25 +20,6 @@ public class ObjectDelete : MonoBehaviour
             Debug.LogError("RealityFlowClient is not found in the scene.");
             return;
         }
-
-        InitializeGraphQLClient();
-    }
-
-    private void InitializeGraphQLClient()
-    {
-        if (realityFlowClient == null)
-        {
-            Debug.LogError("RealityFlowClient is not initialized.");
-            return;
-        }
-
-        var options = new GraphQLHttpClientOptions
-        {
-            EndPoint = new Uri(realityFlowClient.server + "/graphql")
-        };
-
-        graphQLClient = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());
-        graphQLClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {realityFlowClient.accessToken}");
     }
 
     public async void DeleteObject(string objectId)
@@ -66,8 +43,10 @@ public class ObjectDelete : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await graphQLClient.SendMutationAsync<JObject>(deleteObject);
-            if (graphQLResponse.Data != null)
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(deleteObject);
+            var data = graphQLResponse["data"];
+            var errors = graphQLResponse["errors"];
+            if (data != null)
             {
                 Debug.Log("Object deleted from the database successfully.");
 
@@ -86,12 +65,12 @@ public class ObjectDelete : MonoBehaviour
             else
             {
                 Debug.LogError("Failed to delete object from the database.");
-                foreach (var error in graphQLResponse.Errors)
+                foreach (var error in errors)
                 {
-                    Debug.LogError($"GraphQL Error: {error.Message}");
-                    if (error.Extensions != null)
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["Extensions"] != null)
                     {
-                        Debug.LogError($"Error Extensions: {error.Extensions}");
+                        Debug.LogError($"Error Extensions: {error["Extensions"]}");
                     }
                 }
             }

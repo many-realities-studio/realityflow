@@ -15,6 +15,8 @@ namespace RealityFlow.NodeUI
         [SerializeField]
         TMP_Text title;
 
+        public TMP_Text Name => title;
+
         public Action<NodeValue> OnTick { get; set; }
 
         public float Value
@@ -32,12 +34,6 @@ namespace RealityFlow.NodeUI
                 else
                     Debug.LogError("incorrect value type assigned to FloatEditor");
             }
-        }
-
-        public string Name
-        {
-            get => title.text;
-            set => title.text = value;
         }
         
         public void Tick()
