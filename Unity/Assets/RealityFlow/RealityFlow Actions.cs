@@ -69,7 +69,7 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""820f9921-3903-457a-89aa-e02739e701ab"",
                     ""path"": ""<XRController>{LeftHand}/secondaryButton"",
-                    ""interactions"": ""Hold(duration=1)"",
+                    ""interactions"": ""Hold"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ToggleRecording"",

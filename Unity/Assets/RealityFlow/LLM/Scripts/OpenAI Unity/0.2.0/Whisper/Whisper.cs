@@ -25,7 +25,7 @@ namespace Samples.Whisper
         [SerializeField] private GameObject LLMWindow; // Reference to the LLMWindow
 
         private readonly string fileName = "output.wav";
-        private readonly int maxDuration = 60; // 5 minutes in seconds
+        private readonly int maxDuration = 60;
 
         private AudioClip clip;
         private bool isRecording;

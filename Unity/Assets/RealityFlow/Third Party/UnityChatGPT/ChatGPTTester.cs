@@ -1,3 +1,4 @@
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ public class ChatGPTTester : MonoBehaviour
 {
     [SerializeField]
     private PressableButton askButton;
-
     [SerializeField]
     private PressableButton compilerButton;
 
@@ -76,13 +76,13 @@ public class ChatGPTTester : MonoBehaviour
     }
 
     private static readonly Dictionary<string, string> apiFunctionDescriptions = new Dictionary<string, string>
-    {
-        { "SpawnObject", "Create an object: {0}" },
-        { "DespawnObject", "Remove the object: {0}" },
-        { "UpdateObjectTransform", "Update the transform of object: {0}" },
-        { "AddNodeToGraph", "Add a node to the graph: {0}" },
-        // Add more mappings as needed
-    };
+{
+    { "SpawnObject", "Create an object: {0}" },
+    { "DespawnObject", "Remove the object: {0}" },
+    { "UpdateObjectTransform", "Update the transform of object: {0}" },
+    { "AddNodeToGraph", "Add a node to the graph: {0}" },
+    // Add more mappings as needed
+};
 
     private void Awake()
     {
@@ -241,7 +241,7 @@ public class ChatGPTTester : MonoBehaviour
 
         responseTimeText.gameObject.SetActive(isActive);
         chatGPTAnswer.gameObject.SetActive(isActive);
-        chatGPTQuestionText.gameObject.SetActive(isActive);
+        //chatGPTQuestionText.gameObject.SetActive(isActive);
         promptText.gameObject.SetActive(isActive);
         scenarioQuestionText.gameObject.SetActive(isActive);
         scenarioTitleText.gameObject.SetActive(isActive);
