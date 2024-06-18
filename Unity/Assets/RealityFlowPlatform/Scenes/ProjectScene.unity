@@ -8144,9 +8144,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d130b5e3e15d62f4aa0dff764b312fd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTRhOGE4NWQ2ZjI2NWU0YTM2OWU4NyIsInVzZXJuYW1lIjoiVGVzdFVzZXIxIiwiZW1haWwiOiJUZXN0MUB0ZXN0LmNvbSIsImZpcnN0TmFtZSI6InRlc3QxIiwibGFzdE5hbWUiOiJVc2VyIiwiZGVmYXVsdFByb2plY3RJZCI6IiIsImlhdCI6MTcxNjkxNDAwNSwiZXhwIjoxNzE4MTIzNjA1fQ.j0yFmmjgx8JEecxDGdMD4BJtsKfIpex_n-gMF-8g_5Q
+  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NThiZjFiM2U3MDY5NGU0YmFiMWRhMyIsInVzZXJuYW1lIjoidGVzdDEiLCJlbWFpbCI6InRlc3RAZ21haWxsLmNvbSIsImZpcnN0TmFtZSI6InRlc3QxIiwibGFzdE5hbWUiOiJ0dHQiLCJkZWZhdWx0UHJvamVjdElkIjoiIiwiaWF0IjoxNzE4NjYzNjM0LCJleHAiOjE3MTk4NzMyMzR9.XL4-6VJIF-iMxII9mpD_zE_RDn3UVsbCa7nH46Vy_Gw
   roomClient: {fileID: 0}
-  server: http://localhost:4000
+  server: http://localhost:4000/
+  graphQLRoute: graphql
 --- !u!114 &1269863014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10379,9 +10380,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d130b5e3e15d62f4aa0dff764b312fd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTRhOGRjNWQ2ZjI2NWU0YTM2OWU4OSIsInVzZXJuYW1lIjoiVGVzdFVzZXIyIiwiZW1haWwiOiJUZXN0RW1haWwyQGVzdC5jb20iLCJmaXJzdE5hbWUiOiJUZXN0MiIsImxhc3ROYW1lIjoiVXNlciIsImRlZmF1bHRQcm9qZWN0SWQiOiIiLCJpYXQiOjE3MTY5MTQwMDUsImV4cCI6MTcxODEyMzYwNX0.bPhlGC9ID6YS1OGkXN54mzaVCgG0FBXUMiF_K02-kOY
+  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NThiZWU5M2U3MDY5NGU0YmFiMWRhMSIsInVzZXJuYW1lIjoidGVzdDAiLCJlbWFpbCI6InRlc3RAZ21haWwuY28iLCJmaXJzdE5hbWUiOiJ0ZXN0MCIsImxhc3ROYW1lIjoidHR0IiwiZGVmYXVsdFByb2plY3RJZCI6IiIsImlhdCI6MTcxODY2MzYzNCwiZXhwIjoxNzE5ODczMjM0fQ.CvJ_k3ep2Dt1INEOgekBEnRvS88CvgcxF_rWH9fk0Oc
   roomClient: {fileID: 0}
-  server: http://localhost:4000
+  server: http://localhost:4000/
+  graphQLRoute: graphql
 --- !u!114 &1628094197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15203,6 +15205,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RfClient
+      objectReference: {fileID: 0}
+    - target: {fileID: 5758328985047450263, guid: 3b45afe5b63c0514aa2c17cf8fb9e92e,
+        type: 3}
+      propertyPath: server
+      value: http://localhost:4000/
+      objectReference: {fileID: 0}
+    - target: {fileID: 5758328985047450263, guid: 3b45afe5b63c0514aa2c17cf8fb9e92e,
+        type: 3}
+      propertyPath: roomClient
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5758328985047450263, guid: 3b45afe5b63c0514aa2c17cf8fb9e92e,
+        type: 3}
+      propertyPath: accessToken
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NWQzNmMwOGVjN2JiZGQ1NDYzMGU3ZiIsInVzZXJuYW1lIjoiYXZhIiwiZW1haWwiOiJhdmFAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoiYXZhIiwibGFzdE5hbWUiOiJkIiwiZGVmYXVsdFByb2plY3RJZCI6IiIsImlhdCI6MTcxODY2MzYzNCwiZXhwIjoxNzE5ODczMjM0fQ.y5HbJcDS5oygyTwl_7qUoppIXIW2CP_mENt-TsutD5I
+      objectReference: {fileID: 0}
+    - target: {fileID: 5758328985047450263, guid: 3b45afe5b63c0514aa2c17cf8fb9e92e,
+        type: 3}
+      propertyPath: graphQLRoute
+      value: graphql
       objectReference: {fileID: 0}
     - target: {fileID: 6457976410651697496, guid: 3b45afe5b63c0514aa2c17cf8fb9e92e,
         type: 3}
