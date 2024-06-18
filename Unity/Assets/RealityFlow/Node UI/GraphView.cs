@@ -369,12 +369,12 @@ namespace RealityFlow.NodeUI
             if (selectedVariable == null)
                 return;
 
+            foreach (Transform trans in variableContent)
+                if (trans.GetComponent<VariableItem>().varName == selectedVariable)
+                    Destroy(trans.gameObject);
+
             if (!Graph.TryGetVariableType(selectedVariable, out _))
                 return;
-
-            foreach (Transform trans in variableContent)
-                if (trans.GetComponent<VariableItem>().name == selectedVariable)
-                    Destroy(trans.gameObject);
 
             RealityFlowAPI.Instance.RemoveVariableFromGraph(Graph, selectedVariable);
 
