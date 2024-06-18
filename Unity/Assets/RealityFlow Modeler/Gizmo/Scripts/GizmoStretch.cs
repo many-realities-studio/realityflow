@@ -8,6 +8,9 @@ public class GizmoStretch : GizmoTranslateAxis
     private Vector3 originalMeshScale;
     private float originalGizmoDistance;
 
+    private ComponentScaling currentOperation;
+    private Vector3 startScale;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,20 +29,22 @@ public class GizmoStretch : GizmoTranslateAxis
             InitRayGizmolData();
             InitLineData();
             EnableLineRenderer(this.transform.position, GetAxisDirection(), 100f);
-            InitTanSphere(); 
-            
+            InitTanSphere();
 
             originalMeshScale = GetStretchInGrid(GetAttachedObject().transform.localScale);
             originalGizmoDistance = GetGizmoOriginDistance();
             
 
             lastUpdateRaySelect = true;
+            BeginMeshOperation();
         }
 
         else if (EndOfRaySelect())
         {
             DisableLineRenderer();
+            EndMeshOperation();
             Destroy(tanSphere);
+            BakeRotation();
 
             lastUpdateRaySelect = false;
         }
@@ -95,5 +100,28 @@ public class GizmoStretch : GizmoTranslateAxis
         Vector3 position = GetPositionFromTranslate(transform.position, GetAxisDirection());
         tanSphere.transform.position = position;
         return Vector3.Distance(GetGizmoContainer().transform.position, position);
+    }
+
+    void BeginMeshOperation()
+    {
+        if (currentOperation == null)
+            currentOperation = new ComponentScaling(HandleSelectionManager.Instance.GetUniqueSelectedIndices());
+        startScale = GetAttachedObject().transform.localScale;
+    }
+
+    void EndMeshOperation()
+    {
+        Vector3 invertedLastScale = Vector3.zero;
+        invertedLastScale.x = 1 / startScale.x;
+        invertedLastScale.y = 1 / startScale.y;
+        invertedLastScale.z = 1 / startScale.z;
+        Vector3 newScale = Vector3.Scale(GetAttachedObject().transform.localScale, invertedLastScale);
+        currentOperation.AddOffsetAmount(newScale);
+        try
+        {
+            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+        }
+        catch { }
+        currentOperation = null;
     }
 }

@@ -8,9 +8,9 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class NetworkedVRWhiteBoard : MonoBehaviour, INetworkSpawnable
+public class NetworkedVRWhiteBoard : MonoBehaviour//, INetworkSpawnable
 {
-   public NetworkId NetworkId {get; set;} = NetworkId.Unique();
+   public NetworkId NetworkId {get; set;} //  = NetworkId.Unique();
     NetworkContext context;
     public bool owner;
     private GameObject obj;

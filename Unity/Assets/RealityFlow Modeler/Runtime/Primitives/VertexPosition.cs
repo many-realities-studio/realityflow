@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,35 +51,49 @@ public static class VertexPosition
     /// </summary>
     /// <param name="mesh"> target mesh</param>
     /// <param name="indicies"> indicies in shared vertex array </param>
-    /// <param name="positions"> translation amount </param>
-    public static void TransformVertices(this EditableMesh mesh, int[] indicies, Vector3 positions)
+    /// <param name="position"> translation amount </param>
+    public static void TransformVertices(this EditableMesh mesh, int[] indices, Vector3 position)
     {
-        for (int i = 0; i < indicies.Length; i++)
+        for (int i = 0; i < indices.Length; i++)
         {
-            TransformVertex(mesh, indicies[i], positions);
+            TransformVertex(mesh, indices[i], position);
         }
 
         mesh.RefreshMesh();
     }
 
-    public static void TranslateVerticesWithNetworking(this EditableMesh mesh, int[] indicies, Vector3 offset)
+    public static void TransformVertices(this EditableMesh mesh, int[] indices, Vector3[] positions)
     {
-        TransformVertices(mesh, indicies, offset);
+        if (indices.Length != positions.Length)
+            return;
 
-        NetworkVertexPosition(mesh, TransformType.Translate, indicies, offset, Quaternion.identity, Vector3.one);
+        for (int i = 0; i < indices.Length; i++)
+        {
+            TransformVertex(mesh, indices[i], positions[i]);
+        }
+
+        mesh.RefreshMesh();
+    }
+
+    public static void TranslateVerticesWithNetworking(this EditableMesh mesh, int[] indices, Vector3 offset)
+    {
+        TransformVertices(mesh, indices, offset);
+        //for (int i = 0; i < indices.Length; i++) { mesh.CacheOperation(indices[i], offset); }
+        NetworkVertexPosition(mesh, TransformType.Translate, indices, offset, Quaternion.identity, Vector3.one);
     }
 
 
     /// <summary>
     /// Translates the position of all conicident vertices
     /// </summary>
-    public static void TransformVertex(this EditableMesh mesh, int sharedVertIndex, Vector3 position)
+    public static void TransformVertex(this EditableMesh mesh, int sharedVertIndex, Vector3 offset)
     {
         int[] vertIndices = mesh.sharedVertices[sharedVertIndex].vertices;
 
         for(int i = 0; i < vertIndices.Length; i++)
         {
-            mesh.positions[vertIndices[i]] += position;
+            // mesh.positions[vertIndices[i]] += position;
+            mesh.positions[vertIndices[i]] += offset;
         }
     }
 
@@ -88,6 +103,8 @@ public static class VertexPosition
     public static void SetVertexPosition(this EditableMesh mesh, int sharedVertIndex, Vector3 position)
     {
         int[] vertIndices = mesh.sharedVertices[sharedVertIndex].vertices;
+        Vector3 startingPos = mesh.positions[vertIndices[0]];
+        Vector3 offset = position - startingPos;
 
         for (int i = 0; i < vertIndices.Length; i++)
         {
@@ -95,58 +112,70 @@ public static class VertexPosition
         }
     }
 
-    public static void RotateVerticesWithNetworking(this EditableMesh mesh, int[] indicies, Quaternion newRot)
+    public static void RotateVerticesWithNetworking(this EditableMesh mesh, int[] indices, Quaternion newRot)
     {
-        RotateVertices(mesh, indicies, newRot);
-        NetworkVertexPosition(mesh, TransformType.Rotate, indicies, Vector3.zero, newRot, Vector3.one);
+        Vector3[] offsets = RotateVertices(mesh, indices, newRot);
+        NetworkVertexPosition(mesh, TransformType.Rotate, indices, Vector3.zero, newRot, Vector3.one);
     }
 
-    public static void ScaleVerticesWithNetworking(this EditableMesh mesh, int[] indicies, Vector3 newScale)
+    public static void ScaleVerticesWithNetworking(this EditableMesh mesh, int[] indices, Vector3 newScale)
     {
-        ScaleVertices(mesh, indicies, newScale);
-        NetworkVertexPosition(mesh, TransformType.Scale, indicies, Vector3.zero, Quaternion.identity, newScale);
+        Vector3[] offsets = ScaleVertices(mesh, indices, newScale);
+        NetworkVertexPosition(mesh, TransformType.Scale, indices, Vector3.zero, Quaternion.identity, newScale);
+    }
+
+    public static void BakeVerticesWithNetworking(this EditableMesh mesh)
+    {
+        // should be better way to do this!
+        if (mesh == null)
+            return;
+        BakeVertices(mesh);
+        NetworkVertexPosition(mesh, TransformType.Bake, new int[0], Vector3.zero, mesh.transform.rotation, mesh.transform.localScale);
     }
 
     /// <summary>
     /// Rotates a set of vertices around centroid
     /// </summary>
-    public static void RotateVertices(this EditableMesh mesh, int[] indicies, Quaternion newRot)
+    public static Vector3[] RotateVertices(this EditableMesh mesh, int[] indices, Quaternion newRot)
     {
-        Vector3 center = FindCentroidFromVertices(mesh, indicies);
+        Vector3 center = FindCentroidFromVertices(mesh, indices);
+        Vector3[] offsets = new Vector3[indices.Length];
         int index;
-        for(int i = 0; i < indicies.Length; i++)
+        for(int i = 0; i < indices.Length; i++)
         {
-            //index = mesh.sharedVertexLookup[indicies[i]];
-            index = indicies[i];
-            //Vector3 relativePos = mesh.positions[indicies[i]] - center;
+            index = indices[i];
             Vector3 relativePos = mesh.positions[mesh.sharedVertices[index].vertices[0]] - center;
             Vector3 rotatedPos = newRot * relativePos;
             rotatedPos += center;
+
+            offsets[i] = rotatedPos - mesh.GetPositionFromSharedVertIndex(index);
             SetVertexPosition(mesh, index, rotatedPos);
         }
 
         mesh.RefreshMesh();
+        return offsets;
     }
 
     /// <summary>
     /// Scales a set of vertices around centroid
     /// </summary>
-    public static void ScaleVertices(this EditableMesh mesh, int[] indicies, Vector3 newScale)
+    public static Vector3[] ScaleVertices(this EditableMesh mesh, int[] indices, Vector3 newScale)
     {
-        Vector3 center = FindCentroidFromVertices(mesh, indicies);
+        Vector3 center = FindCentroidFromVertices(mesh, indices);
+        Vector3[] offsets = new Vector3[indices.Length];
         int index;
-        for (int j = 0; j < indicies.Length; j++)
+        for (int i = 0; i < indices.Length; i++)
         {
-            //index = mesh.sharedVertexLookup[indicies[j]];
-            index = indicies[j];
-            Vector3 pos = mesh.positions[mesh.sharedVertices[indicies[j]].vertices[0]];
-            //Vector3 direction = mesh.positions[indicies[j]] - center;
+            index = indices[i];
+            Vector3 pos = mesh.positions[mesh.sharedVertices[indices[i]].vertices[0]];
             Vector3 direction = pos - center;
             Vector3 newPos = Vector3.Scale(newScale, direction) + center;
+            offsets[i] = newPos - mesh.GetPositionFromSharedVertIndex(index);
             SetVertexPosition(mesh, index, newPos);
         }
 
         mesh.RefreshMesh();
+        return offsets;
     }
 
 
@@ -211,5 +240,30 @@ public static class VertexPosition
             rotation,
             scale
         );
+    }
+
+    public static void BakeVertices(this EditableMesh mesh)
+    {
+        Transform meshTransform = mesh.gameObject.transform;
+        EMSharedVertex[] sharedVertices = mesh.sharedVertices;
+        int[] indices = new int[sharedVertices.Length];
+
+        for (int i = 0; i < sharedVertices.Length; i++)
+        {
+            indices[i] = i;
+
+            Vector3 relativePos = mesh.positions[sharedVertices[i].vertices[0]];
+            Vector3 scalePos = Vector3.Scale(relativePos, meshTransform.localScale);
+            Vector3 rotatedPos = meshTransform.rotation * scalePos;
+
+            SetVertexPosition(mesh, i, rotatedPos);
+        }
+
+        mesh.RefreshMesh();
+        mesh.gameObject.transform.rotation = Quaternion.identity;
+        mesh.gameObject.transform.transform.localScale = Vector3.one;
+        mesh.GetComponent<NetworkedMesh>().wasBake = true;
+        // should be better way to do this
+        mesh.gameObject.GetComponent<BoundsControl>().RecomputeBounds();
     }
 }

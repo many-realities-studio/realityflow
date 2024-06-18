@@ -129,7 +129,7 @@ public class CopyTool : MonoBehaviour
         copiedObject = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(primitive);
         // Network that this copied mesh is free to manipulate for everyone
         // copiedObject.GetComponent<NetworkedMesh>().EndHold();
-        
+
         EditableMesh em = copiedObject.GetComponent<EditableMesh>();
         em.CreateMesh(selectedMesh.GetComponent<EditableMesh>());
 
