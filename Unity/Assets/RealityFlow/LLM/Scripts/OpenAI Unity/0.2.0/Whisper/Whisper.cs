@@ -25,7 +25,7 @@ namespace Samples.Whisper
         [SerializeField] private GameObject LLMWindow; // Reference to the LLMWindow
 
         private readonly string fileName = "output.wav";
-        private readonly int maxDuration = 60;
+        private readonly int maxDuration = 5;
 
         private AudioClip clip;
         private bool isRecording;
@@ -48,7 +48,7 @@ namespace Samples.Whisper
 
         private void OnEnable()
         {
-            inputActions.RealityFlowXRActions.ToggleRecording.started += OnRecordingStarted;
+            inputActions.RealityFlowXRActions.ToggleRecording.performed += OnRecordingStarted;
             inputActions.RealityFlowXRActions.ToggleRecording.canceled += OnRecordingCanceled;
             inputActions.RealityFlowXRActions.Execute.started += OnExecute; // Register the Execute action
             inputActions.RealityFlowXRActions.OpenLLMMenu.started += OnOpenLLMMenu; // Register the OpenLLMMenu action
@@ -57,7 +57,7 @@ namespace Samples.Whisper
 
         private void OnDisable()
         {
-            inputActions.RealityFlowXRActions.ToggleRecording.started -= OnRecordingStarted;
+            inputActions.RealityFlowXRActions.ToggleRecording.performed -= OnRecordingStarted;
             inputActions.RealityFlowXRActions.ToggleRecording.canceled -= OnRecordingCanceled;
             inputActions.RealityFlowXRActions.Execute.started -= OnExecute; // Unregister the Execute action
             inputActions.RealityFlowXRActions.OpenLLMMenu.started -= OnOpenLLMMenu; // Unregister the OpenLLMMenu action
@@ -216,7 +216,7 @@ namespace Samples.Whisper
         {
             if (isRecording) return;
             isRecording = true;
-            recordButton.enabled = false;
+            //recordButton.enabled = false;
 
             time = 0;
             SetProgressBarColor(new Color(0.847f, 1.0f, 0.824f)); // Set color to #D8FFD2
@@ -247,7 +247,7 @@ namespace Samples.Whisper
         {
             if (!isRecording) return;
             isRecording = false;
-            recordButton.enabled = true;
+            // recordButton.enabled = true;
 
             Debug.Log("In the EndRecording method");
             progressText.text = "Transcripting..."; // Update progress text
@@ -320,7 +320,12 @@ namespace Samples.Whisper
             {
                 time += Time.deltaTime;
                 float fillAmount = time / maxDuration; // Fill amount based on 10 minutes duration
-                StartCoroutine(AnimateProgressBarFill(fillAmount));
+                if (time >= maxDuration)
+                {
+                    time = 0;
+                    isRecording = false;
+                    EndRecording();
+                }
             }
         }
 
