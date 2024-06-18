@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
@@ -8,8 +9,7 @@ using System;
 using System.Linq;
 using RealityFlow.NodeGraph;
 using UnityEngine.Assertions;
-
-
+using System.IO;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,7 +18,7 @@ using UnityEditor;
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private NetworkSpawnManager spawnManager;
-    private ActionLogger actionLogger = new ActionLogger();
+    public ActionLogger actionLogger = new ActionLogger();
     private NetworkContext networkContext;
 
     public NetworkId NetworkId { get; set; }
@@ -67,9 +67,30 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    void Start()
+    void Update()
     {
+        HandleInput();
+    }
 
+    private void HandleInput()
+    {
+        List<InputDevice> devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, devices);
+
+        foreach (var device in devices)
+        {
+            if (device.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 primary2DAxisValue))
+            {
+                if (primary2DAxisValue.x < -0.5f)
+                {
+                    UndoLastAction();
+                }
+                else if (primary2DAxisValue.x > 0.5f)
+                {
+                    RedoLastAction();
+                }
+            }
+        }
     }
 
     public void ProcessTransformUpdate(string propertyKey, string jsonMessage)
@@ -196,7 +217,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return null;
     }
 
-    // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         GameObject obj = FindSpawnedObject(objectName);
@@ -392,156 +412,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Attempting to undo last action.");
         Debug.Log($"Action stack count before undo: {actionLogger.GetActionStackCount()}");
 
-        actionLogger.StartUndo();
-        var lastAction = actionLogger.GetLastAction();
-        actionLogger.EndUndo();
+        actionLogger.UndoLastAction();
 
-        if (lastAction == null)
-        {
-            Debug.Log("No actions to undo.");
-            return;
-        }
-
-        if (lastAction is ActionLogger.CompoundAction compoundAction)
-        {
-            foreach (var action in compoundAction.Actions)
-            {
-                UndoSingleAction(action);
-            }
-        }
-        else
-        {
-            UndoSingleAction(lastAction);
-        }
-
-        // Clear the action stack after undo
-        //actionLogger.ClearActionStack();
         Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
-        //StopAllCoroutines();
     }
 
-
-    private void UndoSingleAction(ActionLogger.LoggedAction action)
+    public void RedoLastAction()
     {
-        switch (action.FunctionName)
-        {
-            case nameof(SpawnObject):
-                string prefabName = (string)action.Parameters[0] + "(Clone)";
-                Debug.Log("The spawned object's name is " + prefabName);
-                GameObject spawnedObject = FindSpawnedObject(prefabName);
-                if (spawnedObject != null)
-                {
-                    DespawnObject(spawnedObject);
-                }
-                break;
+        Debug.Log("Attempting to redo last action.");
+        Debug.Log($"Redo stack count before redo: {actionLogger.GetRedoStackCount()}");
 
-            case nameof(DespawnObject):
-                string objName = ((string)action.Parameters[0]).Replace("(Clone)", "").Trim();
-                Debug.Log("Undoing the despawn of object named " + objName);
-                Vector3 position = (Vector3)action.Parameters[1];
-                Quaternion rotation = (Quaternion)action.Parameters[2];
-                Vector3 scale = (Vector3)action.Parameters[3];
-                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
-                if (respawnedObject != null)
-                {
-                    respawnedObject.transform.localScale = scale;
-                }
-                break;
+        actionLogger.RedoLastAction();
 
-            case nameof(UpdateObjectTransform):
-                string objectName = (string)action.Parameters[0];
-                Vector3 oldPosition = (Vector3)action.Parameters[1];
-                Quaternion oldRotation = (Quaternion)action.Parameters[2];
-                Vector3 oldScale = (Vector3)action.Parameters[3];
-                Debug.Log("Undoing the transform of object named " + objectName);
-                GameObject obj = FindSpawnedObject(objectName);
-                if (obj != null)
-                {
-                    UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
-                }
-                else
-                {
-                    Debug.LogError($"Object named {objectName} not found during undo transform.");
-                }
-                break;
-
-            case nameof(AddNodeToGraph):
-                Graph graph = (Graph)action.Parameters[0];
-                NodeIndex index = (NodeIndex)action.Parameters[2];
-
-                graph.RemoveNode(index);
-                break;
-
-            case nameof(RemoveNodeFromGraph):
-                graph = (Graph)action.Parameters[0];
-                Graph.NodeMemory mem = (Graph.NodeMemory)action.Parameters[1];
-                List<(PortIndex, PortIndex)> data = (List<(PortIndex, PortIndex)>)action.Parameters[2];
-                List<(PortIndex, NodeIndex)> exec = (List<(PortIndex, NodeIndex)>)action.Parameters[3];
-
-                graph.RememberNode(mem, out _);
-                foreach ((PortIndex fromData, PortIndex toData) in data)
-                    if (!graph.TryAddEdge(fromData.Node, fromData.Port, toData.Node, toData.Port))
-                        Debug.LogError("Failed to restore edge of deleted node");
-                foreach ((PortIndex fromExec, NodeIndex toExec) in exec)
-                    if (!graph.TryAddExecutionEdge(fromExec.Node, fromExec.Port, toExec))
-                        Debug.LogError("Failed to restore execution edge of deleted node");
-
-                break;
-
-            case nameof(AddDataEdgeToGraph):
-                graph = (Graph)action.Parameters[0];
-                (PortIndex from, PortIndex to) = ((PortIndex, PortIndex))action.Parameters[1];
-
-                graph.RemoveDataEdge(from, to);
-                break;
-
-            case nameof(RemoveDataEdgeFromGraph):
-                graph = (Graph)action.Parameters[0];
-                from = (PortIndex)action.Parameters[1];
-                to = (PortIndex)action.Parameters[2];
-
-                if (!graph.TryAddEdge(from.Node, from.Port, to.Node, to.Port))
-                    Debug.LogError($"Failed to undo delete edge from {from} to {to}");
-                break;
-
-            case nameof(AddExecEdgeToGraph):
-                graph = (Graph)action.Parameters[0];
-                (PortIndex port, NodeIndex node) = ((PortIndex, NodeIndex))action.Parameters[1];
-
-                graph.RemoveExecutionEdge(port, node);
-                break;
-
-            case nameof(RemoveExecEdgeFromGraph):
-                graph = (Graph)action.Parameters[0];
-                from = (PortIndex)action.Parameters[1];
-                NodeIndex toNode = (NodeIndex)action.Parameters[2];
-
-                if (!graph.TryAddExecutionEdge(from.Node, from.Port, toNode))
-                    Debug.LogError($"Failed to undo delete exec edge from {from} to {toNode}");
-                break;
-
-            case nameof(SetNodePosition):
-                graph = (Graph)action.Parameters[0];
-                node = (NodeIndex)action.Parameters[1];
-                Vector2 prevPos = (Vector2)action.Parameters[2];
-                Vector2 pos = (Vector2)action.Parameters[3];
-
-                graph.GetNode(node).Position = prevPos;
-                break;
-
-            case nameof(SetNodeFieldValue):
-                graph = (Graph)action.Parameters[0];
-                node = (NodeIndex)action.Parameters[1];
-                int field = (int)action.Parameters[2];
-                NodeValue oldValue = (NodeValue)action.Parameters[3];
-
-                if (!graph.GetNode(node).TrySetField(field, oldValue))
-                    Debug.LogError("Failed to undo set field");
-
-                break;
-
-                // Add cases for other functions...
-        }
+        Debug.Log($"Redo stack after redo: {actionLogger.GetRedoStackCount()}");
     }
 
     public List<string> GetPrefabNames()
@@ -575,6 +458,34 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void EndCompoundAction()
     {
         actionLogger.EndCompoundAction();
+    }
+
+    public string ExportSpawnedObjectsData()
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+        foreach (var kvp in spawnManager.GetSpawnedForRoom())
+        {
+            var obj = kvp.Value;
+            if (obj != null)
+            {
+                sb.AppendLine("Object: " + obj.name);
+                Component[] components = obj.GetComponents<Component>();
+                foreach (Component component in components)
+                {
+                    sb.AppendLine("  Component: " + component.GetType().Name);
+                    if (component is Transform transform)
+                    {
+                        sb.AppendLine("    Position: " + transform.position);
+                        sb.AppendLine("    Rotation: " + transform.rotation);
+                        sb.AppendLine("    Scale: " + transform.localScale);
+                    }
+                }
+                sb.AppendLine();
+            }
+        }
+
+        return sb.ToString();
     }
 }
 

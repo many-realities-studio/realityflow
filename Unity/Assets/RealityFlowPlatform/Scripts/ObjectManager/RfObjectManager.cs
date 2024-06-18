@@ -172,7 +172,7 @@ public class RfObjectManager : MonoBehaviour
                             continue;
                         }
 
-                        Debug.Log("Object: " + JsonUtility.ToJson(obj)); 
+                        Debug.Log("Object: " + JsonUtility.ToJson(obj));
                     }
 
                     return objectsInDatabase;
@@ -288,4 +288,32 @@ public class RfObjectManager : MonoBehaviour
 
         Debug.Log("Room population complete.");
     }
+    public void ExportSpawnedObjectsData(string filePath)
+    {
+        using (StreamWriter writer = new StreamWriter(filePath))
+        {
+            foreach (var obj in FindObjectsOfType<GameObject>())
+            {
+                if (obj != null && obj.name.StartsWith("spawned_")) // Assuming spawned objects have a specific name pattern
+                {
+                    writer.WriteLine("Object: " + obj.name);
+                    Component[] components = obj.GetComponents<Component>();
+                    foreach (Component component in components)
+                    {
+                        writer.WriteLine("  Component: " + component.GetType().Name);
+                        if (component is Transform transform)
+                        {
+                            writer.WriteLine("    Position: " + transform.position);
+                            writer.WriteLine("    Rotation: " + transform.rotation);
+                            writer.WriteLine("    Scale: " + transform.localScale);
+                        }
+                    }
+                    writer.WriteLine();
+                }
+            }
+        }
+
+        Debug.Log("Spawned objects data exported to " + filePath);
+    }
+
 }
