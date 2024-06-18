@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using dotnow;
+using dotnow.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -15,6 +18,8 @@ namespace RealityFlow.Scripting
     public static class ScriptUtilities
     {
         static CSharpCompilation compilation;
+
+        readonly static dotnow.AppDomain Domain = new();
 
         public static readonly string[] CSharpKeywords = {
             "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked",
@@ -33,9 +38,9 @@ namespace RealityFlow.Scripting
 
         static ScriptUtilities()
         {
-            compilation = CSharpCompilation.Create("scripts")
+            compilation = CSharpCompilation.Create(null)
                 .AddReferences(
-                    AppDomain
+                    System.AppDomain
                     .CurrentDomain
                     .GetAssemblies()
                     .Where(asm => !asm.IsDynamic)
@@ -58,7 +63,7 @@ namespace RealityFlow.Scripting
 
             if (results.Success)
             {
-                Assembly asm = Assembly.Load(stream.ToArray());
+                Assembly asm = Domain.LoadModuleStream(stream, true);
                 return asm;
             }
 
@@ -72,7 +77,9 @@ namespace RealityFlow.Scripting
         /// </summary>
         public static Assembly CompileToAssembly(string file, List<Diagnostic> diagnostics)
         {
-            var csc = compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(file));
+            var csc = compilation
+                .AddSyntaxTrees(CSharpSyntaxTree.ParseText(file))
+                .WithAssemblyName($"scripts_{Guid.NewGuid()}");
             return Compile(csc, diagnostics);
         }
 
@@ -83,9 +90,11 @@ namespace RealityFlow.Scripting
         /// </summary>
         public static Assembly CompileToAssembly(IEnumerable<string> files, List<Diagnostic> diagnostics)
         {
-            var csc = compilation.AddSyntaxTrees(
-                files.Select(file => CSharpSyntaxTree.ParseText(file))
-            );
+            var csc = compilation
+                .AddSyntaxTrees(
+                    files.Select(file => CSharpSyntaxTree.ParseText(file))
+                )
+                .WithAssemblyName($"scripts_{Guid.NewGuid()}");
             return Compile(csc, diagnostics);
         }
 
@@ -123,10 +132,14 @@ namespace RealityFlow.Scripting
             );
             if (asm is null)
                 return null;
-            return (Action)Delegate.CreateDelegate(
-                typeof(Action),
-                asm.GetType("Script").GetMethod("Eval")
-            );
+
+            // Simply using `CreateDelegate` is tempting, but produces a broken function pointer
+            // and SEGFAULT's unity, so don't do that.
+            MethodInfo method = asm.GetType("Script").GetMethod("Eval");
+            return () =>
+            {
+                method.Invoke(null, null);
+            };
         }
 
         /// <summary>
@@ -144,10 +157,12 @@ namespace RealityFlow.Scripting
             );
             if (asm is null)
                 return null;
-            return (Action<T1>)Delegate.CreateDelegate(
-                typeof(Action<T1>),
-                asm.GetType("Script").GetMethod("Eval")
-            );
+
+            MethodInfo method = asm.GetType("Script").GetMethod("Eval");
+            return t1 =>
+            {
+                method.Invoke(null, new object[] { t1 });
+            };
         }
 
         /// <summary>
@@ -171,10 +186,11 @@ namespace RealityFlow.Scripting
             );
             if (asm is null)
                 return null;
-            return (Action<T1, T2>)Delegate.CreateDelegate(
-                typeof(Action<T1, T2>),
-                asm.GetType("Script").GetMethod("Eval")
-            );
+            MethodInfo method = asm.GetType("Script").GetMethod("Eval");
+            return (t1, t2) =>
+            {
+                method.Invoke(null, new object[] { t1, t2 });
+            };
         }
 
         /// <summary>
@@ -191,10 +207,8 @@ namespace RealityFlow.Scripting
             );
             if (asm is null)
                 return null;
-            return (Func<R>)Delegate.CreateDelegate(
-                typeof(Func<R>),
-                asm.GetType("Script").GetMethod("Eval")
-            );
+            MethodInfo method = asm.GetType("Script").GetMethod("Eval");
+            return () => (R)method.Invoke(null, null);
         }
 
         /// <summary>
@@ -203,7 +217,7 @@ namespace RealityFlow.Scripting
         /// If diagnostics is not null, adds any warnings/errors to it.
         /// Returns null if not successful.
         /// </summary>
-        public static Func<R, T1> GetFunc<R, T1>(string body, List<Diagnostic> diagnostics, string arg1Name)
+        public static Func<T1, R> GetFunc<T1, R>(string body, List<Diagnostic> diagnostics, string arg1Name)
         {
             Assembly asm = CompileToAssembly(
                 GetScriptCode(body, typeof(R), new[] {
@@ -213,10 +227,8 @@ namespace RealityFlow.Scripting
             );
             if (asm is null)
                 return null;
-            return (Func<R, T1>)Delegate.CreateDelegate(
-                typeof(Func<R, T1>),
-                asm.GetType("Script").GetMethod("Eval")
-            );
+            MethodInfo method = asm.GetType("Script").GetMethod("Eval");
+            return t1 => (R)method.Invoke(null, new object[] { t1 });
         }
 
         /// <summary>
@@ -225,7 +237,7 @@ namespace RealityFlow.Scripting
         /// If diagnostics is not null, adds any warnings/errors to it.
         /// Returns null if not successful.
         /// </summary>
-        public static Func<R, T1, T2> GetFunc<R, T1, T2>(
+        public static Func<T1, T2, R> GetFunc<T1, T2, R>(
             string body,
             List<Diagnostic> diagnostics,
             string arg1Name,
@@ -241,10 +253,11 @@ namespace RealityFlow.Scripting
             );
             if (asm is null)
                 return null;
-            return (Func<R, T1, T2>)Delegate.CreateDelegate(
-                typeof(Func<R, T1, T2>),
-                asm.GetType("Script").GetMethod("Eval")
-            );
+            MethodInfo method = asm.GetType("Script").GetMethod("Eval");
+            return (t1, t2) => (R)method.Invoke(null, new object[] { t1, t2 });
         }
+
+        public static object CreateInstance(Type type)
+            => Domain.CreateInstance(type);
     }
 }
