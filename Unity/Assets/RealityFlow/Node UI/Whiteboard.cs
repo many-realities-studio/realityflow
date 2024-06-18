@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
 using RealityFlow.NodeGraph;
 using UnityEngine;
 
@@ -40,6 +41,7 @@ namespace RealityFlow.NodeUI
             // TODO: Probably use API for this later
             transform.position = obj.transform.position + Vector3.up * 0.5f;
             topLevelGraphView.Graph = obj.graph;
+            topLevelGraphView.CurrentObject = obj;
         }
     }
 }

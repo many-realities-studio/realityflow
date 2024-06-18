@@ -228,12 +228,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    public void AddNodeToGraph(Graph graph, NodeDefinition def)
+    public NodeIndex AddNodeToGraph(Graph graph, NodeDefinition def)
     {
         // TODO: Add node to GraphQL
         NodeIndex index = graph.AddNode(def);
         actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
+        return index;
     }
 
     public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
@@ -328,6 +329,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
         Debug.Log($"Set node {node} input port {port} to {value}");
+    }
+
+    public void AddVariableToGraph(Graph graph, string name, NodeValueType type)
+    {
+        graph.AddVariable(name, type);
+    }
+
+    public void RemoveVariableFromGraph(Graph graph, string name)
+    {
+        graph.RemoveVariable(name);
     }
 
     public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)

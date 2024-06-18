@@ -23,6 +23,19 @@ namespace RealityFlow.NodeGraph
         [Dropdown("validTypes")]
         NodeValueType type;
 
+        public static readonly NodeValueType[] valueTypes =
+            new[] {
+                NodeValueType.Bool,
+                NodeValueType.Int,
+                NodeValueType.Float,
+                NodeValueType.Vector2,
+                NodeValueType.Vector3,
+                NodeValueType.Quaternion,
+                NodeValueType.GameObject,
+                NodeValueType.TemplateObject,
+                NodeValueType.String,
+            };
+
         /// <summary>
         /// Used to determine which types to show in the inspector dropdown 
         /// (just excludes the Any type)
@@ -118,6 +131,11 @@ namespace RealityFlow.NodeGraph
             if (this.value is T tValue)
             {
                 value = tValue;
+                return true;
+            }
+            else if (this.value is null && default(T) == null)
+            {
+                value = default;
                 return true;
             }
             else if (this.value is Boxed box && box.DynValue is T boxedValue)
@@ -258,7 +276,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.GameObject => null,
             NodeValueType.TemplateObject => null,
             NodeValueType.String => string.Empty,
-            NodeValueType.Variable => string.Empty,
+            NodeValueType.Variable => null,
             _ => throw new ArgumentException(),
         };
 
