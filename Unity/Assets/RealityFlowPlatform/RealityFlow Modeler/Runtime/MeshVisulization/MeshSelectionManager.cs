@@ -48,7 +48,7 @@ public class MeshSelectionManager : MonoBehaviour
         {
             Debug.LogError(go.name + " doesn't have an EditableMesh!");
         }
-        // Debug.Log("SelectedMeshes: " + selectedMeshes.Count);
+        Debug.Log("SelectedMeshes: " + selectedMeshes.Count);
     }
 
     public void DeselectMesh(GameObject go)
@@ -56,16 +56,22 @@ public class MeshSelectionManager : MonoBehaviour
         try
         {
             selectedMeshes.Remove(go);
-            if (lastSelection == go)
-            {
-                lastSelection = null;
-            }
-
-            // Debug.Log("SelectedMeshes: " + selectedMeshes.Count);
+            UpdateLastSelected(go);
         }
         catch
         {
             Debug.LogError(go.name + " was not selected");
+        }
+    }
+
+    private void UpdateLastSelected(GameObject go)
+    {
+        if (lastSelection == go)
+        {
+            if(selectedMeshes.Count == 0)
+                lastSelection = null;
+            else
+                lastSelection = selectedMeshes[selectedMeshes.Count - 1];
         }
     }
 
@@ -76,11 +82,8 @@ public class MeshSelectionManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-//         if (!selectTool.isActive && selectedMeshes.Count > 0)
-//         {
-//             ClearSelectedMeshes();
-//         }
-    }
+    // void Update()
+    // {
+    //     Debug.Log("Selected meshes count: " + selectedMeshes.Count);
+    // }
 }

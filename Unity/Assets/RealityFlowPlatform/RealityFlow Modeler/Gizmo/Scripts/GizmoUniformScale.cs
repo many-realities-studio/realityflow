@@ -42,6 +42,7 @@ public class GizmoUniformScale : GizmoTranslatePlane
         else if (EndOfRaySelect())
         {
             lastUpdateRaySelect = false;
+            BakeRotation();
         }
 
         if (lastUpdateRaySelect)

@@ -6,6 +6,7 @@ namespace TransformTypes
         None,
         Scale,
         Rotate,
-        Translate
+        Translate,
+        Bake
     }
 }

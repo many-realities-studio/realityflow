@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6772492142695843272}
   - component: {fileID: 7721553573477535999}
   - component: {fileID: 4453928736748660258}
+  - component: {fileID: 4039417510879828485}
   - component: {fileID: 5383675967248967750}
   - component: {fileID: -3145124811549111402}
   - component: {fileID: 3325974614625294}
@@ -20,6 +21,8 @@ GameObject:
   - component: {fileID: 4652174531995107049}
   - component: {fileID: 2935166160665358904}
   - component: {fileID: 1220612881292142212}
+  - component: {fileID: 5241023694219699609}
+  - component: {fileID: 8721132859247098966}
   m_Layer: 0
   m_Name: PrimitiveBase
   m_TagString: Untagged
@@ -204,6 +207,19 @@ MonoBehaviour:
   normals: []
   baseShape: 0
   isEmpty: 1
+--- !u!114 &4039417510879828485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c38e75cad308646bb665565f79b580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &5383675967248967750
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,6 +235,7 @@ MonoBehaviour:
   owner: 0
   isHeld: 0
   isSelected: 0
+  wasBake: 0
   isDuplicate: 0
   originalName: 
 --- !u!114 &-3145124811549111402
@@ -253,7 +270,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_InteractionLayers:
-    m_Bits: 4294967295
+    m_Bits: 1
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -273,34 +290,10 @@ MonoBehaviour:
       m_Calls: []
   m_HoverEntered:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2935166160665358904}
-        m_TargetAssemblyTypeName: SelectToolManager, Assembly-CSharp
-        m_MethodName: PrepareSelectionForMesh
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_HoverExited:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2935166160665358904}
-        m_TargetAssemblyTypeName: SelectToolManager, Assembly-CSharp
-        m_MethodName: ReactivateManipulationsOnHoverOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_FirstSelectEntered:
     m_PersistentCalls:
       m_Calls:
@@ -606,7 +599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f3f2652d4ff14543be4d1ece28036a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundsVisualsPrefab: {fileID: 5671351296789090341, guid: 15301ffb05c378f41a77a2ce339fadbe,
+  boundsVisualsPrefab: {fileID: 2256040821643364666, guid: 46519b441b8eca242bade385a265c167,
     type: 3}
   boundsCalculationMethod: 0
   includeInactiveObjects: 0
@@ -705,7 +698,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524904045447331170}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 35d3018a1f4e954499e671bb037c70e8, type: 3}
   m_Name: 
@@ -716,3 +709,29 @@ MonoBehaviour:
     type: 3}
   faceHandle: {fileID: 1915545549827038600, guid: a6e0b289fe2909b41a79ecaa25c28bb6,
     type: 3}
+  alphaAmount: 0.4
+--- !u!114 &5241023694219699609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8721132859247098966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34071a382df193941b54b83ea76043c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkedPlayManager: {fileID: 0}

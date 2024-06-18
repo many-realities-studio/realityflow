@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 20438416931027405}
   - component: {fileID: 2973263019367995782}
-  - component: {fileID: 4069261077512677754}
+  - component: {fileID: 7501473006340473379}
+  - component: {fileID: 8611017173452601530}
   m_Layer: 0
   m_Name: Gizmo Manager
   m_TagString: Untagged
@@ -57,7 +58,7 @@ MonoBehaviour:
   lookForTarget: 0
   checkMeshRaySelection: 0
   isActive: 0
---- !u!114 &4069261077512677754
+--- !u!114 &7501473006340473379
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -73,13 +74,72 @@ MonoBehaviour:
     m_Name: Action
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: f0f5dbaf-b7ee-4f80-aa49-7ec49b81d5f8
+    m_Id: 87b2dcda-6815-4943-b949-726f82b6f488
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: 51063f50-566b-4d8d-9138-c17efeacd43f
-      m_Path: <XRController>{LeftHand}/gripPressed
+      m_Id: 53155c6f-a9a0-4944-ad2d-c8f6b54be053
+      m_Path: <OculusTouchController>{LeftHand}/gripPressed
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
+  OnPress:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2973263019367995782}
+        m_TargetAssemblyTypeName: AttachGizmoState, Assembly-CSharp
+        m_MethodName: EnableMeshRaySelection
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRelease:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2973263019367995782}
+        m_TargetAssemblyTypeName: AttachGizmoState, Assembly-CSharp
+        m_MethodName: DisableMeshRaySelection
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &8611017173452601530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4902614821818156488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fee115c6df54144ba4b1564db624e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: d7dfad23-73cb-49f8-874a-d5202a346854
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: f85624df-6ea1-45bd-ace4-4858377a2606
+      m_Path: <OculusTouchController>{RightHand}/gripPressed
       m_Interactions: 
       m_Processors: 
       m_Groups: 

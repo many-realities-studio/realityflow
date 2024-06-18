@@ -68,9 +68,9 @@ public class ComponentSelectManipulator : MonoBehaviour
         EditableMesh mesh = selectionManager.mesh;
         Vector3 offset = transform.localPosition - lastPosition;
         ComponentTransformations.TranslateVertices(mesh, offset);
-        selectionManager.handleSelector.UpdateHandlePositions();
+        selectionManager.handleSpawner.UpdateHandlePositions();
+        //selectionManager.handleSelector.UpdateHandlePositions();
         //UpdateHandlePosition();
-
     }
 
     private void RotateSelection()
@@ -78,7 +78,8 @@ public class ComponentSelectManipulator : MonoBehaviour
         EditableMesh mesh = selectionManager.mesh;
         Quaternion rotation = transform.localRotation * Quaternion.Inverse(lastRotation);
         ComponentTransformations.RotateVertices(mesh, rotation);
-        selectionManager.handleSelector.UpdateHandlePositions();
+        selectionManager.handleSpawner.UpdateHandlePositions();
+        // selectionManager.handleSelector.UpdateHandlePositions();
         //UpdateHandlePosition();
     }
 
@@ -91,8 +92,9 @@ public class ComponentSelectManipulator : MonoBehaviour
         invertedLastScale.z = 1 / lastScale.z;
         Vector3 newScale = Vector3.Scale(transform.localScale, invertedLastScale);
         ComponentTransformations.ScaleVertices(mesh, newScale);
-        selectionManager.handleSelector.UpdateHandlePositions();
-        //UpdateHandlePosition();
+        selectionManager.handleSpawner.UpdateHandlePositions();
+        // selectionManager.handleSelector.UpdateHandlePositions();
+        // UpdateHandlePosition();
     }
 
     private void HideBoundingBox()
