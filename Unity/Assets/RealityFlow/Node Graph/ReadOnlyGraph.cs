@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -20,25 +21,30 @@ namespace RealityFlow.NodeGraph
             this.graph = graph;
         }
 
-        public Node GetNode(NodeIndex index)
+        public readonly Node GetNode(NodeIndex index)
         {
             return graph.GetNode(index);
         }
 
-        public List<NodeValueType> OutputPorts => graph.OutputPorts;
+        public readonly bool TryGetVariableType(string name, out NodeValueType type)
+        {
+            return graph.TryGetVariableType(name, out type);
+        }
 
-        public int ExecutionInputs => graph.ExecutionInputs;
+        public readonly List<NodeValueType> OutputPorts => graph.OutputPorts;
 
-        public List<NodeIndex> InputExecutionEdges(int index)
+        public readonly int ExecutionInputs => graph.ExecutionInputs;
+
+        public readonly ImmutableList<NodeIndex> InputExecutionEdges(int index)
             => graph.InputExecutionEdges(index);
 
-        public bool TryGetOutputPortOf(PortIndex input, out PortIndex output)
+        public readonly bool TryGetOutputPortOf(PortIndex input, out PortIndex output)
             => graph.TryGetOutputPortOf(input, out output);
 
-        public bool TryGetGraphOutputSource(int outputIndex, out PortIndex port)
+        public readonly bool TryGetGraphOutputSource(int outputIndex, out PortIndex port)
             => graph.TryGetGraphOutputSource(outputIndex, out port);
 
-        public List<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
+        public readonly ImmutableList<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => graph.GetExecutionInputPortsOf(outputPort);
 
         public override readonly bool Equals(object obj)

@@ -28,9 +28,24 @@ namespace RealityFlow.NodeGraph
             for (int i = 0; i < definition.Fields.Count; i++)
                 fieldValues.Add(definition.Fields[i].Default);
             for (int i = 0; i < definition.Inputs.Count; i++)
-                inputs.Add(new());
+                if (NodeValue.TryGetDefaultFor(definition.Inputs[i].Type, out NodeValue value))
+                    inputs.Add(new() { ConstantValue = value });
+                else
+                    inputs.Add(new());
             for (int i = 0; i < definition.Outputs.Count; i++)
                 outputs.Add(new());
+        }
+
+        public bool TryGetField(int index, out NodeValue value)
+        {
+            if (index < fieldValues.Count)
+            {
+                value = fieldValues[index];
+                return true;
+            }
+
+            value = NodeValue.Null;
+            return false;
         }
 
         public bool TryGetField<T>(int index, out T field)
@@ -45,8 +60,54 @@ namespace RealityFlow.NodeGraph
             field = default;
             return false;
         }
+
         public InputNodePort GetInput(int index) => inputs[index];
         public OutputNodePort GetOutput(int index) => outputs[index];
+
+        public bool TryGetInputValue(int index, out NodeValue value)
+        {
+            if (index < inputs.Count)
+            {
+                value = inputs[index].ConstantValue;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public bool TrySetInputValue(int index, NodeValue value)
+        {
+            if (index >= inputs.Count)
+                return false;
+
+            if (NodeValue.IsNotAssignableTo(value.Type, Definition.Inputs[index].Type))
+                return false;
+
+            inputs[index].ConstantValue = value;
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to set the value of the given field.
+        /// Fails if:
+        /// <list type="bullet">
+        /// <item>
+        /// index is out of bounds
+        /// </item>
+        /// </list>
+        /// </summary>
+        public bool TrySetFieldValue(int index, NodeValue value)
+        {
+            if (index >= fieldValues.Count)
+                return false;
+
+            if (NodeValue.IsNotAssignableTo(value.Type, Definition.Fields[index].Default.Type))
+                return false;
+
+            fieldValues[index] = value;
+            return true;
+        }
 
         /// <summary>
         /// Attempts to set the value of the given field.
@@ -64,14 +125,11 @@ namespace RealityFlow.NodeGraph
         {
             if (index >= fieldValues.Count)
                 return false;
-            
-            if (Definition.Fields[index].Default.GetValueType() != typeof(T))
-                return false;
 
-            fieldValues[index] = NodeValue.From(value);
+            fieldValues[index] = NodeValue.From(value, Definition.Fields[index].Default.Type);
             return true;
         }
-        
+
         public void SetInputConstant(int index, NodeValue value)
         {
             inputs[index].ConstantValue = value;

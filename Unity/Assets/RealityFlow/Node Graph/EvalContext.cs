@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using RealityFlow.Collections;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -8,28 +10,80 @@ namespace RealityFlow.NodeGraph
     /// The primary class used to evaluate graphs/nodes.
     /// Stores relevant information during evaluation, such as intermediate results.
     /// </summary>
+    [Serializable]
     public class EvalContext
     {
         GameObject target;
-        readonly Stack<ReadonlyGraph> graphStack = new();
+        readonly List<ReadonlyGraph> graphStack = new();
         readonly Queue<NodeIndex> nodeQueue = new();
         readonly List<NodeIndex> nodeStack = new();
         readonly Dictionary<PortIndex, object> nodeOutputCache = new();
         readonly Dictionary<(ReadonlyGraph, int), object> graphOutputCache = new();
+        readonly Dictionary<string, NodeValue> startArguments = new();
+        readonly Dictionary<(ReadonlyGraph, string), NodeValue> variableValues = new();
 
-        void PopNode() => nodeStack.RemoveAt(nodeStack.Count - 1);
+        public ImmutableDictionary<string, NodeValue> StartArguments => startArguments.ToImmutableDictionary();
 
         public GameObject GetThis() => target;
 
         public T GetField<T>(int index)
         {
-            NodeIndex nodeIndex = nodeStack[^1];
+            NodeIndex nodeIndex = nodeStack.Peek();
             ReadonlyGraph graph = graphStack.Peek();
             Node node = graph.GetNode(nodeIndex);
             if (node.TryGetField(index, out T field))
                 return field;
 
             throw new InvalidCastException();
+        }
+
+        bool TryFindVariableGraph(string name, out ReadonlyGraph graph)
+        {
+            for (int i = graphStack.Count - 1; i >= 0; i--)
+            {
+                ReadonlyGraph currentGraph = graphStack[i];
+
+                if (variableValues.TryGetValue((currentGraph, name), out _))
+                {
+                    graph = currentGraph;
+                    return true;
+                }
+
+                if (currentGraph.TryGetVariableType(name, out NodeValueType type))
+                {
+                    variableValues[(currentGraph, name)] = NodeValue.DefaultFor(type);
+                    graph = currentGraph;
+                    return true;
+                }
+            }
+
+            graph = default;
+            return false;
+        }
+
+        NodeValue GetVariableOrDefault(string name)
+        {
+            if (TryFindVariableGraph(name, out ReadonlyGraph graph))
+                return variableValues[(graph, name)];
+
+            throw new ArgumentException($"{name} is not a variable in scope");
+        }
+
+        public T GetVariable<T>(string name)
+        {
+            return GetVariableOrDefault(name).UnwrapValue<T>();
+        }
+
+        public void SetVariable<T>(string name, T value)
+        {
+            if (TryFindVariableGraph(name, out ReadonlyGraph graph))
+            {
+                NodeValue oldValue = variableValues[(graph, name)];
+                NodeValue nodeValue = NodeValue.From(value, oldValue.Type);
+                variableValues[(graph, name)] = nodeValue;
+            }
+            else
+                throw new ArgumentException($"{name} is not a variable in scope");
         }
 
         /// <summary>
@@ -78,6 +132,8 @@ namespace RealityFlow.NodeGraph
                     && (float)intValue is T castValue
                 )
                 return castValue;
+            else if (typeof(T) == typeof(string) && value.ToString() is T tString)
+                return tString;
             else
                 throw new GraphTypeMismatchException();
         }
@@ -86,11 +142,6 @@ namespace RealityFlow.NodeGraph
         {
             NodeIndex node = nodeStack[^1];
             nodeOutputCache[new(node, port)] = value;
-        }
-
-        void SetNullOutput(NodeIndex node, int port)
-        {
-            nodeOutputCache[new(node, port)] = null;
         }
 
         public T GetGraphOutput<T>(ReadonlyGraph graph, int outputPort)
@@ -114,7 +165,7 @@ namespace RealityFlow.NodeGraph
         {
             NodeIndex node = nodeStack[^1];
             ReadonlyGraph graph = graphStack.Peek();
-            List<NodeIndex> nodes = graph.GetExecutionInputPortsOf(new(node, port));
+            ImmutableList<NodeIndex> nodes = graph.GetExecutionInputPortsOf(new(node, port));
             for (int i = 0; i < nodes.Count; i++)
                 QueueNode(nodes[i]);
         }
@@ -149,7 +200,7 @@ namespace RealityFlow.NodeGraph
                 {
                     nodeStack.Add(node);
                     evaluate(this);
-                    PopNode();
+                    nodeStack.Pop();
                 }
                 else
                 {
@@ -181,8 +232,11 @@ namespace RealityFlow.NodeGraph
             graphOutputCache.Clear();
         }
 
-        public void EvaluateGraphFromRoot(GameObject target, ReadonlyGraph graph, NodeIndex root)
+        public void EvaluateGraphFromRoot(GameObject target, ReadonlyGraph graph, NodeIndex root, params (string, NodeValue)[] startArguments)
         {
+            foreach ((string name, NodeValue value) in startArguments)
+                this.startArguments.Add(name, value);
+
             graphStack.Push(graph);
 
             Node node = graph.GetNode(root);
@@ -193,6 +247,7 @@ namespace RealityFlow.NodeGraph
             Evaluate(target);
 
             graphStack.Pop();
+            this.startArguments.Clear();
         }
 
         public void EvaluateGraph(GameObject target, ReadonlyGraph graph, int executionInputPort)

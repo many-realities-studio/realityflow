@@ -434,7 +434,6 @@ namespace Ubiq.Spawning
         //This function was edited by RealityFlow the commented out function above was the original
         private int ResolveIndex(GameObject gameObject)
         {
-
             // Debug log each prefab in the catalogue for verification
             for (int curr = 0; curr < catalogue.prefabs.Count; curr++)
             {

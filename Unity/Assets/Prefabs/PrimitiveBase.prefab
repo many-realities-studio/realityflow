@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: 4652174531995107049}
   - component: {fileID: 2935166160665358904}
   - component: {fileID: 1220612881292142212}
+  - component: {fileID: 3969154042671898735}
+  - component: {fileID: 5954362475428783005}
   - component: {fileID: 5241023694219699609}
   - component: {fileID: 8721132859247098966}
   m_Layer: 0
@@ -710,19 +712,7 @@ MonoBehaviour:
   faceHandle: {fileID: 1915545549827038600, guid: a6e0b289fe2909b41a79ecaa25c28bb6,
     type: 3}
   alphaAmount: 0.4
---- !u!114 &5241023694219699609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524904045447331170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8721132859247098966
+--- !u!114 &3969154042671898735
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -735,3 +725,68 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPlayManager: {fileID: 0}
+--- !u!114 &5954362475428783005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5241023694219699609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb76d9caff5fb754e80e28b876ed974a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graph:
+    nodes:
+      list:
+        listDict: []
+      nextIndex: 0
+    reverseEdges:
+      listDict: []
+    executionEdges:
+      forward:
+        dict:
+          listDict: []
+    inputPorts: 
+    outputPorts: 
+    reverseInputPortEdges:
+      listDict: []
+    reverseOutputPortEdges:
+      listDict: []
+    executionInputs: 0
+    inputExecutionEdges:
+      dict:
+        listDict: []
+    variadicPassthrough: 0
+    variadicOutput: 0
+  isTemplate: 0
+  references:
+    version: 2
+    RefIds: []
+--- !u!114 &8721132859247098966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whiteboardPrefab: {fileID: 1790523852647275305, guid: 1eb4494b38b188e429bf4d1008b88657,
+    type: 3}

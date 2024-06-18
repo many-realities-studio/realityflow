@@ -11,7 +11,7 @@ namespace RealityFlow.NodeUI
     public class OverlapLayoutGroup : LayoutGroup
     {
         public int _layoutPriority = 1;
- 
+
         RectTransform rect;
 
         new void Start()
@@ -27,7 +27,7 @@ namespace RealityFlow.NodeUI
             float minWidth = 0;
             float prefWidth = 0;
             float flexWidth = -1;
-            foreach (RectTransform child in transform)
+            foreach (RectTransform child in rectChildren)
             {
                 minWidth = Mathf.Max(minWidth, LayoutUtility.GetMinWidth(child));
                 prefWidth = Mathf.Max(prefWidth, LayoutUtility.GetPreferredWidth(child));
@@ -42,7 +42,7 @@ namespace RealityFlow.NodeUI
             float minHeight = 0;
             float prefHeight = 0;
             float flexHeight = -1;
-            foreach (RectTransform child in transform)
+            foreach (RectTransform child in rectChildren)
             {
                 minHeight = Mathf.Max(minHeight, LayoutUtility.GetMinHeight(child));
                 prefHeight = Mathf.Max(prefHeight, LayoutUtility.GetPreferredHeight(child));
@@ -58,7 +58,7 @@ namespace RealityFlow.NodeUI
             float width = isFlexible ? rect.rect.width : preferredWidth;
             width -= padding.horizontal;
 
-            foreach (RectTransform child in transform)
+            foreach (RectTransform child in rectChildren)
             {
                 SetChildAlongAxis(child, 0, padding.left, width);
             }
@@ -70,7 +70,7 @@ namespace RealityFlow.NodeUI
             float height = isFlexible ? rect.rect.height : preferredHeight;
             height -= padding.vertical;
 
-            foreach (RectTransform child in transform)
+            foreach (RectTransform child in rectChildren)
             {
                 SetChildAlongAxis(child, 1, padding.top, height);
             }
