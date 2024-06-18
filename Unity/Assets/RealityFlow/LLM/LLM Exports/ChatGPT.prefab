@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4470639748675610493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8250296596692495706}
+  - component: {fileID: 1739224985341762910}
+  m_Layer: 0
+  m_Name: ChatGPT
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8250296596692495706
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470639748675610493}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.8838217, y: -0.00000023841858, z: 3.160751}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1739224985341762910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470639748675610493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e86ad970d5520c743be4148069965215, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  askButton: {fileID: 0}
+  compilerButton: {fileID: 0}
+  responseTimeText: {fileID: 0}
+  chatGPTAnswer: {fileID: 0}
+  chatGPTQuestionText: {fileID: 0}
+  chatGPTQuestion: {fileID: 11400000, guid: 2057acbd9d54171449836afe2853ce10, type: 2}
+  scenarioTitleText: {fileID: 0}
+  promptText: {fileID: 0}
+  scenarioQuestionText: {fileID: 0}
+  lastChatGPTResponseCache:
+    <Id>k__BackingField: 
+    <Object>k__BackingField: 
+    <Created>k__BackingField: 0
+    <Choices>k__BackingField: []
+    <Usage>k__BackingField:
+      <PromptTokens>k__BackingField: 0
+      <CompletionTokens>k__BackingField: 0
+      <TotalTokens>k__BackingField: 0
+    <ResponseTotalTime>k__BackingField: 0
+  immediateCompilation: 0
+  whisperCanvasHolder: {fileID: 0}
+  whisperToggleButton: {fileID: 0}
+  undoButton: {fileID: 0}
+  progressText: {fileID: 0}

@@ -29,13 +29,8 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
     [TextArea(5, 20)]
     private string resultInfo;
 
+    private readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
 
-    public RoslynCodeRunner()
-    {
-
-    }
-
-    readonly List<Diagnostic> diagnostics = new();
     public void RunCode(string updatedCode = null)
     {
         Logger.Instance.LogInfo("Executing Runcode...");
@@ -61,11 +56,11 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 
             if (asm is null)
             {
-                Debug.LogError("failed to compile chatgpt response");
+                Debug.LogError("Failed to compile chatgpt response");
                 return;
             }
 
-            Type[] comps = 
+            Type[] comps =
                 asm
                 .GetTypes()
                 .Where(ty => ty.IsSubclassOf(typeof(MonoBehaviour)))
@@ -89,6 +84,14 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
         catch (Exception mainCodeException)
         {
             Logger.Instance.LogError(mainCodeException.Message);
+        }
+    }
+
+    public void RunMultipleCodes(List<string> codes)
+    {
+        foreach (var codeSnippet in codes)
+        {
+            RunCode(codeSnippet);
         }
     }
 }

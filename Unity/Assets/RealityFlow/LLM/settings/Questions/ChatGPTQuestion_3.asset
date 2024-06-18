@@ -25,11 +25,12 @@ MonoBehaviour:
   - do not require any references
   - all references should not be null
   - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets; '
-  - 'Only use the RealityFlow API which is referenced here: ### RealityFlow API Functions
-    and Examples  1. **SpawnObject**    - **Description**: Spawns an object in the
-    virtual room.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.SpawnObject("Ladder",
-    new Vector3(0, 0, 0), Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);     
-    ```  2. **DespawnObject**    - **Description**: Removes an object from the virtual
+  - 'Only use the RealityFlow API which an example of which is referenced here: ###
+    RealityFlow API Functions and Examples  1. **SpawnObject**    - **Description**:
+    Spawns an object in the virtual room.    - **Usage**:       ```csharp      GameObject
+    ladder = RealityFlowAPI.Instance.SpawnObject("Ladder", new Vector3(0, 0, 0),
+    Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);      ``` 
+    2. **DespawnObject**    - **Description**: Removes an object from the virtual
     room.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.FindSpawnedObject("Ladder(Clone)");     
     if (ladder != null)      {          RealityFlowAPI.Instance.DespawnObject(ladder);     
     }      ```  3. **UpdateObjectTransform**    - **Description**: Updates the position,
@@ -53,7 +54,6 @@ MonoBehaviour:
     the provided RealityFlow API functions, maintaining consistency and compatibility
     within your project. '
   - DO NOT USE COROUTINES
-  - 'Only use the following prefabs when spawning: Firework, TreeStump, Floating_BodyA,
-    Ladder, TestObject, characterSmall, Climbing Wall'
-  - 'Only use the following prefabs when spawning: Firework, TreeStump, Floating_BodyA,
-    Ladder, TestObject, characterSmall, Climbing Wall'
+  - 'Only use the following prefabs when spawning: Reality Palette, FireworkNew,
+    VRWhiteBoard, Cube, Capsule, Cylinder, Rectangle (Horizontal), Rectangle (Vertical),
+    Sphere, Reality Palette, TestCube, PrimitiveBase, DuplicateProxy'
