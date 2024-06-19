@@ -121,7 +121,7 @@ namespace RealityFlow.NodeGraph
             if (graph.TryGetOutputPortOf(input, out var outputPort))
                 value = nodeOutputCache[outputPort];
             else
-                value = input.AsInput(graph).ConstantValue;
+                value = input.AsInput(graph).ConstantValue.Value;
 
             if (value is T typedVal)
                 return typedVal;
@@ -239,30 +239,48 @@ namespace RealityFlow.NodeGraph
 
             graphStack.Push(graph);
 
-            Node node = graph.GetNode(root);
-            if (!node.Definition.IsRoot)
-                Debug.LogError("Attempted to evaluate starting from non-root");
+            try
+            {
+                Node node = graph.GetNode(root);
+                if (!node.Definition.IsRoot)
+                    Debug.LogError("Attempted to evaluate starting from non-root");
 
-            QueueNode(root);
-            Evaluate(target);
-
-            graphStack.Pop();
-            this.startArguments.Clear();
+                QueueNode(root);
+                Evaluate(target);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                graphStack.Pop();
+                this.startArguments.Clear();
+            }
         }
 
         public void EvaluateGraph(GameObject target, ReadonlyGraph graph, int executionInputPort)
         {
             graphStack.Push(graph);
 
-            if (executionInputPort >= graph.ExecutionInputs)
-                throw new IndexOutOfRangeException();
+            try
+            {
+                if (executionInputPort >= graph.ExecutionInputs)
+                    throw new IndexOutOfRangeException();
 
-            foreach (NodeIndex node in graph.InputExecutionEdges(executionInputPort))
-                QueueNode(node);
+                foreach (NodeIndex node in graph.InputExecutionEdges(executionInputPort))
+                    QueueNode(node);
 
-            Evaluate(target);
-
-            graphStack.Pop();
+                Evaluate(target);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                graphStack.Pop();
+            }
         }
     }
 }

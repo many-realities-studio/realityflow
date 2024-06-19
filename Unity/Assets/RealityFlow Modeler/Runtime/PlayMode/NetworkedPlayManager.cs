@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Ubiq.Spawning;
 using Ubiq.Messaging;
+using UnityEngine.Events;
 
 /// <summary>
 /// Class NetworkedPlayManager provides the current state of the room and is connected to the Ubiq Network library.
@@ -12,7 +13,26 @@ public class NetworkedPlayManager : MonoBehaviour, INetworkSpawnable
     public NetworkId NetworkId { get; set; }
     public NetworkContext context;
 
-    public bool playMode;
+    public UnityEvent enterPlayMode;
+    public UnityEvent exitPlayMode;
+
+    bool _playMode;
+    public bool playMode
+    {
+        get => _playMode;
+        set
+        {
+            if (value != _playMode)
+            {
+                if (value)
+                    enterPlayMode.Invoke();
+                else
+                    exitPlayMode.Invoke();
+            }
+
+            _playMode = value;
+        }
+    }
 
     // Users that are in the room when Play mode is turned on or off has context. Users that join the room during Play mode will not have context, thus will need it.
     public bool hasContext;
@@ -21,7 +41,7 @@ public class NetworkedPlayManager : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
-        if (this.NetworkId == null)
+        if (NetworkId == null)
             Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }
 
@@ -41,8 +61,10 @@ public class NetworkedPlayManager : MonoBehaviour, INetworkSpawnable
         }
 
         // Debug.Log("Requested Play data");
-        Message msg = new Message();
-        msg.needsData = true;
+        Message msg = new()
+        {
+            needsData = true
+        };
 
         context.SendJson(msg);
     }
