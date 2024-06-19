@@ -283,4 +283,22 @@ public class PaletteHandManager : MonoBehaviour
         farRay.SetActive(false);
         pokeInteractor.SetActive(false);
     }
+
+    // This method does not wait, is it necessary to wait?
+    public void disableControllerOnReopen()
+    {
+        // If the dominant hand is set, turn off the corresponding rays.
+        if (isLeftHandDominant != null)
+        {
+            if(isLeftHandDominant.IsToggled)
+            {
+                rightHandRay.SetActive(false);
+                rightHandPokeInteractor.SetActive(false);
+            } else
+            {
+                leftHandRay.SetActive(false);
+                leftHandPokeInteractor.SetActive(false);
+            }
+        }
+    }
 }

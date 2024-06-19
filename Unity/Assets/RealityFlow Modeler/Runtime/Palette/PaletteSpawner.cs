@@ -6,6 +6,7 @@ using Ubiq.Spawning;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 
 /// <summary>
@@ -151,7 +152,6 @@ public class PaletteSpawner : MonoBehaviour
             {
                 PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
                 phm.EnableAllControlsOnPaletteClose();
-                //phm.left.enabled = false;
             }
            
 
@@ -172,8 +172,8 @@ public class PaletteSpawner : MonoBehaviour
             if(palette != null)
             {
                 PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
-                //phm.EnableAllControlsOnPaletteClose();
-                phm.left.enabled = false;
+                phm.disableControllerOnReopen();
+             
             }
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
