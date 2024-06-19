@@ -30,7 +30,7 @@ namespace RealityFlow.Collections
         public void Add(TKey key, TValue value)
         {
             if (!TryAdd(key, value))
-                throw new ArgumentException();
+                throw new ArgumentException($"key {key} already present in BiDict");
         }
 
         public bool TryGetValue(TKey key, out TValue value)
