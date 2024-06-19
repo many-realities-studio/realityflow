@@ -32,7 +32,8 @@ public class PopulateObjectLibrary : MonoBehaviour
     }
 
     // Instantiate a button and set it's prefab
-    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab, GameObject iconPrefab, Transform parent)
+    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab, 
+        GameObject iconPrefab, Transform parent)
     {
         // Instantiate the new button, set the text, and set the icon prefab
         GameObject newButton = Instantiate(buttonPrefab, parent);
@@ -41,7 +42,9 @@ public class PopulateObjectLibrary : MonoBehaviour
 
         // Create a new Unity action and add it as a listener to the buttons OnClicked event
         UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
-         newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(Instantiate(objectPrefab)));
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(
+            Instantiate(objectPrefab)
+            ));
         //newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
     }
 
@@ -51,11 +54,8 @@ public class PopulateObjectLibrary : MonoBehaviour
     {
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(objectPrefab);
-        //spawnScript.RaySpawnToggle(objectPrefab);
-        //spawnNetworkedObject.SpawnWithPeerScope(objectPrefab);
-        //GameObject newObj = objectPrefab;
-        //GameObject newObj = Instantiate(objectPrefab, networkSpawnManager.transform);
-        GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
+        spawnScript.RaySpawnToggle(objectPrefab);
+        // GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
         //newObj.GetComponent<NetworkedMesh>().owner = true;
         //newObj.transform.SetParent(networkSpawnManager.transform);
     }

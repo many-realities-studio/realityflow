@@ -127,7 +127,7 @@ public class RealityFlowClient : MonoBehaviour
         // Debug.Log("RoomClient successfully initialized and listener added.");
     }
 
-    public async void CreateRoom(string ProjectId)
+    public void CreateRoom(string ProjectId)
     {
         Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
         currentProjectId = ProjectId;
@@ -433,7 +433,7 @@ public class RealityFlowClient : MonoBehaviour
         OnRoomsReceived?.Invoke(rooms);
     }
     // Wrapper method to call RoomManager's CreateRoom
-    public async void CallCreateRoom()
+    public void CallCreateRoom()
     {
         CreateRoom(currentProjectId);
     }
