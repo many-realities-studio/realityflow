@@ -1,16 +1,17 @@
 using UnityEngine;
-using TMPro;
+using TMPro; // Add this for TMP_InputField
+using UnityEngine.UI;
 
-// NOTE: OTPVerification is the updated version of this script. 
-public class LoginScript : MonoBehaviour
+public class OTPVerification : MonoBehaviour
 {
-    public TMP_InputField OTPInput; // Input field for the OTP
-    //public Button submitBtn;        // Button to submit the OTP
-    public RealityFlowClient rfClient; // RealityFlow client for sending requests
+    public TMP_InputField otpInputField; // Change the type to TMP_InputField
+    public Button submitButton;
+    private string otpCode = "";
+    private RealityFlowClient rfClient;
 
     void Start()
     {
-        // The client uses "http://localhost:4000/graphql" as the endpoint and NewtonsoftJsonSerializer for serialization.
+        // Find the RealityFlowClient in the scene
         rfClient = FindObjectOfType<RealityFlowClient>();
 
         // Check if rfClient is found
@@ -20,29 +21,38 @@ public class LoginScript : MonoBehaviour
             return;
         }
 
-        // Check if OTPInput and submitBtn are assigned
-        /*if (OTPInput == null || submitBtn == null)
+        // Check if otpInputField and submitButton are assigned
+        if (otpInputField == null || submitButton == null)
         {
-            Debug.LogError("OTPInput or submitBtn is not assigned.");
+            Debug.LogError("otpInputField or submitButton is not assigned.");
             return;
         }
 
-        // Listeners for the input fields
-        OTPInput.onValueChanged.AddListener(handleSearchChange);
-        submitBtn.onClick.AddListener(submitOTP);*/
+        // Find all the buttons by their names and add listeners to them
+        for (int i = 0; i <= 9; i++)
+        {
+            int number = i; // Local variable to capture the correct value in the closure
+            Button button = GameObject.Find("n" + i + "_Button").GetComponent<Button>();
+            button.onClick.AddListener(() => AddDigit(number));
+        }
+
+        // Add listener to the submit button
+        submitButton.onClick.AddListener(SubmitOTP);
     }
 
-    // Function to handle the change in the input field
-    public void handleSearchChange(string value)
+    void AddDigit(int digit)
     {
-        Debug.Log(value);
+        if (otpCode.Length < 4)
+        {
+            otpCode += digit.ToString();
+            otpInputField.text = otpCode;
+        }
     }
 
-    // Function to submit the OTP
-    public async void submitOTP()
+    public async void SubmitOTP()
     {
         // Log the current text from the OTP input field for debugging purposes.
-        Debug.Log(OTPInput.text);
+        Debug.Log(otpInputField.text);
 
         // Create a new GraphQL mutation request to verify the OTP provided by the user.
         var verifyOTP = new GraphQLRequest
@@ -55,7 +65,7 @@ public class LoginScript : MonoBehaviour
                    }
             ",
             OperationName = "VerifyOTP",
-            Variables = new { input = new { otp = OTPInput.text } }
+            Variables = new { input = new { otp = otpInputField.text } }
         };
 
         // Send the mutation request asynchronously and wait for the response.
@@ -72,5 +82,11 @@ public class LoginScript : MonoBehaviour
         {
             Debug.Log(errors[0]["message"]);
         }
+    }
+
+    public void ClearCode()
+    {
+        otpCode = "";
+        otpInputField.text = otpCode;
     }
 }
