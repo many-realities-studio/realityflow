@@ -99,7 +99,7 @@ public class PlayModeSpawner : MonoBehaviour
         }
         else
         {
-            networkSpawnManager.SpawnWithRoomScopeWithReturn(managerPrefab);
+            NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(managerPrefab);
             playModeManager = FindObjectOfType<NetworkedPlayManager>().gameObject;
             paletteSwitcher.SetPlayModeManagerRef(playModeManager.GetComponent<NetworkedPlayManager>());
         }

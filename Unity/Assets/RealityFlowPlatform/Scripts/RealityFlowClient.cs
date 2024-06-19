@@ -35,6 +35,7 @@ public class RealityFlowClient : MonoBehaviour
     public string server = @"http://localhost:4000/";
 #endif
     public string graphQLRoute = "graphql"; 
+    public event Action<bool> LoginSuccess;
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
 
@@ -42,7 +43,7 @@ public class RealityFlowClient : MonoBehaviour
     {
         //Debug.Log("RealityFlowClient Awake");
         // Ensure only one instance
-        if (transform.parent == null)
+               if (transform.parent == null)
         {
             if (rootRealityFlowClient == null)
             {
@@ -66,20 +67,6 @@ public class RealityFlowClient : MonoBehaviour
                 }
             }
         }
-
-        if (string.IsNullOrEmpty(accessToken))
-        {
-            accessToken = PlayerPrefs.GetString("accessToken");
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                Debug.LogWarning("Access token is not set.");
-                return;
-            }
-        }
-
-        userDecoded = DecodeJwt(accessToken);
-        // Debug.Log("User decoded: " + userDecoded);
-
         // Attempt to find RoomClient manually if not assigned
         if (roomClient == null)
         {
@@ -99,9 +86,46 @@ public class RealityFlowClient : MonoBehaviour
         }
 
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
-        // Debug.Log("RoomClient successfully initialized and listener added.");
     }
     private static RealityFlowClient rootRealityFlowClient;
+    public async void Login(string inputAccessToken) {
+        Debug.Log("Logging in....");
+        userDecoded = DecodeJwt(inputAccessToken);
+        // Debug.Log("User decoded: " + userDecoded);
+                // Create a new room using the GraphQL API
+        var verifyToken = new GraphQLRequest
+        {
+            Query = @"
+            query VerifyAccessToken($input: String) {
+                verifyAccessToken(accessToken: $input) {
+                    id
+                }
+            }
+        ",
+            OperationName = "VerifyAccessToken",
+            Variables = new
+            {
+                input = inputAccessToken
+            }
+        };
+        var graphQL = await SendQueryAsync(verifyToken);
+        if (graphQL["data"] != null)
+        {
+            Debug.Log("User Logged In successfully");
+            accessToken = inputAccessToken;
+            PlayerPrefs.SetString("accessToken", accessToken);
+            LoginSuccess.Invoke(true);
+        }
+        else
+        {
+            Debug.LogError("Failed to log in");
+            accessToken = "";
+            PlayerPrefs.SetString("accessToken", "");
+            LoginSuccess.Invoke(false);
+        }
+
+        // Debug.Log("RoomClient successfully initialized and listener added.");
+    }
 
     public async void CreateRoom(string ProjectId)
     {

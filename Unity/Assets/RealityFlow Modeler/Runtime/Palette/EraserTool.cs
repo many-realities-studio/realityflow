@@ -8,6 +8,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using Ubiq.Avatars;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// Class EraserTool assigns the eraser tool to the user and allows the deletion of meshes through the Eraser button on the palette.
@@ -28,8 +29,9 @@ public class EraserTool : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         spawnManager = NetworkSpawnManager.Find(this);
 

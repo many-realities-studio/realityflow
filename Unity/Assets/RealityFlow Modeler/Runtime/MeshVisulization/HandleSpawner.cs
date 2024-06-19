@@ -5,6 +5,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// Class HandleSpawner handles spawning handles on a mesh
@@ -49,8 +50,9 @@ public class HandleSpawner : MonoBehaviour
         }
 
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         handles = new List<Handle>();
