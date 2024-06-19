@@ -147,6 +147,14 @@ public class PaletteSpawner : MonoBehaviour
         // all scripts which would not allow the user to use any functions from the palette.
         else if (paletteShown)
         {
+            if(palette != null)
+            {
+                PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
+                phm.EnableAllControlsOnPaletteClose();
+                //phm.left.enabled = false;
+            }
+           
+
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
             {
@@ -161,6 +169,12 @@ public class PaletteSpawner : MonoBehaviour
         }
         else if (!paletteShown)
         {
+            if(palette != null)
+            {
+                PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
+                //phm.EnableAllControlsOnPaletteClose();
+                phm.left.enabled = false;
+            }
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
             {

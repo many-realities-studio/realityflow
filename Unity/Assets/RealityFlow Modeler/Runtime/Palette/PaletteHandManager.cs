@@ -108,7 +108,7 @@ public class PaletteHandManager : MonoBehaviour
                     leftHandRay.SetActive(true);
                     leftHandPokeInteractor.SetActive(true);
 
-                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray"),
+                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/Far Ray"),
                                     GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor")));
                 }
                 else if (!isLeftHandDominant.IsToggled)
@@ -248,7 +248,7 @@ public class PaletteHandManager : MonoBehaviour
     {
         try
         {
-            if (isLeftHandDominant.IsToggled)
+            /*if (isLeftHandDominant.IsToggled)
             {
                 left.enabled = false;
                 right.enabled = true;
@@ -260,12 +260,20 @@ public class PaletteHandManager : MonoBehaviour
                 right.enabled = false;
                 // paletteManager.GetComponents<OnButtonPress>()[0].enabled = true;
                 // paletteManager.GetComponents<OnButtonPress>()[1].enabled = false;
-            }
+            }*/
         }
         catch (NullReferenceException e)
         {
             Debug.Log(e);
         }
+    }
+
+    public void EnableAllControlsOnPaletteClose()
+    {
+        leftHandRay.SetActive(true);
+        leftHandPokeInteractor.SetActive(true);
+        rightHandRay.SetActive(true);
+        rightHandPokeInteractor.SetActive(true);
     }
 
     // Disable the previous dominant controller after a slight interval to avoid button states locking into place
