@@ -17,11 +17,12 @@ MonoBehaviour:
   Outputs: []
   IsVariadic: 0
   IsVariadicOutput: 0
-  EvaluationMethod: 0
+  EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 
+  EvalCode: then();
   ExecutionInput: 0
-  ExecutionOutputs: []
+  ExecutionOutputs:
+  - then
   references:
     version: 2
     RefIds: []
