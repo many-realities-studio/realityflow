@@ -2,7 +2,7 @@ using DilmerGames.Core.Singletons;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,25 +11,23 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     [SerializeField]
     private ChatGTPSettings chatGTPSettings;
 
-    private List<ChatGPTChatMessage> conversationHistory = new List<ChatGPTChatMessage>();
-
     public IEnumerator Ask(string prompt, Action<ChatGPTResponse> callBack)
     {
         var url = chatGTPSettings.debug ? $"{chatGTPSettings.apiURL}?debug=true" : chatGTPSettings.apiURL;
-
-        // Add the user message to the conversation history
-        conversationHistory.Add(new ChatGPTChatMessage
-        {
-            role = "user",
-            content = prompt
-        });
 
         using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
             var requestParams = JsonConvert.SerializeObject(new ChatGPTRequest
             {
                 Model = chatGTPSettings.apiModel,
-                Messages = conversationHistory.ToArray() // Pass the conversation history
+                Messages = new ChatGPTChatMessage[]
+                {
+                    new ChatGPTChatMessage
+                    {
+                        role = "user",
+                        content = prompt
+                    }
+                }
             });
 
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(requestParams);
@@ -81,15 +79,25 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 
                 response.ResponseTotalTime = (DateTime.Now - requestStartDateTime).TotalMilliseconds;
 
-                // Add the assistant message to the conversation history
-                conversationHistory.Add(new ChatGPTChatMessage
-                {
-                    role = "assistant",
-                    content = response.Choices[0].Message.content
-                });
+                // Write response to a file
+                WriteResponseToFile(responseInfo);
 
                 callBack(response);
             }
+        }
+    }
+
+    private void WriteResponseToFile(string response)
+    {
+        string path = Application.persistentDataPath + "/ChatGPTResponse.json";
+        try
+        {
+            File.WriteAllText(path, response);
+            Debug.Log("Response written to file: " + path);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Failed to write response to file: " + e.Message);
         }
     }
 }

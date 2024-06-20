@@ -122,6 +122,17 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""488d1d6c-c6fc-4e96-81c1-5accd8fe3da4"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Execute"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""a7440b53-b797-4d43-9342-4a250657b52c"",
                     ""path"": ""<XRController>{LeftHand}/primary2DAxisClick"",
                     ""interactions"": """",

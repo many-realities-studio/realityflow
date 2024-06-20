@@ -79,19 +79,11 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 
             Type type = comps.Single();
 
-            gameObject.AddComponent(type);
+            //gameObject.AddComponent(type);
         }
         catch (Exception mainCodeException)
         {
             Logger.Instance.LogError(mainCodeException.Message);
-        }
-    }
-
-    public void RunMultipleCodes(List<string> codes)
-    {
-        foreach (var codeSnippet in codes)
-        {
-            RunCode(codeSnippet);
         }
     }
 }
