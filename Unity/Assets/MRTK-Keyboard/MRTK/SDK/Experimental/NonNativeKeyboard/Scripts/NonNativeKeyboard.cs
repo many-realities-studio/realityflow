@@ -155,7 +155,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// <summary>
         /// Make the keyboard disappear automatically after a timeout
         /// </summary>
-        public bool CloseOnInactivity = true;
+        public bool CloseOnInactivity = false;
 
         /// <summary>
         /// Inactivity time that makes the keyboard disappear automatically.

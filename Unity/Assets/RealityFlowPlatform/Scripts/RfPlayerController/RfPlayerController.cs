@@ -57,11 +57,13 @@ public class RfPlayerController : MonoBehaviour
     private void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
+        Debug.Log("OnMove called with value: " + moveInput);
     }
 
     // Input System callback for turning
     private void OnTurn(InputAction.CallbackContext context)
     {
         turnInput = context.ReadValue<Vector2>().x;
+        Debug.Log("OnTurn called with value: " + turnInput);
     }
 }

@@ -77,7 +77,6 @@ public class ProjectContentManager : MonoBehaviour
         {
             instance = this;
         }
-        client.OnJoinedRoom.AddListener(delegate { onRoomCreation(); });
         accessToken = PlayerPrefs.GetString("accessToken");
 
         rfClient = RealityFlowClient.Find(this);
@@ -287,35 +286,6 @@ public class ProjectContentManager : MonoBehaviour
         }
     }
 
-    async void onRoomCreation()
-    {
-        Debug.Log("LOADING CONTENT");
-        Debug.Log(client.Room.JoinCode);
-        Debug.Log(client.Room.Name);
-        // string[] useText = client.Room.Name.Split('@');
-        // if(useText.Length > 0)
-        // {
-
-        //     // This is extracting the project id from the room name
-        //     // If there isn't any, then it probably won't work
-        //     //If this fails, no network scene to join
-        // // Error here? 
-        // var publicProjectsQuery = new GraphQLRequest
-        // {
-        //     Query = @"
-        //          mutation AddRoom($input: AddRoomInput) {
-        //       addRoom(input: $input) {
-        //         joinCode
-        //       }
-        //     }
-        //     ",
-        //     OperationName = "AddRoom",
-        //     Variables = new { roomId = client.Room.UUID, joinCode = client.Room.JoinCode, projectId = useText[1] }
-        // };
-
-        // var queryResult = await graphQLClient.SendMutationAsync<JObject>(publicProjectsQuery);
-        // }
-    }
     
     void LoadSceneContent(string content)
     {

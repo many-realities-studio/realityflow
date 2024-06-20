@@ -5,6 +5,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// Class HandleSelector handles selecting handles and supporting different types of Handle Selection modes
@@ -35,8 +36,9 @@ public class HandleSelector : MonoBehaviour
         PaletteHandManager.OnHandChange += SwitchHands;
 
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK RightHand Controller");
+        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
     }
 

@@ -1,15 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
 using Ubiq.Messaging;
-using Ubiq.Rooms;
 using Ubiq.Spawning;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using RealityFlow.NodeGraph;
-using UnityEngine.Assertions;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 using System.IO;
+using System.Net.Sockets;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,16 +17,22 @@ using UnityEditor;
 
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
+    private string objectId;
     private NetworkSpawnManager spawnManager;
+    private RealityFlowClient realityFlowClient;
+    private GameObject selectedObject;
+    private Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+    private Vector3 previousPosition;
+    private Quaternion previousRotation;
+    private Vector3 previousScale;
+    public Material outlineMaterial;
     public ActionLogger actionLogger = new ActionLogger();
     private NetworkContext networkContext;
-
     public NetworkId NetworkId { get; set; }
+    private static RealityFlowAPI _instance;                // SINGLE INSTANCE OF THE API
+    private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
 
-    // Singleton instance
-    private static RealityFlowAPI _instance;
-    private static readonly object _lock = new object();
-
+    private RealityFlowClient client;
     public enum SpawnScope
     {
         Room,
@@ -37,7 +43,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         get
         {
-            lock (_lock)
+            lock (_lock)   // ENSURE THREAD SAFETY 
             {
                 if (_instance == null)
                 {
@@ -63,66 +69,43 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
-            spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated);
         }
+        
+        client = RealityFlowClient.Find(this);
     }
 
-    void Update()
+    // ===== SUPPORT FUNCTIONS =====
+        public string ExportSpawnedObjectsData()
     {
-        HandleInput();
-    }
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-    private void HandleInput()
-    {
-        List<InputDevice> devices = new List<InputDevice>();
-        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, devices);
-
-        foreach (var device in devices)
+        foreach (var kvp in spawnManager.GetSpawnedForRoom())
         {
-            if (device.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 primary2DAxisValue))
+            var obj = kvp.Value;
+            if (obj != null)
             {
-                if (primary2DAxisValue.x < -0.5f)
+                sb.AppendLine("Object: " + obj.name);
+                Component[] components = obj.GetComponents<Component>();
+                foreach (Component component in components)
                 {
-                    UndoLastAction();
+                    sb.AppendLine("  Component: " + component.GetType().Name);
+                    if (component is Transform transform)
+                    {
+                        sb.AppendLine("    Position: " + transform.position);
+                        sb.AppendLine("    Rotation: " + transform.rotation);
+                        sb.AppendLine("    Scale: " + transform.localScale);
+                    }
                 }
-                else if (primary2DAxisValue.x > 0.5f)
-                {
-                    RedoLastAction();
-                }
+                sb.AppendLine();
             }
         }
+
+        return sb.ToString();
     }
 
-    public void ProcessTransformUpdate(string propertyKey, string jsonMessage)
+    public GameObject GetPrefabByName(string name) 
     {
-        var transformMessage = JsonUtility.FromJson<TransformMessage>(jsonMessage);
-        Debug.Log($"Received transform update: {transformMessage.ObjectName}, Pos: {transformMessage.Position}, Rot: {transformMessage.Rotation}, Scale: {transformMessage.Scale}");
-        GameObject obj = FindSpawnedObject(transformMessage.ObjectName);
-        if (obj != null)
-        {
-            obj.transform.position = transformMessage.Position;
-            obj.transform.rotation = transformMessage.Rotation;
-            obj.transform.localScale = transformMessage.Scale;
-        }
-        else
-        {
-            Debug.LogError($"Object named {transformMessage.ObjectName} not found in ProcessTransformUpdate.");
-        }
-    }
-
-    private void OnRoomUpdated(IRoom room)
-    {
-        foreach (var property in room)
-        {
-            if (property.Key.StartsWith("transform."))
-            {
-                ProcessTransformUpdate(property.Key, property.Value);
-            }
-        }
-    }
-
-    public GameObject GetPrefabByName(string name)
-    {
+        // This function searches the catalogue for a prefab with the given name
         if (spawnManager != null && spawnManager.catalogue != null)
         {
             foreach (var prefab in spawnManager.catalogue.prefabs)
@@ -135,118 +118,61 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return null;
     }
 
-    public GameObject SpawnObject(string prefabName, Vector3 position, Vector3 scale = default, Quaternion rotation = default, SpawnScope scope = SpawnScope.Room)
+    private string GetMeshJson(GameObject spawnedObject)
     {
-        GameObject newObject = spawnManager.catalogue.prefabs.Find(prefab => prefab.name.Equals(prefabName, StringComparison.OrdinalIgnoreCase));
-        if (newObject == null)
+        // This function serializes the mesh data of the spawned object
+        MeshFilter meshFilter = spawnedObject.GetComponent<MeshFilter>();
+        if (meshFilter != null)
         {
-            Debug.LogError($"Prefab not found: {prefabName}");
-            return null;
+            Mesh mesh = meshFilter.mesh;
+            MeshData meshData = new MeshData
+            {
+                vertices = mesh.vertices,
+                triangles = mesh.triangles,
+                normals = mesh.normals,
+                uv = mesh.uv
+            };
+            return JsonUtility.ToJson(meshData);
         }
-
-        switch (scope)
-        {
-            case SpawnScope.Room:
-                spawnManager.SpawnWithRoomScope(newObject);
-                Debug.Log("Spawned with Room Scope");
-                break;
-            case SpawnScope.Peer:
-                spawnManager.SpawnWithPeerScope(newObject);
-                Debug.Log("Spawned with Peer Scope");
-                break;
-            default:
-                Debug.LogError("Unknown spawn scope");
-                break;
-        }
-
-        if (newObject != null)
-        {
-            newObject.transform.position = position;
-            newObject.transform.rotation = rotation;
-            newObject.transform.localScale = scale;
-        }
-
-        actionLogger.LogAction(nameof(SpawnObject), prefabName, position, scale, rotation, scope);
-        return newObject;
+        return "{}";
     }
 
-    public void DespawnObject(GameObject objectToDespawn)
+    void OutlineEffect(GameObject obj)
     {
-        if (objectToDespawn != null)
+        // Apply the outline effect (using material or component)
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
         {
-            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
-            spawnManager.Despawn(objectToDespawn);
-            Debug.Log("Despawned: " + objectToDespawn.name);
-        }
-        else
-        {
-            Debug.LogError("Object to despawn is null");
-        }
-    }
-
-    public GameObject FindSpawnedObject(string objectName)
-    {
-        if (spawnManager == null)
-        {
-            Debug.LogError("SpawnManager is not initialized.");
-            return null;
-        }
-
-        // Search in the spawnedForRoom dictionary
-        foreach (var kvp in spawnManager.GetSpawnedForRoom())
-        {
-            if (kvp.Value.name.Equals(objectName, StringComparison.OrdinalIgnoreCase))
+            if (renderer != null)
             {
-                return kvp.Value;
-            }
-        }
-
-        // Search in the spawnedForPeers dictionary
-        foreach (var peerDict in spawnManager.GetSpawnedForPeers())
-        {
-            foreach (var kvp in peerDict.Value)
-            {
-                if (kvp.Value.name.Equals(objectName, StringComparison.OrdinalIgnoreCase))
+                // Store the original material if not already stored
+                if (!originalMaterials.ContainsKey(renderer.gameObject))
                 {
-                    return kvp.Value;
+                    originalMaterials[renderer.gameObject] = renderer.material;
                 }
+                // Apply the outline material
+                renderer.material = outlineMaterial;
             }
         }
-
-        Debug.LogWarning($"Object named {objectName} not found in the spawned objects.");
-        return null;
     }
 
-    public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    void RemoveOutlineEffect(GameObject obj)
     {
-        GameObject obj = FindSpawnedObject(objectName);
-        if (obj == null)
+        // Remove the outline effect (restore original material)
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
         {
-            obj = GetPrefabByName(objectName);
-        }
-        if (obj != null)
-        {
-            // Log the current transform before making changes
-            actionLogger.LogAction(nameof(UpdateObjectTransform), objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
-            Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
-            Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
-
-            obj.transform.position = position;
-            obj.transform.rotation = rotation;
-            obj.transform.localScale = scale;
-
-            // Serialize and send the transform update
-            var message = new TransformMessage(objectName, position, rotation, scale);
-            Debug.Log($"Sending transform update: {message.ObjectName}, Pos: {message.Position}, Rot: {message.Rotation}, Scale: {message.Scale}");
-            var jsonMessage = JsonUtility.ToJson(message);
-            var propertyKey = $"transform.{objectName}";
-            spawnManager.roomClient.Room[propertyKey] = jsonMessage;
-        }
-        else
-        {
-            Debug.LogError($"Object named {objectName} not found.");
+            if (renderer != null && originalMaterials.ContainsKey(renderer.gameObject))
+            {
+                renderer.material = originalMaterials[renderer.gameObject];
+                originalMaterials.Remove(renderer.gameObject); // Optionally remove the entry if it's no longer needed
+            }
         }
     }
+
+    // ===== API FUNCTIONS [ObjectManagement] =====
+
+    // -- Node Operations--
 
     public void AddNodeToGraph(Graph graph, NodeDefinition def)
     {
@@ -302,8 +228,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
         Debug.Log($"Deleted exec edge from {from} to {to}");
     }
-
-    public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
+        public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
     {
         if (!graph.ContainsNode(node))
         {
@@ -354,6 +279,347 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         // TODO: Punted implementation until rewrite for less to rewrite
         // ^ also punting undo functionality
+    }
+
+    // ---Spawn/Save Object---
+    public GameObject SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube) {
+        var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        if(inputMesh = null) {
+            // Based on the shape
+            EditableMesh newMesh = PrimitiveGenerator.CreatePrimitive(type);
+            em.CreateMesh(newMesh);
+            Destroy(newMesh.gameObject);
+        } else {
+            em.CreateMesh(inputMesh);
+
+        }
+        spawnedMesh.transform.position = position;
+        spawnedMesh.transform.rotation = rotation;
+        spawnedMesh.transform.localScale = scale;
+        return spawnedMesh;
+    } 
+
+    public GameObject SpawnObject(string prefabName, Vector3 spawnPosition, 
+        Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
+    {       
+        //Search for Object in the catalogue
+        GameObject newObject = GetPrefabByName(prefabName);
+        if (newObject != null && spawnManager != null)
+        {
+            // Spawn the object with the given scope
+            switch (scope)
+            {
+                case SpawnScope.Room:
+                    spawnManager.SpawnWithRoomScope(newObject);
+                    Debug.Log("Spawned with Room Scope");
+                    break;
+                case SpawnScope.Peer:
+                    spawnManager.SpawnWithPeerScope(newObject);
+                    Debug.Log("Spawned with Peer Scope");
+                    break;
+                default:
+                    Debug.LogError("Unknown spawn scope");
+                    break;
+            }
+
+            // Debug.Log($"Spawned {newObject.name} with {scope} scope.");
+            
+            // Find the newly Spawned Object [Send it to Database]
+            GameObject spawnedObject = GameObject.Find(newObject.name);
+            if (spawnedObject != null)
+            {
+                // Set the object's transform
+                if (newObject != null)
+                {
+                    newObject.transform.position = spawnPosition;
+                    newObject.transform.rotation = spawnRotation;
+                    newObject.transform.localScale = scale;
+                }
+                // Serialize the object's transform
+                TransformData transformData = new TransformData
+                {
+                    position = spawnedObject.transform.position,
+                    rotation = spawnedObject.transform.rotation,
+                    scale = spawnedObject.transform.localScale
+                };
+
+                RfObject rfObject = new RfObject
+                {
+                    // projectId = projectId,  (!!!)
+                    name = spawnedObject.name,
+                    type = "Prefab",
+                    transformJson = JsonUtility.ToJson(transformData),
+                    meshJson = GetMeshJson(spawnedObject)
+                };
+
+                SaveObjectToDatabase(rfObject);
+
+                actionLogger.LogAction(nameof(SpawnObject), prefabName, spawnPosition, scale, spawnRotation, scope);
+                return newObject;
+            }
+            else
+            {
+                Debug.LogError("Could not find the spawned object in the scene.");
+                return null;
+            }
+        }
+        else
+        {
+            Debug.LogError("Prefab not found or NetworkSpawnManager is not initialized.");
+            return null;
+        }
+    }
+
+    private async void SaveObjectToDatabase(RfObject rfObject)
+    {
+        if (realityFlowClient == null)
+        {
+            Debug.LogError("RealityFlowClient is not initialized.");
+            return;
+        }
+
+        var saveObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation SaveObject($input: SaveObjectInput!) {
+                saveObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "SaveObject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectId = rfObject.projectId,
+                    name = rfObject.name,
+                    type = rfObject.type,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            Debug.Log("Sending GraphQL request to: " + realityFlowClient.server + "/graphql");
+            Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
+
+            var graphQLResponse = await client.SendQueryAsync(saveObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Object saved to the database successfully.");
+                
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse["data"]["saveObject"]["id"].ToString();
+                rfObject.id = returnedId;
+                Debug.Log($"Assigned ID from database: {rfObject.id}");
+                
+                // Update the name of the spawned object in the scene
+                GameObject spawnedObject = GameObject.Find(rfObject.name);
+                if (spawnedObject != null)
+                {
+                    spawnedObject.name = rfObject.id;
+                    Debug.Log($"Updated spawned object name to: {spawnedObject.name}");
+                }
+                else
+                {
+                    Debug.LogError("Could not find the spawned object to update its name.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
+                }
+            }
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+        }
+    }
+
+    // ---Select/Edit---
+    public GameObject FindSpawnedObject(string id)
+    {
+        // !I dont know what this method is used for but I wont delete it!
+        if (spawnManager == null)
+        {
+            Debug.LogError("SpawnManager is not initialized.");
+            return null;
+        }
+
+        // Search in the spawnedForRoom dictionary (What are the Dictonarys For?)
+        foreach (var kvp in spawnManager.GetSpawnedForRoom())
+        {
+            if (kvp.Value.name.Equals(id, StringComparison.OrdinalIgnoreCase))
+            {
+                return kvp.Value;
+            }
+        }
+
+        // Search in the spawnedForPeers dictionary (What are the Dictonarys For?)
+        foreach (var peerDict in spawnManager.GetSpawnedForPeers())
+        {
+            foreach (var kvp in peerDict.Value)
+            {
+                if (kvp.Value.name.Equals(id, StringComparison.OrdinalIgnoreCase))
+                {
+                    return kvp.Value;
+                }
+            }
+        }
+
+        Debug.LogWarning($"Object named {id} not found in the spawned objects.");
+        return null;
+    }
+
+    public void SelectAndOutlineObject(string id)
+    {
+        // Find the object with the given ID
+        GameObject objectToSelect = GameObject.Find(id);
+
+        if (objectToSelect != null)
+        {
+            // Apply outline effect to the object
+            OutlineEffect(objectToSelect);
+
+            // If there is already a selected object, remove the outline
+            if (selectedObject != null && selectedObject != objectToSelect)
+            {
+                RemoveOutlineEffect(selectedObject);
+            }
+
+            // Update the reference to the currently selected object
+            selectedObject = objectToSelect;
+
+            // Initialize previous transform values
+            previousPosition = selectedObject.transform.position;
+            previousRotation = selectedObject.transform.rotation;
+            previousScale = selectedObject.transform.localScale;
+
+            // Set the objectId for database updates
+            objectId = id;
+        }
+        else
+        {
+            Debug.LogWarning("Object with ID " + id + " not found.");
+        }
+    }
+
+    // Method to update the transform of a networked object
+    public async void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        if (selectedObject != null)
+        {
+            if (selectedObject.transform.position != previousPosition ||
+                selectedObject.transform.rotation != previousRotation ||
+                selectedObject.transform.localScale != previousScale)
+            {
+                // Update the previous transform values
+                previousPosition = selectedObject.transform.position;
+                previousRotation = selectedObject.transform.rotation;
+                previousScale = selectedObject.transform.localScale;
+
+                // Send updated transform to the database
+                TransformData transformData = new TransformData
+                {
+                    position = selectedObject.transform.position,
+                    rotation = selectedObject.transform.rotation,
+                    scale = selectedObject.transform.localScale
+                };
+
+                // Await SaveObjectTransformToDatabase
+                await SaveObjectTransformToDatabase(objectId, transformData);
+            }
+        }
+    }
+
+    public async Task SaveObjectTransformToDatabase(string objectId, TransformData transformData)
+    {
+        var rfObject = new RfObject
+        {
+            id = objectId,
+            transformJson = JsonUtility.ToJson(transformData)
+        };
+
+        var saveObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation UpdateObjectTransform($input: UpdateObjectTransformInput!) {
+                updateObjectTransform(input: $input) {
+                    id
+                }
+            }",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(saveObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Object transform updated in the database successfully.");
+            }
+            else
+            {
+                Debug.LogError("Failed to update object transform in the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["Extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["Extensions"]}");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Exception: " + ex.Message);
+        }
+    }
+
+    // ---Despawn/Delete---
+    public void DespawnObject(GameObject objectToDespawn)
+    {
+        if (objectToDespawn != null)
+        {
+            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
+            spawnManager.Despawn(objectToDespawn);
+            Debug.Log("Despawned: " + objectToDespawn.name);
+        }
+        else
+        {
+            Debug.LogError("Object to despawn is null");
+        }
     }
 
 #if UNITY_EDITOR
@@ -412,19 +678,88 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Attempting to undo last action.");
         Debug.Log($"Action stack count before undo: {actionLogger.GetActionStackCount()}");
 
-        actionLogger.UndoLastAction();
+        actionLogger.StartUndo();
+        var lastAction = actionLogger.GetLastAction();
+        actionLogger.EndUndo();
 
+        if (lastAction == null)
+        {
+            Debug.Log("No actions to undo.");
+            return;
+        }
+
+        if (lastAction is ActionLogger.CompoundAction compoundAction)
+        {
+            foreach (var action in compoundAction.Actions)
+            {
+                UndoSingleAction(action);
+            }
+        }
+        else
+        {
+            UndoSingleAction(lastAction);
+        }
+
+        // Clear the action stack after undo
+        //actionLogger.ClearActionStack();
         Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
+        //StopAllCoroutines();
     }
 
-    public void RedoLastAction()
+    private void UndoSingleAction(ActionLogger.LoggedAction action)
     {
-        Debug.Log("Attempting to redo last action.");
-        Debug.Log($"Redo stack count before redo: {actionLogger.GetRedoStackCount()}");
+        switch (action.FunctionName)
+        {
+            case nameof(SpawnObject):
+                string prefabName = (string)action.Parameters[0] + "(Clone)";
+                Debug.Log("The spawned object's name is " + prefabName);
+                GameObject spawnedObject = FindSpawnedObject(prefabName);
+                if (spawnedObject != null)
+                {
+                    DespawnObject(spawnedObject);
+                }
+                break;
 
-        actionLogger.RedoLastAction();
+            case nameof(DespawnObject):
+                string objName = ((string)action.Parameters[0]).Replace("(Clone)", "").Trim();
+                Debug.Log("Undoing the despawn of object named " + objName);
+                Vector3 position = (Vector3)action.Parameters[1];
+                Quaternion rotation = (Quaternion)action.Parameters[2];
+                Vector3 scale = (Vector3)action.Parameters[3];
+                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
+                if (respawnedObject != null)
+                {
+                    respawnedObject.transform.localScale = scale;
+                }
+                break;
 
-        Debug.Log($"Redo stack after redo: {actionLogger.GetRedoStackCount()}");
+            case nameof(UpdateObjectTransform):
+                string objectName = (string)action.Parameters[0];
+                Vector3 oldPosition = (Vector3)action.Parameters[1];
+                Quaternion oldRotation = (Quaternion)action.Parameters[2];
+                Vector3 oldScale = (Vector3)action.Parameters[3];
+                Debug.Log("Undoing the transform of object named " + objectName);
+                GameObject obj = FindSpawnedObject(objectName);
+                if (obj != null)
+                {
+                    UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {objectName} not found during undo transform.");
+                }
+                break;
+
+            case nameof(AddNodeToGraph):
+                Graph graph = (Graph)action.Parameters[0];
+                NodeIndex index = (NodeIndex)action.Parameters[2];
+
+                graph.RemoveNode(index);
+
+                break;
+
+                // Add cases for other functions...
+        }
     }
 
     public List<string> GetPrefabNames()
@@ -459,49 +794,34 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         actionLogger.EndCompoundAction();
     }
-
-    public string ExportSpawnedObjectsData()
-    {
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-
-        foreach (var kvp in spawnManager.GetSpawnedForRoom())
-        {
-            var obj = kvp.Value;
-            if (obj != null)
-            {
-                sb.AppendLine("Object: " + obj.name);
-                Component[] components = obj.GetComponents<Component>();
-                foreach (Component component in components)
-                {
-                    sb.AppendLine("  Component: " + component.GetType().Name);
-                    if (component is Transform transform)
-                    {
-                        sb.AppendLine("    Position: " + transform.position);
-                        sb.AppendLine("    Rotation: " + transform.rotation);
-                        sb.AppendLine("    Scale: " + transform.localScale);
-                    }
-                }
-                sb.AppendLine();
-            }
-        }
-
-        return sb.ToString();
-    }
 }
 
-[Serializable]
-public class TransformMessage
+// ===== RF Object Class =====
+[System.Serializable]
+public class RfObject
 {
-    public string ObjectName;
-    public Vector3 Position;
-    public Quaternion Rotation;
-    public Vector3 Scale;
-
-    public TransformMessage(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
-    {
-        ObjectName = objectName;
-        Position = position;
-        Rotation = rotation;
-        Scale = scale;
-    }
+    public string id; // Unique ID for each object
+    public string projectId;
+    public string name;
+    public string type;
+    public string transformJson;
+    public string meshJson;
 }
+
+[System.Serializable]
+public class MeshData
+{
+    public Vector3[] vertices;
+    public int[] triangles;
+    public Vector3[] normals;
+    public Vector2[] uv;
+}
+
+[System.Serializable]
+public class TransformData
+{
+    public Vector3 position;
+    public Quaternion rotation;
+    public Vector3 scale;
+}
+

@@ -6,6 +6,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using TransformTypes;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// This class manages which object is the gizmo should attach to
@@ -45,16 +46,16 @@ public class AttachGizmoState : MonoBehaviour
         checkMeshRaySelection = false;
         attachedGameObject = null;
         lookForTarget = false;
+        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
         if(rightHand == null) {
-            rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+            rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
+            Debug.Log(rightHand);
         }
-        //Debug.Log("AttachGizmoState righthand set to" + rightHand);
         //Debug.Log(GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller"));
         if(leftHand == null) {
-            leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
+            leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+            Debug.Log(leftHand);
         }
-        //rightHand = GameObject.Find("MRTK RightHand Controller");
-        //leftHand = GameObject.Find("MRTK LeftHand Controller");
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
     }

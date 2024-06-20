@@ -25,7 +25,7 @@ public static class PrimitiveRebuilder
                 break;
             //case ShapeType.Wedge:
             //    em = PrimitiveGenerator.CreateWedge(new Vector3(size, size, size));
-                break;
+                // break;
             case ShapeType.Cylinder:
                 em = PrimitiveGenerator.CreateCylinder(16, 1, size);
                 break;
@@ -40,7 +40,7 @@ public static class PrimitiveRebuilder
                 break;
             //case ShapeType.Pipe:
             //   em = PrimitiveGenerator.CreatePipe(8, 0, 0.5f * size, size, 0.2f * size);
-                break;
+                // break;
             default:
                 return;
         }
