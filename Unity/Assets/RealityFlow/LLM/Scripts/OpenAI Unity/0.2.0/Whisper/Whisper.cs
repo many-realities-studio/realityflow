@@ -12,20 +12,14 @@ namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
-        [SerializeField] private Button recordButton;
-        [SerializeField] private Image progressBar;
+
         [SerializeField] private MRTKTMPInputField message;
-        [SerializeField] private MRTKTMPInputField apiKeyInputField;
-        [SerializeField] private TMP_Dropdown dropdown;
-        [SerializeField] private Button submitButton;
-        [SerializeField] private Button muteButton;
-        [SerializeField] private TextMeshProUGUI progressText;
         [SerializeField] private GameObject flashingLight; // Reference to the flashing light GameObject
         [SerializeField] private GameObject nearmenutoolbox; // Reference to the nearmenutoolbox
         [SerializeField] private GameObject LLMWindow; // Reference to the LLMWindow
 
         private readonly string fileName = "output.wav";
-        private readonly int maxDuration = 5;
+        private readonly int maxDuration = 30;
 
         private AudioClip clip;
         private bool isRecording;
@@ -91,14 +85,6 @@ namespace Samples.Whisper
 
         private void Start()
         {
-            recordButton.onClick.AddListener(ToggleRecording);
-            //dropdown.onValueChanged.AddListener(ChangeMicrophone);
-            submitButton.onClick.AddListener(SubmitApiKey);
-            muteButton.onClick.AddListener(() => muteManager?.ToggleMute());
-
-            // Comment out the microphone list refresh and selection
-            //RefreshMicrophoneList();
-
             muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
             {
@@ -106,11 +92,6 @@ namespace Samples.Whisper
             }
 
             string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                apiKey = apiKeyInputField.text;
-            }
-
             if (!string.IsNullOrEmpty(apiKey))
             {
                 Debug.Log("In whisper API key is :" + apiKey);
@@ -120,9 +101,6 @@ namespace Samples.Whisper
             {
                 Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
             }
-
-            var index = PlayerPrefs.GetInt("user-mic-device-index");
-            dropdown.SetValueWithoutNotify(index);
 
             if (flashingLight != null)
             {
@@ -146,51 +124,6 @@ namespace Samples.Whisper
             openai = new OpenAIApi(apiKey);
             Debug.Log("OpenAI API initialized with provided key.");
         }
-
-        public void SubmitApiKey()
-        {
-            string apiKey = apiKeyInputField.text;
-            if (!string.IsNullOrEmpty(apiKey))
-            {
-                EnvConfigManager.Instance.UpdateApiKey(apiKey);
-                InitializeOpenAI(apiKey);
-                Debug.Log("API key submitted: " + apiKey);
-            }
-            else
-            {
-                Debug.LogError("API key is empty. Please enter a valid API key.");
-            }
-        }
-
-        /* 
-        // Commented out the microphone list refresh and selection
-        private void RefreshMicrophoneList()
-        {
-            Debug.Log("Refreshing microphone list...");
-            dropdown.ClearOptions();
-            List<string> devices = new List<string>(Microphone.devices);
-            if (devices.Count == 0)
-            {
-                Debug.LogError("No microphone devices found.");
-                dropdown.options.Add(new TMP_Dropdown.OptionData("No devices found"));
-            }
-            else
-            {
-                foreach (var device in devices)
-                {
-                    Debug.Log("Found device: " + device);
-                    dropdown.options.Add(new TMP_Dropdown.OptionData(device));
-                }
-            }
-            dropdown.RefreshShownValue();
-        }
-
-        private void ChangeMicrophone(int index)
-        {
-            Debug.Log($"Microphone changed to: {dropdown.options[index].text}");
-            PlayerPrefs.SetInt("user-mic-device-index", index);
-        }
-        */
 
         public void ToggleRecording()
         {
@@ -219,10 +152,6 @@ namespace Samples.Whisper
             //recordButton.enabled = false;
 
             time = 0;
-            SetProgressBarColor(new Color(0.847f, 1.0f, 0.824f)); // Set color to #D8FFD2
-
-            progressText.text = "Talking to Whisper"; // Update progress text
-
             // Use the default microphone
             string micName = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
             if (string.IsNullOrEmpty(micName))
@@ -250,7 +179,6 @@ namespace Samples.Whisper
             // recordButton.enabled = true;
 
             Debug.Log("In the EndRecording method");
-            progressText.text = "Transcripting..."; // Update progress text
 
             Microphone.End(null);
 
@@ -283,11 +211,6 @@ namespace Samples.Whisper
 
             Debug.Log("Using API key: " + currentApiKey);
             var res = await openai.CreateAudioTranscription(req);
-
-            StartCoroutine(AnimateProgressBarFill(0));
-            SetProgressBarColor(new Color(0.314f, 0.388f, 0.835f)); // Set color to #5063D5 after recording
-            progressText.text = "In the Whisper menu"; // Update progress text
-
             // Write the transcribed text to the MRTKTMPInputField
             //message.text = $"This is what we heard you say, is this correct:\n\n \"{res.Text}\"?";
 
@@ -327,36 +250,6 @@ namespace Samples.Whisper
                     EndRecording();
                 }
             }
-        }
-
-        private void SetProgressBarColor(Color color)
-        {
-            progressBar.color = color;
-
-            foreach (Transform child in progressBar.transform)
-            {
-                var childImage = child.GetComponent<Image>();
-                if (childImage != null)
-                {
-                    childImage.color = color;
-                }
-            }
-        }
-
-        private IEnumerator AnimateProgressBarFill(float targetFillAmount)
-        {
-            float startFillAmount = progressBar.fillAmount;
-            float elapsed = 0f;
-            float duration = 0.5f;
-
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                progressBar.fillAmount = Mathf.Lerp(startFillAmount, targetFillAmount, elapsed / duration);
-                yield return null;
-            }
-
-            progressBar.fillAmount = targetFillAmount;
         }
 
         private IEnumerator FlashLight()
