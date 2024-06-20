@@ -39,6 +39,9 @@ namespace RealityFlow.NodeUI
             gameObject.SetActive(true);
             // TODO: Probably use API for this later
             transform.position = obj.transform.position + Vector3.up * 0.5f;
+
+            if (obj.graph == null)
+                RealityFlowAPI.Instance.CreateNodeGraph();
             topLevelGraphView.Graph = obj.graph;
         }
     }

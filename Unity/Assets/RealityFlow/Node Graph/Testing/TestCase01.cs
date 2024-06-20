@@ -18,7 +18,7 @@ namespace RealityFlow.NodeGraph.Testing
 
         public Graph ConstructGraph()
         {
-            Graph graph = new();
+            Graph graph = new("");
             start = graph.AddNode(OnInteract);
             NodeIndex print = graph.AddNode(Print);
             Assert.IsTrue(graph.TryAddExecutionEdge(start, 0, print));

@@ -18,7 +18,7 @@ namespace RealityFlow.NodeGraph.Testing
 
         public Graph ConstructGraph()
         {
-            Graph graph = new();
+            Graph graph = new("");
             start = graph.AddNode(OnInteract);
 
             return graph;
