@@ -63,7 +63,7 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
             }
 
             // Find a type that contains a static 'Execute' method
-            Type type = asm.GetTypes().FirstOrDefault(t => t.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public) != null);
+            Type type = asm.GetTypes().Where(t => t.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public) != null).FirstOrDefault();
             if (type == null)
             {
                 Debug.LogError("No static Execute method found.");

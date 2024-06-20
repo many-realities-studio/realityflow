@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -56,8 +55,6 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI progressText;
 
-
-
     public string ChatGPTMessage
     {
         get
@@ -67,13 +64,13 @@ public class ChatGPTTester : MonoBehaviour
     }
 
     private static readonly Dictionary<string, string> apiFunctionDescriptions = new Dictionary<string, string>
-{
-    { "SpawnObject", "Create an object: {0}" },
-    { "DespawnObject", "Remove the object: {0}" },
-    { "UpdateObjectTransform", "Update the transform of object: {0}" },
-    { "AddNodeToGraph", "Add a node to the graph: {0}" },
-    // Add more mappings as needed
-};
+    {
+        { "SpawnObject", "Create an object: {0}" },
+        { "DespawnObject", "Remove the object: {0}" },
+        { "UpdateObjectTransform", "Update the transform of object: {0}" },
+        { "AddNodeToGraph", "Add a node to the graph: {0}" },
+        // Add more mappings as needed
+    };
 
     private void Awake()
     {
@@ -97,14 +94,14 @@ public class ChatGPTTester : MonoBehaviour
         if (prefabNames.Count > 0)
         {
             var reminderMessage = "Only use the following prefabs when spawning: " + string.Join(", ", prefabNames);
-            chatGPTQuestion.reminders = chatGPTQuestion.reminders.Concat(new[] { reminderMessage }).ToArray();
+            AddOrUpdateReminder(reminderMessage);
         }
 
         string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
         if (!string.IsNullOrEmpty(spawnedObjectsData))
         {
             var reminderMessage = "Current spawned objects data: " + spawnedObjectsData;
-            chatGPTQuestion.reminders = chatGPTQuestion.reminders.Concat(new[] { reminderMessage }).ToArray();
+            AddOrUpdateReminder(reminderMessage);
         }
 
         if (chatGPTQuestion.reminders.Length > 0)
@@ -116,10 +113,6 @@ public class ChatGPTTester : MonoBehaviour
 
         StartCoroutine(ChatGPTClient.Instance.Ask(gptPrompt, (response) =>
         {
-
-
-
-
             lastChatGPTResponseCache = response;
             responseTimeText.text = $"Time: {response.ResponseTotalTime} ms";
 
@@ -137,6 +130,32 @@ public class ChatGPTTester : MonoBehaviour
                 ExecuteLoggedActions();
             }
         }));
+
+        // Clear reminders after use
+        chatGPTQuestion.reminders = chatGPTQuestion.reminders.Where(r => !IsTemporaryReminder(r)).ToArray();
+    }
+
+    private void AddOrUpdateReminder(string newReminder)
+    {
+        var remindersList = chatGPTQuestion.reminders.ToList();
+        var existingReminderIndex = remindersList.FindIndex(r => r.Contains(newReminder.Split(':')[0]));
+
+        if (existingReminderIndex != -1)
+        {
+            remindersList[existingReminderIndex] = newReminder;
+        }
+        else
+        {
+            remindersList.Add(newReminder);
+        }
+
+        chatGPTQuestion.reminders = remindersList.ToArray();
+    }
+
+    private bool IsTemporaryReminder(string reminder)
+    {
+        // Identify temporary reminders based on specific keywords or patterns
+        return reminder.StartsWith("Only use the following prefabs") || reminder.StartsWith("Current spawned objects data");
     }
 
     private void LogApiCalls(string generatedCode)
@@ -180,7 +199,6 @@ public class ChatGPTTester : MonoBehaviour
         RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
     }
 
-
     private void ToggleWhisperCanvas()
     {
         bool isActive = whisperCanvasHolder.activeSelf;
@@ -202,7 +220,6 @@ public class ChatGPTTester : MonoBehaviour
         scenarioQuestionText.gameObject.SetActive(isActive);
         scenarioTitleText.gameObject.SetActive(isActive);
     }
-
 
     private void WriteResponseToFile(string response)
     {
