@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 [CustomEditor(typeof(RealityFlowAPI))]
 public class RealityFlowAPIEditor : Editor
@@ -113,10 +114,6 @@ public class RealityFlowAPIEditor : Editor
         {
             realityFlowAPI.StartCoroutine(ScaleAndMove(realityFlowAPI, "Ladder(Clone)", new Vector3(2.0f, 2.0f, 2.0f), new Vector3(2.0f, 2.0f, 2.0f), 5.0f)); // Move to (2, 2, 2) and scale to (2, 2, 2) over 5 seconds
         }
-        if (GUILayout.Button("Build House"))
-        {
-            realityFlowAPI.StartCoroutine(BuildHouse(realityFlowAPI));
-        }
         if (GUILayout.Button("Move characterSmall"))
         {
             MoveCharacterSmall(realityFlowAPI);
@@ -177,35 +174,32 @@ public class RealityFlowAPIEditor : Editor
 
         api.EndCompoundAction();
     }
-    private IEnumerator BuildHouse(RealityFlowAPI api)
+    private async Task BuildHouse(RealityFlowAPI api)
     {
         api.StartCompoundAction();
 
         // Create and place the walls
-        GameObject wall1 = api.SpawnObject("Climbing Wall", new Vector3(0, 0, 0), new Vector3(1, 1, 1), Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
-        GameObject wall2 = api.SpawnObject("Climbing Wall", new Vector3(0, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 90, 0), RealityFlowAPI.SpawnScope.Peer);
-        GameObject wall3 = api.SpawnObject("Climbing Wall", new Vector3(2, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 180, 0), RealityFlowAPI.SpawnScope.Peer);
-        GameObject wall4 = api.SpawnObject("Climbing Wall", new Vector3(2, 0, 0), new Vector3(1, 1, 1), Quaternion.Euler(0, -90, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall1 = await api.SpawnObject("Climbing Wall", new Vector3(0, 0, 0), new Vector3(1, 1, 1), Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall2 = await api.SpawnObject("Climbing Wall", new Vector3(0, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 90, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall3 = await api.SpawnObject("Climbing Wall", new Vector3(2, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 180, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall4 = await api.SpawnObject("Climbing Wall", new Vector3(2, 0, 0), new Vector3(1, 1, 1), Quaternion.Euler(0, -90, 0), RealityFlowAPI.SpawnScope.Peer);
 
-        yield return new WaitForSeconds(0.1f); // Optional: Wait for a short duration to ensure proper spawning
 
         // Create and place the roof
-        GameObject roof = api.SpawnObject("Climbing Wall", new Vector3(1, 2, 1), new Vector3(1, 1, 1), Quaternion.Euler(90, 0, 0), RealityFlowAPI.SpawnScope.Peer);
-
-        yield return new WaitForSeconds(0.1f); // Optional: Wait for a short duration to ensure proper spawning
+        GameObject roof = await api.SpawnObject("Climbing Wall", new Vector3(1, 2, 1), new Vector3(1, 1, 1), Quaternion.Euler(90, 0, 0), RealityFlowAPI.SpawnScope.Peer);
 
         // Adjust the size of the walls to make them fit the structure
-        api.UpdateObjectTransform(wall1.name, new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2, 2, 1));
-        api.UpdateObjectTransform(wall2.name, new Vector3(0, 0, 2), Quaternion.Euler(0, 90, 0), new Vector3(2, 2, 1));
-        api.UpdateObjectTransform(wall3.name, new Vector3(2, 0, 2), Quaternion.Euler(0, 180, 0), new Vector3(2, 2, 1));
-        api.UpdateObjectTransform(wall4.name, new Vector3(2, 0, 0), Quaternion.Euler(0, -90, 0), new Vector3(2, 2, 1));
-        api.UpdateObjectTransform(roof.name, new Vector3(1, 2, 1), Quaternion.Euler(90, 0, 0), new Vector3(2, 2, 2));
+        await api.UpdateObjectTransform(wall1.name, new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2, 2, 1));
+        await api.UpdateObjectTransform(wall2.name, new Vector3(0, 0, 2), Quaternion.Euler(0, 90, 0), new Vector3(2, 2, 1));
+        await api.UpdateObjectTransform(wall3.name, new Vector3(2, 0, 2), Quaternion.Euler(0, 180, 0), new Vector3(2, 2, 1));
+        await api.UpdateObjectTransform(wall4.name, new Vector3(2, 0, 0), Quaternion.Euler(0, -90, 0), new Vector3(2, 2, 1));
+        await api.UpdateObjectTransform(roof.name, new Vector3(1, 2, 1), Quaternion.Euler(90, 0, 0), new Vector3(2, 2, 2));
 
         api.EndCompoundAction();
     }
-    private void MoveCharacterSmall(RealityFlowAPI api)
+    private async void MoveCharacterSmall(RealityFlowAPI api)
     {
-        GameObject characterSmall = api.SpawnObject("characterSmall", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        GameObject characterSmall = await api.SpawnObject("characterSmall", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
         ;
         if (characterSmall != null)
         {
@@ -214,7 +208,7 @@ public class RealityFlowAPIEditor : Editor
             Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f); // Define the new scale
 
             api.StartCompoundAction();
-            api.UpdateObjectTransform("characterSmall", newPosition, newRotation, newScale);
+            await api.UpdateObjectTransform("characterSmall", newPosition, newRotation, newScale);
             api.EndCompoundAction();
 
             Debug.Log("Moved characterSmall to new position.");

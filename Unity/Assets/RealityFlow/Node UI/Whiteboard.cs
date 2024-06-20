@@ -34,14 +34,15 @@ namespace RealityFlow.NodeUI
                 Instance = this;
         }
 
-        public void ShowForObject(VisualScript obj)
+        public async void ShowForObject(VisualScript obj)
         {
             gameObject.SetActive(true);
             // TODO: Probably use API for this later
             transform.position = obj.transform.position + Vector3.up * 0.5f;
-
+            Graph currentGraph = obj.graph;
             if (obj.graph == null)
-                RealityFlowAPI.Instance.CreateNodeGraph();
+                currentGraph = await RealityFlowAPI.Instance.CreateNodeGraphAsync();
+            await RealityFlowAPI.Instance.AssignGraph(currentGraph, obj.gameObject);
             topLevelGraphView.Graph = obj.graph;
         }
     }

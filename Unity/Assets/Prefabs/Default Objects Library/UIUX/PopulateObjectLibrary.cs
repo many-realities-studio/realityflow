@@ -43,19 +43,19 @@ public class PopulateObjectLibrary : MonoBehaviour
         // Create a new Unity action and add it as a listener to the buttons OnClicked event
         UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
         newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(
-            Instantiate(objectPrefab)
+            objectPrefab
             ));
         //newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
     }
 
     // OnClicked event that triggers when the button is pressed
     // Sends the object prefab for the new buttons object to SpawnObjectAtRay when pressed
-    void TriggerObjectSpawn(GameObject objectPrefab)
+    async void TriggerObjectSpawn(GameObject objectPrefab)
     {
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(objectPrefab);
         // spawnScript.RaySpawnToggle(objectPrefab);
-        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        await RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
         // GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
         //newObj.GetComponent<NetworkedMesh>().owner = true;
         //newObj.transform.SetParent(networkSpawnManager.transform);

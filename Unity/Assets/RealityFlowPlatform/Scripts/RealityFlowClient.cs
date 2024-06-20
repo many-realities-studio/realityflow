@@ -142,6 +142,7 @@ public class RealityFlowClient : MonoBehaviour
         // !!LOAD OBJECTS FROM PROJECT HERE!!
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
         roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
+        RealityFlowAPI.Instance.FetchAndPopulateObjects();
 
     }
 
@@ -197,6 +198,8 @@ public class RealityFlowClient : MonoBehaviour
         roomClient.Join(joinCode);
 
         // !!LOAD OBJECTS FROM PROJECT HERE!!
+        //Call FetchAndPopulateObjects from API
+        //RealityFlowAPI.Instance.FetchAndPopulateObjects();
     }
 
     private void OnJoinedRoom(IRoom room)
@@ -250,7 +253,7 @@ public class RealityFlowClient : MonoBehaviour
             try {
                 Debug.Log(request.downloadHandler.text);
                 response = JsonConvert.DeserializeObject<JObject>(
-                    request.downloadHandler.text
+                    request.downloadHandler.text // This is failing
                 );
             } catch(Exception e) {
                 Debug.Log(response);
@@ -281,6 +284,7 @@ public class RealityFlowClient : MonoBehaviour
     {
         return currentProjectId;
     }
+
     public void SetCurrentProject(string projectId)
     {
         //Debug.Log("Setting current project ID to: " + projectId);
@@ -315,28 +319,13 @@ public class RealityFlowClient : MonoBehaviour
     public static RealityFlowClient Find(Transform component)
     {
         // Check if the scene is simply a parent, or if we can find a root scene.
-        var scene = component.GetComponentInParent<RealityFlowClient>();
-        if (scene)
-        {
-            return scene;
-        }
+        // var scene = component.GetComponentInParent<RealityFlowClient>();
+        var scene = NetworkScene.Find(component);
+        var rootRealityFlowClient = scene.GetComponentInChildren<RealityFlowClient>();
         if (rootRealityFlowClient != null)
         {
             return rootRealityFlowClient;
         }
-
-        // Check each common ancestor to find cousin scenes
-
-        do
-        {
-            scene = component.GetComponentInChildren<RealityFlowClient>();
-            if (scene)
-            {
-                return scene;
-            }
-            component = component.parent;
-        } while (component != null);
-
         return null;
     }
 

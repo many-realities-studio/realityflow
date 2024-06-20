@@ -299,9 +299,17 @@ public class PrimitiveSpawner : MonoBehaviour
             return;
 
         if (attachedObject == null) return; 
-        RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
-        Quaternion.identity, Vector3.one, spawnedMesh.GetComponent<EditableMesh>());
-        TryEnterResizeMode();
+        Debug.Log(attachedObject);
+        if(attachedObject.GetComponent<EditableMesh>() == null)  {
+            Debug.LogError("EditableMesh component not found on attached object.");
+            return;
+        }
+        spawnedMesh = RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
+            Quaternion.identity, Vector3.one, 
+            attachedObject.GetComponent<EditableMesh>());
+        if(spawnedMesh != null) {
+            TryEnterResizeMode();
+        }
     }
 
     private void TryEnterResizeMode()

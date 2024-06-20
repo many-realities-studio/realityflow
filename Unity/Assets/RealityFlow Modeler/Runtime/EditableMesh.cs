@@ -112,6 +112,9 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
     public void CreateMesh(EditableMesh otherMesh)
     {
+        Debug.Log(otherMesh.gameObject);
+        if(otherMesh != null) {
+
         positions = otherMesh.positions;
         faces = otherMesh.faces;
         /*positions = new Vector3[otherMesh.positions.Length];
@@ -126,6 +129,9 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
         meshOperationCache = new MeshOperationCache(this);
 
         FinalizeMesh();
+        } else {
+            Debug.Log("Error! Mesh wrong");
+        }
     }
 
     public void CreateMesh(PrimitiveData input)

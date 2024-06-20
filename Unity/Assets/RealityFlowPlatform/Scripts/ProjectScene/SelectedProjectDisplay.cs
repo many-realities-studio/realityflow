@@ -53,7 +53,7 @@ public class MyProjectsDisplay : MonoBehaviour
         if(rfClient == null) {
             return;
         }
-
+        var userId = rfClient.userDecoded["id"];
         // Create a new GraphQL query request to get the projects owned, co-owned, and joined by the user.
         var projectsQuery = new GraphQLRequest
         {
@@ -82,7 +82,7 @@ public class MyProjectsDisplay : MonoBehaviour
                 }
             ",
             OperationName = "GetUserProjects",
-            Variables = new {getUserByIdId = rfClient.userDecoded["id"]}
+            Variables = new {getUserByIdId = userId}
      
         };
 

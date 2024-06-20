@@ -15,6 +15,12 @@ namespace RealityFlow.NodeGraph
         public string Id => id;
 
         /// <summary>
+        /// The name of this graph.
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        public string name = "Graph";
+        /// <summary>
         /// The arena of nodes in this graph.
         /// </summary>
         [SerializeField]

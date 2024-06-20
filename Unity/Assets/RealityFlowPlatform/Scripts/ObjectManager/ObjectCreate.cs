@@ -73,11 +73,12 @@ public class ObjectSpawn : MonoBehaviour
                     projectId = projectId,
                     name = spawnedObject.name,
                     type = "Prefab",
+                    graphId = null,
                     transformJson = JsonUtility.ToJson(transformData),
                     meshJson = GetMeshJson(spawnedObject)
                 };
 
-                SaveObjectToDatabase(rfObject);
+                CreateObjectInDatabase(rfObject);
 
                 // Log the JSON to verify it
                 Debug.Log("transformJson: " + rfObject.transformJson);
@@ -128,7 +129,7 @@ public class ObjectSpawn : MonoBehaviour
         return "{}";
     }
 
-    private async void SaveObjectToDatabase(RfObject rfObject)
+    private async void CreateObjectInDatabase(RfObject rfObject)
     {
         if (realityFlowClient == null)
         {
@@ -136,15 +137,15 @@ public class ObjectSpawn : MonoBehaviour
             return;
         }
 
-        var saveObject = new GraphQLRequest
+        var createObject = new GraphQLRequest
         {
             Query = @"
-            mutation SaveObject($input: SaveObjectInput!) {
-                saveObject(input: $input) {
+            mutation CreateObject($input: SaveObjectInput!) {
+                createObject(input: $input) {
                     id
                 }
             }",
-            OperationName = "SaveObject",
+            OperationName = "CreateObject",
             Variables = new
             {
                 input = new
@@ -161,9 +162,9 @@ public class ObjectSpawn : MonoBehaviour
         try
         {
             Debug.Log("Sending GraphQL request to: " + realityFlowClient.server + "/graphql");
-            Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
+            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
 
-            var graphQLResponse = await realityFlowClient.SendQueryAsync(saveObject);
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(createObject);
             var data = graphQLResponse["data"];
             var errors = graphQLResponse["errors"];
             if (data != null)
