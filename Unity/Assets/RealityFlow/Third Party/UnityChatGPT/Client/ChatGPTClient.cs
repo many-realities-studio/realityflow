@@ -80,8 +80,6 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
                 response.ResponseTotalTime = (DateTime.Now - requestStartDateTime).TotalMilliseconds;
 
                 // Write response to a file
-                WriteResponseToFile(responseInfo);
-
                 callBack(response);
             }
         }
