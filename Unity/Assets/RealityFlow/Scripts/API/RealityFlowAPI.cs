@@ -796,6 +796,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return defs;
     }
 
+    public string[] GetNodeWhitelist()
+    {
+        // TODO: Access graphql DB to get whitelist for current project
+
+        return null;
+    }
+
     public void StartCompoundAction()
     {
         actionLogger.StartCompoundAction();

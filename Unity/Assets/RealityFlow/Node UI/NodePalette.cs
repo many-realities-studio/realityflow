@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
@@ -17,7 +18,11 @@ namespace RealityFlow.NodeUI
 
         void Start()
         {
-            defs = RealityFlowAPI.Instance.GetAvailableNodeDefinitions();
+            string[] whitelist = RealityFlowAPI.Instance.GetNodeWhitelist();
+            defs = RealityFlowAPI.Instance
+                .GetAvailableNodeDefinitions()
+                .Where(def => whitelist.Contains(def.Name))
+                .ToList();
 
             page.OnShow = (element, index) =>
             {
