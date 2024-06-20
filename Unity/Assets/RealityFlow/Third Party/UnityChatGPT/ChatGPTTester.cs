@@ -93,20 +93,23 @@ public class ChatGPTTester : MonoBehaviour
         List<string> prefabNames = RealityFlowAPI.Instance.GetPrefabNames();
         if (prefabNames.Count > 0)
         {
-            var reminderMessage = "Only use the following prefabs when spawning: " + string.Join(", ", prefabNames);
+            var reminderMessage = "\n-------------------------------------------------------------------------\n\n\nOnly use the following prefabs when spawning: " + string.Join(", ", prefabNames);
+            Debug.Log("Only use the following prefabs when generating code: " + string.Join(", ", prefabNames));
             AddOrUpdateReminder(reminderMessage);
         }
 
-        string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
-        if (!string.IsNullOrEmpty(spawnedObjectsData))
-        {
-            var reminderMessage = "Current spawned objects data: " + spawnedObjectsData;
-            AddOrUpdateReminder(reminderMessage);
-        }
+        //string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
+        //if (!string.IsNullOrEmpty(spawnedObjectsData))
+        //{
+        //  var reminderMessage = "\n --------------------------------------------------------------\n\n\nCurrent spawned objects data: " + spawnedObjectsData;
+        //Debug.Log("Current spawned objects data: " + spawnedObjectsData);
+        //AddOrUpdateReminder(reminderMessage);
+        //}
 
         if (chatGPTQuestion.reminders.Length > 0)
         {
             gptPrompt += $", {string.Join(',', chatGPTQuestion.reminders)}";
+            Debug.Log("The complete reminders are: " + gptPrompt);
         }
 
         scenarioQuestionText.text = gptPrompt;
@@ -120,7 +123,8 @@ public class ChatGPTTester : MonoBehaviour
 
             WriteResponseToFile(ChatGPTMessage);
             // Log the API calls in plain English
-            LogApiCalls(ChatGPTMessage);
+            //LogApiCalls(ChatGPTMessage);
+            Logger.Instance.LogInfo(ChatGPTMessage);
 
             // Log the generated code instead of executing it immediately
             RealityFlowAPI.Instance.actionLogger.LogGeneratedCode(ChatGPTMessage);

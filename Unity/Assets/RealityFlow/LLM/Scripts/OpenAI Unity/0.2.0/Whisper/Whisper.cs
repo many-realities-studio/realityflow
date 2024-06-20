@@ -378,6 +378,7 @@ namespace Samples.Whisper
                 yield return new WaitForSeconds(1);
                 countdown--;
             }
+            message.text = $"{transcribedText}";
             isCountdownActive = false;
 
             SendMessageToChatGPT();
