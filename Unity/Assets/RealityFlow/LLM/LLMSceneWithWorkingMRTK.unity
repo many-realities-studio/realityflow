@@ -12592,6 +12592,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3230532483955390004, guid: 0ed19d08a0964894e867846df4c361a9,
         type: 3}
+      propertyPath: m_Name
+      value: WhisperInputField
+      objectReference: {fileID: 0}
+    - target: {fileID: 3230532483955390004, guid: 0ed19d08a0964894e867846df4c361a9,
+        type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
@@ -23772,6 +23777,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lastSelection: {fileID: 0}
+  ObjectSelected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &372016332
 GameObject:
   m_ObjectHideFlags: 0
@@ -52846,18 +52854,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &835637176 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5272261527976917992, guid: 5adf88d5268a6744fb67ca7b9d346b73,
-    type: 3}
-  m_PrefabInstance: {fileID: 716078157}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b765c7397fd18a841ae637d4240571ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &836499061
 GameObject:
   m_ObjectHideFlags: 0
@@ -93142,6 +93138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed1c8e0fba9e14c47b88ed03686d562f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rfClient: {fileID: 0}
   server: http://localhost:4000/graphql
   defaultProjectId: 
   mainMenu: {fileID: 0}
@@ -117201,7 +117198,7 @@ PrefabInstance:
         type: 3}
       propertyPath: promptText
       value: 
-      objectReference: {fileID: 835637176}
+      objectReference: {fileID: 1692044386}
     - target: {fileID: 1739224985341762910, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
       propertyPath: undoButton
@@ -117222,6 +117219,11 @@ PrefabInstance:
       propertyPath: compilerButton
       value: 
       objectReference: {fileID: 1253477184}
+    - target: {fileID: 1739224985341762910, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: UserWhisperInput
+      value: 
+      objectReference: {fileID: 1692044386}
     - target: {fileID: 1739224985341762910, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
       propertyPath: responseTimeText
