@@ -47,6 +47,7 @@ public class AttachGizmoState : MonoBehaviour
         attachedGameObject = null;
         lookForTarget = false;
         var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
+        Debug.Log(rig);
         if(rightHand == null) {
             rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
             Debug.Log(rightHand);

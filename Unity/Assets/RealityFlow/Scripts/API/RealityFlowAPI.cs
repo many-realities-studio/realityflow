@@ -296,21 +296,28 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // ---Spawn/Save Object---
-    public GameObject SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube) {
-        var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
-        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
-        if(inputMesh = null) {
-            // Based on the shape
-            EditableMesh newMesh = PrimitiveGenerator.CreatePrimitive(type);
-            em.CreateMesh(newMesh);
-            Destroy(newMesh.gameObject);
-        } else {
-            em.CreateMesh(inputMesh);
-
+    public GameObject SpawnPrimitive(bool active, GameObject attatchedObject, GameObject primitive) {
+        
+        if (!active)
+        {
+            Debug.Log("not in mesh spawning mode");
+            return null;
         }
-        spawnedMesh.transform.position = position;
-        spawnedMesh.transform.rotation = rotation;
-        spawnedMesh.transform.localScale = scale;
+            
+        var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(primitive);
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        if(attatchedObject == null) {
+            Debug.Log("preview object failed to build");
+            return null;
+            // Based on the shape
+            //EditableMesh newMesh = PrimitiveGenerator.CreatePrimitive(type);
+            //em.CreateMesh(newMesh);
+            //Destroy(newMesh.gameObject);
+        }
+        em.CreateMesh(attatchedObject.GetComponent<EditableMesh>());
+        spawnedMesh.transform.position = attatchedObject.transform.position;
+        //spawnedMesh.transform.rotation = rotation;
+        //spawnedMesh.transform.localScale = scale;
         return spawnedMesh;
     } 
 

@@ -25,6 +25,7 @@ public class PrimitiveSpawner : MonoBehaviour
     [SerializeField] private GameObject leftHand;
     [SerializeField] private GameObject rightHand;
     [SerializeField] private GameObject resizeMeshPlane;
+    [SerializeField] public NetworkSpawnManager spawnManager;
 
     public static PrimitiveSpawner instance;
     private GameObject attachedObject;
@@ -130,6 +131,12 @@ public class PrimitiveSpawner : MonoBehaviour
         CreateMeshProxy();
         Destroy(XZplane);
         Destroy(Yplane);
+
+        if(spawnedMesh == null)
+        {
+            Debug.Log("new object failed to be created");
+            return;
+        }
 
         spawnedMesh.GetComponent<MeshCollider>().enabled = true;
     }
@@ -295,13 +302,13 @@ public class PrimitiveSpawner : MonoBehaviour
     /// </summary>
     public void SpawnMesh()
     {
-        if (!active)
-            return;
 
-        if (attachedObject == null) return; 
-        RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
-        Quaternion.identity, Vector3.one, spawnedMesh.GetComponent<EditableMesh>());
-        TryEnterResizeMode();
+        spawnedMesh = RealityFlowAPI.Instance.SpawnPrimitive(active, attachedObject, primitive);
+
+        if(spawnedMesh != null)
+        {
+            TryEnterResizeMode();  
+        }       
     }
 
     private void TryEnterResizeMode()
