@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -6,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
+using System.IO;
 
 public class ChatGPTTester : MonoBehaviour
 {
@@ -63,58 +63,18 @@ public class ChatGPTTester : MonoBehaviour
         }
     }
 
-    public Color CompileButtonColor
-    {
-        set
-        {
-            var renderer = compilerButton.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material.color = value;
-            }
-        }
-    }
-
     private static readonly Dictionary<string, string> apiFunctionDescriptions = new Dictionary<string, string>
-{
-    { "SpawnObject", "Create an object: {0}" },
-    { "DespawnObject", "Remove the object: {0}" },
-    { "UpdateObjectTransform", "Update the transform of object: {0}" },
-    { "AddNodeToGraph", "Add a node to the graph: {0}" },
-    // Add more mappings as needed
-};
+    {
+        { "SpawnObject", "Create an object: {0}" },
+        { "DespawnObject", "Remove the object: {0}" },
+        { "UpdateObjectTransform", "Update the transform of object: {0}" },
+        { "AddNodeToGraph", "Add a node to the graph: {0}" },
+        // Add more mappings as needed
+    };
 
     private void Awake()
     {
-        progressText.text = "RealityGPT";
-        responseTimeText.text = string.Empty;
-        SetButtonEnabled(compilerButton, false);
-        SetButtonEnabled(undoButton, false);
 
-        askButton.OnClicked.AddListener(() =>
-        {
-            SetButtonEnabled(compilerButton, false);
-            CompileButtonColor = Color.white;
-
-            Execute();
-        });
-
-        compilerButton.OnClicked.AddListener(() =>
-        {
-            ExecuteLoggedActions();
-            SetButtonEnabled(undoButton, true); // Enable Undo button after compiling
-        });
-
-        whisperToggleButton.OnClicked.AddListener(() =>
-        {
-            ToggleWhisperCanvas();
-        });
-
-        undoButton.OnClicked.AddListener(() =>
-        {
-            RealityFlowAPI.Instance.UndoLastAction();
-            CheckUndoButtonState();
-        });
     }
 
     public void Execute()
@@ -122,8 +82,6 @@ public class ChatGPTTester : MonoBehaviour
         gptPrompt = $"{chatGPTQuestion.promptPrefixConstant} {promptText.text}";
 
         scenarioTitleText.text = chatGPTQuestion.scenarioTitle;
-
-        SetButtonEnabled(askButton, false);
 
         ChatGPTProgress.Instance.StartProgress("Generating source code, please wait");
 
@@ -136,14 +94,14 @@ public class ChatGPTTester : MonoBehaviour
         if (prefabNames.Count > 0)
         {
             var reminderMessage = "Only use the following prefabs when spawning: " + string.Join(", ", prefabNames);
-            chatGPTQuestion.reminders = chatGPTQuestion.reminders.Concat(new[] { reminderMessage }).ToArray();
+            AddOrUpdateReminder(reminderMessage);
         }
 
         string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
         if (!string.IsNullOrEmpty(spawnedObjectsData))
         {
             var reminderMessage = "Current spawned objects data: " + spawnedObjectsData;
-            chatGPTQuestion.reminders = chatGPTQuestion.reminders.Concat(new[] { reminderMessage }).ToArray();
+            AddOrUpdateReminder(reminderMessage);
         }
 
         if (chatGPTQuestion.reminders.Length > 0)
@@ -155,16 +113,12 @@ public class ChatGPTTester : MonoBehaviour
 
         StartCoroutine(ChatGPTClient.Instance.Ask(gptPrompt, (response) =>
         {
-            SetButtonEnabled(askButton, true);
-
-            CompileButtonColor = Color.blue;
-
-            SetButtonEnabled(compilerButton, true);
             lastChatGPTResponseCache = response;
             responseTimeText.text = $"Time: {response.ResponseTotalTime} ms";
 
             ChatGPTProgress.Instance.StopProgress();
 
+            WriteResponseToFile(ChatGPTMessage);
             // Log the API calls in plain English
             LogApiCalls(ChatGPTMessage);
 
@@ -174,9 +128,34 @@ public class ChatGPTTester : MonoBehaviour
             if (immediateCompilation)
             {
                 ExecuteLoggedActions();
-                SetButtonEnabled(undoButton, true); // Enable Undo button after compiling
             }
         }));
+
+        // Clear reminders after use
+        chatGPTQuestion.reminders = chatGPTQuestion.reminders.Where(r => !IsTemporaryReminder(r)).ToArray();
+    }
+
+    private void AddOrUpdateReminder(string newReminder)
+    {
+        var remindersList = chatGPTQuestion.reminders.ToList();
+        var existingReminderIndex = remindersList.FindIndex(r => r.Contains(newReminder.Split(':')[0]));
+
+        if (existingReminderIndex != -1)
+        {
+            remindersList[existingReminderIndex] = newReminder;
+        }
+        else
+        {
+            remindersList.Add(newReminder);
+        }
+
+        chatGPTQuestion.reminders = remindersList.ToArray();
+    }
+
+    private bool IsTemporaryReminder(string reminder)
+    {
+        // Identify temporary reminders based on specific keywords or patterns
+        return reminder.StartsWith("Only use the following prefabs") || reminder.StartsWith("Current spawned objects data");
     }
 
     private void LogApiCalls(string generatedCode)
@@ -220,11 +199,6 @@ public class ChatGPTTester : MonoBehaviour
         RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
     }
 
-    private void SetButtonEnabled(PressableButton button, bool isEnabled)
-    {
-        button.enabled = isEnabled;
-    }
-
     private void ToggleWhisperCanvas()
     {
         bool isActive = whisperCanvasHolder.activeSelf;
@@ -247,8 +221,17 @@ public class ChatGPTTester : MonoBehaviour
         scenarioTitleText.gameObject.SetActive(isActive);
     }
 
-    private void CheckUndoButtonState()
+    private void WriteResponseToFile(string response)
     {
-        SetButtonEnabled(undoButton, RealityFlowAPI.Instance.actionLogger.GetActionStackCount() > 0);
+        string path = Application.persistentDataPath + "/ChatGPTResponse.json";
+        try
+        {
+            File.WriteAllText(path, response);
+            Debug.Log("Response written to file: " + path);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Failed to write response to file: " + e.Message);
+        }
     }
 }
