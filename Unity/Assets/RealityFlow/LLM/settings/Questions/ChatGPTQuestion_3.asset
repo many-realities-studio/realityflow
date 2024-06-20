@@ -12,19 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8f40005f71da0842b543834cc80d108, type: 3}
   m_Name: ChatGPTQuestion_3
   m_EditorClassIdentifier: 
-  scenarioTitle: Creating player armatures, moving, and jumping
+  scenarioTitle: 
   promptPrefixConstant: A unity c# class script that
-  prompt: loads a PlayerArmature prefab from Resources consistently every 1/2 second,
-    get StarterAssetsInputs component, set the "move" field to a vector2 with 1.0f
-    for x and 0 for y, then set the "jump" field to true
+  prompt: 
   replacements: []
   reminders:
-  - do not include any explanations
-  - aways include code with markdown
-  - do not require any prefabs
-  - do not require any references
-  - all references should not be null
-  - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets; '
   - 'Only use the RealityFlow API which an example of which is referenced here: ###
     RealityFlow API Functions and Examples  1. **SpawnObject**    - **Description**:
     Spawns an object in the virtual room.    - **Usage**:       ```csharp      GameObject
@@ -53,7 +45,31 @@ MonoBehaviour:
     compact yet detailed list ensures that ChatGPT will generate code using only
     the provided RealityFlow API functions, maintaining consistency and compatibility
     within your project. '
+  - do not include any explanations
+  - aways include code with markdown
+  - do not require any prefabs
+  - do not require any references
+  - all references should not be null
+  - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets; '
+  - ONLY GENERATE CODE THAT MATCHES WHAT THE USER IS REQUESTING NOTHING ELSE
   - DO NOT USE COROUTINES
-  - 'Only use the following prefabs when spawning: Reality Palette, FireworkNew,
-    VRWhiteBoard, Cube, Capsule, Cylinder, Rectangle (Horizontal), Rectangle (Vertical),
-    Sphere, Reality Palette, TestCube, PrimitiveBase, DuplicateProxy'
+  - All code should be in a static Execute method
+  - Do not use any methods that you yourseld do not create or know you have specific
+    access to such as Invoke()
+  - 'Remember that the Execute method is static and instance methods of MonoBehaviour
+    cannot be called from a static method. If you want to use one do it like this
+    example: using UnityEngine; using System.Collections; using StarterAssets;  public
+    class SpawnRectangle : MonoBehaviour {     public static void Execute()     {        
+    string message = "This is what we heard you say, is this correct: \"Spawn a Rectangle\"?";        
+    Debug.Log(message);          // Create a new GameObject and add this script to
+    it         GameObject go = new GameObject("SpawnRectangleObject");         SpawnRectangle
+    script = go.AddComponent<SpawnRectangle>();          // Start the coroutine to
+    delay sending the confirmation message         script.StartCoroutine(script.DelayedMessage(1.0f));    
+    }      private IEnumerator DelayedMessage(float delay)     {         yield return
+    new WaitForSeconds(delay);          Debug.Log("Message will be sent in 1 seconds
+    unless canceled or re-recorded.");          // Spawn a Rectangle object after
+    the delay         RealityFlowAPI.Instance.SpawnObject("Rectangle (Horizontal)",
+    new Vector3(0, 0, 0), Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);         
+    // Optionally, destroy the GameObject after spawning to clean up         Destroy(gameObject);    
+    } } '
+  - DO NOT USE MONOBEHAVIOURS
