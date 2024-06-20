@@ -371,7 +371,7 @@ namespace Samples.Whisper
         private IEnumerator StartCountdown(string transcribedText)
         {
             isCountdownActive = true;
-            int countdown = 10;
+            int countdown = 5;
             while (countdown > 0)
             {
                 message.text = $"This is what we heard you say, is this correct:\n\n \"{transcribedText}\"?\n\nMessage will be sent in {countdown} seconds unless canceled or re-recorded.";

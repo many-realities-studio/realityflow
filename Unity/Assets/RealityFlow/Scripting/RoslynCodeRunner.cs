@@ -33,65 +33,60 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 
     public void RunCode(string updatedCode = null)
     {
-        Logger.Instance.LogInfo("Executing Runcode...");
+        Logger.Instance.LogInfo("Executing RunCode...");
 
-        updatedCode = string.IsNullOrEmpty(updatedCode) ? null : updatedCode;
+        updatedCode = string.IsNullOrEmpty(updatedCode) ? code : updatedCode;
         try
         {
-            code = $"{updatedCode ?? code}";
+            // Compile the provided code into an assembly
+            Assembly asm = RealityFlow.Scripting.ScriptUtilities.CompileToAssembly(updatedCode, diagnostics);
 
-            Assembly asm = RealityFlow.Scripting.ScriptUtilities.CompileToAssembly(code, diagnostics);
-
+            // Log any compilation diagnostics
             foreach (var diag in diagnostics)
             {
-                if (diag.Severity is DiagnosticSeverity.Warning)
+                if (diag.Severity == DiagnosticSeverity.Warning)
                     Debug.LogWarning(diag);
-                else if (diag.Severity is DiagnosticSeverity.Error)
+                else if (diag.Severity == DiagnosticSeverity.Error)
                     Debug.LogError(diag);
-                else if (diag.Severity is DiagnosticSeverity.Info)
+                else if (diag.Severity == DiagnosticSeverity.Info)
                     Debug.Log(diag);
             }
 
+            // Clear diagnostics for next compilation
             diagnostics.Clear();
 
-            if (asm is null)
+            // Check if the compilation resulted in a valid assembly
+            if (asm == null)
             {
-                Debug.LogError("Failed to compile chatgpt response");
+                Debug.LogError("Failed to compile code.");
                 return;
             }
 
-            Type[] comps =
-                asm
-                .GetTypes()
-                .Where(ty => ty.IsSubclassOf(typeof(MonoBehaviour)))
-                .ToArray();
-
-            if (comps.Length < 1)
+            // Find a type that contains a static 'Execute' method
+            Type type = asm.GetTypes().Where(t => t.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public) != null).FirstOrDefault();
+            if (type == null)
             {
-                Debug.LogError("ChatGPT response didn't define a MonoBehaviour");
-                return;
-            }
-            if (comps.Length > 1)
-            {
-                Debug.LogError("ChatGPT response defined more than one MonoBehaviour");
+                Debug.LogError("No static Execute method found.");
                 return;
             }
 
-            Type type = comps.Single();
+            // Get the static 'Execute' method
+            MethodInfo method = type.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public);
+            if (method == null)
+            {
+                Debug.LogError("Execute method not found.");
+                return;
+            }
 
-            gameObject.AddComponent(type);
+            // Invoke the static 'Execute' method
+            method.Invoke(null, null);
         }
-        catch (Exception mainCodeException)
+        catch (Exception ex)
         {
-            Logger.Instance.LogError(mainCodeException.Message);
+            // Log any exceptions that occur during the process
+            Logger.Instance.LogError(ex.Message);
         }
     }
 
-    public void RunMultipleCodes(List<string> codes)
-    {
-        foreach (var codeSnippet in codes)
-        {
-            RunCode(codeSnippet);
-        }
-    }
+
 }
