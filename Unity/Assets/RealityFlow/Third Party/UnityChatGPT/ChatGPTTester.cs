@@ -10,50 +10,18 @@ using System.IO;
 public class ChatGPTTester : MonoBehaviour
 {
     [SerializeField]
-    private PressableButton askButton;
-    [SerializeField]
-    private PressableButton compilerButton;
-
-    [SerializeField]
-    private TextMeshProUGUI responseTimeText;
-
-    [SerializeField]
-    private TextMeshProUGUI chatGPTAnswer;
-
-    [SerializeField]
-    private TextMeshProUGUI chatGPTQuestionText;
-
-    [SerializeField]
     private ChatGPTQuestion chatGPTQuestion;
 
-    private string gptPrompt;
+    private string LLMPromptToBePassed;
 
     [SerializeField]
-    private TextMeshProUGUI scenarioTitleText;
-
-    [SerializeField]
-    private MRTKTMPInputField promptText;
-
-    [SerializeField]
-    private MRTKTMPInputField scenarioQuestionText;
+    private MRTKTMPInputField UserWhisperInput;
 
     [SerializeField]
     private ChatGPTResponse lastChatGPTResponseCache;
 
     [SerializeField]
     private bool immediateCompilation = false;
-
-    [SerializeField]
-    private GameObject whisperCanvasHolder;
-
-    [SerializeField]
-    private PressableButton whisperToggleButton;
-
-    [SerializeField]
-    private PressableButton undoButton;
-
-    [SerializeField]
-    private TextMeshProUGUI progressText;
 
     public string ChatGPTMessage
     {
@@ -79,48 +47,59 @@ public class ChatGPTTester : MonoBehaviour
 
     public void Execute()
     {
-        gptPrompt = $"{chatGPTQuestion.promptPrefixConstant} {promptText.text}";
+        LLMPromptToBePassed
 
-        scenarioTitleText.text = chatGPTQuestion.scenarioTitle;
+ = $"{chatGPTQuestion.promptPrefixConstant} {UserWhisperInput.text}";
+
 
         ChatGPTProgress.Instance.StartProgress("Generating source code, please wait");
 
         Array.ForEach(chatGPTQuestion.replacements, r =>
         {
-            gptPrompt = gptPrompt.Replace("{" + $"{r.replacementType}" + "}", r.value);
+            LLMPromptToBePassed
+
+     = LLMPromptToBePassed
+
+    .Replace("{" + $"{r.replacementType}" + "}", r.value);
         });
 
         List<string> prefabNames = RealityFlowAPI.Instance.GetPrefabNames();
         if (prefabNames.Count > 0)
         {
-            var reminderMessage = "Only use the following prefabs when spawning: " + string.Join(", ", prefabNames);
+            var reminderMessage = "\n-------------------------------------------------------------------------\n\n\nOnly use the following prefabs when spawning: " + string.Join(", ", prefabNames);
+            Debug.Log("Only use the following prefabs when generating code: " + string.Join(", ", prefabNames));
             AddOrUpdateReminder(reminderMessage);
         }
 
-        string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
-        if (!string.IsNullOrEmpty(spawnedObjectsData))
-        {
-            var reminderMessage = "Current spawned objects data: " + spawnedObjectsData;
-            AddOrUpdateReminder(reminderMessage);
-        }
+        //string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
+        //if (!string.IsNullOrEmpty(spawnedObjectsData))
+        //{
+        //  var reminderMessage = "\n --------------------------------------------------------------\n\n\nCurrent spawned objects data: " + spawnedObjectsData;
+        //Debug.Log("Current spawned objects data: " + spawnedObjectsData);
+        //AddOrUpdateReminder(reminderMessage);
+        //}
 
         if (chatGPTQuestion.reminders.Length > 0)
         {
-            gptPrompt += $", {string.Join(',', chatGPTQuestion.reminders)}";
+            LLMPromptToBePassed
+
+     += $", {string.Join(',', chatGPTQuestion.reminders)}";
+            Debug.Log("The complete reminders are: " + LLMPromptToBePassed
+
+    );
         }
 
-        scenarioQuestionText.text = gptPrompt;
+        StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed
 
-        StartCoroutine(ChatGPTClient.Instance.Ask(gptPrompt, (response) =>
+, (response) =>
         {
             lastChatGPTResponseCache = response;
-            responseTimeText.text = $"Time: {response.ResponseTotalTime} ms";
-
             ChatGPTProgress.Instance.StopProgress();
 
             WriteResponseToFile(ChatGPTMessage);
             // Log the API calls in plain English
             LogApiCalls(ChatGPTMessage);
+            //Logger.Instance.LogInfo(ChatGPTMessage);
 
             // Log the generated code instead of executing it immediately
             RealityFlowAPI.Instance.actionLogger.LogGeneratedCode(ChatGPTMessage);
@@ -197,28 +176,6 @@ public class ChatGPTTester : MonoBehaviour
     public void ProcessAndCompileResponse()
     {
         RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
-    }
-
-    private void ToggleWhisperCanvas()
-    {
-        bool isActive = whisperCanvasHolder.activeSelf;
-        whisperCanvasHolder.SetActive(!isActive);
-
-        if (!isActive)
-        {
-            progressText.text = "In the Whisper menu";
-        }
-        else
-        {
-            progressText.text = "RealityGPT";
-        }
-
-        responseTimeText.gameObject.SetActive(isActive);
-        chatGPTAnswer.gameObject.SetActive(isActive);
-        //chatGPTQuestionText.gameObject.SetActive(isActive);
-        promptText.gameObject.SetActive(isActive);
-        scenarioQuestionText.gameObject.SetActive(isActive);
-        scenarioTitleText.gameObject.SetActive(isActive);
     }
 
     private void WriteResponseToFile(string response)

@@ -6,6 +6,7 @@ using Ubiq.Spawning;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 
 /// <summary>
@@ -26,50 +27,6 @@ public class PaletteSpawner : MonoBehaviour
 
     private Vector3 paletteSize;
     private Vector3 playPaletteSize;
-
-    /*public void SpawnPalette()
-    {
-        Vector3 paletteSize = palettePrefab.transform.localScale;
-
-        // If the palette is not in the current scene, then spawn it in
-        if(palette == null)
-        {
-            // Debug.Log("SpawnPalette() was triggered to spawn a palette");
-            palette = NetworkSpawnManager.Find(this).SpawnWithPeerScope(palettePrefab);
-            PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
-            phm.paletteManager = gameObject;
-            phm.left = GetComponents<OnButtonPress>()[0];
-            phm.right = GetComponents<OnButtonPress>()[1];
-            phm.left.enabled = false;
-            paletteShown = true;
-
-            // Set the ownership of the spawned palette to the user who spawned it
-            palette.GetComponent<NetworkedPalette>().owner = true;
-            //palette.GetComponent<NetworkedPalette>().needData = true;
-
-            try
-            {
-                isLeftHandDominant = GameObject.FindGameObjectsWithTag("DominantHandManager")[0].GetComponent<PressableButton>();
-                Debug.Log(GameObject.FindGameObjectsWithTag("DominantHandManager")[0]);
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                Debug.Log(e + " Has the palette been spawned in your scene?");
-            }
-        }
-        // We set the scale of the palette to 0 to effectively hide it. We do not disable it in the hierarchy as this will turn off
-        // all scripts which would not allow the user to use any functions from the palette.
-        else if (paletteShown)
-        {
-            palette.transform.localScale = new Vector3(0, 0, 0);
-            paletteShown = false;
-        }
-        else if (!paletteShown)
-        {
-            palette.transform.localScale = paletteSize;
-            paletteShown = true;
-        }
-    }*/
 
     void Start()
     {
@@ -143,10 +100,20 @@ public class PaletteSpawner : MonoBehaviour
                 playPalette.transform.localScale = new Vector3(0, 0, 0);
             }
         }
+
         // We set the scale of the palette to 0 to effectively hide it. We do not disable it in the hierarchy as this will turn off
         // all scripts which would not allow the user to use any functions from the palette.
         else if (paletteShown)
         {
+
+            // If the palette exists and is closing, we re-enable rays
+            if(palette != null)
+            {
+                PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
+                phm.EnableAllControlsOnPaletteClose();
+            }
+           
+
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
             {
@@ -161,6 +128,14 @@ public class PaletteSpawner : MonoBehaviour
         }
         else if (!paletteShown)
         {
+            // If the palette exists and is opened/reactivated, disable the appropriate controls 
+            // (the hand holding palette should be inactive)
+            if(palette != null)
+            {
+                PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
+                phm.disableControllerOnReopen();
+             
+            }
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
             {
