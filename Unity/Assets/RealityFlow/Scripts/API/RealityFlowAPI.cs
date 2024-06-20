@@ -173,13 +173,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ===== API FUNCTIONS [ObjectManagement] =====
 
     // -- Node Operations--
-
     public void AddNodeToGraph(Graph graph, NodeDefinition def)
     {
         // TODO: Add node to GraphQL
         NodeIndex index = graph.AddNode(def);
         actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
+
+        // MUTATIONS TO UPDATE JSON STRING
     }
 
     public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
@@ -191,6 +192,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         graph.RemoveNode(node);
         actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
         Debug.Log("Removed node from graph");
+
+        // MUTATIONS TO UPDATE JSON STRING
     }
 
     public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
@@ -202,6 +205,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
+
+        // MUTATIONS TO UPDATE JSON STRING
     }
 
     public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
