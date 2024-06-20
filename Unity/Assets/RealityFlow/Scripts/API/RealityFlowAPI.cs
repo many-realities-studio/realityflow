@@ -173,6 +173,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ===== API FUNCTIONS [ObjectManagement] =====
 
     // -- Node Operations--
+
+    public Graph CreateNodeGraph()
+    {
+        // TODO: Add new graph to graphql and allocate new id
+        string id = Guid.NewGuid().ToString();
+        actionLogger.LogAction(nameof(CreateNodeGraph), id);
+        return new Graph(id);
+    }
+
     public void AddNodeToGraph(Graph graph, NodeDefinition def)
     {
         // TODO: Add node to GraphQL
