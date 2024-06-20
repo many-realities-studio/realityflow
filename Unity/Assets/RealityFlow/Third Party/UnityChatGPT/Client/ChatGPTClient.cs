@@ -86,18 +86,4 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
             }
         }
     }
-
-    private void WriteResponseToFile(string response)
-    {
-        string path = Application.persistentDataPath + "/ChatGPTResponse.json";
-        try
-        {
-            File.WriteAllText(path, response);
-            Debug.Log("Response written to file: " + path);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Failed to write response to file: " + e.Message);
-        }
-    }
 }
