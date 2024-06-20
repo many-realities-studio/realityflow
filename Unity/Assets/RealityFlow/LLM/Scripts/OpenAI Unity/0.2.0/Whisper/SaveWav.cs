@@ -43,16 +43,19 @@ namespace Samples.Whisper
 			}
 
 			var filepath = Path.Combine(Application.persistentDataPath, filename);
-
+			Debug.Log(filepath);
 			// Make sure directory exists if user is saving to sub dir.
 			Directory.CreateDirectory(Path.GetDirectoryName(filepath) ?? string.Empty);
-
-			using(var memoryStream = CreateEmpty())
+			using (var fileStream = CreateEmptyFileStream(filepath))
 			{
-				ConvertAndWrite(memoryStream, clip);
-				WriteHeader(memoryStream, clip);
+				using (var memoryStream = CreateEmpty())
+				{
+					ConvertAndWrite(memoryStream, clip);
+					WriteHeader(memoryStream, clip);
+					memoryStream.WriteTo(fileStream);
 
-				return memoryStream.GetBuffer();
+					return memoryStream.GetBuffer();
+				}
 			}
 		}
 
@@ -95,6 +98,20 @@ namespace Samples.Whisper
 
 			return clip;
 		}
+
+		static FileStream CreateEmptyFileStream(string filepath)
+		{
+			var fileStream = new FileStream(filepath, FileMode.OpenOrCreate);
+			byte emptyByte = new byte();
+
+			for (int i = 0; i < HeaderSize; i++) //preparing the header
+			{
+				fileStream.WriteByte(emptyByte);
+			}
+
+			return fileStream;
+		}
+
 
 		static MemoryStream CreateEmpty()
 		{
@@ -172,7 +189,7 @@ namespace Samples.Whisper
 
 			Byte[]
 				byteRate = BitConverter.GetBytes(hz * channels *
-				                                 2); // sampleRate * bytesPerSample*number of channels, here 44100*2*2
+												 2); // sampleRate * bytesPerSample*number of channels, here 44100*2*2
 			memoryStream.Write(byteRate, 0, 4);
 
 			UInt16 blockAlign = (ushort)(channels * 2);

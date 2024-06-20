@@ -6,9 +6,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Ubiq.Messaging;
 using Ubiq.Spawning;
 using UnityEngine;
@@ -36,16 +33,16 @@ public class ProjectContentManager : MonoBehaviour
     //public UnityEvent projectLoad = new UnityEvent();
     public List<IRealityFlowObject> sceneObjects = new List<IRealityFlowObject>();
     public static ProjectContentManager instance;
+    public RealityFlowClient rfClient;
     public const string objectPath = "/savefile";
     public const string objectPathCount = "/savefile.count";
-  public string server = "http://localhost:4000/graphql";
-  public string defaultProjectId;
+    public string server = "http://localhost:4000/graphql";
+    public string defaultProjectId;
     private bool _editMode = true;
     private RoomClient client;
     public NetworkContext context;
     public GameObject mainMenu;
-    public GraphQLHttpClient graphQLClient;
-  public string accessToken;
+    public string accessToken;
 
     // Each of these working with just JSON serialization...
     // Loads all of the objects from the JSON file.
@@ -80,11 +77,9 @@ public class ProjectContentManager : MonoBehaviour
         {
             instance = this;
         }
-        client.OnJoinedRoom.AddListener(delegate { onRoomCreation(); });
         accessToken = PlayerPrefs.GetString("accessToken");
-       var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
-       graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-       graphQLClient = graphQLC;
+
+        rfClient = RealityFlowClient.Find(this);
     }
 
     public IRealityFlowObject GetObject(GameObject obj)
@@ -94,7 +89,6 @@ public class ProjectContentManager : MonoBehaviour
 
     public async void LoadObject(IRealityFlowObject em)
     {
-        var graphQLC = new GraphQLHttpClient(server, new NewtonsoftJsonSerializer());
         // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
         // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
         // graphQLClient = graphQLC;
@@ -113,14 +107,15 @@ public class ProjectContentManager : MonoBehaviour
             OperationName = "Query",
             Variables = new { getProjectByIdId = defaultProjectId }
         };
-        var queryResult = await graphQLClient.SendQueryAsync<JObject>(getProjectObjects);
+        var queryResult = await rfClient.SendQueryAsync(getProjectObjects);
+        var data = queryResult["data"];
+        var errors = queryResult["errors"];
         Debug.Log("helloyes");
         //var data;
-        if (queryResult.Data != null)
+        if (data != null)
         {
             Debug.Log("hello");
             //data = (JArray)queryResult.Data["getProjectById"];
-            var data = queryResult.Data["getProjectById"]["objects"];
             //var data2 = data["getProjectById"]["objects"];
             //Debug.Log("uuid1: "+data2[0]["id"]);
             //Debug.Log("object1: " + data2[0]["objectJson"]);
@@ -157,10 +152,10 @@ public class ProjectContentManager : MonoBehaviour
             //    Debug.Log("uuid2: " + item.ToString());
             //}
         }
-        else if (queryResult.Errors != null)
+        else if (errors != null)
         {
 
-            Debug.Log(queryResult.Errors[0].Message);
+            Debug.Log(errors[0]["message"]);
         }
 
         //projectLoad.Invoke();
@@ -215,17 +210,17 @@ public class ProjectContentManager : MonoBehaviour
             Variables = new { input = new { objectJson = em.smi, projectId = defaultProjectId } }
         };
 
-        var queryResult = await graphQLClient.SendMutationAsync<JObject>(getUserInfoRequest);
-        JObject queryData = queryResult.Data;
+        var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
+        var queryData = queryResult["data"];
 
         if (queryData != null)
         {
             Debug.Log("successfully call api");
         }
-        else if (queryResult.Errors != null)
+        else if (queryResult["errors"] != null)
         {
 
-            Debug.Log(queryResult.Errors[0].Message);
+            Debug.Log(queryResult["errors"][0]["message"]);
         }
 
         Debug.Log(queryData["saveObject"]["id"]);
@@ -259,7 +254,7 @@ public class ProjectContentManager : MonoBehaviour
                 Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid, objectJson = go} }
             };
 
-            var queryResult = await graphQLClient.SendMutationAsync<JObject>(getUserInfoRequest);
+            var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
         }
     }
 
@@ -287,39 +282,10 @@ public class ProjectContentManager : MonoBehaviour
                 Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid } }
             };
 
-            var queryResult = await graphQLClient.SendMutationAsync<JObject>(getUserInfoRequest);
+            var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
         }
     }
 
-    async void onRoomCreation()
-    {
-        Debug.Log("LOADING CONTENT");
-        Debug.Log(client.Room.JoinCode);
-        Debug.Log(client.Room.Name);
-        // string[] useText = client.Room.Name.Split('@');
-        // if(useText.Length > 0)
-        // {
-
-        //     // This is extracting the project id from the room name
-        //     // If there isn't any, then it probably won't work
-        //     //If this fails, no network scene to join
-        // // Error here? 
-        // var publicProjectsQuery = new GraphQLRequest
-        // {
-        //     Query = @"
-        //          mutation AddRoom($input: AddRoomInput) {
-        //       addRoom(input: $input) {
-        //         joinCode
-        //       }
-        //     }
-        //     ",
-        //     OperationName = "AddRoom",
-        //     Variables = new { roomId = client.Room.UUID, joinCode = client.Room.JoinCode, projectId = useText[1] }
-        // };
-
-        // var queryResult = await graphQLClient.SendMutationAsync<JObject>(publicProjectsQuery);
-        // }
-    }
     
     void LoadSceneContent(string content)
     {

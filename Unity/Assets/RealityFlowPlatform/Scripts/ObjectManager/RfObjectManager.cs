@@ -1,7 +1,4 @@
 using UnityEngine;
-using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using Newtonsoft.Json.Linq;
 using Ubiq.Spawning;
 using System;
@@ -13,7 +10,6 @@ using System.Threading.Tasks;
 
 public class RfObjectManager : MonoBehaviour
 {
-    private GraphQLHttpClient graphQLClient;
     private NetworkSpawnManager networkSpawnManager;
     public PrefabCatalogue catalogue;
     private RealityFlowClient realityFlowClient;
@@ -40,20 +36,9 @@ public class RfObjectManager : MonoBehaviour
             return;
         }
 
-        InitializeGraphQLClient();  // Initialize GraphQL client with the access token
         FetchAndPopulateObjects();  // Fetch objects from the database and populate the room
     }
 
-    public void InitializeGraphQLClient()
-    {
-        var options = new GraphQLHttpClientOptions
-        {
-            EndPoint = new Uri(realityFlowClient.server + "/graphql") // Server URL found in RealityFlowClient
-        };
-
-        graphQLClient = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());
-        graphQLClient.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {realityFlowClient.accessToken}");
-    }
 
     private async void FetchAndPopulateObjects()
     {
@@ -93,20 +78,20 @@ public class RfObjectManager : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await graphQLClient.SendMutationAsync<JObject>(saveObject);
-            if (graphQLResponse.Data != null)
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(saveObject);
+            if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Object transform updated in the database successfully.");
             }
             else
             {
                 Debug.LogError("Failed to update object transform in the database.");
-                foreach (var error in graphQLResponse.Errors)
+                foreach (var error in graphQLResponse["errors"])
                 {
-                    Debug.LogError($"GraphQL Error: {error.Message}");
-                    if (error.Extensions != null)
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["Extensions"] != null)
                     {
-                        Debug.LogError($"Error Extensions: {error.Extensions}");
+                        Debug.LogError($"Error Extensions: {error["Extensions"]}");
                     }
                 }
             }
@@ -139,12 +124,12 @@ public class RfObjectManager : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await graphQLClient.SendQueryAsync<JObject>(getObjectsQuery);
-            if (graphQLResponse.Data != null)
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(getObjectsQuery);
+            if (graphQLResponse["data"] != null)
             {
                 //Debug.Log("GraphQL Response Data: " + graphQLResponse.Data.ToString());
 
-                var data = graphQLResponse.Data["getObjectsByProjectId"];
+                var data = graphQLResponse["data"]["getObjectsByProjectId"];
                 if (data == null)
                 {
                     Debug.LogWarning("No objects found for the given project ID.");
@@ -172,7 +157,7 @@ public class RfObjectManager : MonoBehaviour
                             continue;
                         }
 
-                        Debug.Log("Object: " + JsonUtility.ToJson(obj)); 
+                        Debug.Log("Object: " + JsonUtility.ToJson(obj));
                     }
 
                     return objectsInDatabase;
@@ -185,14 +170,15 @@ public class RfObjectManager : MonoBehaviour
             else
             {
                 Debug.LogError("Failed to retrieve objects. Response data is null.");
-                if (graphQLResponse.Errors != null)
+                var errors = graphQLResponse["errors"];
+                if (errors != null)
                 {
-                    foreach (var error in graphQLResponse.Errors)  // Log any errors in the response
+                    foreach (var error in errors)  // Log any errors in the response
                     {
-                        Debug.LogError($"GraphQL Error: {error.Message}");
-                        if (error.Extensions != null)
+                        Debug.LogError($"GraphQL Error: {error["message"]}");
+                        if (error["Extensions"] != null)
                         {
-                            Debug.LogError($"Error Extensions: {error.Extensions}");
+                            Debug.LogError($"Error Extensions: {error["Extensions"]}");
                         }
                     }
                 }
@@ -288,4 +274,32 @@ public class RfObjectManager : MonoBehaviour
 
         Debug.Log("Room population complete.");
     }
+    public void ExportSpawnedObjectsData(string filePath)
+    {
+        using (StreamWriter writer = new StreamWriter(filePath))
+        {
+            foreach (var obj in FindObjectsOfType<GameObject>())
+            {
+                if (obj != null && obj.name.StartsWith("spawned_")) // Assuming spawned objects have a specific name pattern
+                {
+                    writer.WriteLine("Object: " + obj.name);
+                    Component[] components = obj.GetComponents<Component>();
+                    foreach (Component component in components)
+                    {
+                        writer.WriteLine("  Component: " + component.GetType().Name);
+                        if (component is Transform transform)
+                        {
+                            writer.WriteLine("    Position: " + transform.position);
+                            writer.WriteLine("    Rotation: " + transform.rotation);
+                            writer.WriteLine("    Scale: " + transform.localScale);
+                        }
+                    }
+                    writer.WriteLine();
+                }
+            }
+        }
+
+        Debug.Log("Spawned objects data exported to " + filePath);
+    }
+
 }
