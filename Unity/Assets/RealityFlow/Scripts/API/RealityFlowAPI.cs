@@ -1255,23 +1255,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         actionLogger.EndCompoundAction();
     }
 
-    // Add these using directives if not already present
-
-    public void LogRaycastHitLocation(XRRayInteractor rayInteractor)
-    {
-        if (rayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hitResult))
-        {
-            Vector3 hitPosition = hitResult.point;
-            Debug.Log($"Raycast hit at position: {hitPosition}");
-
-            // Log the action
-            actionLogger.LogAction(nameof(LogRaycastHitLocation), hitPosition);
-        }
-        else
-        {
-            Debug.Log("Raycast did not hit any object.");
-        }
-    }
 }
 
 // ===== RF Object Class =====
