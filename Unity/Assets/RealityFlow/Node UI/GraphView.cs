@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
+using TMPro;
 using UnityEngine;
 
 namespace RealityFlow.NodeUI
@@ -21,6 +22,8 @@ namespace RealityFlow.NodeUI
             set
             {
                 graph = value;
+                EnableVariableButtons();
+                templateToggle.ForceSetToggled(currentObject.isTemplate);
                 Render();
             }
         }
@@ -29,14 +32,45 @@ namespace RealityFlow.NodeUI
         public GameObject edgeUIPrefab;
 
         bool dirty;
+        VisualScript currentObject;
+        public VisualScript CurrentObject { get => currentObject; set => currentObject = value; }
+        string selectedVariable;
         Dictionary<NodeIndex, NodeView> nodeUis = new();
         Dictionary<(PortIndex, PortIndex), EdgeView> dataEdgeUis = new();
         Dictionary<(PortIndex, NodeIndex), EdgeView> execEdgeUis = new();
+        Dictionary<string, NodeDefinition> nodeDefinitions;
+
+        [SerializeField]
+        private Custom_MRTK_InputField variableNameField;
+        [SerializeField]
+        private GameObject variableItemPrefab;
+        [SerializeField]
+        private Transform variableContent;
+        [SerializeField]
+        private PressableButton addVariableButton;
+        [SerializeField]
+        private TMP_Dropdown variableTypeDropdown;
+        [SerializeField]
+        private PressableButton removeVariableButton;
+        [SerializeField]
+        private PressableButton templateToggle;
 
         public PortIndex? selectedInputEdgePort;
         public PortIndex? selectedOutputEdgePort;
         public NodeIndex? selectedInputExecEdgePort;
         public PortIndex? selectedOutputExecEdgePort;
+
+        void Start()
+        {
+            variableTypeDropdown.ClearOptions();
+            variableTypeDropdown.AddOptions(
+                NodeValue.valueTypes.Select(type => type.ToString()).ToList()
+            );
+
+            nodeDefinitions = RealityFlowAPI.Instance
+                .GetAvailableNodeDefinitions()
+                .ToDictionary(def => def.Name);
+        }
 
         void Update()
         {
@@ -111,6 +145,8 @@ namespace RealityFlow.NodeUI
                 }
 
             SetPortsActive();
+
+            EnableVariableButtons();
         }
 
         void ClearSelectedEdgeEnds()
@@ -272,6 +308,97 @@ namespace RealityFlow.NodeUI
             RealityFlowAPI.Instance.AddExecEdgeToGraph(graph, from, to);
             ClearSelectedEdgeEnds();
             SetPortsActive();
+            MarkDirty();
+        }
+
+        public void SetTemplate(bool isTemplate)
+        {
+            if (!CurrentObject)
+                return;
+
+            CurrentObject.isTemplate = isTemplate;
+        }
+
+        public void SetSelectedVariable(string variable)
+        {
+            selectedVariable = variable;
+
+            EnableVariableButtons();
+        }
+
+        public void VariableNameChanged(string name)
+        {
+            EnableVariableButtons();
+        }
+
+        void EnableVariableButtons()
+        {
+            addVariableButton.enabled =
+                !string.IsNullOrEmpty(variableNameField.text)
+                && !Graph.TryGetVariableType(variableNameField.text, out _);
+
+            removeVariableButton.enabled =
+                selectedVariable != null
+                && Graph.TryGetVariableType(selectedVariable, out _);
+        }
+
+        public void AddVariable()
+        {
+            string name = variableNameField.text;
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            if (Graph.TryGetVariableType(name, out _))
+                return;
+
+            NodeValueType type = NodeValue.valueTypes[variableTypeDropdown.value];
+
+            RealityFlowAPI.Instance.AddVariableToGraph(Graph, name, type);
+
+            GameObject item = Instantiate(variableItemPrefab, variableContent);
+            VariableItem varItem = item.GetComponent<VariableItem>();
+            varItem.title.text = string.Format(varItem.title.text, name, type.ToString());
+            varItem.varName = name;
+            varItem.type = type;
+            varItem.view = this;
+
+            MarkDirty();
+        }
+
+        public void RemoveVariable()
+        {
+            if (selectedVariable == null)
+                return;
+
+            foreach (Transform trans in variableContent)
+                if (trans.GetComponent<VariableItem>().varName == selectedVariable)
+                    Destroy(trans.gameObject);
+
+            if (!Graph.TryGetVariableType(selectedVariable, out _))
+                return;
+
+            RealityFlowAPI.Instance.RemoveVariableFromGraph(Graph, selectedVariable);
+
+            selectedVariable = null;
+
+            MarkDirty();
+        }
+
+        public void AddGetVariableNode(string varName, NodeValueType type)
+        {
+            string name = $"Get{type}Variable";
+            NodeDefinition def = nodeDefinitions[name];
+            NodeIndex node = RealityFlowAPI.Instance.AddNodeToGraph(Graph, def);
+            RealityFlowAPI.Instance.SetNodeFieldValue(Graph, node, 0, NodeValue.Variable(varName));
+            MarkDirty();
+        }
+
+        public void AddSetVariableNode(string varName, NodeValueType type)
+        {
+            string name = $"Set{type}Variable";
+            NodeDefinition def = nodeDefinitions[name];
+            NodeIndex node = RealityFlowAPI.Instance.AddNodeToGraph(Graph, def);
+            RealityFlowAPI.Instance.SetNodeFieldValue(Graph, node, 0, NodeValue.Variable(varName));
             MarkDirty();
         }
     }

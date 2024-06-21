@@ -149,6 +149,11 @@ namespace RealityFlow.NodeGraph
             variables.Add(name, type);
         }
 
+        public void RemoveVariable(string name)
+        {
+            variables.Remove(name);
+        }
+
         public bool TryGetVariableType(string name, out NodeValueType type)
         {
             return variables.TryGetValue(name, out type);

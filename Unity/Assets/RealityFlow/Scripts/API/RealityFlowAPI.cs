@@ -431,7 +431,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("General Exception: " + ex.Message);
         }
     }
-    public void AddNodeToGraph(Graph graph, NodeDefinition def)
+    
+    public NodeIndex AddNodeToGraph(Graph graph, NodeDefinition def)
     {
         // add the node to the graph
         NodeIndex index = graph.AddNode(def);
@@ -442,6 +443,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+        return index;
     }
 
     public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
@@ -578,6 +580,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Setting node {node} port {port} constant to {value}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+    }
+
+    public void AddVariableToGraph(Graph graph, string name, NodeValueType type)
+    {
+        graph.AddVariable(name, type);
+    }
+
+    public void RemoveVariableFromGraph(Graph graph, string name)
+    {
+        graph.RemoveVariable(name);
     }
 
     public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)
@@ -1427,6 +1439,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // In the future, this can query the DB to access online node definitions
 
         return defs;
+    }
+
+    public string[] GetNodeWhitelist()
+    {
+        // TODO: Access graphql DB to get whitelist for current project
+
+        return null;
     }
 
     public void StartCompoundAction()
