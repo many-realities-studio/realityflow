@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7670202484151112037}
   - component: {fileID: 4711203790962144156}
   - component: {fileID: 8217279459168513404}
+  - component: {fileID: 4295565110628730561}
   m_Layer: 0
   m_Name: Whisper
   m_TagString: Untagged
@@ -74,3 +75,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b56a755acaeda594f9d9b37a93ba4517, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4295565110628730561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8536332299705171600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df418a9c6f827444b8e58b9bfc1e23b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rayInteractor: {fileID: 0}
+  visualIndicatorPrefab: {fileID: 0}

@@ -12,7 +12,6 @@ namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
-
         [SerializeField] private MRTKTMPInputField message;
         [SerializeField] private GameObject flashingLight; // Reference to the flashing light GameObject
         [SerializeField] private GameObject nearmenutoolbox; // Reference to the nearmenutoolbox
@@ -46,6 +45,7 @@ namespace Samples.Whisper
             inputActions.RealityFlowXRActions.ToggleRecording.canceled += OnRecordingCanceled;
             inputActions.RealityFlowXRActions.Execute.started += OnExecute; // Register the Execute action
             inputActions.RealityFlowXRActions.OpenLLMMenu.started += OnOpenLLMMenu; // Register the OpenLLMMenu action
+            inputActions.RealityFlowXRActions.StopCountdown.started += OnStopCountdown; // Register the StopCountdown action
             inputActions.Enable();
         }
 
@@ -55,6 +55,7 @@ namespace Samples.Whisper
             inputActions.RealityFlowXRActions.ToggleRecording.canceled -= OnRecordingCanceled;
             inputActions.RealityFlowXRActions.Execute.started -= OnExecute; // Unregister the Execute action
             inputActions.RealityFlowXRActions.OpenLLMMenu.started -= OnOpenLLMMenu; // Unregister the OpenLLMMenu action
+            inputActions.RealityFlowXRActions.StopCountdown.started -= OnStopCountdown; // Unregister the StopCountdown action
             inputActions.Disable();
         }
 
@@ -81,6 +82,11 @@ namespace Samples.Whisper
             {
                 LLMWindow.SetActive(!LLMWindow.activeSelf); // Toggle the LLMWindow's active state
             }
+        }
+
+        private void OnStopCountdown(InputAction.CallbackContext context)
+        {
+            StopCountdown();
         }
 
         private void Start()
@@ -302,6 +308,18 @@ namespace Samples.Whisper
             if (chatGPTTester != null)
             {
                 chatGPTTester.ExecuteLoggedActions();
+            }
+        }
+
+        // New method to stop the countdown
+        public void StopCountdown()
+        {
+            if (countdownCoroutine != null)
+            {
+                StopCoroutine(countdownCoroutine);
+                countdownCoroutine = null;
+                isCountdownActive = false;
+                Debug.Log("Countdown stopped.");
             }
         }
     }

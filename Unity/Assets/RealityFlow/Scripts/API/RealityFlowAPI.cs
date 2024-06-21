@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using Ubiq.Messaging;
 using Ubiq.Spawning;
 using System;
@@ -16,10 +17,6 @@ using Unity.VisualScripting;
 using Graph = RealityFlow.NodeGraph.Graph;
 using Ubiq.Rooms;
 using UnityEngine.Events;
-
-
-
-
 
 
 #if UNITY_EDITOR
@@ -1258,6 +1255,24 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void EndCompoundAction()
     {
         actionLogger.EndCompoundAction();
+    }
+
+    // Add these using directives if not already present
+
+    public void LogRaycastHitLocation(XRRayInteractor rayInteractor)
+    {
+        if (rayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hitResult))
+        {
+            Vector3 hitPosition = hitResult.point;
+            Debug.Log($"Raycast hit at position: {hitPosition}");
+
+            // Log the action
+            actionLogger.LogAction(nameof(LogRaycastHitLocation), hitPosition);
+        }
+        else
+        {
+            Debug.Log("Raycast did not hit any object.");
+        }
     }
 }
 
