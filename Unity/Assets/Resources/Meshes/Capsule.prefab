@@ -19,6 +19,8 @@ GameObject:
   - component: {fileID: -6708346019706695128}
   - component: {fileID: 3848875142390444687}
   - component: {fileID: 2506362059740405422}
+  - component: {fileID: -2794054414887458671}
+  - component: {fileID: 1416405337142170999}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Default Object
@@ -504,3 +506,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceThreshold: 20
+--- !u!114 &-2794054414887458671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4580671458235758380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34071a382df193941b54b83ea76043c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkedPlayManager: {fileID: 0}
+--- !u!114 &1416405337142170999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4580671458235758380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
