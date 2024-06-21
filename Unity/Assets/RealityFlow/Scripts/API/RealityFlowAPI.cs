@@ -19,6 +19,8 @@ using Ubiq.Rooms;
 using UnityEngine.Events;
 using RealityFlow.NodeUI;
 using UnityEngine.Rendering;
+using Microsoft.MixedReality.GraphicsTools;
+
 
 
 
@@ -752,10 +754,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 input = new
                 {
                     id = rfObject.id,
-                    projectId = rfObject.projectId,
                     name = rfObject.name,
                     graphId = rfObject.graphId,
-                    type = rfObject.type,
                     meshJson = rfObject.meshJson,
                     transformJson = rfObject.transformJson,
                 }
@@ -773,7 +773,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.Log("Object saved to the database successfully.");
 
                 // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["saveObject"]["id"].ToString();
+                var returnedId = graphQLResponse["data"]["updateObject"]["id"].ToString();
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
 
@@ -928,7 +928,72 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Clear the current dictionary
         spawnedObjects.Clear();
 
-        foreach (var obj in objectsInDatabase)
+        var getGraphsQuery = new GraphQLRequest
+        {
+            Query = @"
+            query GetGraphsByProjectId($projectId: String!) {
+                getGraphsByProjectId(projectId: $projectId) {
+                    id
+                    graphJson
+                }
+            }",
+            Variables = new { projectId = client.GetCurrentProjectId() }
+        };
+
+        List<GraphData> graphsInDatabase = null;
+
+        try
+        {
+            var graphQLResponse = client.SendQueryAsync(getGraphsQuery);
+            if (graphQLResponse["data"] != null)
+            {
+                var data = graphQLResponse["data"]["getGraphsByProjectId"];
+                if (data == null)
+                    Debug.LogWarning("No graphs found for the given project ID.");
+
+                if (data is JArray graphsArray)
+                {
+                    graphsInDatabase = graphsArray.ToObject<List<GraphData>>();
+                    if (graphsInDatabase == null)
+                        Debug.LogWarning("Deserialized objects are null.");
+                }
+                else
+                    Debug.LogWarning("Data is not a JArray.");
+            }
+            else
+            {
+                Debug.LogError("Failed to retrieve graphs. Response data is null.");
+                var errors = graphQLResponse["errors"];
+                if (errors != null)
+                    foreach (var error in errors)
+                    {
+                        Debug.LogError($"GraphQL Error: {error["message"]}");
+                        if (error["Extensions"] != null)
+                            Debug.LogError($"Error Extensions: {error["Extensions"]}");
+                    }
+            }
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogError("Exception stack trace: " + ex.StackTrace);
+        }
+
+        Dictionary<string, GraphData> graphData = graphsInDatabase?.ToDictionary(graph => graph.id);
+
+        foreach (RfObject obj in objectsInDatabase)
         {
             if (obj == null)
             {
@@ -962,6 +1027,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     Debug.LogError("Spawned object is null.");
                     continue;
                 }
+
+                if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
+                    spawnedObject.EnsureComponent<VisualScript>().graph =
+                        JsonUtility.FromJson<Graph>(graph.graphJson);
 
                 // Set the name of the spawned object to its ID for unique identification
                 spawnedObject.name = obj.id;
@@ -1364,3 +1433,9 @@ public class TransformData
     public Vector3 scale;
 }
 
+[Serializable]
+public class GraphData
+{
+    public string id;
+    public string graphJson;
+}
