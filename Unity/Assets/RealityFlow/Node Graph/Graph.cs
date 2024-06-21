@@ -114,7 +114,8 @@ namespace RealityFlow.NodeGraph
         bool variadicOutput;
 
         [NonSerialized]
-        readonly Dictionary<string, HashSet<NodeIndex>> nodeTypes = new();
+        Dictionary<string, HashSet<NodeIndex>> nodeTypes = new();
+
         /// <summary>
         /// A mapping of node definition names to node indices. Useful for looking up all nodes
         /// of a given type.
@@ -140,7 +141,7 @@ namespace RealityFlow.NodeGraph
         [SerializeField]
         readonly Dictionary<string, NodeValueType> variables = new();
 
-        public ImmutableDictionary<string, NodeValueType> Variables 
+        public ImmutableDictionary<string, NodeValueType> Variables
             => variables.ToImmutableDictionary();
 
         public void AddVariable(string name, NodeValueType type)
@@ -479,6 +480,7 @@ namespace RealityFlow.NodeGraph
 
         public void OnAfterDeserialize()
         {
+            nodeTypes = new();
             foreach ((NodeIndex index, Node node) in nodes)
                 MutableNodesOfType(node.Definition.Name).Add(index);
         }
