@@ -33,7 +33,7 @@ public class ObjectSelect : MonoBehaviour
         }
     }
 
-    async void LateUpdate()
+    void LateUpdate()
     {
         // Check if the selected object's transform has changed
         if (selectedObject != null)
@@ -56,7 +56,7 @@ public class ObjectSelect : MonoBehaviour
                 };
 
                 // Await SaveObjectTransformToDatabase
-                await rfObjectManager.SaveObjectTransformToDatabase(objectId, transformData);
+                rfObjectManager.SaveObjectTransformToDatabase(objectId, transformData);
             }
         }
     }

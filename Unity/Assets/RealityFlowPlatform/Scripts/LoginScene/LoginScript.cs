@@ -39,7 +39,7 @@ public class LoginScript : MonoBehaviour
     }
 
     // Function to submit the OTP
-    public async void submitOTP()
+    public void submitOTP()
     {
         // Log the current text from the OTP input field for debugging purposes.
         Debug.Log(OTPInput.text);
@@ -59,7 +59,7 @@ public class LoginScript : MonoBehaviour
         };
 
         // Send the mutation request asynchronously and wait for the response.
-        var queryResult = await rfClient.SendQueryAsync(verifyOTP);
+        var queryResult = rfClient.SendQueryAsync(verifyOTP);
         var data = queryResult["data"];
         var errors = queryResult["errors"];
         if (data != null && errors == null)  // Success in retrieving Data
