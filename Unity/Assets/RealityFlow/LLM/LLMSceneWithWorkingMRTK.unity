@@ -118014,6 +118014,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   outlineMaterial: {fileID: 0}
   catalogue: {fileID: 0}
+  whiteboardPrefab: {fileID: 0}
 --- !u!1 &2032794943
 GameObject:
   m_ObjectHideFlags: 0
@@ -124729,7 +124730,7 @@ PrefabInstance:
     - target: {fileID: 2690738644405696198, guid: a56e8f972a56bc14bbf2fd5d98f6607b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.338
+      value: 0.533
       objectReference: {fileID: 0}
     - target: {fileID: 2690738644405696198, guid: a56e8f972a56bc14bbf2fd5d98f6607b,
         type: 3}
@@ -126040,6 +126041,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4295565110628730561, guid: 0b43262dfc8339541aca016d7a710497,
+        type: 3}
+      propertyPath: glowMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 6099cc43555ae2c408513c7a6e909f18, type: 2}
     - target: {fileID: 4295565110628730561, guid: 0b43262dfc8339541aca016d7a710497,
         type: 3}
       propertyPath: rayInteractor

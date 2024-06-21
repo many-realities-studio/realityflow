@@ -73,3 +73,4 @@ MonoBehaviour:
     // Optionally, destroy the GameObject after spawning to clean up         Destroy(gameObject);    
     } } '
   - DO NOT USE MONOBEHAVIOURS
+  - If you spawn an object make it have the tag 'Spawned'
