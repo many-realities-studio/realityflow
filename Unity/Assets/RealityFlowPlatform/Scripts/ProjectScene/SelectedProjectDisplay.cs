@@ -48,7 +48,7 @@ public class MyProjectsDisplay : MonoBehaviour
         getProjectsData();
     }
 
-    private async void getProjectsData()
+    private void getProjectsData()
     {
         if(rfClient == null) {
             return;
@@ -87,7 +87,7 @@ public class MyProjectsDisplay : MonoBehaviour
         };
 
         // Send the query request to the GraphQL server
-        var queryResult = await rfClient.SendQueryAsync(projectsQuery);
+        var queryResult = rfClient.SendQueryAsync(projectsQuery);
         var data = queryResult["data"];  //Get the data from the query result
         if (data != null)
         {
@@ -159,7 +159,7 @@ public class MyProjectsDisplay : MonoBehaviour
     }
 
     // Function to open the project details panel
-    public async void OpenProject(string id)
+    public void OpenProject(string id)
     {
         // Debug.Log("Opening project with ID: " + id);
         rfClient.SetCurrentProject(id);
@@ -183,7 +183,7 @@ public class MyProjectsDisplay : MonoBehaviour
             Variables = new { getProjectByIdId = id }
         };
 
-        var graphQL = await rfClient.SendQueryAsync(getProjectData);
+        var graphQL = rfClient.SendQueryAsync(getProjectData);
 
         var projectdata = graphQL["data"];
         if (projectdata != null)

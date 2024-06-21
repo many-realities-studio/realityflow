@@ -22,7 +22,7 @@ public class ObjectDelete : MonoBehaviour
         }
     }
 
-    public async void DeleteObject(string objectId)
+    public void DeleteObject(string objectId)
     {
         var deleteObject = new GraphQLRequest
         {
@@ -43,7 +43,7 @@ public class ObjectDelete : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await realityFlowClient.SendQueryAsync(deleteObject);
+            var graphQLResponse = realityFlowClient.SendQueryAsync(deleteObject);
             var data = graphQLResponse["data"];
             var errors = graphQLResponse["errors"];
             if (data != null)

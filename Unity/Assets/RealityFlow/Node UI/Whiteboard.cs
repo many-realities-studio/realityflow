@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RealityFlow.NodeGraph;
 using UnityEngine;
 
@@ -34,16 +35,15 @@ namespace RealityFlow.NodeUI
                 Instance = this;
         }
 
-        public async void ShowForObject(VisualScript obj)
+        public void ShowForObject(VisualScript obj)
         {
             gameObject.SetActive(true);
             // TODO: Probably use API for this later
-            transform.position = obj.transform.position + Vector3.up * 0.5f;
-            Graph currentGraph = obj.graph;
+            transform.position = obj.transform.position + Vector3.up * 2.5f;
             if (obj.graph == null)
-                currentGraph = await RealityFlowAPI.Instance.CreateNodeGraphAsync();
-            await RealityFlowAPI.Instance.AssignGraph(currentGraph, obj.gameObject);
+                obj.graph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
             topLevelGraphView.Graph = obj.graph;
+            RealityFlowAPI.Instance.AssignGraph(obj.graph, obj.gameObject);
         }
     }
 }

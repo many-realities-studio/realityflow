@@ -17,6 +17,7 @@ using Unity.VisualScripting;
 using Graph = RealityFlow.NodeGraph.Graph;
 using Ubiq.Rooms;
 using UnityEngine.Events;
+using RealityFlow.NodeUI;
 
 
 #if UNITY_EDITOR
@@ -39,6 +40,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private static RealityFlowAPI _instance;                // SINGLE INSTANCE OF THE API
     private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
     public PrefabCatalogue catalogue; // Prefab Catalog
+    public GameObject whiteboardPrefab;
     /// </summary>
 
     private RealityFlowClient client;
@@ -185,13 +187,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // -- CREATE GRAPH FUNCTIONS --
 
     // Update the object with the new graph id
-    public async Task AssignGraph(Graph newGraph, GameObject obj)
+    public void AssignGraph(Graph newGraph, GameObject obj)
     {
         // Adds the graph ID to the object's graph property as an update.
         spawnedObjects[obj].graphId = newGraph.Id;
-        await SaveObjectToDatabase(spawnedObjects[obj]);
+        SaveObjectToDatabase(spawnedObjects[obj]);
     }
-    public async Task<Graph> CreateNodeGraphAsync()
+
+    public Graph CreateNodeGraphAsync()
     {
         string name = "New Graph";
 
@@ -239,13 +242,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 OperationName = "CreateGraph",
                 Variables = variables
             };
-            var graphQLResponse = await client.SendQueryAsync(queryObject);
+            var graphQLResponse = client.SendQueryAsync(queryObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Graph saved to the database successfully.");
 
                 // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["id"].ToString();
+                var returnedId = graphQLResponse["data"]["createGraph"]["id"].ToString();
                 Debug.Log($"Assigned ID from database: {returnedId}");
                 newGraph = new Graph(returnedId);
                 newGraph.name = name;
@@ -283,7 +286,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         return newGraph;
     }
-    public async Task SaveGraphAsync(Graph toSave) // Saves the graph to the database
+    public void SaveGraphAsync(Graph toSave) // Saves the graph to the database
     {
         var query = @"
             mutation SaveGraph($input: SaveGraphInput!) {
@@ -313,7 +316,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         try
         {
 
-            var graphQLResponse = await client.SendQueryAsync(queryObject);
+            var graphQLResponse = client.SendQueryAsync(queryObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Graph saved to the database successfully.");
@@ -497,19 +500,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedMesh;
     }
 
-    public Task<GameObject> SpawnObject(string prefabName, Vector3 spawnPosition,
+    public GameObject SpawnObject(string prefabName, Vector3 spawnPosition,
         Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
     {
-        var tcs = new TaskCompletionSource<GameObject>();
         //Search for Object in the catalogue
         GameObject newObject = GetPrefabByName(prefabName);
         GameObject spawnedObject = null;
         Debug.Log(newObject);
         Debug.Log(spawnManager);
         UnityAction<GameObject, IRoom, IPeer, NetworkSpawnOrigin> action = null;
-        action = async (GameObject go, IRoom room, IPeer peer, NetworkSpawnOrigin origin) =>
+        action = (GameObject go, IRoom room, IPeer peer, NetworkSpawnOrigin origin) =>
             {
                 spawnedObject = go;
+                spawnedObject.AddComponent<AttachedWhiteboard>();
                 if (spawnedObject != null)
                 {
                     spawnedObject.transform.position = spawnPosition;
@@ -563,7 +566,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     {
                         Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
                         Debug.Log("Request: " + JsonUtility.ToJson(createObject));
-                        var graphQLResponse = await client.SendQueryAsync(createObject);
+                        var graphQLResponse = client.SendQueryAsync(createObject);
                         if (graphQLResponse["data"] != null)
                         {
                             Debug.Log("Object saved to the database successfully.");
@@ -597,7 +600,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             }
                         }
                         actionLogger.LogAction(nameof(SpawnObject), prefabName, spawnPosition, scale, spawnRotation, scope);
-                        tcs.SetResult(newObject);
                     }
                     catch (HttpRequestException httpRequestException)
                     {
@@ -619,10 +621,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 else
                 {
                     Debug.LogError("Could not find the spawned object in the scene.");
-                    tcs.SetResult(null);
+                    return;
                 }
                 spawnManager.OnSpawned.RemoveListener(action);
             };
+
         if (newObject != null && spawnManager != null)
         {
             // Spawn the object with the given scope
@@ -647,10 +650,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Prefab not found or NetworkSpawnManager is not initialized.");
             return null;
         }
-        return tcs.Task;
+
+        return spawnedObject;
     }
 
-    private async Task SaveObjectToDatabase(RfObject rfObject)
+    private void SaveObjectToDatabase(RfObject rfObject)
     {
         if (client == null)
         {
@@ -686,7 +690,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
 
-            var graphQLResponse = await client.SendQueryAsync(saveObject);
+            var graphQLResponse = client.SendQueryAsync(saveObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Object saved to the database successfully.");
@@ -740,16 +744,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // --- Fetch/Populate Room---
-    public async void FetchAndPopulateObjects()
+    public void FetchAndPopulateObjects()
     {
-        var objectsInDatabase = await FetchObjectsByProjectId(client.GetCurrentProjectId());
+        var objectsInDatabase = FetchObjectsByProjectId(client.GetCurrentProjectId());
         if (objectsInDatabase != null)
         {
             //ObjectUI.PopulateUI(contentContainer, objectPrefab, objectsInDatabase); USED TO POPULATE UI
             PopulateRoom(objectsInDatabase);
         }
     }
-    private async Task<List<RfObject>> FetchObjectsByProjectId(string projectId)
+    private List<RfObject> FetchObjectsByProjectId(string projectId)
     {
         Debug.Log("Fetching objects by project ID: " + projectId);
 
@@ -771,11 +775,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            var graphQLResponse = await client.SendQueryAsync(getObjectsQuery);
+            var graphQLResponse = client.SendQueryAsync(getObjectsQuery);
             if (graphQLResponse["data"] != null)
             {
-                //Debug.Log("GraphQL Response Data: " + graphQLResponse.Data.ToString());
-
                 var data = graphQLResponse["data"]["getObjectsByProjectId"];
                 if (data == null)
                 {
@@ -785,26 +787,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 if (data is JArray objectsArray)
                 {
-                    //Debug.Log("Raw Objects JSON: " + objectsArray.ToString());
-
-                    // Deserialize JSON data into a list of RfObject
                     var objectsInDatabase = objectsArray.ToObject<List<RfObject>>();
                     if (objectsInDatabase == null)
                     {
                         Debug.LogWarning("Deserialized objects are null.");
                         return null;
-                    }
-
-                    // Log each object in the list
-                    foreach (var obj in objectsInDatabase)
-                    {
-                        if (obj == null)
-                        {
-                            Debug.LogWarning("An object in the list is null.");
-                            continue;
-                        }
-
-                        Debug.Log("Object: " + JsonUtility.ToJson(obj));
                     }
 
                     return objectsInDatabase;
@@ -820,7 +807,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 var errors = graphQLResponse["errors"];
                 if (errors != null)
                 {
-                    foreach (var error in errors)  // Log any errors in the response
+                    foreach (var error in errors)
                     {
                         Debug.LogError($"GraphQL Error: {error["message"]}");
                         if (error["Extensions"] != null)
@@ -831,8 +818,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
             }
         }
-
-        // These debug logs should identify exceptions
         catch (HttpRequestException httpRequestException)
         {
             Debug.LogError("HttpRequestException: " + httpRequestException.Message);
@@ -863,6 +848,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             return;
         }
 
+        // Clear the current dictionary
+        spawnedObjects.Clear();
+
         foreach (var obj in objectsInDatabase)
         {
             if (obj == null)
@@ -891,6 +879,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 // Find the spawned object in the scene (assuming it's named the same as the prefab)
                 GameObject spawnedObject = GameObject.Find(objectName);
+                spawnedObject.AddComponent<AttachedWhiteboard>();
                 if (spawnedObject == null)
                 {
                     Debug.LogError("Spawned object is null.");
@@ -910,6 +899,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
 
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
+
+                spawnedObjects.Add(spawnedObject, obj);
+
+                Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
             }
             catch (Exception ex)
             {
@@ -917,6 +910,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.LogError("Exception stack trace: " + ex.StackTrace);
             }
         }
+
+        // Debug log to show the dictionary was populated
+        Debug.Log("Dictionary populated with " + spawnedObjects.Count + " objects.");
+        foreach (var kvp in spawnedObjects)
+            Debug.Log("GameObject: " + kvp.Key.name + ", RfObject: " + JsonUtility.ToJson(kvp.Value));
 
         Debug.Log("Room population complete.");
     }
@@ -990,7 +988,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // Method to update the transform of a networked object
-    public async Task UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         if (selectedObject != null)
         {
@@ -1012,12 +1010,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 };
 
                 // Await SaveObjectTransformToDatabase
-                await SaveObjectTransformToDatabase(objectId, transformData);
+                SaveObjectTransformToDatabase(objectId, transformData);
             }
         }
     }
 
-    public async Task SaveObjectTransformToDatabase(string objectId, TransformData transformData)
+    public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         var rfObject = new RfObject
         {
@@ -1045,7 +1043,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            var graphQLResponse = await client.SendQueryAsync(saveObject);
+            var graphQLResponse = client.SendQueryAsync(saveObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Object transform updated in the database successfully.");
@@ -1168,7 +1166,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         //StopAllCoroutines();
     }
 
-    private async void UndoSingleAction(ActionLogger.LoggedAction action)
+    private void UndoSingleAction(ActionLogger.LoggedAction action)
     {
         switch (action.FunctionName)
         {
@@ -1188,7 +1186,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Vector3 position = (Vector3)action.Parameters[1];
                 Quaternion rotation = (Quaternion)action.Parameters[2];
                 Vector3 scale = (Vector3)action.Parameters[3];
-                GameObject respawnedObject = await SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
+                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
                 if (respawnedObject != null)
                 {
                     respawnedObject.transform.localScale = scale;
