@@ -741,7 +741,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         var saveObject = new GraphQLRequest
         {
             Query = @"
-            mutation UpdateObject($input: SaveObjectInput!) {
+            mutation UpdateObject($input: UpdateObjectInput!) {
                 updateObject(input: $input) {
                     id
                 }
@@ -751,12 +751,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 input = new
                 {
+                    id = rfObject.id,
                     projectId = rfObject.projectId,
                     name = rfObject.name,
                     graphId = rfObject.graphId,
                     type = rfObject.type,
                     meshJson = rfObject.meshJson,
-                    transformJson = rfObject.transformJson
+                    transformJson = rfObject.transformJson,
                 }
             }
         };
