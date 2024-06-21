@@ -29,7 +29,7 @@ using UnityEditor;
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private string objectId;
-    private NetworkSpawnManager spawnManager;
+    [SerializeField] private NetworkSpawnManager spawnManager;
     private GameObject selectedObject;
     private Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
     private Vector3 previousPosition;
@@ -215,6 +215,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Graph newGraph = null;
         try
         {
+            /*
             // Serialize the Graph object to JSON
             string graphJson = JsonUtility.ToJson(new { nodes = Array.Empty<Node[]>(), edges = Array.Empty<Edge[]>() });
             // Call the GraphQL resolver to save the graph and retrieve its ID
@@ -267,6 +268,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
 
             actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
+            */
         }
         catch (HttpRequestException httpRequestException)
         {
