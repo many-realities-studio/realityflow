@@ -19,6 +19,8 @@ GameObject:
   - component: {fileID: -615707251139361962}
   - component: {fileID: 529573521825013395}
   - component: {fileID: -381439422654158572}
+  - component: {fileID: 8898768435919497944}
+  - component: {fileID: -5840174259821423563}
   m_Layer: 0
   m_Name: Rectangle (Vertical)
   m_TagString: Default Object
@@ -486,6 +488,7 @@ MonoBehaviour:
   owner: 0
   isHeld: 0
   isSelected: 0
+  wasBake: 0
   isDuplicate: 0
   originalName: 
 --- !u!114 &-381439422654158572
@@ -501,3 +504,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceThreshold: 20
+--- !u!114 &8898768435919497944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014505625119845936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34071a382df193941b54b83ea76043c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkedPlayManager: {fileID: 0}
+--- !u!114 &-5840174259821423563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014505625119845936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
