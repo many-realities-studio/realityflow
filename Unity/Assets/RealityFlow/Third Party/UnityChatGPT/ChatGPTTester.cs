@@ -23,6 +23,8 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField]
     private bool immediateCompilation = false;
 
+    public RaycastLogger raycastLogger;
+
     public string ChatGPTMessage
     {
         get
@@ -47,20 +49,13 @@ public class ChatGPTTester : MonoBehaviour
 
     public void Execute()
     {
-        LLMPromptToBePassed
-
- = $"{chatGPTQuestion.promptPrefixConstant} {UserWhisperInput.text}";
-
+        LLMPromptToBePassed = $"{chatGPTQuestion.promptPrefixConstant} {UserWhisperInput.text}";
 
         ChatGPTProgress.Instance.StartProgress("Generating source code, please wait");
 
         Array.ForEach(chatGPTQuestion.replacements, r =>
         {
-            LLMPromptToBePassed
-
-     = LLMPromptToBePassed
-
-    .Replace("{" + $"{r.replacementType}" + "}", r.value);
+            LLMPromptToBePassed = LLMPromptToBePassed.Replace("{" + $"{r.replacementType}" + "}", r.value);
         });
 
         List<string> prefabNames = RealityFlowAPI.Instance.GetPrefabNames();
@@ -68,30 +63,24 @@ public class ChatGPTTester : MonoBehaviour
         {
             var reminderMessage = "\n-------------------------------------------------------------------------\n\n\nOnly use the following prefabs when spawning: " + string.Join(", ", prefabNames);
             Debug.Log("Only use the following prefabs when generating code: " + string.Join(", ", prefabNames));
+
+            Vector3 indicatorPosition = raycastLogger.GetVisualIndicatorPosition();
+            if (indicatorPosition != Vector3.zero)
+            {
+                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the location {indicatorPosition} as the position data when you spawn any and all objects.";
+                Debug.Log("Visual Indicator Location: " + indicatorPosition);
+            }
+
             AddOrUpdateReminder(reminderMessage);
         }
 
-        //string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
-        //if (!string.IsNullOrEmpty(spawnedObjectsData))
-        //{
-        //  var reminderMessage = "\n --------------------------------------------------------------\n\n\nCurrent spawned objects data: " + spawnedObjectsData;
-        //Debug.Log("Current spawned objects data: " + spawnedObjectsData);
-        //AddOrUpdateReminder(reminderMessage);
-        //}
-
         if (chatGPTQuestion.reminders.Length > 0)
         {
-            LLMPromptToBePassed
-
-     += $", {string.Join(',', chatGPTQuestion.reminders)}";
-            Debug.Log("The complete reminders are: " + LLMPromptToBePassed
-
-    );
+            LLMPromptToBePassed += $", {string.Join(',', chatGPTQuestion.reminders)}";
+            Debug.Log("The complete reminders are: " + LLMPromptToBePassed);
         }
 
-        StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed
-
-, (response) =>
+        StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed, (response) =>
         {
             lastChatGPTResponseCache = response;
             ChatGPTProgress.Instance.StopProgress();

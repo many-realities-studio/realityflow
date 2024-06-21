@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using Ubiq.Messaging;
 using Ubiq.Spawning;
 using System;
@@ -17,6 +18,8 @@ using Graph = RealityFlow.NodeGraph.Graph;
 using Ubiq.Rooms;
 using UnityEngine.Events;
 using RealityFlow.NodeUI;
+using UnityEngine.Rendering;
+
 
 
 #if UNITY_EDITOR
@@ -360,15 +363,85 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // -- EDIT GRAPH FUNCTIONS --
+    public void sendGraphUpdateToDatabase(string graphJson, string graphId)
+    {
+        var query = @"
+            mutation UpdateGraph($input: UpdateGraphInput!) {
+                updateGraph(input: $input) {
+                    id
+                    graphJson
+                }
+            }
+        ";
 
+        var variables = new
+        {
+            input = new
+            {
+                id = graphId,
+                graphJson = graphJson
+            }
+        };
+
+        var queryObject = new GraphQLRequest
+        {
+            Query = query,
+            OperationName = "UpdateGraph",
+            Variables = variables
+        };
+
+        try
+        {
+            var graphQLResponse = client.SendQueryAsync(queryObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Graph updated in the database successfully.");
+
+                // Extract the ID from the response
+                var returnedId = graphQLResponse["data"]["updateGraph"]["id"].ToString();
+                Debug.Log($"Assigned ID from database: {returnedId}");
+            }
+            else
+            {
+                Debug.LogError("Failed to update the graph in the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
+                }
+            }
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+        }
+    }
     public void AddNodeToGraph(Graph graph, NodeDefinition def)
     {
-        // TODO: Add node to GraphQL
+        // add the node to the graph
         NodeIndex index = graph.AddNode(def);
         actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
+
+        // Serialize the graph object to JSON
+        string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
-        // MUTATIONS TO UPDATE JSON STRING
+        sendGraphUpdateToDatabase(graphJson, graph.Id);
     }
 
     public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
@@ -381,7 +454,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
         Debug.Log("Removed node from graph");
 
-        // MUTATIONS TO UPDATE JSON STRING
+        // Serialize the graph object to JSON
+        string graphJson = JsonUtility.ToJson(graph);
+        // Debug.Log($"Adding node {def} to graph at index {index}");
+
+        sendGraphUpdateToDatabase(graphJson, graph.Id);
     }
 
     public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
@@ -626,7 +703,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 spawnManager.OnSpawned.RemoveListener(action);
             };
-        
+
         if (newObject != null && spawnManager != null)
         {
             // Spawn the object with the given scope
@@ -666,7 +743,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         var saveObject = new GraphQLRequest
         {
             Query = @"
-            mutation UpdateObject($input: SaveObjectInput!) {
+            mutation UpdateObject($input: UpdateObjectInput!) {
                 updateObject(input: $input) {
                     id
                 }
@@ -676,12 +753,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 input = new
                 {
+                    id = rfObject.id,
                     projectId = rfObject.projectId,
                     name = rfObject.name,
                     graphId = rfObject.graphId,
                     type = rfObject.type,
                     meshJson = rfObject.meshJson,
-                    transformJson = rfObject.transformJson
+                    transformJson = rfObject.transformJson,
                 }
             }
         };
@@ -1255,6 +1333,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         actionLogger.EndCompoundAction();
     }
+
 }
 
 // ===== RF Object Class =====
