@@ -20,7 +20,7 @@ namespace RealityFlow.NodeUI
 
         Graph ConstructGraph()
         {
-            Graph graph = new();
+            Graph graph = new("");
             NodeIndex start = graph.AddNode(Activate);
             NodeIndex print = graph.AddNode(Print);
             Assert.IsTrue(graph.TryAddExecutionEdge(start, 0, print));

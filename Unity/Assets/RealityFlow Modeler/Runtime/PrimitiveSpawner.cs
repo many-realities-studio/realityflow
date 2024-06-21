@@ -48,7 +48,7 @@ public class PrimitiveSpawner : MonoBehaviour
     private float offMode = 0f;
     private float surfaceMode = 1f;
     private bool leftHandDominant = false;
-    private bool inMeshCreationMode = false;
+    // private bool inMeshCreationMode = false;
 
     public void Awake()
     {
@@ -298,15 +298,18 @@ public class PrimitiveSpawner : MonoBehaviour
         if (!active)
             return;
 
-        spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(primitive);
-        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
-
         if (attachedObject == null) return; 
-
-        em.CreateMesh(attachedObject.GetComponent<EditableMesh>());
-        spawnedMesh.transform.position = attachedObject.transform.position;
-
-        TryEnterResizeMode();
+        Debug.Log(attachedObject);
+        if(attachedObject.GetComponent<EditableMesh>() == null)  {
+            Debug.LogError("EditableMesh component not found on attached object.");
+            return;
+        }
+        spawnedMesh = RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
+            Quaternion.identity, Vector3.one, 
+            attachedObject.GetComponent<EditableMesh>());
+        if(spawnedMesh != null) {
+            TryEnterResizeMode();
+        }
     }
 
     private void TryEnterResizeMode()

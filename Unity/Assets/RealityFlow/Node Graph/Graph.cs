@@ -10,6 +10,16 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public class Graph : ISerializationCallbackReceiver
     {
+        [SerializeField]
+        readonly string id;
+        public string Id => id;
+
+        /// <summary>
+        /// The name of this graph.
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        public string name = "Graph";
         /// <summary>
         /// The arena of nodes in this graph.
         /// </summary>
@@ -141,6 +151,11 @@ namespace RealityFlow.NodeGraph
         public bool TryGetVariableType(string name, out NodeValueType type)
         {
             return variables.TryGetValue(name, out type);
+        }
+
+        public Graph(string realityflowId)
+        {
+            id = realityflowId;
         }
 
         public NodeIndex AddNode(NodeDefinition definition)

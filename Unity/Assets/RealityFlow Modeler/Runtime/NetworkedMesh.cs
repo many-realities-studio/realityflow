@@ -186,7 +186,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     private void RequestMeshData()
     {
-        if (!em.isEmpty)
+        if (em != null && !em.isEmpty)
         {
             return;
         }

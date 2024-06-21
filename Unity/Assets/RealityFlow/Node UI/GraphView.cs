@@ -14,7 +14,8 @@ namespace RealityFlow.NodeUI
         {
             get
             {
-                graph ??= new();
+                if (graph is null)
+                    Debug.LogError("Attempted to access Graph of GraphView before initialization");
                 return graph;
             }
             set

@@ -7,6 +7,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using TransformTypes;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// Class CopyTool assigns the copy tool to the user and allows the duplication of meshes through the Copy button on the palette.
@@ -38,8 +39,10 @@ public class CopyTool : MonoBehaviour
         gizmoManager = gameObject.GetComponentInChildren<AttachGizmoState>();
 
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject.gameObject;
+        Debug.Log(rig);
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (rayInteractor == null)

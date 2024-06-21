@@ -53,6 +53,9 @@ namespace RealityFlow.NodeGraph
             if (isTemplate)
                 gameObject.SetActive(false);
 
+            if (graph is null)
+                return;
+
             foreach (NodeIndex node in graph.NodesOfType("OnStart"))
                 // TODO: Instead of playing from each root individually, add all to queue and evaluate
                 // once.
@@ -61,13 +64,13 @@ namespace RealityFlow.NodeGraph
 
         public void OnExitPlayMode()
         {
-            if (isTemplate)
+            if (isTemplate || graph is null)
                 gameObject.SetActive(true);
         }
 
         void OnActivate(ActivateEventArgs args)
         {
-            if (!PlayManager.playMode)
+            if (!PlayManager.playMode || graph is null)
                 return;
 
             foreach (NodeIndex node in graph.NodesOfType("OnActivate"))
@@ -76,7 +79,7 @@ namespace RealityFlow.NodeGraph
 
         void OnSelect(SelectEnterEventArgs args)
         {
-            if (!PlayManager.playMode)
+            if (!PlayManager.playMode || graph is null)
                 return;
 
             foreach (NodeIndex node in graph.NodesOfType("OnSelect"))
@@ -85,7 +88,7 @@ namespace RealityFlow.NodeGraph
 
         void OnSelectExit(SelectExitEventArgs args)
         {
-            if (!PlayManager.playMode)
+            if (!PlayManager.playMode || graph is null)
                 return;
 
             foreach (NodeIndex node in graph.NodesOfType("OnSelectExit"))
@@ -94,7 +97,7 @@ namespace RealityFlow.NodeGraph
 
         void OnCollisionEnter(Collision col)
         {
-            if (!PlayManager.playMode)
+            if (!PlayManager.playMode || graph is null)
                 return;
 
             foreach (NodeIndex node in graph.NodesOfType("OnCollision"))

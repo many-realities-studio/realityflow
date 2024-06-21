@@ -792,7 +792,7 @@ public static class PrimitiveGenerator
         EMFace[] f = new EMFace[numQuadFaces];
         Vector3[] points = new Vector3[numVertices];
 
-        int zero, one, two, three;
+        // int zero, one, two, three;
         int index = 0;
 
         int f_index = 0;

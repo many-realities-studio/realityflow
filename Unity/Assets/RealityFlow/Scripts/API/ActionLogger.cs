@@ -233,7 +233,7 @@ public class ActionLogger
         Debug.Log($"Redo stack after redo: {GetRedoStackCount()}");
     }
 
-    private void UndoSingleAction(LoggedAction action)
+    private async void UndoSingleAction(LoggedAction action)
     {
         // Implement undo logic based on the action
         switch (action.FunctionName)
@@ -254,7 +254,7 @@ public class ActionLogger
                 Vector3 positionToDespawn = (Vector3)action.Parameters[1];
                 Quaternion rotationToDespawn = (Quaternion)action.Parameters[2];
                 Vector3 scaleToDespawn = (Vector3)action.Parameters[3];
-                GameObject respawnedObject = RealityFlowAPI.Instance.SpawnObject(objectToDespawnName, positionToDespawn, scaleToDespawn, rotationToDespawn, RealityFlowAPI.SpawnScope.Peer);
+                GameObject respawnedObject = await RealityFlowAPI.Instance.SpawnObject(objectToDespawnName, positionToDespawn, scaleToDespawn, rotationToDespawn, RealityFlowAPI.SpawnScope.Peer);
                 if (respawnedObject != null)
                 {
                     respawnedObject.transform.localScale = scaleToDespawn;

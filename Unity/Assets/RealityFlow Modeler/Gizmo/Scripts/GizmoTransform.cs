@@ -6,6 +6,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using UnityEngine;
+using Unity.XR.CoreUtils;
 
 
 /// <summary>
@@ -38,8 +39,10 @@ public class GizmoTransform : MonoBehaviour
 
     public void Awake()
     {
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
+
         //rightHand = GameObject.Find("MRTK RightHand Controller");
         //leftHand = GameObject.Find("MRTK LeftHand Controller");
         gizmoManager = GameObject.Find("Gizmo Manager");
