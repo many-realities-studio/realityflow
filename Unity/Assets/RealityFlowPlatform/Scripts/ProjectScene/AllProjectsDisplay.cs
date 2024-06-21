@@ -42,7 +42,7 @@ public class ProjectDisplay : MonoBehaviour
     }
 
     // Function to get the projects data
-    private async void GetProjectsData()
+    private void GetProjectsData()
     {
         Debug.Log("Getting public projects");
         // Create a new GraphQL query request to get the public projects available on the platform.
@@ -63,7 +63,7 @@ public class ProjectDisplay : MonoBehaviour
         };
 
         // Send the query request asynchronously and wait for the response.
-        var queryResult = await rfClient.SendQueryAsync(publicProjectsQuery);
+        var queryResult = rfClient.SendQueryAsync(publicProjectsQuery);
         var data = queryResult["data"];  // Store the data received from the query
 
         // If the data is not null, display the projects on the platform.

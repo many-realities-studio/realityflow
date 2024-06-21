@@ -174,32 +174,32 @@ public class RealityFlowAPIEditor : Editor
 
         api.EndCompoundAction();
     }
-    private async Task BuildHouse(RealityFlowAPI api)
+    private void BuildHouse(RealityFlowAPI api)
     {
         api.StartCompoundAction();
 
         // Create and place the walls
-        GameObject wall1 = await api.SpawnObject("Climbing Wall", new Vector3(0, 0, 0), new Vector3(1, 1, 1), Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
-        GameObject wall2 = await api.SpawnObject("Climbing Wall", new Vector3(0, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 90, 0), RealityFlowAPI.SpawnScope.Peer);
-        GameObject wall3 = await api.SpawnObject("Climbing Wall", new Vector3(2, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 180, 0), RealityFlowAPI.SpawnScope.Peer);
-        GameObject wall4 = await api.SpawnObject("Climbing Wall", new Vector3(2, 0, 0), new Vector3(1, 1, 1), Quaternion.Euler(0, -90, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall1 = api.SpawnObject("Climbing Wall", new Vector3(0, 0, 0), new Vector3(1, 1, 1), Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall2 = api.SpawnObject("Climbing Wall", new Vector3(0, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 90, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall3 = api.SpawnObject("Climbing Wall", new Vector3(2, 0, 2), new Vector3(1, 1, 1), Quaternion.Euler(0, 180, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject wall4 = api.SpawnObject("Climbing Wall", new Vector3(2, 0, 0), new Vector3(1, 1, 1), Quaternion.Euler(0, -90, 0), RealityFlowAPI.SpawnScope.Peer);
 
 
         // Create and place the roof
-        GameObject roof = await api.SpawnObject("Climbing Wall", new Vector3(1, 2, 1), new Vector3(1, 1, 1), Quaternion.Euler(90, 0, 0), RealityFlowAPI.SpawnScope.Peer);
+        GameObject roof = api.SpawnObject("Climbing Wall", new Vector3(1, 2, 1), new Vector3(1, 1, 1), Quaternion.Euler(90, 0, 0), RealityFlowAPI.SpawnScope.Peer);
 
         // Adjust the size of the walls to make them fit the structure
-        await api.UpdateObjectTransform(wall1.name, new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2, 2, 1));
-        await api.UpdateObjectTransform(wall2.name, new Vector3(0, 0, 2), Quaternion.Euler(0, 90, 0), new Vector3(2, 2, 1));
-        await api.UpdateObjectTransform(wall3.name, new Vector3(2, 0, 2), Quaternion.Euler(0, 180, 0), new Vector3(2, 2, 1));
-        await api.UpdateObjectTransform(wall4.name, new Vector3(2, 0, 0), Quaternion.Euler(0, -90, 0), new Vector3(2, 2, 1));
-        await api.UpdateObjectTransform(roof.name, new Vector3(1, 2, 1), Quaternion.Euler(90, 0, 0), new Vector3(2, 2, 2));
+        api.UpdateObjectTransform(wall1.name, new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(wall2.name, new Vector3(0, 0, 2), Quaternion.Euler(0, 90, 0), new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(wall3.name, new Vector3(2, 0, 2), Quaternion.Euler(0, 180, 0), new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(wall4.name, new Vector3(2, 0, 0), Quaternion.Euler(0, -90, 0), new Vector3(2, 2, 1));
+        api.UpdateObjectTransform(roof.name, new Vector3(1, 2, 1), Quaternion.Euler(90, 0, 0), new Vector3(2, 2, 2));
 
         api.EndCompoundAction();
     }
-    private async void MoveCharacterSmall(RealityFlowAPI api)
+    private void MoveCharacterSmall(RealityFlowAPI api)
     {
-        GameObject characterSmall = await api.SpawnObject("characterSmall", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
+        GameObject characterSmall = api.SpawnObject("characterSmall", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);
         ;
         if (characterSmall != null)
         {
@@ -208,7 +208,7 @@ public class RealityFlowAPIEditor : Editor
             Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f); // Define the new scale
 
             api.StartCompoundAction();
-            await api.UpdateObjectTransform("characterSmall", newPosition, newRotation, newScale);
+            api.UpdateObjectTransform("characterSmall", newPosition, newRotation, newScale);
             api.EndCompoundAction();
 
             Debug.Log("Moved characterSmall to new position.");

@@ -24,15 +24,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     Color lastColor;
     //bool lastGravity;
 
-    // Start is called before the first frame update
     void Start()
     {
         context = NetworkScene.Register(this);
         Debug.Log(context.Scene.Id);
-    }
-
-    void Awake()
-    {
         owner = false;
         isHeld = false;
         manipulator = this.GetComponent<ObjectManipulator>();
@@ -48,24 +43,23 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Set object owner to whoever picks the object up, and set isHeld to true for every user in scene since object is being held
     public void StartHold()
     {
-            if (!owner && isHeld)
-                return;
+        if (!owner && isHeld)
+            return;
 
-
-            owner = true;
-            isHeld = true;
-            rb.isKinematic = false;
-            context.SendJson(new Message()
-            {
-                position = transform.localPosition,
-                scale = transform.localScale,
-                rotation = transform.localRotation,
-                owner = false,
-                isHeld = true,
-                isKinematic = true,
-                color = obj.GetComponent<Renderer>().material.color
-                // gravity = obj.GetComponent<Rigidbody>().useGravity
-            }); 
+        owner = true;
+        isHeld = true;
+        rb.isKinematic = false;
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            owner = false,
+            isHeld = true,
+            isKinematic = true,
+            color = obj.GetComponent<Renderer>().material.color
+            // gravity = obj.GetComponent<Rigidbody>().useGravity
+        }); 
     }
 
     // Set isHeld to false for all users when object is no longer currently being held
@@ -98,28 +92,28 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // // If you currently own the object, physics calculations are made on your device and transmitted to the rest for that object
         // if(owner)
         // {
-            if(lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != obj.GetComponent<Renderer>().material.color)
-            {
-                lastPosition = transform.localPosition;
-                lastScale = transform.localScale;
-                lastRotation = transform.localRotation;
-                lastOwner = myObject.owner;
-                lastColor = obj.GetComponent<Renderer>().material.color;
-                // lastGravity = obj.GetComponent<Rigidbody>().useGravity;
+            // if(lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != obj.GetComponent<Renderer>().material.color)
+            // {
+            //     lastPosition = transform.localPosition;
+            //     lastScale = transform.localScale;
+            //     lastRotation = transform.localRotation;
+            //     lastOwner = myObject.owner;
+            //     lastColor = obj.GetComponent<Renderer>().material.color;
+            //     // lastGravity = obj.GetComponent<Rigidbody>().useGravity;
 
-                // Send position details to the rest of the users in the lobby
-                context.SendJson(new Message()
-                {
-                    position = transform.localPosition,
-                    scale = transform.localScale,
-                    rotation = transform.localRotation,
-                    owner = false, 
-                    isHeld = isHeld,
-                    isKinematic = true,
-                    color = obj.GetComponent<Renderer>().material.color
-                    // gravity = obj.GetComponent<Rigidbody>().useGravity
-                });
-            }
+            //     // Send position details to the rest of the users in the lobby
+            //     context.SendJson(new Message()
+            //     {
+            //         position = transform.localPosition,
+            //         scale = transform.localScale,
+            //         rotation = transform.localRotation,
+            //         owner = false, 
+            //         isHeld = isHeld,
+            //         isKinematic = true,
+            //         color = obj.GetComponent<Renderer>().material.color
+            //         // gravity = obj.GetComponent<Rigidbody>().useGravity
+            //     });
+            // }
         //}
     }
 

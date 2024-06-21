@@ -8,6 +8,9 @@ using Ubiq.Rooms;
 using Ubiq.Messaging;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Threading;
+using System.Collections;
+using Unity.VisualScripting;
 
 
 // Structure for GraphQL Requests
@@ -88,7 +91,7 @@ public class RealityFlowClient : MonoBehaviour
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
     }
     private static RealityFlowClient rootRealityFlowClient;
-    public async void Login(string inputAccessToken) {
+    public void Login(string inputAccessToken) {
         Debug.Log("Logging in....");
         userDecoded = DecodeJwt(inputAccessToken);
         // Debug.Log("User decoded: " + userDecoded);
@@ -108,7 +111,7 @@ public class RealityFlowClient : MonoBehaviour
                 input = inputAccessToken
             }
         };
-        var graphQL = await SendQueryAsync(verifyToken);
+        var graphQL = SendQueryAsync(verifyToken);
         if (graphQL["data"] != null)
         {
             Debug.Log("User Logged In successfully");
@@ -146,7 +149,7 @@ public class RealityFlowClient : MonoBehaviour
 
     }
 
-    private async void OnJoinedRoomCreate(IRoom room)
+    private void OnJoinedRoomCreate(IRoom room)
     {
         Debug.Log("Created Room: " + room.Name);
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
@@ -176,7 +179,7 @@ public class RealityFlowClient : MonoBehaviour
                 }
             }
         };
-        var graphQL = await SendQueryAsync(addRoom);
+        var graphQL = SendQueryAsync(addRoom);
         if (graphQL["data"] != null)
         {
             Debug.Log("Room created successfully");
@@ -210,7 +213,7 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " Publish: " + room.Publish);
     }
 
-    public async Task<JObject> SendQueryAsync(GraphQLRequest payload)
+    public JObject SendQueryAsync(GraphQLRequest payload)
     {
         // Describe request
         UnityWebRequest request = UnityWebRequest.Post(server + graphQLRoute,
@@ -219,12 +222,10 @@ public class RealityFlowClient : MonoBehaviour
             request.SetRequestHeader("Authorization", "Bearer " + accessToken);
 
         // Send request
-        bool waiting = true;
-        request.SendWebRequest().completed += _ => waiting = false;
-        await Task.Run(async () => {
-            while (waiting)
-                await Task.Delay(3);
-        });
+        UnityWebRequestAsyncOperation task = request.SendWebRequest();
+        while (!task.isDone)
+            Thread.Sleep(3);
+
         // Handle response
         JObject response = null;
 
@@ -329,7 +330,7 @@ public class RealityFlowClient : MonoBehaviour
         return null;
     }
 
-    public async void OpenProject(string id)
+    public void OpenProject(string id)
     {
         Debug.Log("Opening project with ID: " + id);
         
@@ -360,7 +361,7 @@ public class RealityFlowClient : MonoBehaviour
         };
 
         // Send the query request asynchronously and wait for the response.
-        var graphQL = await SendQueryAsync(GetProjectData);
+        var graphQL = SendQueryAsync(GetProjectData);
         var projectdata = graphQL["data"];
         if (projectdata != null)
         {
@@ -388,7 +389,7 @@ public class RealityFlowClient : MonoBehaviour
     }
 
     // Function to get the rooms associated with the project
-    public async void GetRoomsByProjectId(string projectId)
+    public void GetRoomsByProjectId(string projectId)
     {
         var getRooms = new GraphQLRequest
         {
@@ -406,7 +407,7 @@ public class RealityFlowClient : MonoBehaviour
             Variables = new { projectId = projectId }
         };
 
-        var graphQL = await SendQueryAsync(getRooms);
+        var graphQL = SendQueryAsync(getRooms);
         var roomsData = graphQL["data"];
         JArray rooms = null;
         if (roomsData != null)
