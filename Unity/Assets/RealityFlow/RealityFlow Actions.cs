@@ -163,7 +163,7 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""250da0f9-bc76-4665-92b7-370df9bde262"",
-                    ""path"": ""<XRController>{LeftHand}/{SecondaryTrigger}"",
+                    ""path"": ""<XRController>{LeftHand}/{GripButton}"",
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",

@@ -1,10 +1,11 @@
 using UnityEngine;
 using TMPro; // Add this for TMP_InputField
 using UnityEngine.UI;
+using Samples.Whisper;
 
 public class OTPVerification : MonoBehaviour
 {
-    public GameObject projectDisplay; 
+    public GameObject projectDisplay;
     public TMP_InputField otpInputField; // Change the type to TMP_InputField
     public Button submitButton;
     private string otpCode = "";
@@ -21,12 +22,16 @@ public class OTPVerification : MonoBehaviour
             Setup();
             return;
         }
-        rfClient.LoginSuccess += (result) => {
-            if(result) {
+        rfClient.LoginSuccess += (result) =>
+        {
+            if (result)
+            {
                 Debug.Log("Login successful, proceeding with room.");
                 projectDisplay.SetActive(true);
                 this.gameObject.SetActive(false);
-            } else {
+            }
+            else
+            {
                 Debug.Log("Login is unsuccessful, proceeding with setup.");
                 Setup();
             }
@@ -34,24 +39,25 @@ public class OTPVerification : MonoBehaviour
         rfClient.Login(accessToken);
     }
 
-    void Setup() {
-            // Check if otpInputField and submitButton are assigned
-            if (otpInputField == null || submitButton == null)
-            {
-                Debug.LogError("otpInputField or submitButton is not assigned.");
-                return;
-            }
+    void Setup()
+    {
+        // Check if otpInputField and submitButton are assigned
+        if (otpInputField == null || submitButton == null)
+        {
+            Debug.LogError("otpInputField or submitButton is not assigned.");
+            return;
+        }
 
-            // Find all the buttons by their names and add listeners to them
-            for (int i = 0; i <= 9; i++)
-            {
-                int number = i; // Local variable to capture the correct value in the closure
-                Button button = GameObject.Find("n" + i + "_Button").GetComponent<Button>();
-                button.onClick.AddListener(() => AddDigit(number));
-            }
+        // Find all the buttons by their names and add listeners to them
+        for (int i = 0; i <= 9; i++)
+        {
+            int number = i; // Local variable to capture the correct value in the closure
+            Button button = GameObject.Find("n" + i + "_Button").GetComponent<Button>();
+            button.onClick.AddListener(() => AddDigit(number));
+        }
 
-            // Add listener to the submit button
-            submitButton.onClick.AddListener(SubmitOTP);
+        // Add listener to the submit button
+        submitButton.onClick.AddListener(SubmitOTP);
     }
 
     void AddDigit(int digit)
