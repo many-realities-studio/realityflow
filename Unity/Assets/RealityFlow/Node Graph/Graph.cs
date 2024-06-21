@@ -11,7 +11,7 @@ namespace RealityFlow.NodeGraph
     public class Graph : ISerializationCallbackReceiver
     {
         [SerializeField]
-        readonly string id;
+        string id;
         public string Id => id;
 
         /// <summary>

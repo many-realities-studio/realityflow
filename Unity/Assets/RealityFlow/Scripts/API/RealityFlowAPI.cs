@@ -1065,8 +1065,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
 
                 if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
-                    spawnedObject.EnsureComponent<VisualScript>().graph =
-                        JsonUtility.FromJson<Graph>(graph.graphJson);
+                {
+                    Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;                    
+                }
 
                 // Set the name of the spawned object to its ID for unique identification
                 spawnedObject.name = obj.id;
