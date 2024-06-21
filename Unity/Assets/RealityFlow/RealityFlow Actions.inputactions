@@ -15,6 +15,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "StopCountdown",
+                    "type": "Button",
+                    "id": "8ec02b40-bb29-4ba4-a91c-73a03c58514e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "OpenLLMMenu",
                     "type": "Button",
                     "id": "3db29b92-65c3-41ce-9f49-779fd3fc7c4e",
@@ -36,6 +45,15 @@
                     "name": "Undo",
                     "type": "Button",
                     "id": "38602135-bee1-4ac8-8493-b1843187151d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SelectLocation",
+                    "type": "Button",
+                    "id": "bfdde655-dd69-459f-b0cd-1cb064f526b2",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -117,6 +135,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "Undo",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "250da0f9-bc76-4665-92b7-370df9bde262",
+                    "path": "<XRController>{LeftHand}/{SecondaryTrigger}",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SelectLocation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "146c1500-4b28-4ff0-9a8b-cbe4b6f3b32b",
+                    "path": "<Keyboard>/l",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SelectLocation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c1baf823-f104-4b65-99a5-5e38a8f6ba65",
+                    "path": "<XRController>{LeftHand}/secondaryButton",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StopCountdown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d38b1458-dbe6-4720-ab53-7b6e61c14fb6",
+                    "path": "<Keyboard>/#(J)",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StopCountdown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

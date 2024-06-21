@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using Ubiq.Messaging;
 using Ubiq.Spawning;
 using System;
@@ -700,7 +701,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 spawnManager.OnSpawned.RemoveListener(action);
             };
-        
+
         if (newObject != null && spawnManager != null)
         {
             // Spawn the object with the given scope
@@ -1329,6 +1330,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         actionLogger.EndCompoundAction();
     }
+
 }
 
 // ===== RF Object Class =====
