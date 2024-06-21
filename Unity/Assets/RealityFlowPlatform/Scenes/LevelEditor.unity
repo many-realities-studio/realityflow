@@ -3965,6 +3965,16 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1370883964485773158, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1370883964485773158, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1760805328908958873, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4060,6 +4070,16 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7062185229995155033, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7062185229995155033, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7713547826859454349, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -4093,6 +4113,26 @@ PrefabInstance:
     - target: {fileID: 7815370499876984975, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873494472391799193, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873494472391799193, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873494472391799193, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7873494472391799193, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -5372,7 +5412,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outlineMaterial: {fileID: 2100000, guid: 907edd6c9e9158e4b86ac1600f122e03, type: 2}
-  catalogue: {fileID: 0}
+  catalogue: {fileID: 11400000, guid: 7a94a007695900f4bb781ef85766e6f0, type: 2}
+  whiteboardPrefab: {fileID: 1790523852647275305, guid: 1eb4494b38b188e429bf4d1008b88657,
+    type: 3}
 --- !u!224 &1971431885 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1791071849249458078, guid: d6b701d19fbdb9d4586bfe1690958979,
