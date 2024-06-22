@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4439372, g: 0.49315345, b: 0.5721989, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -930,6 +930,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: WhisperIndicator
       objectReference: {fileID: 0}
+    - target: {fileID: 1148942217445294879, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4052409297971758546, guid: aeee8d423692fd144ad8bd2e933f7717,
         type: 3}
       propertyPath: m_Pivot.x
@@ -1045,6 +1050,36 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7392489130490227742, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.040949292
+      objectReference: {fileID: 0}
+    - target: {fileID: 7392489130490227742, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.037950985
+      objectReference: {fileID: 0}
+    - target: {fileID: 7392489130490227742, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.040949292
+      objectReference: {fileID: 0}
+    - target: {fileID: 7392489130490227742, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7392489130490227742, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 7392489130490227742, guid: aeee8d423692fd144ad8bd2e933f7717,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -7.6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1053,6 +1088,12 @@ PrefabInstance:
 --- !u!224 &259943051 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4052409297971758546, guid: aeee8d423692fd144ad8bd2e933f7717,
+    type: 3}
+  m_PrefabInstance: {fileID: 259943050}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &259943052 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1148942217445294879, guid: aeee8d423692fd144ad8bd2e933f7717,
     type: 3}
   m_PrefabInstance: {fileID: 259943050}
   m_PrefabAsset: {fileID: 0}
@@ -4563,6 +4604,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 223283456444255550, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 223283456444255550, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 223283456444255550, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 223283456444255550, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 258501386388845553, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -4605,18 +4666,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1919399022872265163, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
+      propertyPath: glowMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 6099cc43555ae2c408513c7a6e909f18, type: 2}
+    - target: {fileID: 1919399022872265163, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
       propertyPath: rayInteractor
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1394465206}
     - target: {fileID: 2291408901247946920, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
       propertyPath: flashingLight
       value: 
+      objectReference: {fileID: 259943052}
+    - target: {fileID: 3575078573666742713, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3575078573666742713, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4470639748675610493, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
       propertyPath: m_Name
       value: ChatGPT
+      objectReference: {fileID: 0}
+    - target: {fileID: 5700514750877140143, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5700514750877140143, guid: 84789a221a394de43b00c3771fd6ba23,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6133174934784144271, guid: 84789a221a394de43b00c3771fd6ba23,
         type: 3}
@@ -4739,7 +4825,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1696060087374712495, guid: 84789a221a394de43b00c3771fd6ba23, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 84789a221a394de43b00c3771fd6ba23, type: 3}

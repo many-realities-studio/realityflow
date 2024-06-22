@@ -58,7 +58,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     private RealityFlowClient client;
     readonly Dictionary<GameObject, RfObject> spawnedObjects = new();
-    public ImmutableDictionary<GameObject, RfObject> SpawnedObjects 
+    public ImmutableDictionary<GameObject, RfObject> SpawnedObjects
         => spawnedObjects.ToImmutableDictionary();
     readonly Dictionary<string, GameObject> spawnedObjectsById = new();
     public ImmutableDictionary<string, GameObject> SpawnedObjectsById
@@ -1207,33 +1207,33 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
-        if (selectedObject != null)
+        GameObject obj = FindSpawnedObject(objectName);
+        if (obj != null)
         {
-            if (selectedObject.transform.position != previousPosition ||
-                selectedObject.transform.rotation != previousRotation ||
-                selectedObject.transform.localScale != previousScale)
+            // Update the peer object transform
+            UpdatePeerObjectTransform(obj, position, rotation, scale);
+
+            // Prepare the transform data for the database update
+            TransformData transformData = new TransformData
             {
-                // Update the previous transform values
-                previousPosition = selectedObject.transform.position;
-                previousRotation = selectedObject.transform.rotation;
-                previousScale = selectedObject.transform.localScale;
+                position = position,
+                rotation = rotation,
+                scale = scale
+            };
 
-                // Send updated transform to the database
-                TransformData transformData = new TransformData
-                {
-                    position = selectedObject.transform.position,
-                    rotation = selectedObject.transform.rotation,
-                    scale = selectedObject.transform.localScale
-                };
-
-                // Await SaveObjectTransformToDatabase
-                SaveObjectTransformToDatabase(objectId, transformData);
-            }
+            // Send the updated transform to the database
+            SaveObjectTransformToDatabase(objectName, transformData);
+        }
+        else
+        {
+            Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
 
+
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
+        Debug.Log("Inside the save object transform to database function called from the update object transform function");
         var rfObject = new RfObject
         {
             id = objectId,
@@ -1540,6 +1540,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public GameObject FindSpawnedObjectByName(string objectName)
     {
+        Debug.Log("In the FindSpawnedByName method");
         if (spawnManager == null)
         {
             Debug.LogError("SpawnManager is not initialized.");
