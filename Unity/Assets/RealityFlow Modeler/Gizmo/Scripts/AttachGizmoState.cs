@@ -337,7 +337,7 @@ public class AttachGizmoState : MonoBehaviour
     {
         GameObject activeContoller = rightHand;
 
-        if (rightHand.GetComponentInChildren<XRRayInteractor>() == null)
+        if (rightHand.GetComponentInChildren<MRTKRayInteractor>() == null)
             activeContoller = leftHand;            
 
         return activeContoller.transform.Find("Far Ray").gameObject;
@@ -348,9 +348,9 @@ public class AttachGizmoState : MonoBehaviour
 
         GameObject farRay = GetActiveContollerFarRay();
         LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
-        LayerMask ui = 1 << LayerMask.NameToLayer("UI");
+        LayerMask ui = 1 << LayerMask.NameToLayer("RealityFlowUI");
 
-        farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;
         // 6 is gizmo layer
         //SetLayerOfFarRay(farRay, 6);
     }
