@@ -39,7 +39,7 @@ namespace Ubiq.XRI
 
             if (!modalityManager)
             {
-                Debug.LogWarning("No XRInputModalityManager on child objects. Cannot provide hints. This script will be disabled.");
+                // Debug.LogWarning("No XRInputModalityManager on child objects. Cannot provide hints. This script will be disabled.");
                 enabled = false;
                 return;
             }

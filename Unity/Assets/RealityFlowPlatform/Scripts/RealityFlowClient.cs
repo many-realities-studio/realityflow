@@ -28,6 +28,8 @@ public class GraphQLRequest : System.Object
 public class RealityFlowClient : MonoBehaviour
 {
     public string accessToken = null;
+    public GameObject projectManager;
+    public OTPVerification loginMenu;
     public RoomClient roomClient;
     private string currentProjectId;
 
@@ -45,7 +47,7 @@ public class RealityFlowClient : MonoBehaviour
 
     private void Awake()
     {
-        //Debug.Log("RealityFlowClient Awake");
+        Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
         if (transform.parent == null)
         {
@@ -71,6 +73,7 @@ public class RealityFlowClient : MonoBehaviour
                 }
             }
         }
+
         // Attempt to find RoomClient manually if not assigned
         if (roomClient == null)
         {
@@ -88,15 +91,92 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("RoomClient component not found on this GameObject or in the scene.");
             return;
         }
-
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
+
+        LoginSuccess += (result) =>
+        {
+            if (result)
+            {
+                Debug.Log("Login successful, proceeding with room.");
+                projectManager.SetActive(true);
+                loginMenu.gameObject.SetActive(false);
+            }
+            else
+            {
+                Debug.Log("Login is unsuccessful, proceeding with setup.");
+            }
+        };
+
+        accessToken = PlayerPrefs.GetString("accessToken");
+
+        // Check to see if PlayerPrefs already has an access token
+        if (!string.IsNullOrEmpty(accessToken))
+        {
+            // The access token is null or empty
+            Debug.Log("Access token is null or empty.");
+            ShowOTP();
+        }
+        else
+        {
+            // The access token is not null or empty
+            Debug.Log("Access token is valid.");
+            Login(accessToken);
+            // Add your handling code here
+        }
+    }
+
+    private void ShowOTP() {
+        projectManager.SetActive(false);
+        loginMenu.gameObject.SetActive(true);
+        loginMenu.onOTPSubmitted += SubmitOTP;
+
     }
     private static RealityFlowClient rootRealityFlowClient;
+    
+    public void SubmitOTP(string otp)
+    {
+
+        // Create a new GraphQL mutation request to verify the OTP provided by the user.
+        var verifyOTP = new GraphQLRequest
+        {
+            Query = @"
+                   mutation VerifyOTP($input: VerifyOTPInput!) {
+                        verifyOTP(input: $input) {
+                            accessToken
+                         }
+                   }
+            ",
+            OperationName = "VerifyOTP",
+            Variables = new { input = new { otp } }
+        };
+
+        // Send the mutation request asynchronously and wait for the response.
+        var queryResult = SendQueryAsync(verifyOTP);
+        var data = queryResult["data"];
+        var errors = queryResult["errors"];
+        if (data != null && errors == null)  // Success in retrieving Data
+        {
+            Debug.Log(data);
+            string accessToken = (string)data["verifyOTP"]["accessToken"];
+            PlayerPrefs.SetString("accessToken", accessToken);
+            Login(accessToken);
+            projectManager.SetActive(true);
+            this.gameObject.SetActive(false);
+
+        }
+        else if (errors != null) // Failure to retrieve data
+        {
+            Debug.Log(errors[0]["message"]);
+        }
+    }
+
     public void Login(string inputAccessToken)
     {
         Debug.Log("Logging in....");
-        userDecoded = DecodeJwt(inputAccessToken);
-        // Debug.Log("User decoded: " + userDecoded);
+        
+        //userDecoded = DecodeJwt(inputAccessToken);
+        //Debug.Log("User decoded: " + userDecoded);
+
         // Create a new room using the GraphQL API
         var verifyToken = new GraphQLRequest
         {

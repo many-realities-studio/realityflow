@@ -62,35 +62,30 @@ public class RaycastLogger : MonoBehaviour
             Vector3 hitPosition = hitResult.point;
             GameObject hitObject = hitResult.collider.gameObject;
 
-            // Check if the object has the tag "Teleport"
-
             Debug.Log($"Raycast hit at position: {hitPosition}");
             Debug.Log($"Raycast hit object: {hitObject.name}");
 
             // Log the action in RealityFlowAPI
             realityFlowAPI.actionLogger.LogAction(nameof(LogRaycastHitLocation), hitPosition, hitObject.name);
 
-            // Apply glow effect to the hit object
-
-            // Activate and move the visual indicator to the hit position
-            if (visualIndicatorInstance != null)
-            {
-                visualIndicatorInstance.transform.position = hitPosition;
-                visualIndicatorInstance.SetActive(true);
-                Debug.Log("Visual indicator updated and activated.");
-            }
-            else
-            {
-                Debug.LogWarning("Visual indicator instance is not available.");
-            }
-
             if (hitObject.CompareTag("Teleport"))
             {
+                // Activate and move the visual indicator to the hit position
+                if (visualIndicatorInstance != null)
+                {
+                    visualIndicatorInstance.transform.position = hitPosition;
+                    visualIndicatorInstance.SetActive(true);
+                    Debug.Log("Visual indicator updated and activated.");
+                }
+                else
+                {
+                    Debug.LogWarning("Visual indicator instance is not available.");
+                }
+
                 Debug.Log($"Raycast hit object with 'Teleport' tag: {hitObject.name}. Skipping selection.");
                 return;
             }
 
-            visualIndicatorInstance.SetActive(false);
             ApplyGlowEffect(hitObject);
             // Store the selected object's name
             selectedObjectName = hitObject.name;
@@ -103,10 +98,11 @@ public class RaycastLogger : MonoBehaviour
 
     private void ApplyGlowEffect(GameObject hitObject)
     {
-        if (hitObject != lastHitObject && lastHitObject != null)
+        if (hitObject != lastHitObject && lastHitObject != null && !lastHitObject.CompareTag("Floor"))
         {
             // Revert the last hit object's material to its original material
             RevertGlowEffect(lastHitObject);
+            lastHitObject = null; // Reset the last hit object if it's not the floor
         }
 
         // Save the original material of the hit object
