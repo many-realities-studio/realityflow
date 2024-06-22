@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4439372, g: 0.49315345, b: 0.5721989, a: 1}
+  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -8133,6 +8133,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 949414606593817586, guid: c89c6abe83bae094ab4495486f1ebea0,
         type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 949414606593817586, guid: c89c6abe83bae094ab4495486f1ebea0,
+        type: 3}
       propertyPath: m_TagString
       value: Teleport
       objectReference: {fileID: 0}
@@ -8175,6 +8180,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 5258535502068062491, guid: c89c6abe83bae094ab4495486f1ebea0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5258535502068062491, guid: c89c6abe83bae094ab4495486f1ebea0,
         type: 3}
@@ -8271,16 +8281,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6231844003277400652, guid: c89c6abe83bae094ab4495486f1ebea0,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: c7db482acb1ce6a4293e26ceb7ee5f51, type: 2}
     - target: {fileID: 5944098467012174029, guid: c89c6abe83bae094ab4495486f1ebea0,
         type: 3}
       propertyPath: m_TagString
       value: Teleport
       objectReference: {fileID: 0}
+    - target: {fileID: 6231844003277400652, guid: c89c6abe83bae094ab4495486f1ebea0,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c7db482acb1ce6a4293e26ceb7ee5f51, type: 2}
     - target: {fileID: 6759396186159014814, guid: c89c6abe83bae094ab4495486f1ebea0,
         type: 3}
       propertyPath: m_TagString
@@ -8418,6 +8428,16 @@ PrefabInstance:
       propertyPath: m_RaycastMask.m_Bits
       value: 1073741919
       objectReference: {fileID: 0}
+    - target: {fileID: 950129982477044239, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1214009722975437527, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1237311026241415686, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -8498,6 +8518,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2313746689446656021, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2365302628611046183, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_PresetInfoIsWorld
@@ -8514,6 +8539,11 @@ PrefabInstance:
       value: Far Ray
       objectReference: {fileID: 0}
     - target: {fileID: 3085753549785865120, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3576978524361396809, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -8537,6 +8567,11 @@ PrefabInstance:
         type: 3}
       propertyPath: prioritizedInteractionModes.Array.data[3].associatedTypes.Array.data[1].reference
       value: UnityEngine.XR.Interaction.Toolkit.XRRayInteractor, Unity.XR.Interaction.Toolkit
+      objectReference: {fileID: 0}
+    - target: {fileID: 3692662202792915563, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4056129408448637885, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
@@ -8638,10 +8673,40 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -7.9
       objectReference: {fileID: 0}
+    - target: {fileID: 6566347112225161012, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6566347113454156424, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6566347113855090879, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6782520547910918648, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_Name
       value: Rf Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6782520547910918648, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6824168364959767028, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6885144376354572857, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7638774787697280747, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
