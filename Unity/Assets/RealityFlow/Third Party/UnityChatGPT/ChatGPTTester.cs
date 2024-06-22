@@ -44,7 +44,6 @@ public class ChatGPTTester : MonoBehaviour
 
     private void Awake()
     {
-
     }
 
     public void Execute()

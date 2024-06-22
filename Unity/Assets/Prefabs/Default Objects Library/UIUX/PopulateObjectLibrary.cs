@@ -16,8 +16,8 @@ public class PopulateObjectLibrary : MonoBehaviour
     // This should be set to the SpawnObjectAtRay component atttached to one of the hands
     public SpawnObjectAtRay spawnScript;
 
-     // Spawn the object as networked
-   [SerializeField] private NetworkSpawnManager networkSpawnManager;
+    // Spawn the object as networked
+    [SerializeField] private NetworkSpawnManager networkSpawnManager;
 
     // These lists should be populated with all of the objects that are expected to appear
     // in the toolbox along with their icon prefabs
@@ -32,7 +32,7 @@ public class PopulateObjectLibrary : MonoBehaviour
     }
 
     // Instantiate a button and set it's prefab
-    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab, 
+    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab,
         GameObject iconPrefab, Transform parent)
     {
         // Instantiate the new button, set the text, and set the icon prefab
@@ -55,7 +55,7 @@ public class PopulateObjectLibrary : MonoBehaviour
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(objectPrefab);
         // spawnScript.RaySpawnToggle(objectPrefab);
-        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.zero, objectPrefab.transform.localScale, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
         // GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
         //newObj.GetComponent<NetworkedMesh>().owner = true;
         //newObj.transform.SetParent(networkSpawnManager.transform);

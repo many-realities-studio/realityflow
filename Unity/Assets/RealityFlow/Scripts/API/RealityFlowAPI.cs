@@ -646,8 +646,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log(newObject);
         Debug.Log(spawnManager);
         UnityAction<GameObject, IRoom, IPeer, NetworkSpawnOrigin> action = null;
+        Debug.Log("####### The spawn scope is " + scope + " ############");
         action = (GameObject go, IRoom room, IPeer peer, NetworkSpawnOrigin origin) =>
             {
+                Debug.Log("inside the action with the scope" + scope + " ############");
                 spawnedObject = go;
                 spawnedObject.AddComponent<AttachedWhiteboard>();
                 if (spawnedObject != null)
@@ -758,7 +760,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 else
                 {
-                    Debug.LogError("Could not find the spawned object in the scene.");
+                    Debug.LogWarning("Could not find the spawned object in the scene or the object was spawned with peer scope.");
                     return;
                 }
                 spawnManager.OnSpawned.RemoveListener(action);
@@ -777,6 +779,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 case SpawnScope.Peer:
                     spawnedObject = spawnManager.SpawnWithPeerScope(newObject);
                     Debug.Log("Spawned with Peer Scope");
+                    // Directly call the action for Peer scope
+                    action.Invoke(spawnedObject, null, null, NetworkSpawnOrigin.Local);
                     break;
                 default:
                     Debug.LogError("Unknown spawn scope");

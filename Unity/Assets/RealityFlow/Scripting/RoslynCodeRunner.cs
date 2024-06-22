@@ -33,7 +33,7 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 
     public void RunCode(string updatedCode = null)
     {
-        Logger.Instance.LogInfo("Executing RunCode...");
+        Logger.Instance.LogInfo("Doing the actions now...");
 
         updatedCode = string.IsNullOrEmpty(updatedCode) ? code : updatedCode;
         try
