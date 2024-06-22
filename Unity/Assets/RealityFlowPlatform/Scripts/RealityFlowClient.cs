@@ -174,8 +174,8 @@ public class RealityFlowClient : MonoBehaviour
     {
         Debug.Log("Logging in....");
         
-        //userDecoded = DecodeJwt(inputAccessToken);
-        //Debug.Log("User decoded: " + userDecoded);
+        userDecoded = DecodeJwt(inputAccessToken);
+        Debug.Log("User decoded: " + userDecoded);
 
         // Create a new room using the GraphQL API
         var verifyToken = new GraphQLRequest
