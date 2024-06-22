@@ -11,6 +11,7 @@ using UnityEngine.Networking;
 using System.Threading;
 using System.Collections;
 using Unity.VisualScripting;
+using Samples.Whisper;
 
 
 // Structure for GraphQL Requests
@@ -37,7 +38,7 @@ public class RealityFlowClient : MonoBehaviour
 #else
     public string server = @"http://localhost:4000/";
 #endif
-    public string graphQLRoute = "graphql"; 
+    public string graphQLRoute = "graphql";
     public event Action<bool> LoginSuccess;
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
@@ -46,7 +47,7 @@ public class RealityFlowClient : MonoBehaviour
     {
         //Debug.Log("RealityFlowClient Awake");
         // Ensure only one instance
-               if (transform.parent == null)
+        if (transform.parent == null)
         {
             if (rootRealityFlowClient == null)
             {
@@ -91,17 +92,18 @@ public class RealityFlowClient : MonoBehaviour
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
     }
     private static RealityFlowClient rootRealityFlowClient;
-    public void Login(string inputAccessToken) {
+    public void Login(string inputAccessToken)
+    {
         Debug.Log("Logging in....");
         userDecoded = DecodeJwt(inputAccessToken);
         // Debug.Log("User decoded: " + userDecoded);
-                // Create a new room using the GraphQL API
+        // Create a new room using the GraphQL API
         var verifyToken = new GraphQLRequest
         {
             Query = @"
             query VerifyAccessToken($input: String) {
                 verifyAccessToken(accessToken: $input) {
-                    id
+                    apiKey
                 }
             }
         ",
@@ -118,6 +120,7 @@ public class RealityFlowClient : MonoBehaviour
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
             LoginSuccess.Invoke(true);
+            Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
         }
         else
         {
@@ -231,7 +234,8 @@ public class RealityFlowClient : MonoBehaviour
 
         // Handle network issues
         if (request.result != UnityWebRequest.Result.Success
-                && request.downloadHandler.text == "") {
+                && request.downloadHandler.text == "")
+        {
             response = new JObject();
             var errors = new JArray();
             var error = new JObject();
@@ -248,26 +252,31 @@ public class RealityFlowClient : MonoBehaviour
 
             response.Add("errors", errors);
         }
-        
+
         // Handle response
-        if (response == null) {
-            try {
+        if (response == null)
+        {
+            try
+            {
                 Debug.Log(request.downloadHandler.text);
                 response = JsonConvert.DeserializeObject<JObject>(
                     request.downloadHandler.text // This is failing
                 );
-            } catch(Exception e) {
+            }
+            catch (Exception e)
+            {
                 Debug.Log(response);
                 Debug.LogError(e);
                 return new JObject();
             }
         }
 
-
         // Display any errors
-        if (response["errors"] != null) {
+        if (response["errors"] != null)
+        {
             Debug.LogError("GraphQL Errors");
-            foreach (JObject error in response["errors"]) {
+            foreach (JObject error in response["errors"])
+            {
                 Debug.LogError(error["message"]);
             }
         }
@@ -280,7 +289,7 @@ public class RealityFlowClient : MonoBehaviour
         // Implementation for leaving a room
 
     }
-    
+
     public string GetCurrentProjectId()
     {
         return currentProjectId;
@@ -333,7 +342,7 @@ public class RealityFlowClient : MonoBehaviour
     public void OpenProject(string id)
     {
         Debug.Log("Opening project with ID: " + id);
-        
+
         // Create a new GraphQL query request to get the project details by ID.
         var GetProjectData = new GraphQLRequest
         {
@@ -366,7 +375,7 @@ public class RealityFlowClient : MonoBehaviour
         if (projectdata != null)
         {
             Debug.Log("Fetched project data: " + projectdata.ToString());
-            
+
             // Set the project details in the UI
             OnProjectUpdated.Invoke((JObject)projectdata);
             var roomsData = projectdata["getProjectById"]["rooms"];
@@ -430,7 +439,7 @@ public class RealityFlowClient : MonoBehaviour
 
     // Wrapper method to call RoomManager's JoinRoom
     public void CallJoinRoom(string joinCode)
-    {  
+    {
         Debug.Log("[JOIN ROOM]Join code!: " + joinCode);
         roomClient.Join(joinCode);
     }

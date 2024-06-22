@@ -42,6 +42,7 @@ namespace RealityFlow.NodeUI
             transform.position = obj.transform.position + Vector3.up * 1.0f;
             if (obj.graph == null)
                 obj.graph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
+            topLevelGraphView.CurrentObject = obj;
             topLevelGraphView.Graph = obj.graph;
             RealityFlowAPI.Instance.AssignGraph(obj.graph, obj.gameObject);
         }

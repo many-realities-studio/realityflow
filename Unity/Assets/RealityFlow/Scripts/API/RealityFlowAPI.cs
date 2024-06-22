@@ -13,16 +13,13 @@ using System.IO;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using System.Text;
-using Unity.VisualScripting;
 using Graph = RealityFlow.NodeGraph.Graph;
 using Ubiq.Rooms;
 using UnityEngine.Events;
 using RealityFlow.NodeUI;
 using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
-
-
-
+using System.Collections.Immutable;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -31,7 +28,7 @@ using UnityEditor;
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private string objectId;
-    private NetworkSpawnManager spawnManager;
+    [SerializeField] private NetworkSpawnManager spawnManager;
     private GameObject selectedObject;
     private Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
     private Vector3 previousPosition;
@@ -45,10 +42,27 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
     public PrefabCatalogue catalogue; // Prefab Catalog
     public GameObject whiteboardPrefab;
-    /// </summary>
+
+    ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
+    public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
+    {
+        get
+        {
+            nodeDefinitionDict ??= GetAvailableNodeDefinitions()
+                    .ToDictionary(def => def.Name)
+                    .ToImmutableDictionary();
+
+            return nodeDefinitionDict;
+        }
+    }
 
     private RealityFlowClient client;
-    public Dictionary<GameObject, RfObject> spawnedObjects = new Dictionary<GameObject, RfObject>();
+    readonly Dictionary<GameObject, RfObject> spawnedObjects = new();
+    public ImmutableDictionary<GameObject, RfObject> SpawnedObjects 
+        => spawnedObjects.ToImmutableDictionary();
+    readonly Dictionary<string, GameObject> spawnedObjectsById = new();
+    public ImmutableDictionary<string, GameObject> SpawnedObjectsById
+        => spawnedObjectsById.ToImmutableDictionary();
     public enum SpawnScope
     {
         Room,
@@ -85,6 +99,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
+            spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated); // Add listener for room updates
+
         }
 
         client = RealityFlowClient.Find(this);
@@ -219,8 +235,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Graph newGraph = null;
         try
         {
-            // Serialize the Graph object to JSON
-            string graphJson = JsonUtility.ToJson(new { nodes = Array.Empty<Node[]>(), edges = Array.Empty<Edge[]>() });
             // Call the GraphQL resolver to save the graph and retrieve its ID
             var query = @"
             mutation CreateGraph($input: CreateGraphInput!) {
@@ -228,7 +242,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     id
                 }
             }
-        ";
+            ";
 
             var variables = new
             {
@@ -236,7 +250,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     projectId = projectId,
                     name = name,
-                    graphJson = graphJson
+                    graphJson = "{}",
                 }
             };
 
@@ -431,7 +445,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("General Exception: " + ex.Message);
         }
     }
-    public void AddNodeToGraph(Graph graph, NodeDefinition def)
+
+    public NodeIndex AddNodeToGraph(Graph graph, NodeDefinition def)
     {
         // add the node to the graph
         NodeIndex index = graph.AddNode(def);
@@ -442,6 +457,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+        return index;
     }
 
     public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
@@ -542,7 +558,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (!nodeData.TryGetField(field, out NodeValue oldValue))
         {
             Debug.LogError("Failed to get old field value when setting node field");
-            oldValue = NodeValue.Null;
+            oldValue = null;
         }
         if (!nodeData.TrySetFieldValue(field, value))
         {
@@ -564,7 +580,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (!nodeData.TryGetInputValue(port, out NodeValue oldValue))
         {
             Debug.LogError("Failed to get old input port constant value when setting input port constant");
-            oldValue = NodeValue.Null;
+            oldValue = null;
         }
         if (!nodeData.TrySetInputValue(port, value))
         {
@@ -578,6 +594,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Setting node {node} port {port} constant to {value}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+    }
+
+    public void AddVariableToGraph(Graph graph, string name, NodeValueType type)
+    {
+        graph.AddVariable(name, type);
+    }
+
+    public void RemoveVariableFromGraph(Graph graph, string name)
+    {
+        graph.RemoveVariable(name);
     }
 
     public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)
@@ -622,8 +648,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log(newObject);
         Debug.Log(spawnManager);
         UnityAction<GameObject, IRoom, IPeer, NetworkSpawnOrigin> action = null;
+        Debug.Log("####### The spawn scope is " + scope + " ############");
         action = (GameObject go, IRoom room, IPeer peer, NetworkSpawnOrigin origin) =>
             {
+                Debug.Log("inside the action with the scope" + scope + " ############");
                 spawnedObject = go;
                 spawnedObject.AddComponent<AttachedWhiteboard>();
                 if (spawnedObject != null)
@@ -689,6 +717,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             rfObject.id = returnedId;
                             Debug.Log($"Assigned ID from database: {rfObject.id}");
                             spawnedObjects[spawnedObject] = rfObject;
+                            spawnedObjectsById[returnedId] = spawnedObject;
                             // Update the name of the spawned object in the scene
                             if (spawnedObject != null)
                             {
@@ -733,7 +762,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 else
                 {
-                    Debug.LogError("Could not find the spawned object in the scene.");
+                    Debug.LogWarning("Could not find the spawned object in the scene or the object was spawned with peer scope.");
                     return;
                 }
                 spawnManager.OnSpawned.RemoveListener(action);
@@ -752,6 +781,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 case SpawnScope.Peer:
                     spawnedObject = spawnManager.SpawnWithPeerScope(newObject);
                     Debug.Log("Spawned with Peer Scope");
+                    // Directly call the action for Peer scope
+                    action.Invoke(spawnedObject, null, null, NetworkSpawnOrigin.Local);
                     break;
                 default:
                     Debug.LogError("Unknown spawn scope");
@@ -963,6 +994,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         // Clear the current dictionary
         spawnedObjects.Clear();
+        spawnedObjectsById.Clear();
 
         var getGraphsQuery = new GraphQLRequest
         {
@@ -1066,8 +1098,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
                 {
+                    Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
                     Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
-                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;                    
+                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
                 }
 
                 // Set the name of the spawned object to its ID for unique identification
@@ -1085,6 +1118,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
                 spawnedObjects.Add(spawnedObject, obj);
+                spawnedObjectsById.Add(obj.id, spawnedObject);
 
                 Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
             }
@@ -1415,7 +1449,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return new List<string>();
     }
 
-    public List<NodeDefinition> GetAvailableNodeDefinitions()
+    private List<NodeDefinition> GetAvailableNodeDefinitions()
     {
         List<NodeDefinition> defs = new();
 
@@ -1429,6 +1463,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return defs;
     }
 
+    public string[] GetNodeWhitelist()
+    {
+        // TODO: Access graphql DB to get whitelist for current project
+
+        return null;
+    }
+
     public void StartCompoundAction()
     {
         actionLogger.StartCompoundAction();
@@ -1439,6 +1480,96 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         actionLogger.EndCompoundAction();
     }
 
+    public void UpdatePeerObjectTransform(GameObject obj, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        if (obj != null)
+        {
+            // Log the current transform before making changes
+            actionLogger.LogAction(nameof(UpdatePeerObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
+            Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
+
+            // Apply the transform changes
+            obj.transform.position = position;
+            obj.transform.rotation = rotation;
+            obj.transform.localScale = scale;
+
+            // Serialize and send the transform update
+            var message = new TransformMessage(obj.name, position, rotation, scale);
+            Debug.Log($"Sending transform update: {message.ObjectName}, Pos: {message.Position}, Rot: {message.Rotation}, Scale: {message.Scale}");
+            var jsonMessage = JsonUtility.ToJson(message);
+            var propertyKey = $"transform.{obj.name}";
+            spawnManager.roomClient.Room[propertyKey] = jsonMessage;
+        }
+        else
+        {
+            Debug.LogWarning("UpdatePeerObjectTransform: The provided GameObject is null.");
+        }
+    }
+
+    // Method to process incoming peer transform updates
+    public void ProcessPeerTransformUpdate(string propertyKey, string jsonMessage)
+    {
+        var transformMessage = JsonUtility.FromJson<TransformMessage>(jsonMessage);
+        Debug.Log($"Received transform update: {transformMessage.ObjectName}, Pos: {transformMessage.Position}, Rot: {transformMessage.Rotation}, Scale: {transformMessage.Scale}");
+        GameObject obj = FindSpawnedObjectByName(transformMessage.ObjectName);
+        if (obj != null)
+        {
+            obj.transform.position = transformMessage.Position;
+            obj.transform.rotation = transformMessage.Rotation;
+            obj.transform.localScale = transformMessage.Scale;
+        }
+        else
+        {
+            Debug.LogError($"Object named {transformMessage.ObjectName} not found in ProcessPeerTransformUpdate.");
+        }
+    }
+
+    // Method to handle room updates and process peer transform updates for all objects
+    private void OnRoomUpdated(IRoom room)
+    {
+        foreach (var property in room)
+        {
+            if (property.Key.StartsWith("transform."))
+            {
+                ProcessPeerTransformUpdate(property.Key, property.Value);
+            }
+        }
+    }
+
+    // Method to find a spawned object by its name
+
+    public GameObject FindSpawnedObjectByName(string objectName)
+    {
+        if (spawnManager == null)
+        {
+            Debug.LogError("SpawnManager is not initialized.");
+            return null;
+        }
+
+        foreach (var kvp in spawnManager.GetSpawnedForRoom())
+        {
+            if (kvp.Value.name.Equals(objectName, StringComparison.OrdinalIgnoreCase))
+            {
+                return kvp.Value;
+            }
+        }
+
+        foreach (var peerDict in spawnManager.GetSpawnedForPeers())
+        {
+            foreach (var kvp in peerDict.Value)
+            {
+                if (kvp.Value.name.Equals(objectName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return kvp.Value;
+                }
+            }
+        }
+
+        Debug.LogWarning($"Object named {objectName} not found in the spawned objects.");
+        return null;
+    }
+    // TODO: Refactor this method to improve performance
 }
 
 // ===== RF Object Class =====
@@ -1469,6 +1600,22 @@ public class TransformData
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 scale;
+}
+[Serializable]
+public class TransformMessage
+{
+    public string ObjectName;
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public Vector3 Scale;
+
+    public TransformMessage(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        ObjectName = objectName;
+        Position = position;
+        Rotation = rotation;
+        Scale = scale;
+    }
 }
 
 [Serializable]

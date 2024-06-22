@@ -14,10 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields:
   - Name: value
-    Default:
-      type: 0
-      value:
-        rid: 6695490793263595529
+    DefaultType: 0
+    DefaultValue:
+      rid: 4204108547055419475
   Inputs: []
   Outputs:
   - Name: 
@@ -33,7 +32,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6695490793263595529
-      type: {class: NodeValue/BoxedInt, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
+    - rid: 4204108547055419475
+      type: {class: IntValue, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
       data:
         value: 0

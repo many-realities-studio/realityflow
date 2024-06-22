@@ -139,7 +139,7 @@ namespace RealityFlow.NodeGraph
             MutableNodesOfType(type).ToImmutableHashSet();
 
         [SerializeField]
-        readonly Dictionary<string, NodeValueType> variables = new();
+        SerializableDict<string, NodeValueType> variables = new();
 
         public ImmutableDictionary<string, NodeValueType> Variables
             => variables.ToImmutableDictionary();
@@ -147,6 +147,11 @@ namespace RealityFlow.NodeGraph
         public void AddVariable(string name, NodeValueType type)
         {
             variables.Add(name, type);
+        }
+
+        public void RemoveVariable(string name)
+        {
+            variables.Remove(name);
         }
 
         public bool TryGetVariableType(string name, out NodeValueType type)
@@ -172,14 +177,13 @@ namespace RealityFlow.NodeGraph
         /// Can be used to re-add a node to a graph with confidence that it will be valid to do so.
         /// </summary>
         public NodeMemory GetMemory(NodeIndex index)
-            => new(this, index, GetNode(index));
+            => new(Id, index, GetNode(index));
 
-        // TODO: Replace Graph with RealityFlowID of this graph
-        public record NodeMemory(Graph Graph, NodeIndex Index, Node Node);
+        public record NodeMemory(string Graph, NodeIndex Index, Node Node);
 
         public bool RememberNode(NodeMemory node, out NodeIndex index)
         {
-            if (node.Graph != this)
+            if (node.Graph != Id)
             {
                 index = default;
                 return false;
@@ -481,8 +485,27 @@ namespace RealityFlow.NodeGraph
         public void OnAfterDeserialize()
         {
             nodeTypes = new();
+            variables ??= new();
+
+            List<NodeIndex> invalidNodes = new();
+
             foreach ((NodeIndex index, Node node) in nodes)
-                MutableNodesOfType(node.Definition.Name).Add(index);
+                if (node.Definition != null)
+                    MutableNodesOfType(node.Definition.Name).Add(index);
+                else
+                    invalidNodes.Add(index);
+
+            foreach (NodeIndex index in invalidNodes)
+                RemoveNode(index);
+
+            foreach ((PortIndex to, PortIndex from) in reverseEdges)
+                if (!ContainsNode(to.Node) || !ContainsNode(from.Node))
+                    RemoveDataEdge(from, to);
+
+            foreach ((PortIndex from, List<NodeIndex> tos) in executionEdges)
+                foreach (NodeIndex to in tos)
+                    if (!ContainsNode(from.Node) || !ContainsNode(to))
+                        RemoveExecutionEdge(from, to);
         }
     }
 }

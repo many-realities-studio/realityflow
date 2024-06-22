@@ -102,12 +102,12 @@ public class GizmoTransform : MonoBehaviour
     /// <returns>True if an interactor on an active contoller was found</returns>
     public bool SetActiveInteractor()
     {
-        // interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
-        interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+        interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        //interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         if (interactor == null)
-        // interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
-            interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
+            // interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
 
         else if (interactor == null)
             return false;

@@ -14,6 +14,18 @@ namespace RealityFlow.NodeUI
     {
         GameObject realityTools;
 
+        NetworkedPlayManager _playManager;
+        NetworkedPlayManager PlayManager
+        {
+            get
+            {
+                if (!_playManager)
+                    _playManager = FindObjectOfType<NetworkedPlayManager>();
+
+                return _playManager;
+            }
+        }
+
         void Start()
         {
             realityTools = GameObject.Find("RealityFlow Editor");
@@ -31,7 +43,8 @@ namespace RealityFlow.NodeUI
 
             GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
             {
-                ShowWhiteboard(gameObject);
+                if (PlayManager == null || !PlayManager.playMode)
+                    ShowWhiteboard(gameObject);
             });
             Debug.Log("Added listener!");
         }

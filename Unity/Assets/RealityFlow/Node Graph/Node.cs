@@ -5,12 +5,14 @@ using UnityEngine;
 namespace RealityFlow.NodeGraph
 {
     [Serializable]
-    public class Node
+    public class Node : ISerializationCallbackReceiver
     {
+        [NonSerialized]
         public NodeDefinition Definition;
+        public string DefinitionName;
 
         [SerializeField]
-        List<NodeValue> fieldValues = new();
+        List<NodeValueWrapper> fieldValues = new();
         [SerializeField]
         List<InputNodePort> inputs = new();
         [SerializeField]
@@ -20,13 +22,13 @@ namespace RealityFlow.NodeGraph
 
         public int VariadicInputs => variadicInputs;
 
-        public Vector2 Position { get; set; }
+        public Vector2 Position;
 
         public Node(NodeDefinition definition)
         {
             Definition = definition;
             for (int i = 0; i < definition.Fields.Count; i++)
-                fieldValues.Add(definition.Fields[i].Default);
+                fieldValues.Add(new(definition.Fields[i].DefaultValue));
             for (int i = 0; i < definition.Inputs.Count; i++)
                 if (NodeValue.TryGetDefaultFor(definition.Inputs[i].Type, out NodeValue value))
                     inputs.Add(new() { ConstantValue = value });
@@ -40,11 +42,11 @@ namespace RealityFlow.NodeGraph
         {
             if (index < fieldValues.Count)
             {
-                value = fieldValues[index];
+                value = fieldValues[index].Value;
                 return true;
             }
 
-            value = NodeValue.Null;
+            value = default;
             return false;
         }
 
@@ -52,8 +54,8 @@ namespace RealityFlow.NodeGraph
         {
             if (index < fieldValues.Count)
             {
-                NodeValue nodeValue = fieldValues[index];
-                if (nodeValue.TryGetValue(out field))
+                NodeValue nodeValue = fieldValues[index].Value;
+                if (NodeValue.TryGetValue(nodeValue, out field))
                     return true;
             }
 
@@ -81,7 +83,7 @@ namespace RealityFlow.NodeGraph
             if (index >= inputs.Count)
                 return false;
 
-            if (NodeValue.IsNotAssignableTo(value.Type, Definition.Inputs[index].Type))
+            if (NodeValue.IsNotAssignableTo(value.ValueType, Definition.Inputs[index].Type))
                 return false;
 
             inputs[index].ConstantValue = value;
@@ -102,10 +104,10 @@ namespace RealityFlow.NodeGraph
             if (index >= fieldValues.Count)
                 return false;
 
-            if (NodeValue.IsNotAssignableTo(value.Type, Definition.Fields[index].Default.Type))
+            if (NodeValue.IsNotAssignableTo(value.ValueType, Definition.Fields[index].DefaultType))
                 return false;
 
-            fieldValues[index] = value;
+            fieldValues[index] = new(value);
             return true;
         }
 
@@ -126,13 +128,29 @@ namespace RealityFlow.NodeGraph
             if (index >= fieldValues.Count)
                 return false;
 
-            fieldValues[index] = NodeValue.From(value, Definition.Fields[index].Default.Type);
+            fieldValues[index] = new(NodeValue.From(value, Definition.Fields[index].DefaultType));
             return true;
         }
 
         public void SetInputConstant(int index, NodeValue value)
         {
             inputs[index].ConstantValue = value;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            DefinitionName = Definition.Name;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (DefinitionName == null)
+            {
+                Debug.LogWarning("Node definition name null in serialized node from DB");
+                return;
+            }
+            
+            RealityFlowAPI.Instance.NodeDefinitionDict.TryGetValue(DefinitionName, out Definition);
         }
     }
 }

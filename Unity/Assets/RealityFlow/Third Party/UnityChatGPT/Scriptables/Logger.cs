@@ -24,6 +24,9 @@ public class Logger : Singleton<Logger>
             debugAreaText = GetComponent<TextMeshProUGUI>();
         }
         debugAreaText.text = string.Empty;
+        ClearLines();
+        string message = "RealityFlow actions list";
+        debugAreaText.text += $"<size=150%><color=\"green\"> {message}</color></size>\n";
     }
 
     void OnEnable()

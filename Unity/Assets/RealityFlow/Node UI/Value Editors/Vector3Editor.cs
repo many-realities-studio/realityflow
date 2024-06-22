@@ -40,7 +40,7 @@ namespace RealityFlow.NodeUI
         {
             set
             {
-                if (value.TryGetValue(out Vector3 val))
+                if (NodeValue.TryGetValue(value, out Vector3 val))
                     Value = val;
                 else
                     Debug.LogError("incorrect value type assigned to Vector3Editor");
@@ -55,7 +55,7 @@ namespace RealityFlow.NodeUI
 
             value = new(xInput.Value, yInput.Value, zInput.Value);
 
-            OnTick(new(value));
+            OnTick(new Vector3Value(value));
         }
     }
 }

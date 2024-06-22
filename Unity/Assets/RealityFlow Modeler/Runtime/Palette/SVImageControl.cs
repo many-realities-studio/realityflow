@@ -50,13 +50,12 @@ public class SVImageControl : MonoBehaviour
 
         if (dominantHandButton.IsToggled)
         {
-            // rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
-            rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            // rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
         }
         else
         {
-            // rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
-            rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         }
 
         if (rayInteractor == null)
@@ -143,13 +142,12 @@ public class SVImageControl : MonoBehaviour
         // Switch the interactor rays and triggers depending on the dominant hand
         if(isLeftHandDominant)
         {
-            //rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
-            rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            //rayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = leftHand.GetComponentInChildren<XRRayInteractor>();
         }
         else
         {
-            //rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
-            rayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+            rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         }
     }
 }
