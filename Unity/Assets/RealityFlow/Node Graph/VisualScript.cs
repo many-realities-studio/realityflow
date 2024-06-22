@@ -60,12 +60,16 @@ namespace RealityFlow.NodeGraph
                 // TODO: Instead of playing from each root individually, add all to queue and evaluate
                 // once.
                 ctx.EvaluateGraphFromRoot(gameObject, new(graph), node);
+
+            ctx.ClearVariables();
         }
 
         public void OnExitPlayMode()
         {
             if (isTemplate || graph is null)
                 gameObject.SetActive(true);
+
+            ctx.ClearVariables();
         }
 
         void OnActivate(ActivateEventArgs args)
