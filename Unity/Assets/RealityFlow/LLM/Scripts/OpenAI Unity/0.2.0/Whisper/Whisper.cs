@@ -336,5 +336,10 @@ namespace Samples.Whisper
                 Debug.Log("Countdown stopped.");
             }
         }
+        public string GetCurrentApiKey()
+        {
+            return currentApiKey;
+        }
+
     }
 }

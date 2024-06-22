@@ -8,9 +8,8 @@ using UnityEngine.Events;
 /// <summary>
 /// Class NetworkedPlayManager provides the current state of the room and is connected to the Ubiq Network library.
 /// </summary>
-public class NetworkedPlayManager : MonoBehaviour, INetworkSpawnable
+public class NetworkedPlayManager : MonoBehaviour
 {
-    public NetworkId NetworkId { get; set; }
     public NetworkContext context;
 
     public UnityEvent enterPlayMode;
@@ -41,13 +40,15 @@ public class NetworkedPlayManager : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
-        if (NetworkId == null)
-            Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
+        // if (NetworkId == null)
+            // Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        // Debug.Log("Network Scene: " + rfScene);
+        // Debug.Log("Scene Id" + rfScene.Id);
         context = NetworkScene.Register(this);
 
         RequestPlayState();
@@ -60,7 +61,7 @@ public class NetworkedPlayManager : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        // Debug.Log("Requested Play data");
+        Debug.Log("Requested Play data");
         Message msg = new()
         {
             needsData = true

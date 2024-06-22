@@ -22,7 +22,7 @@ public class AttachGizmoState : MonoBehaviour
     public GameObject sphere;
     public TransformType transformType;
 
-    public XRRayInteractor interactor;
+    public MRTKRayInteractor interactor;
 
     public bool lookForTarget;
     public bool checkMeshRaySelection;
@@ -114,7 +114,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <param name="target">The target object the gizmo should attach to</param>
     public void AttachGizmoToObject(GameObject target)
     {
-        //Debug.Log("Attach gizmo");
+        Debug.Log("Attach gizmo");
         attachedGameObject = target;
 
         // If the game object has already been selected with the Select Tool then retain its selectedness
@@ -201,11 +201,11 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if an interactor was found, otherwise, false</returns>
     bool SetActiveInteractor()
     {
-        interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
         //interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         if (interactor == null)
-            interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
+            interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
             //interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
 
         else if (interactor == null)
@@ -337,7 +337,7 @@ public class AttachGizmoState : MonoBehaviour
     {
         GameObject activeContoller = rightHand;
 
-        if (rightHand.GetComponentInChildren<XRRayInteractor>() == null)
+        if (rightHand.GetComponentInChildren<MRTKRayInteractor>() == null)
             activeContoller = leftHand;            
 
         return activeContoller.transform.Find("Far Ray").gameObject;
@@ -348,9 +348,9 @@ public class AttachGizmoState : MonoBehaviour
 
         GameObject farRay = GetActiveContollerFarRay();
         LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
-        LayerMask ui = 1 << LayerMask.NameToLayer("UI");
+        LayerMask ui = 1 << LayerMask.NameToLayer("RealityFlowUI");
 
-        farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;
         // 6 is gizmo layer
         //SetLayerOfFarRay(farRay, 6);
     }

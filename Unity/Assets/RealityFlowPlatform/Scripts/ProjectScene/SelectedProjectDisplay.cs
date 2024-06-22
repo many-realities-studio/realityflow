@@ -50,7 +50,8 @@ public class MyProjectsDisplay : MonoBehaviour
 
     private void getProjectsData()
     {
-        if(rfClient == null) {
+        if (rfClient == null)
+        {
             return;
         }
         var userId = rfClient.userDecoded["id"];
@@ -82,8 +83,8 @@ public class MyProjectsDisplay : MonoBehaviour
                 }
             ",
             OperationName = "GetUserProjects",
-            Variables = new {getUserByIdId = userId}
-     
+            Variables = new { getUserByIdId = userId }
+
         };
 
         // Send the query request to the GraphQL server
@@ -116,7 +117,7 @@ public class MyProjectsDisplay : MonoBehaviour
         }
         for (int i = 0; i < projects.Count; i++)
         {
-            var project = GameObject.Instantiate(projectPrefab, parentPanel.transform,false);
+            var project = GameObject.Instantiate(projectPrefab, parentPanel.transform, false);
             var children = new List<GameObject>();
             project.GetChildGameObjects(children);
             foreach (var child in children)
@@ -150,8 +151,10 @@ public class MyProjectsDisplay : MonoBehaviour
                 else if (child.name == "OpenProjectBtn")
                 {
                     int x = i;
-                    child.GetComponent<Button>().onClick.AddListener(delegate { 
-                        OpenProject((string)projects[x]["id"]); });
+                    child.GetComponent<Button>().onClick.AddListener(delegate
+                    {
+                        OpenProject((string)projects[x]["id"]);
+                    });
                 }
 
             }
@@ -163,8 +166,8 @@ public class MyProjectsDisplay : MonoBehaviour
     {
         // Debug.Log("Opening project with ID: " + id);
         rfClient.SetCurrentProject(id);
-        projectDetailPanel.SetActive(true);    
-        
+        projectDetailPanel.SetActive(true);
+
 
         var getProjectData = new GraphQLRequest
         {
@@ -189,7 +192,7 @@ public class MyProjectsDisplay : MonoBehaviour
         if (projectdata != null)
         {
             // Debug.Log("Fetched project data: " + projectdata.ToString());
-            
+
             projectTitle.GetComponent<TextMeshProUGUI>().text = (string)projectdata["getProjectById"]["projectName"];
             projectDescription.GetComponent<TextMeshProUGUI>().text = (string)projectdata["getProjectById"]["description"];
             projectOwner.GetComponent<TextMeshProUGUI>().text = "by " + (string)projectdata["getProjectById"]["projectOwner"]["username"];
@@ -200,7 +203,7 @@ public class MyProjectsDisplay : MonoBehaviour
         {
             Debug.LogError("Failed to fetch project data");
         }
-    
+
     }
 
 
