@@ -77,7 +77,7 @@ public class ChatGPTTester : MonoBehaviour
         string selectedObjectName = raycastLogger.GetSelectedObjectName();
         if (!string.IsNullOrEmpty(selectedObjectName))
         {
-            var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nUse the object {selectedObjectName} to do anything that the user requests other than spawn. If such requests have no object name specified use this object";
+            var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given. If requests have no object name use the object {selectedObjectName} ";
             Debug.Log($"Selected object: {selectedObjectName}");
             AddOrUpdateReminder(selectedObjectReminder);
         }
@@ -94,8 +94,10 @@ public class ChatGPTTester : MonoBehaviour
             ChatGPTProgress.Instance.StopProgress();
 
             WriteResponseToFile(ChatGPTMessage);
-            // Log the API calls in plain English
+            //Log the API calls in plain English
             LogApiCalls(ChatGPTMessage);
+
+            //If you want to see the code produced by ChatGPT uncomment out the line below
             //Logger.Instance.LogInfo(ChatGPTMessage);
 
             // Log the generated code instead of executing it immediately

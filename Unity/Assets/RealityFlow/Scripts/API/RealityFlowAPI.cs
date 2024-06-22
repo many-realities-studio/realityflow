@@ -94,6 +94,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
+            spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated); // Add listener for room updates
+
         }
 
         client = RealityFlowClient.Find(this);
@@ -438,7 +440,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("General Exception: " + ex.Message);
         }
     }
-    
+
     public NodeIndex AddNodeToGraph(Graph graph, NodeDefinition def)
     {
         // add the node to the graph
@@ -1470,6 +1472,96 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         actionLogger.EndCompoundAction();
     }
 
+    public void UpdatePeerObjectTransform(GameObject obj, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        if (obj != null)
+        {
+            // Log the current transform before making changes
+            actionLogger.LogAction(nameof(UpdatePeerObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
+            Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
+
+            // Apply the transform changes
+            obj.transform.position = position;
+            obj.transform.rotation = rotation;
+            obj.transform.localScale = scale;
+
+            // Serialize and send the transform update
+            var message = new TransformMessage(obj.name, position, rotation, scale);
+            Debug.Log($"Sending transform update: {message.ObjectName}, Pos: {message.Position}, Rot: {message.Rotation}, Scale: {message.Scale}");
+            var jsonMessage = JsonUtility.ToJson(message);
+            var propertyKey = $"transform.{obj.name}";
+            spawnManager.roomClient.Room[propertyKey] = jsonMessage;
+        }
+        else
+        {
+            Debug.LogWarning("UpdatePeerObjectTransform: The provided GameObject is null.");
+        }
+    }
+
+    // Method to process incoming peer transform updates
+    public void ProcessPeerTransformUpdate(string propertyKey, string jsonMessage)
+    {
+        var transformMessage = JsonUtility.FromJson<TransformMessage>(jsonMessage);
+        Debug.Log($"Received transform update: {transformMessage.ObjectName}, Pos: {transformMessage.Position}, Rot: {transformMessage.Rotation}, Scale: {transformMessage.Scale}");
+        GameObject obj = FindSpawnedObjectByName(transformMessage.ObjectName);
+        if (obj != null)
+        {
+            obj.transform.position = transformMessage.Position;
+            obj.transform.rotation = transformMessage.Rotation;
+            obj.transform.localScale = transformMessage.Scale;
+        }
+        else
+        {
+            Debug.LogError($"Object named {transformMessage.ObjectName} not found in ProcessPeerTransformUpdate.");
+        }
+    }
+
+    // Method to handle room updates and process peer transform updates for all objects
+    private void OnRoomUpdated(IRoom room)
+    {
+        foreach (var property in room)
+        {
+            if (property.Key.StartsWith("transform."))
+            {
+                ProcessPeerTransformUpdate(property.Key, property.Value);
+            }
+        }
+    }
+
+    // Method to find a spawned object by its name
+
+    public GameObject FindSpawnedObjectByName(string objectName)
+    {
+        if (spawnManager == null)
+        {
+            Debug.LogError("SpawnManager is not initialized.");
+            return null;
+        }
+
+        foreach (var kvp in spawnManager.GetSpawnedForRoom())
+        {
+            if (kvp.Value.name.Equals(objectName, StringComparison.OrdinalIgnoreCase))
+            {
+                return kvp.Value;
+            }
+        }
+
+        foreach (var peerDict in spawnManager.GetSpawnedForPeers())
+        {
+            foreach (var kvp in peerDict.Value)
+            {
+                if (kvp.Value.name.Equals(objectName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return kvp.Value;
+                }
+            }
+        }
+
+        Debug.LogWarning($"Object named {objectName} not found in the spawned objects.");
+        return null;
+    }
+    // TODO: Refactor this method to improve performance
 }
 
 // ===== RF Object Class =====
@@ -1500,6 +1592,22 @@ public class TransformData
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 scale;
+}
+[Serializable]
+public class TransformMessage
+{
+    public string ObjectName;
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public Vector3 Scale;
+
+    public TransformMessage(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        ObjectName = objectName;
+        Position = position;
+        Rotation = rotation;
+        Scale = scale;
+    }
 }
 
 [Serializable]
