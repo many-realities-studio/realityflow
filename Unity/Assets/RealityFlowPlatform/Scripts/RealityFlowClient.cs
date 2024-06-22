@@ -251,7 +251,7 @@ public class RealityFlowClient : MonoBehaviour
         RealityFlowAPI.Instance.FetchAndPopulateObjects();
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
-        {
+        { 
             Query = @"
             mutation AddRoom($input: AddRoomInput!) {
                 addRoom(input: $input) {
@@ -285,17 +285,6 @@ public class RealityFlowClient : MonoBehaviour
         
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedRoomCreate);
     }
-
-    public void JoinRoom(string joinCode)
-    {
-        Debug.Log("Joining room found in the Database. . .");
-
-
-        roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
-        // Join the room using the roomClient
-        roomClient.Join(joinCode);
-    }
-
     private void OnJoinedRoom(IRoom room)
     {
         Debug.Log("Joined room: " + room.Name);
@@ -528,8 +517,12 @@ public class RealityFlowClient : MonoBehaviour
     // Wrapper method to call RoomManager's JoinRoom
     public void CallJoinRoom(string joinCode)
     {
-        Debug.Log("[JOIN ROOM]Join code!: " + joinCode);
+        
+        roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
+        projectManager.SetActive(false);
+        Debug.Log("[JOIN ROOM] from database; Join code!: " + joinCode);
         roomClient.Join(joinCode);
+
     }
 
 }
