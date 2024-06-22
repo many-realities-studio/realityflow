@@ -566,7 +566,7 @@ MonoBehaviour:
       m_Calls: []
   hostTransform: {fileID: 606651668786666927}
   allowedManipulations: -1
-  allowedInteractionTypes: 2
+  allowedInteractionTypes: -1
   useForcesForNearManipulation: 0
   rotationAnchorNear: 1
   rotationAnchorFar: 1
@@ -750,6 +750,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graph:
+    id: 
+    name: 
     nodes:
       list:
         listDict: []
@@ -772,6 +774,8 @@ MonoBehaviour:
         listDict: []
     variadicPassthrough: 0
     variadicOutput: 0
+    variables:
+      listDict: []
   isTemplate: 0
   references:
     version: 2
@@ -788,5 +792,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiteboardPrefab: {fileID: 1790523852647275305, guid: 1eb4494b38b188e429bf4d1008b88657,
-    type: 3}
