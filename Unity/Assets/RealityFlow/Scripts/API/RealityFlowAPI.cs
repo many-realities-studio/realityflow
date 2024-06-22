@@ -93,7 +93,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         else
         {
             _instance = this;
-            DontDestroyOnLoad(gameObject); // Makes the object persistent across scenes
             spawnManager = NetworkSpawnManager.Find(this);
             if (spawnManager == null)
             {

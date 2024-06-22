@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro; // Add this for TMP_InputField
 using UnityEngine.UI;
 using Samples.Whisper;
+using UnityEngine.Events;
 
 public class OTPVerification : MonoBehaviour
 {
@@ -9,37 +10,10 @@ public class OTPVerification : MonoBehaviour
     public TMP_InputField otpInputField; // Change the type to TMP_InputField
     public Button submitButton;
     private string otpCode = "";
-    private RealityFlowClient rfClient;
+    public UnityAction<string> onOTPSubmitted;
 
 
     void Start()
-    {
-        rfClient = RealityFlowClient.Find(this);
-        var accessToken = PlayerPrefs.GetString("accessToken");
-        if (string.IsNullOrEmpty(accessToken))
-        {
-            Debug.LogWarning("Access token is not set.");
-            Setup();
-            return;
-        }
-        rfClient.LoginSuccess += (result) =>
-        {
-            if (result)
-            {
-                Debug.Log("Login successful, proceeding with room.");
-                projectDisplay.SetActive(true);
-                this.gameObject.SetActive(false);
-            }
-            else
-            {
-                Debug.Log("Login is unsuccessful, proceeding with setup.");
-                Setup();
-            }
-        };
-        rfClient.Login(accessToken);
-    }
-
-    void Setup()
     {
         // Check if otpInputField and submitButton are assigned
         if (otpInputField == null || submitButton == null)
@@ -57,7 +31,7 @@ public class OTPVerification : MonoBehaviour
         }
 
         // Add listener to the submit button
-        submitButton.onClick.AddListener(SubmitOTP);
+        submitButton.onClick.AddListener(() => onOTPSubmitted.Invoke(otpInputField.text));
     }
 
     void AddDigit(int digit)
@@ -66,45 +40,6 @@ public class OTPVerification : MonoBehaviour
         {
             otpCode += digit.ToString();
             otpInputField.text = otpCode;
-        }
-    }
-
-    public void SubmitOTP()
-    {
-        // Log the current text from the OTP input field for debugging purposes.
-        Debug.Log(otpInputField.text);
-
-        // Create a new GraphQL mutation request to verify the OTP provided by the user.
-        var verifyOTP = new GraphQLRequest
-        {
-            Query = @"
-                   mutation VerifyOTP($input: VerifyOTPInput!) {
-                        verifyOTP(input: $input) {
-                            accessToken
-                         }
-                   }
-            ",
-            OperationName = "VerifyOTP",
-            Variables = new { input = new { otp = otpInputField.text } }
-        };
-
-        // Send the mutation request asynchronously and wait for the response.
-        var queryResult = rfClient.SendQueryAsync(verifyOTP);
-        var data = queryResult["data"];
-        var errors = queryResult["errors"];
-        if (data != null && errors == null)  // Success in retrieving Data
-        {
-            Debug.Log(data);
-            string accessToken = (string)data["verifyOTP"]["accessToken"];
-            PlayerPrefs.SetString("accessToken", accessToken);
-            rfClient.Login(accessToken);
-            projectDisplay.SetActive(true);
-            this.gameObject.SetActive(false);
-
-        }
-        else if (errors != null) // Failure to retrieve data
-        {
-            Debug.Log(errors[0]["message"]);
         }
     }
 
