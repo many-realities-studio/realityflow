@@ -89,6 +89,8 @@ public class RaycastLogger : MonoBehaviour
                 Debug.Log($"Raycast hit object with 'Teleport' tag: {hitObject.name}. Skipping selection.");
                 return;
             }
+
+            visualIndicatorInstance.SetActive(false);
             ApplyGlowEffect(hitObject);
             // Store the selected object's name
             selectedObjectName = hitObject.name;
