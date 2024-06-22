@@ -5,10 +5,12 @@ using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace RealityFlow.NodeUI
 {
-    public class GraphView : MonoBehaviour
+    public class GraphView : MonoBehaviour, IPointerDownHandler
     {
         Graph graph;
         public Graph Graph
@@ -80,6 +82,12 @@ namespace RealityFlow.NodeUI
         public void MarkDirty()
         {
             dirty = true;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            ClearSelectedEdgeEnds();
+            SetPortsActive();
         }
 
         public void Render()
@@ -191,14 +199,15 @@ namespace RealityFlow.NodeUI
                 selectedOutputExecEdgePort == null;
             foreach ((NodeIndex index, NodeView view) in nodeUis)
             {
-                foreach (var port in view.inputPortViews)
+                foreach (InputPortView port in view.inputPortViews)
                     port.GetComponent<PressableButton>().enabled =
                         noneSelected ||
                         (
                             selectedOutputEdgePort is PortIndex from
                             && graph.PortsCompatible(from, port.port)
-                            && !graph.EdgeWouldFormCycle(from.Node, port.port.Node)
+                            && !graph.TryGetOutputPortOf(port.port, out _)
                             && !graph.EdgeExists(from, port.port)
+                            && !graph.EdgeWouldFormCycle(from.Node, port.port.Node)
                         );
 
                 foreach (var port in view.outputPortViews)
@@ -347,7 +356,7 @@ namespace RealityFlow.NodeUI
             varItem.type = type;
             varItem.view = this;
         }
-        
+
         void ClearVariableItems()
         {
             foreach (Transform transform in variableContent)
