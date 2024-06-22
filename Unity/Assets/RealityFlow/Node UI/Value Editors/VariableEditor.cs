@@ -62,7 +62,9 @@ namespace RealityFlow.NodeUI
         {
             set
             {
-                if (value.TryGetValue(out string val))
+                if (value == null)
+                    Value = null;
+                else if (NodeValue.TryGetValue(value, out string val))
                     Value = val;
                 else
                     Debug.LogError("incorrect value type assigned to VariableEditor");
@@ -71,7 +73,7 @@ namespace RealityFlow.NodeUI
 
         public void Tick()
         {
-            OnTick(NodeValue.Variable(Value));
+            OnTick(new VariableValue(Value));
         }
     }
 }

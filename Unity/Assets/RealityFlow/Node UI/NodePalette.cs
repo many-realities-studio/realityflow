@@ -20,7 +20,8 @@ namespace RealityFlow.NodeUI
         {
             string[] whitelist = RealityFlowAPI.Instance.GetNodeWhitelist();
             defs = RealityFlowAPI.Instance
-                .GetAvailableNodeDefinitions()
+                .NodeDefinitionDict
+                .Values
                 .Where(def => whitelist == null || whitelist.Contains(def.Name))
                 .ToList();
 

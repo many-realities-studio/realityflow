@@ -33,7 +33,7 @@ namespace RealityFlow.NodeUI
         {
             set
             {
-                if (value.TryGetValue(out bool val))
+                if (NodeValue.TryGetValue(value, out bool val))
                     Value = val;
                 else
                     Debug.LogError("incorrect value type assigned to BoolEditor");
@@ -42,7 +42,7 @@ namespace RealityFlow.NodeUI
 
         public void Tick()
         {
-            OnTick(new(Value));
+            OnTick(new BoolValue(Value));
         }
     }
 }

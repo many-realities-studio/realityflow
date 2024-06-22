@@ -28,10 +28,13 @@ namespace RealityFlow.NodeUI
         {
             set
             {
-                if (value.TryGetValue(out int val))
+                if (NodeValue.TryGetValue(value, out int val))
                     Value = val;
                 else
+                {
                     Debug.LogError("incorrect value type assigned to IntEditor");
+                    Value = 0;
+                }
             }
         }
 
@@ -40,8 +43,7 @@ namespace RealityFlow.NodeUI
             if (!int.TryParse(input.text, out _))
                 input.text = "0";
 
-            if (OnTick != null)
-                OnTick(new(Value));
+            OnTick?.Invoke(new IntValue(Value));
         }
     }
 }

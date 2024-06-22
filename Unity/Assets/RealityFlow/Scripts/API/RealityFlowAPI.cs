@@ -13,16 +13,13 @@ using System.IO;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using System.Text;
-using Unity.VisualScripting;
 using Graph = RealityFlow.NodeGraph.Graph;
 using Ubiq.Rooms;
 using UnityEngine.Events;
 using RealityFlow.NodeUI;
 using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
-
-
-
+using System.Collections.Immutable;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -45,7 +42,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
     public PrefabCatalogue catalogue; // Prefab Catalog
     public GameObject whiteboardPrefab;
-    /// </summary>
+
+    ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
+    public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
+    {
+        get
+        {
+            nodeDefinitionDict ??= GetAvailableNodeDefinitions()
+                    .ToDictionary(def => def.Name)
+                    .ToImmutableDictionary();
+
+            return nodeDefinitionDict;
+        }
+    }
 
     private RealityFlowClient client;
     public Dictionary<GameObject, RfObject> spawnedObjects = new Dictionary<GameObject, RfObject>();
@@ -219,8 +228,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Graph newGraph = null;
         try
         {
-            // Serialize the Graph object to JSON
-            string graphJson = JsonUtility.ToJson(new { nodes = Array.Empty<Node[]>(), edges = Array.Empty<Edge[]>() });
             // Call the GraphQL resolver to save the graph and retrieve its ID
             var query = @"
             mutation CreateGraph($input: CreateGraphInput!) {
@@ -228,7 +235,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     id
                 }
             }
-        ";
+            ";
 
             var variables = new
             {
@@ -236,7 +243,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     projectId = projectId,
                     name = name,
-                    graphJson = graphJson
+                    graphJson = "{}",
                 }
             };
 
@@ -544,7 +551,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (!nodeData.TryGetField(field, out NodeValue oldValue))
         {
             Debug.LogError("Failed to get old field value when setting node field");
-            oldValue = NodeValue.Null;
+            oldValue = null;
         }
         if (!nodeData.TrySetFieldValue(field, value))
         {
@@ -566,7 +573,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (!nodeData.TryGetInputValue(port, out NodeValue oldValue))
         {
             Debug.LogError("Failed to get old input port constant value when setting input port constant");
-            oldValue = NodeValue.Null;
+            oldValue = null;
         }
         if (!nodeData.TrySetInputValue(port, value))
         {
@@ -1078,8 +1085,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
                 {
+                    Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
                     Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
-                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;                    
+                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
                 }
 
                 // Set the name of the spawned object to its ID for unique identification
@@ -1427,7 +1435,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return new List<string>();
     }
 
-    public List<NodeDefinition> GetAvailableNodeDefinitions()
+    private List<NodeDefinition> GetAvailableNodeDefinitions()
     {
         List<NodeDefinition> defs = new();
 
