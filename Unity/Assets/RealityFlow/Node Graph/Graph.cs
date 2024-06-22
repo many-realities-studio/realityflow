@@ -177,14 +177,13 @@ namespace RealityFlow.NodeGraph
         /// Can be used to re-add a node to a graph with confidence that it will be valid to do so.
         /// </summary>
         public NodeMemory GetMemory(NodeIndex index)
-            => new(this, index, GetNode(index));
+            => new(Id, index, GetNode(index));
 
-        // TODO: Replace Graph with RealityFlowID of this graph
-        public record NodeMemory(Graph Graph, NodeIndex Index, Node Node);
+        public record NodeMemory(string Graph, NodeIndex Index, Node Node);
 
         public bool RememberNode(NodeMemory node, out NodeIndex index)
         {
-            if (node.Graph != this)
+            if (node.Graph != Id)
             {
                 index = default;
                 return false;

@@ -57,7 +57,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     private RealityFlowClient client;
-    public Dictionary<GameObject, RfObject> spawnedObjects = new Dictionary<GameObject, RfObject>();
+    readonly Dictionary<GameObject, RfObject> spawnedObjects = new();
+    public ImmutableDictionary<GameObject, RfObject> SpawnedObjects 
+        => spawnedObjects.ToImmutableDictionary();
+    readonly Dictionary<string, GameObject> spawnedObjectsById = new();
+    public ImmutableDictionary<string, GameObject> SpawnedObjectsById
+        => spawnedObjectsById.ToImmutableDictionary();
     public enum SpawnScope
     {
         Room,
@@ -708,6 +713,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             rfObject.id = returnedId;
                             Debug.Log($"Assigned ID from database: {rfObject.id}");
                             spawnedObjects[spawnedObject] = rfObject;
+                            spawnedObjectsById[returnedId] = spawnedObject;
                             // Update the name of the spawned object in the scene
                             if (spawnedObject != null)
                             {
@@ -982,6 +988,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         // Clear the current dictionary
         spawnedObjects.Clear();
+        spawnedObjectsById.Clear();
 
         var getGraphsQuery = new GraphQLRequest
         {
@@ -1105,6 +1112,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
                 spawnedObjects.Add(spawnedObject, obj);
+                spawnedObjectsById.Add(obj.id, spawnedObject);
 
                 Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
             }

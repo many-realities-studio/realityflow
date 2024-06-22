@@ -351,7 +351,7 @@ namespace RealityFlow.NodeUI
         void ClearVariableItems()
         {
             foreach (Transform transform in variableContent)
-                Destroy(transform);
+                Destroy(transform.gameObject);
         }
 
         public void AddInitialVariables()
