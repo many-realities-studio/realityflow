@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2200,7 +2200,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 741837848}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70ec73306ca3ef44a95bbb45b96f0538, type: 3}
   m_Name: 
@@ -4245,7 +4245,7 @@ PrefabInstance:
     - target: {fileID: 7585035320575375756, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5005,6 +5005,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WhisperNotifier
+      objectReference: {fileID: 0}
+    - target: {fileID: 3895853455702012099, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
+        type: 3}
+      propertyPath: additionalOffset.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3895853455702012099, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
+        type: 3}
+      propertyPath: additionalRotation.y
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5382200689051380719, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
         type: 3}
@@ -6643,8 +6653,9 @@ MonoBehaviour:
   accessToken: 
   projectManager: {fileID: 167733161}
   loginMenu: {fileID: 323530833}
+  levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  server: http://reality.gaim.ucf.edu/
+  server: http://localhost:4000/
   graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:
@@ -7134,7 +7145,7 @@ PrefabInstance:
     - target: {fileID: 4056129408448637885, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4056129408448637885, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
@@ -7144,7 +7155,7 @@ PrefabInstance:
     - target: {fileID: 4056129408448637885, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: visibilitySettings
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4236133699583937743, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
