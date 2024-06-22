@@ -10,30 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
-  m_Name: SetIntVariable
+  m_Name: Template
   m_EditorClassIdentifier: 
-  Fields:
-  - Name: variable
-    DefaultType: 11
-    DefaultValue:
-      rid: -2
-  Inputs:
-  - Name: value
-    Optional: 0
-    Type: 0
+  Fields: []
+  Inputs: []
   Outputs: []
   IsVariadic: 0
   IsVariadicOutput: 0
-  EvaluationMethod: 1
+  EvaluationMethod: 0
   EvalLookup: 
-  EvalCode: 'ctx.SetVariable(variable, value);
-
-    then();'
-  ExecutionInput: 1
-  ExecutionOutputs:
-  - then
+  EvalCode: 
+  ExecutionInput: 0
+  ExecutionOutputs: []
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    RefIds: []

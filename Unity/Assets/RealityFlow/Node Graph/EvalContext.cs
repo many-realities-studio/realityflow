@@ -86,6 +86,11 @@ namespace RealityFlow.NodeGraph
                 throw new ArgumentException($"{name} is not a variable in scope");
         }
 
+        public void ClearVariables()
+        {
+            variableValues.Clear();
+        }
+
         /// <summary>
         /// Returns number of dependencies enqueued.
         /// Throws InvalidDataFlowException if a non-pure unevaluated dependency is encountered.
