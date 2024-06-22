@@ -28,6 +28,8 @@ public class GraphQLRequest : System.Object
 public class RealityFlowClient : MonoBehaviour
 {
     public string accessToken = null;
+    public GameObject projectManager;
+    public GameObject loginMenu;
     public RoomClient roomClient;
     private string currentProjectId;
 
@@ -45,7 +47,7 @@ public class RealityFlowClient : MonoBehaviour
 
     private void Awake()
     {
-        //Debug.Log("RealityFlowClient Awake");
+        Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
         if (transform.parent == null)
         {
@@ -71,6 +73,7 @@ public class RealityFlowClient : MonoBehaviour
                 }
             }
         }
+
         // Attempt to find RoomClient manually if not assigned
         if (roomClient == null)
         {
@@ -88,8 +91,27 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("RoomClient component not found on this GameObject or in the scene.");
             return;
         }
-
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
+
+
+        // Check to see if PlayerPrefs already has an access token
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            // The access token is null or empty
+            Debug.Log("Access token is null or empty.");
+            projectManager.SetActive(false);
+            loginMenu.SetActive(true);
+            GameObject otpVerificationObject = GameObject.Find("LoginMenu"); // Replace with the actual name
+            OTPVerification otpVerification = otpVerificationObject.GetComponent<OTPVerification>();
+            otpVerification.Setup();
+           
+        }
+        else
+        {
+            // The access token is not null or empty
+            Debug.Log("Access token is valid.");
+            // Add your handling code here
+        }
     }
     private static RealityFlowClient rootRealityFlowClient;
     public void Login(string inputAccessToken)
