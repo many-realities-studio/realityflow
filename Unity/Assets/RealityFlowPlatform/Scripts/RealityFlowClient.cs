@@ -30,6 +30,7 @@ public class RealityFlowClient : MonoBehaviour
     public string accessToken = null;
     public GameObject projectManager;
     public OTPVerification loginMenu;
+    public GameObject levelEditor;
     public RoomClient roomClient;
     private string currentProjectId;
 
@@ -201,7 +202,9 @@ public class RealityFlowClient : MonoBehaviour
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
             LoginSuccess.Invoke(true);
-            Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
+            if(Whisper.rootWhisper != null) {
+                Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
+            }
         }
         else
         {
@@ -226,10 +229,13 @@ public class RealityFlowClient : MonoBehaviour
             return;
         }
 
+        // Hide Project and Login Menus, show Level Editor
+        projectManager.SetActive(false);
+        // Put loading here?
+
         // !!LOAD OBJECTS FROM PROJECT HERE!!
         roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
         roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
-        RealityFlowAPI.Instance.FetchAndPopulateObjects();
 
     }
 
@@ -240,6 +246,9 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
 
+        levelEditor.SetActive(true);
+        
+        RealityFlowAPI.Instance.FetchAndPopulateObjects();
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
         {
@@ -271,8 +280,9 @@ public class RealityFlowClient : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Failed to create room");
+            Debug.LogError("Failed to create room: Room may already exist.");
         }
+        
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedRoomCreate);
     }
 
@@ -281,12 +291,9 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log("Joining room found in the Database. . .");
 
 
+        roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
         // Join the room using the roomClient
         roomClient.Join(joinCode);
-
-        // !!LOAD OBJECTS FROM PROJECT HERE!!
-        //Call FetchAndPopulateObjects from API
-        //RealityFlowAPI.Instance.FetchAndPopulateObjects();
     }
 
     private void OnJoinedRoom(IRoom room)
@@ -301,7 +308,7 @@ public class RealityFlowClient : MonoBehaviour
     {
         // Describe request
         UnityWebRequest request = UnityWebRequest.Post(server + graphQLRoute,
-            JsonConvert.SerializeObject(payload), "application/json");
+        JsonConvert.SerializeObject(payload), "application/json");
         if (accessToken != null && accessToken != "")
             request.SetRequestHeader("Authorization", "Bearer " + accessToken);
 
