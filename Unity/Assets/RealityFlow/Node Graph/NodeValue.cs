@@ -319,8 +319,13 @@ namespace RealityFlow.NodeGraph
 
         public GameObjectValue(GameObject obj)
         {
-            // TODO: Realityflowid lookup
-            throw new NotImplementedException();
+            if (RealityFlowAPI.Instance.SpawnedObjects.TryGetValue(obj, out RfObject rfObj))
+                realityflowId = rfObj.id;
+            else
+            {
+                realityflowId = null;
+                Debug.LogError("Failed to lookup object ID");
+            }
         }
 
         public override NodeValueType ValueType => NodeValueType.GameObject;
@@ -329,8 +334,13 @@ namespace RealityFlow.NodeGraph
         {
             get
             {
-                // TODO: RealityFlowId lookup
-                throw new NotImplementedException();
+                if (RealityFlowAPI.Instance.SpawnedObjectsById.TryGetValue(realityflowId, out GameObject obj))
+                    return obj;
+                else
+                {
+                    Debug.LogError($"Failed to lookup object by id {realityflowId}");
+                    return null;
+                }
             }
         }
 

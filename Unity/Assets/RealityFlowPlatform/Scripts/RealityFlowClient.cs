@@ -271,7 +271,6 @@ public class RealityFlowClient : MonoBehaviour
             }
         }
 
-
         // Display any errors
         if (response["errors"] != null)
         {
