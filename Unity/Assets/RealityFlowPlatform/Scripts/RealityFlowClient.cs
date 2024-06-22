@@ -522,7 +522,8 @@ public class RealityFlowClient : MonoBehaviour
         projectManager.SetActive(false);
         Debug.Log("[JOIN ROOM] from database; Join code!: " + joinCode);
         roomClient.Join(joinCode);
-
+        // onjoinroom call
+        
     }
 
 }

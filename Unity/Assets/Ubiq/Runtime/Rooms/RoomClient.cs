@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using PlasticPipe.PlasticProtocol.Client.Proxies;
 using Ubiq.Dictionaries;
 using Ubiq.Messaging;
 using Ubiq.Networking;
@@ -624,7 +625,7 @@ namespace Ubiq.Rooms
                 SendToServerSync("Join", new JoinArgs()
                 {
                     joincode = joincode,
-                    peer = me.GetPeerInfo()
+                    peer = me.GetPeerInfo(),
                 });
                 me.log.Clear(); // Already sent server up-to-date properties
             });
