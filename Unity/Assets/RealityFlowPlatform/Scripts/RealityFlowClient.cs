@@ -108,9 +108,9 @@ public class RealityFlowClient : MonoBehaviour
         };
 
         accessToken = PlayerPrefs.GetString("accessToken");
-
+        
         // Check to see if PlayerPrefs already has an access token
-        if (!string.IsNullOrEmpty(accessToken))
+        if (string.IsNullOrEmpty(accessToken))
         {
             // The access token is null or empty
             Debug.Log("Access token is null or empty.");
@@ -174,6 +174,7 @@ public class RealityFlowClient : MonoBehaviour
     {
         Debug.Log("Logging in....");
         
+
         userDecoded = DecodeJwt(inputAccessToken);
         Debug.Log("User decoded: " + userDecoded);
 

@@ -14,16 +14,37 @@ namespace RealityFlow.NodeUI
     {
         GameObject realityTools;
 
-        NetworkedPlayManager _playManager;
-        NetworkedPlayManager PlayManager
+        static NetworkedPlayManager _playManager;
+        static NetworkedPlayManager PlayManager
         {
             get
             {
                 if (!_playManager)
+                {
                     _playManager = FindObjectOfType<NetworkedPlayManager>();
+                    _playManager.enterPlayMode.AddListener(OnEnterPlayMode);
+                    _playManager.exitPlayMode.AddListener(OnExitPlayMode);
+                }
 
                 return _playManager;
             }
+        }
+
+        static bool whiteboardActiveBeforePlay;
+
+        static void OnEnterPlayMode()
+        {
+            if (Whiteboard.Instance)
+            {
+                whiteboardActiveBeforePlay = Whiteboard.Instance.gameObject.activeSelf;
+                Whiteboard.Instance.gameObject.SetActive(false);
+            }
+        }
+
+        static void OnExitPlayMode()
+        {
+            if (Whiteboard.Instance && whiteboardActiveBeforePlay)
+                Whiteboard.Instance.gameObject.SetActive(true);
         }
 
         void Start()
@@ -34,11 +55,6 @@ namespace RealityFlow.NodeUI
                 GameObject whiteboard = Instantiate(RealityFlowAPI.Instance.whiteboardPrefab, realityTools.transform);
                 whiteboard.GetComponent<Whiteboard>().Init();
                 whiteboard.SetActive(false);
-
-                // realityTools
-                //     .GetComponentInChildren<MeshSelectionManager>()
-                //     .ObjectSelected
-                //     .AddListener(ShowWhiteboard);
             }
 
             GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
@@ -46,7 +62,6 @@ namespace RealityFlow.NodeUI
                 if (PlayManager == null || !PlayManager.playMode)
                     ShowWhiteboard(gameObject);
             });
-            Debug.Log("Added listener!");
         }
 
         void ShowWhiteboard(GameObject obj)
