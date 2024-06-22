@@ -97,6 +97,7 @@ public class OTPVerification : MonoBehaviour
             Debug.Log(data);
             string accessToken = (string)data["verifyOTP"]["accessToken"];
             PlayerPrefs.SetString("accessToken", accessToken);
+            rfClient.Login(accessToken);
             projectDisplay.SetActive(true);
             this.gameObject.SetActive(false);
 

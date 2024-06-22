@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class ChatGPTProgress : Singleton<ChatGPTProgress>
 {
-    [SerializeField]
-    private TextMeshProUGUI progressText = null;
+    // [SerializeField]
+    // private TextMeshProUGUI progressText = null;
 
     [SerializeField]
     private float frequency = 1.0f;
@@ -22,7 +22,7 @@ public class ChatGPTProgress : Singleton<ChatGPTProgress>
 
     private void Awake()
     {
-        progressText.text = string.Empty;
+        // progressText.text = string.Empty;
     }
 
     public void StartProgress(string status = "In Progress")
@@ -41,15 +41,15 @@ public class ChatGPTProgress : Singleton<ChatGPTProgress>
         {
             if(dotCount >= maxDots) dotCount = 0;
 
-            progressText.text = $"<color=\"yellow\">{Status}{Dots(dotCount)}</color>";
-            dotCount++;
+            // progressText.text = $"<color=\"yellow\">{Status}{Dots(dotCount)}</color>";
+            // dotCount++;
 
-            if (done)
-            {
-                done = false;
-                progressText.text = "<color=\"green\">Done generating source code...</color>";
-                break;
-            };
+            // if (done)
+            // {
+            //     done = false;
+            //     progressText.text = "<color=\"green\">Done generating source code...</color>";
+            //     break;
+            // };
 
             yield return new WaitForSeconds(frequency);
         }
