@@ -162,7 +162,7 @@ public class RealityFlowClient : MonoBehaviour
             PlayerPrefs.SetString("accessToken", accessToken);
             Login(accessToken);
             projectManager.SetActive(true);
-            this.gameObject.SetActive(false);
+            loginMenu.gameObject.SetActive(false);
 
         }
         else if (errors != null) // Failure to retrieve data
