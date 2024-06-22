@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using RealityFlow.NodeGraph;
 using UnityEngine;
@@ -39,8 +40,7 @@ namespace RealityFlow.NodeUI
 
         void Start()
         {
-            List<NodeDefinition> nodes = RealityFlowAPI.Instance.GetAvailableNodeDefinitions();
-            Dictionary<string, NodeDefinition> dict = nodes.ToDictionary(def => def.Name);
+            ImmutableDictionary<string, NodeDefinition> dict = RealityFlowAPI.Instance.NodeDefinitionDict;
             Activate = dict["Activate"];
             Print = dict["Print"];
             AddDef = dict["IntAdd"];

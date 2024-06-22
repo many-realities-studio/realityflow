@@ -184,10 +184,10 @@ RectTransform:
   - {fileID: 4639798460545324186}
   m_Father: {fileID: 8153634528694553415}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 47.615, y: -11}
-  m_SizeDelta: {x: 95.23, y: 22}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5399114696425239947
 CanvasRenderer:
@@ -1169,10 +1169,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7620118693796146099}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 15.965, y: -11}
-  m_SizeDelta: {x: 31.93, y: 9.61}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6287212508384656713
 CanvasRenderer:
@@ -1313,7 +1313,7 @@ PrefabInstance:
     - target: {fileID: 2033061883847465135, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 63.300003
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2033061883847465135, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
@@ -1358,7 +1358,7 @@ PrefabInstance:
     - target: {fileID: 2033061883847465135, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 63.58
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2033061883847465135, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
@@ -1385,65 +1385,100 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dropdown
       objectReference: {fileID: 0}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1706132661377767358}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Tick
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RealityFlow.NodeUI.VariableEditor, RealityFlow
+      objectReference: {fileID: 0}
+    - target: {fileID: 4005512108398976631, guid: d280db2c0c2ab9842a76aaeeb51f30af,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 5099385131321334072, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5099385131321334072, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5099385131321334072, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 12
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5099385131321334072, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 12
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5099385131321334072, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 49.3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5099385131321334072, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6131509442208605775, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6131509442208605775, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6131509442208605775, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 33.3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6131509442208605775, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 9.61
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6131509442208605775, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 21.65
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6131509442208605775, guid: d280db2c0c2ab9842a76aaeeb51f30af,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -11
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

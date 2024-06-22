@@ -27,7 +27,7 @@ namespace RealityFlow.NodeUI
 
         public void Tick()
         {
-            OnTick(NodeValue.Null);
+            OnTick(null);
         }
     }
 }

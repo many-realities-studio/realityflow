@@ -139,7 +139,7 @@ namespace RealityFlow.NodeGraph
             MutableNodesOfType(type).ToImmutableHashSet();
 
         [SerializeField]
-        readonly Dictionary<string, NodeValueType> variables = new();
+        SerializableDict<string, NodeValueType> variables = new();
 
         public ImmutableDictionary<string, NodeValueType> Variables
             => variables.ToImmutableDictionary();
@@ -147,6 +147,11 @@ namespace RealityFlow.NodeGraph
         public void AddVariable(string name, NodeValueType type)
         {
             variables.Add(name, type);
+        }
+
+        public void RemoveVariable(string name)
+        {
+            variables.Remove(name);
         }
 
         public bool TryGetVariableType(string name, out NodeValueType type)
@@ -481,8 +486,27 @@ namespace RealityFlow.NodeGraph
         public void OnAfterDeserialize()
         {
             nodeTypes = new();
+            variables ??= new();
+
+            List<NodeIndex> invalidNodes = new();
+
             foreach ((NodeIndex index, Node node) in nodes)
-                MutableNodesOfType(node.Definition.Name).Add(index);
+                if (node.Definition != null)
+                    MutableNodesOfType(node.Definition.Name).Add(index);
+                else
+                    invalidNodes.Add(index);
+
+            foreach (NodeIndex index in invalidNodes)
+                RemoveNode(index);
+
+            foreach ((PortIndex to, PortIndex from) in reverseEdges)
+                if (!ContainsNode(to.Node) || !ContainsNode(from.Node))
+                    RemoveDataEdge(from, to);
+
+            foreach ((PortIndex from, List<NodeIndex> tos) in executionEdges)
+                foreach (NodeIndex to in tos)
+                    if (!ContainsNode(from.Node) || !ContainsNode(to))
+                        RemoveExecutionEdge(from, to);
         }
     }
 }

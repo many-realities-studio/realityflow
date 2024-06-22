@@ -1062,7 +1062,19 @@ MonoBehaviour:
         m_Calls: []
   onClicked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5086418775489866493}
+        m_TargetAssemblyTypeName: VariableItem, RealityFlow
+        m_MethodName: Select
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEnabled:
     m_PersistentCalls:
       m_Calls: []
@@ -1141,7 +1153,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 160.44, y: 19.61, z: 26.38652}
+  m_Size: {x: 20, y: 0, z: 26.38652}
   m_Center: {x: 0, y: 0, z: 4.6067348}
 --- !u!114 &1666419840983575733
 MonoBehaviour:
@@ -2304,7 +2316,19 @@ MonoBehaviour:
         m_Calls: []
   onClicked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5086418775489866493}
+        m_TargetAssemblyTypeName: VariableItem, RealityFlow
+        m_MethodName: AddSetNode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEnabled:
     m_PersistentCalls:
       m_Calls: []
@@ -2383,7 +2407,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 31.669998, y: 19.61, z: 26.38652}
+  m_Size: {x: 20, y: 0, z: 26.38652}
   m_Center: {x: 0, y: 0, z: 4.6067348}
 --- !u!114 &6209195757237119435
 MonoBehaviour:
@@ -3087,6 +3111,7 @@ GameObject:
   - component: {fileID: 1403439740083431770}
   - component: {fileID: 3844609390365854889}
   - component: {fileID: 3995279057416238767}
+  - component: {fileID: 5086418775489866493}
   m_Layer: 0
   m_Name: Variable Item
   m_TagString: Untagged
@@ -3163,6 +3188,22 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5086418775489866493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6592611205396943141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da5b9f2e1a8bfa4a956dd9cbdcf5150, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: {fileID: 793121521078339777}
+  varName: 
+  type: 0
+  view: {fileID: 0}
 --- !u!1 &6748160911476105113
 GameObject:
   m_ObjectHideFlags: 0
@@ -3441,7 +3482,19 @@ MonoBehaviour:
         m_Calls: []
   onClicked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5086418775489866493}
+        m_TargetAssemblyTypeName: VariableItem, RealityFlow
+        m_MethodName: AddGetNode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEnabled:
     m_PersistentCalls:
       m_Calls: []
@@ -3520,7 +3573,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 32.89, y: 19.61, z: 26.38652}
+  m_Size: {x: 20, y: 0, z: 26.38652}
   m_Center: {x: 0, y: 0, z: 4.6067348}
 --- !u!114 &3953974835025019572
 MonoBehaviour:
@@ -4026,7 +4079,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Name
+  m_text: '{0}: {1}'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
   m_sharedMaterial: {fileID: -1005824763306460071, guid: 533bdd8d5c92b52448ee2ecf7bd828a4,

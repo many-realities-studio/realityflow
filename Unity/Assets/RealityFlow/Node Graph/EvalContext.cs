@@ -71,7 +71,7 @@ namespace RealityFlow.NodeGraph
 
         public T GetVariable<T>(string name)
         {
-            return GetVariableOrDefault(name).UnwrapValue<T>();
+            return NodeValue.UnwrapValue<T>(GetVariableOrDefault(name));
         }
 
         public void SetVariable<T>(string name, T value)
@@ -79,7 +79,7 @@ namespace RealityFlow.NodeGraph
             if (TryFindVariableGraph(name, out ReadonlyGraph graph))
             {
                 NodeValue oldValue = variableValues[(graph, name)];
-                NodeValue nodeValue = NodeValue.From(value, oldValue.Type);
+                NodeValue nodeValue = NodeValue.From(value, oldValue.ValueType);
                 variableValues[(graph, name)] = nodeValue;
             }
             else
@@ -121,7 +121,7 @@ namespace RealityFlow.NodeGraph
             if (graph.TryGetOutputPortOf(input, out var outputPort))
                 value = nodeOutputCache[outputPort];
             else
-                value = input.AsInput(graph).ConstantValue.Value;
+                value = input.AsInput(graph).ConstantValue.DynValue;
 
             if (value is T typedVal)
                 return typedVal;

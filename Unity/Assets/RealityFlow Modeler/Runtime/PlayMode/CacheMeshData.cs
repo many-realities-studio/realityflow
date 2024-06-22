@@ -29,7 +29,8 @@ public class CacheMeshData : MonoBehaviour
     void Update()
     {
         // When Play mode is toggled either on or off
-        if (lastPlayModeState != networkedPlayManager.playMode && gameObject.transform.parent.parent.parent.name == "Forest 1")
+        // gameObject.transform.parent.parent.parent.name == "Forest 1"
+        if (lastPlayModeState != networkedPlayManager.playMode)
         {
             lastPlayModeState = networkedPlayManager.playMode;
             // Cache values when Play mode is entered
