@@ -95,10 +95,10 @@ public class ChatGPTTester : MonoBehaviour
 
             WriteResponseToFile(ChatGPTMessage);
             //Log the API calls in plain English
-            LogApiCalls(ChatGPTMessage);
+            //LogApiCalls(ChatGPTMessage);
 
             //If you want to see the code produced by ChatGPT uncomment out the line below
-            //Logger.Instance.LogInfo(ChatGPTMessage);
+            Logger.Instance.LogInfo(ChatGPTMessage);
 
             // Log the generated code instead of executing it immediately
             RealityFlowAPI.Instance.actionLogger.LogGeneratedCode(ChatGPTMessage);
@@ -179,7 +179,7 @@ public class ChatGPTTester : MonoBehaviour
 
     private void WriteResponseToFile(string response)
     {
-        string path = Application.persistentDataPath + "/ChatGPTResponse.json";
+        string path = Application.persistentDataPath + "/ChatGPTResponse.cs";
         try
         {
             File.WriteAllText(path, response);
