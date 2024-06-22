@@ -220,7 +220,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         try
         {
             // Serialize the Graph object to JSON
-            string graphJson = JsonUtility.ToJson(new { nodes = Array.Empty<Node[]>(), edges = Array.Empty<Edge[]>() });
+            string graphJson = JsonUtility.ToJson(new { });
             // Call the GraphQL resolver to save the graph and retrieve its ID
             var query = @"
             mutation CreateGraph($input: CreateGraphInput!) {
