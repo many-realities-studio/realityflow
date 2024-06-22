@@ -67,11 +67,20 @@ public class ChatGPTTester : MonoBehaviour
             Vector3 indicatorPosition = raycastLogger.GetVisualIndicatorPosition();
             if (indicatorPosition != Vector3.zero)
             {
-                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the location {indicatorPosition} as the position data when you spawn any and all objects.";
+                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the location {indicatorPosition} as the position data when you spawn any and all objects. Also unless specified otherwise use this location as the updateobjecttransform position";
                 Debug.Log("Visual Indicator Location: " + indicatorPosition);
             }
 
             AddOrUpdateReminder(reminderMessage);
+        }
+
+        // Add reminder for selected object if it exists
+        string selectedObjectName = raycastLogger.GetSelectedObjectName();
+        if (!string.IsNullOrEmpty(selectedObjectName))
+        {
+            var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nUse the object {selectedObjectName} to do anything that the user requests other than spawn. If such requests have no object name specified use this object";
+            Debug.Log($"Selected object: {selectedObjectName}");
+            AddOrUpdateReminder(selectedObjectReminder);
         }
 
         if (chatGPTQuestion.reminders.Length > 0)

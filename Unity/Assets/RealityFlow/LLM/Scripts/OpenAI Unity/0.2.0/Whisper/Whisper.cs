@@ -27,6 +27,7 @@ namespace Samples.Whisper
         private MuteManager muteManager;
         private string currentApiKey;
 
+        public static Whisper rootWhisper;
         private RealityFlowActions inputActions;
         private ChatGPTTester chatGPTTester; // Reference to the ChatGPTTester
 
@@ -35,6 +36,17 @@ namespace Samples.Whisper
 
         private void Awake()
         {
+            if (rootWhisper == null)
+            {
+                DontDestroyOnLoad(gameObject);
+                rootWhisper = this;
+            }
+            else
+            {
+                gameObject.SetActive(false);
+                DestroyObject(gameObject);
+                return;
+            }
             inputActions = new RealityFlowActions();
             chatGPTTester = FindObjectOfType<ChatGPTTester>(); // Initialize the ChatGPTTester reference
         }
@@ -88,16 +100,18 @@ namespace Samples.Whisper
         {
             StopCountdown();
         }
-
-        private void Start()
+        //Formerly known as start
+        public void InitializeGPT(string apiKey)
         {
+
+            Debug.Log("################################# the apikey is " + apiKey);
             muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
             {
                 Debug.LogError("MuteManager not found in the scene.");
             }
 
-            string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
+            //string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (!string.IsNullOrEmpty(apiKey))
             {
                 Debug.Log("In whisper API key is :" + apiKey);
