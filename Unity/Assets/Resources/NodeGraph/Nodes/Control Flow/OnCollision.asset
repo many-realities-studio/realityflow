@@ -22,7 +22,10 @@ MonoBehaviour:
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'collided = ctx.StartArguments["collidedWith"].UnwrapValue<GameObject>();
+  EvalCode: 'NodeValue.TryGetValue(ctx.StartArguments["collidedWith"], out GameObject
+    coll);
+
+    collided = coll;
 
     then();'
   ExecutionInput: 0
