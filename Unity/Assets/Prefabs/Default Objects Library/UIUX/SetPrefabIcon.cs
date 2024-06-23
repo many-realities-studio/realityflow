@@ -16,9 +16,9 @@ public class SetPrefabIcon : MonoBehaviour
         prefab.GetComponent<Rigidbody>().isKinematic = true;*/
         //Quaternion defaultRotation = this.transform.rotation;
 
-        GameObject newButtonIcon = Instantiate(prefab, transform.position + new Vector3(0f, 0.025f, 0f), this.gameObject.transform.rotation, this.gameObject.transform);
+        GameObject newButtonIcon = Instantiate(prefab, transform.position + new Vector3(0f, 0.025f, 0f), prefab.transform.localRotation, this.gameObject.transform);
         newButtonIcon.transform.localScale *= 15f;
-        Debug.Log("Spawned with rotation" + this.gameObject.transform.rotation);
+        //Debug.Log("Spawned with rotation" + this.gameObject.transform.rotation);
 
         /*resets the states:
         prefab.GetComponent<Rigidbody>().useGravity = true;
