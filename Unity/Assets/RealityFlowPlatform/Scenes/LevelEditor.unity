@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.4439372, g: 0.49315345, b: 0.5721989, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3306,7 +3306,7 @@ MonoBehaviour:
   m_AllowHoverHapticsWhileSelecting: 1
   m_LineType: 0
   m_BlendVisualLinePoints: 1
-  m_MaxRaycastDistance: 10
+  m_MaxRaycastDistance: 30
   m_RayOriginTransform: {fileID: 1236627760}
   m_ReferenceFrame: {fileID: 0}
   m_Velocity: 16
@@ -5218,7 +5218,7 @@ MonoBehaviour:
   m_AllowHoverHapticsWhileSelecting: 1
   m_LineType: 0
   m_BlendVisualLinePoints: 1
-  m_MaxRaycastDistance: 10
+  m_MaxRaycastDistance: 30
   m_RayOriginTransform: {fileID: 1236627760}
   m_ReferenceFrame: {fileID: 0}
   m_Velocity: 16
@@ -6664,7 +6664,7 @@ MonoBehaviour:
   m_AllowHoverHapticsWhileSelecting: 1
   m_LineType: 0
   m_BlendVisualLinePoints: 1
-  m_MaxRaycastDistance: 10
+  m_MaxRaycastDistance: 30
   m_RayOriginTransform: {fileID: 943692238}
   m_ReferenceFrame: {fileID: 0}
   m_Velocity: 16
@@ -10649,6 +10649,11 @@ PrefabInstance:
       propertyPath: m_AttachTransform
       value: 
       objectReference: {fileID: 684807928}
+    - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_MaxRaycastDistance
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_RayOriginTransform
