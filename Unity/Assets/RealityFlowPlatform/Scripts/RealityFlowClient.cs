@@ -36,7 +36,7 @@ public class RealityFlowClient : MonoBehaviour
 
     // GraphQL client and access token variables
     public Dictionary<string, string> userDecoded;
-    public bool debug = true;
+    // public bool debug = true;
 #if REALITYFLOW_LIVE
     public string server = @"https://reality.gaim.ucf.edu/";
 #else
@@ -50,9 +50,9 @@ public class RealityFlowClient : MonoBehaviour
 
     private void Awake()
     {
-        if(debug==true) {
-            server = @"http://localhost:4000/";
-        }
+        // if(debug==true) {
+            // server = @"http://localhost:4000/";
+        // }
         Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
         if (transform.parent == null)

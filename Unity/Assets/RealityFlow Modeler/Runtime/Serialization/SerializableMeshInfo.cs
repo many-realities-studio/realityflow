@@ -111,7 +111,7 @@ public class SerializableMeshInfo
 
             // faces[i] = em.faces[i].indicies;
             faces[i] = new int[em.faces[i].indicies.Length];
-            for (int j = 0; i < em.faces[i].indicies.Length; i++)
+            for (int j = 0; j < em.faces[i].indicies.Length; j++)
             {
                 Debug.Log("Before faces");
                 faces[i][j] = em.faces[i].indicies[j];
