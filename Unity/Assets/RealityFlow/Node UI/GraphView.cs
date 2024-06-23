@@ -330,7 +330,7 @@ namespace RealityFlow.NodeUI
             if (!CurrentObject)
                 return;
 
-            CurrentObject.isTemplate = isTemplate;
+            RealityFlowAPI.Instance.SetTemplate(CurrentObject, isTemplate);
         }
 
         public void SetSelectedVariable(string variable)

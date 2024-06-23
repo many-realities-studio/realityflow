@@ -20,6 +20,8 @@ using RealityFlow.NodeUI;
 using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
 using System.Collections.Immutable;
+using Unity.VisualScripting;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -63,6 +65,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     readonly Dictionary<string, GameObject> spawnedObjectsById = new();
     public ImmutableDictionary<string, GameObject> SpawnedObjectsById
         => spawnedObjectsById.ToImmutableDictionary();
+
+    readonly Dictionary<GameObject, int> templatesDict = new();
+    public ImmutableDictionary<GameObject, int> TemplatesDict => templatesDict.ToImmutableDictionary();
+    readonly List<GameObject> templates = new();
+    public IEnumerable<GameObject> Templates => templates;
+    public Action OnTemplatesChanged;
+
     public enum SpawnScope
     {
         Room,
@@ -373,6 +382,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("General Exception: " + ex.Message);
         }
         return;
+    }
+
+    public void SetTemplate(VisualScript obj, bool becomeTemplate)
+    {
+        // TODO: Persist to database
+
+        if (!templatesDict.ContainsKey(obj.gameObject) && becomeTemplate)
+        {
+            templatesDict.Add(obj.gameObject, templates.Count);
+            templates.Add(obj.gameObject);
+        }
+        else if (templatesDict.TryGetValue(obj.gameObject, out int index) && !becomeTemplate)
+        {
+            templatesDict.Remove(obj.gameObject);
+            templates.RemoveAt(index);
+        }
+
+        obj.isTemplate = becomeTemplate;
+
+        OnTemplatesChanged?.Invoke();
     }
 
     // -- EDIT GRAPH FUNCTIONS --
@@ -1559,8 +1588,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
-
-
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -1615,7 +1642,18 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    // ---Despawn/Delete---
+    // ---Despawn/Delete--
+    public void DespawnAllObjectsInBothDictionarys()
+    {
+        foreach (var kvp in spawnedObjects)
+        {
+            DespawnObject(kvp.Key);
+        }
+        foreach (var kvp in spawnedObjectsById)
+        {
+            DespawnObject(kvp.Value);
+        }
+    }
 
     //This function is primarily for peer scope
     public void DespawnObject(GameObject objectToDespawn)
@@ -1643,7 +1681,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private async void RemoveObjectFromDatabase(string objectId, System.Action onSuccess)
+    private void RemoveObjectFromDatabase(string objectId, Action onSuccess)
     {
         if (client == null)
         {
