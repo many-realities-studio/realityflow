@@ -261,8 +261,14 @@ public class RealityFlowClient : MonoBehaviour
         var addRoom = new GraphQLRequest
         { 
             Query = @"
-            mutation AddRoom($input: AddRoomInput!) {
+            mutation AddRoom($input: AddRoomInput!, $input2: UpdateExpiredTimeInput!, $input3: UpdateUserRoomIdInput!) {
                 addRoom(input: $input) {
+                    id
+                }
+                updateExpiredTime(input: $input2) {
+                    id
+                }
+                updateUserRoomId(input: $input3) {
                     id
                 }
             }
@@ -270,6 +276,16 @@ public class RealityFlowClient : MonoBehaviour
             OperationName = "AddRoom",
             Variables = new
             {
+                input3 = new
+                {
+                  userId = userDecoded["id"],
+                  defaultProjectId = currentProjectId,
+                  newRoomId = room.UUID
+                },
+                input2 = new
+                {
+                  userId = userDecoded["id"]
+                },
                 input = new
                 {
                     projectId = currentProjectId,
@@ -290,8 +306,44 @@ public class RealityFlowClient : MonoBehaviour
         {
             Debug.LogError("Failed to create room: Room may already exist.");
         }
+
+        // Run KeepRoomAlive every 30 seconds
+        InvokeRepeating("KeepRoomAlive", 0, 30);
+        
         
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
+    }
+
+    private void KeepRoomAlive()
+    {
+        // Create a new room using the GraphQL API
+        var updateExpiredTime = new GraphQLRequest
+        {
+            Query = @"
+            mutation UpdateExpiredTime($input: UpdateExpiredTimeInput!) {
+                updateExpiredTime(input: $input) {
+                    id
+                }
+            }
+        ",
+            OperationName = "UpdateExpiredTime",
+            Variables = new
+            {
+                input = new
+                {
+                    userId = userDecoded["id"]
+                }
+            }
+        };
+        var graphQL = SendQueryAsync(updateExpiredTime);
+        if (graphQL["data"] != null)
+        {
+            Debug.Log("Room alive");
+        }
+        else
+        {
+            Debug.LogError("Failed to keep room alive");
+        }
     }
 
     //  ==============   JOIN ROOM   ======================
