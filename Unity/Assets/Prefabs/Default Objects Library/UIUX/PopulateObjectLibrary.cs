@@ -55,7 +55,7 @@ public class PopulateObjectLibrary : MonoBehaviour
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(objectPrefab);
         // spawnScript.RaySpawnToggle(objectPrefab);
-        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.zero, objectPrefab.transform.localScale, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.up * 1.5f, objectPrefab.transform.localScale, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
         // GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
         //newObj.GetComponent<NetworkedMesh>().owner = true;
         //newObj.transform.SetParent(networkSpawnManager.transform);
