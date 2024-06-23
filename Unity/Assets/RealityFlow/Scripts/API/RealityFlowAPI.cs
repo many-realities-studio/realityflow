@@ -1640,7 +1640,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private async void RemoveObjectFromDatabase(string objectId, System.Action onSuccess)
+    private void RemoveObjectFromDatabase(string objectId, Action onSuccess)
     {
         if (client == null)
         {
