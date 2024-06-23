@@ -111,6 +111,8 @@ namespace RealityFlow.NodeUI
         {
             leftButton.enabled = false;
             rightButton.enabled = false;
+
+            ShowPage();
         }
 
         void InitPool()
