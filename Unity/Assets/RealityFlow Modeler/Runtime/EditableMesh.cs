@@ -53,6 +53,8 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             for (int i = 0; i < value.faces.Length; i++)
             {
                 faces[i] = new EMFace(value.faces[i]);
+                // Debug log to show the face
+                Debug.Log("[EM]Face " + i + " {" + value.faces[i][0] + " " + value.faces[i][1] + " " + value.faces[i][2]);
             }
 
             baseShape = value.getShape();
