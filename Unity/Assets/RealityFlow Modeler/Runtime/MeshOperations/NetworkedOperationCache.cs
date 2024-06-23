@@ -36,7 +36,7 @@ public class NetworkedOperationCache : MonoBehaviour, INetworkSpawnable
     {
         try
         {
-            if (cacheSize != em.meshOperationCache.operations.Count)
+            if (em != null && cacheSize != em.meshOperationCache.operations.Count)
             {
                 cacheSize = em.meshOperationCache.operations.Count;
                 SendMostRecentCacheData();

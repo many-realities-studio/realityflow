@@ -105,7 +105,17 @@ namespace RealityFlow.NodeGraph
                 return;
 
             foreach (NodeIndex node in graph.NodesOfType("OnCollision"))
-                ctx.EvaluateGraphFromRoot(gameObject, new(graph), node, ("collidedWith", new GameObjectValue(col.gameObject)));
+                ctx.EvaluateGraphFromRoot(
+                    gameObject,
+                    new(graph), 
+                    node, 
+                    (
+                        "collidedWith", 
+                        RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(col.gameObject) 
+                            ? new GameObjectValue(col.gameObject) 
+                            : null
+                    )
+                );
         }
     }
 }

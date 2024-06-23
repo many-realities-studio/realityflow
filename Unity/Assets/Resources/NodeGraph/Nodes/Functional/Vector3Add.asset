@@ -14,32 +14,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields:
   - Name: left
-    Default:
-      type: 3
-      value:
-        rid: 4204108339390971920
+    DefaultType: 3
+    DefaultValue:
+      rid: 4204108569358106624
   - Name: right
-    Default:
-      type: 3
-      value:
-        rid: 4204108339390971921
+    DefaultType: 3
+    DefaultValue:
+      rid: 4204108569358106625
   Inputs: []
-  Outputs: []
+  Outputs:
+  - Name: sum
+    Optional: 0
+    Type: 3
   IsVariadic: 0
   IsVariadicOutput: 0
-  EvaluationMethod: 0
+  EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 
+  EvalCode: sum = left + right;
   ExecutionInput: 0
   ExecutionOutputs: []
   references:
     version: 2
     RefIds:
-    - rid: 4204108339390971920
-      type: {class: NodeValue/BoxedVector3, ns: RealityFlow.NodeGraph, asm: RealityFlow}
+    - rid: 4204108569358106624
+      type: {class: Vector3Value, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
       data:
         value: {x: 0, y: 0, z: 0}
-    - rid: 4204108339390971921
-      type: {class: NodeValue/BoxedVector3, ns: RealityFlow.NodeGraph, asm: RealityFlow}
+    - rid: 4204108569358106625
+      type: {class: Vector3Value, ns: RealityFlow.NodeGraph, asm: Assembly-CSharp}
       data:
         value: {x: 0, y: 0, z: 0}
