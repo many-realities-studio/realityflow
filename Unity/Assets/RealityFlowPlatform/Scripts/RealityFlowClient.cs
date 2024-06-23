@@ -92,13 +92,12 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("RoomClient component not found on this GameObject or in the scene.");
             return;
         }
-        roomClient.OnJoinedRoom.AddListener(OnJoinedRoom);
 
         LoginSuccess += (result) =>
         {
             if (result)
             {
-                Debug.Log("Login successful, proceeding with room.");
+                Debug.Log("Login successful");
                 projectManager.SetActive(true);
                 loginMenu.gameObject.SetActive(false);
             }
@@ -126,14 +125,20 @@ public class RealityFlowClient : MonoBehaviour
         }
     }
 
+    public string GetCurrentProjectId()
+    {
+        return currentProjectId;
+    }
+
+    private static RealityFlowClient rootRealityFlowClient;
+
+    // ========= LOGIN/AUTHORIZAITON FUNCTIONS =========
+
     private void ShowOTP() {
         projectManager.SetActive(false);
         loginMenu.gameObject.SetActive(true);
         loginMenu.onOTPSubmitted += SubmitOTP;
-
     }
-    private static RealityFlowClient rootRealityFlowClient;
-    
     public void SubmitOTP(string otp)
     {
 
@@ -217,10 +222,12 @@ public class RealityFlowClient : MonoBehaviour
         // Debug.Log("RoomClient successfully initialized and listener added.");
     }
 
-    public void CreateRoom(string ProjectId)
+    // ========= CREATE ROOM ============================
+    // Wrapper method to call RoomManager's CreateRoom
+
+    public void CreateRoom()
     {
         Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
-        currentProjectId = ProjectId;
 
         // Check if a project is selected
         if (string.IsNullOrEmpty(currentProjectId))
@@ -234,12 +241,13 @@ public class RealityFlowClient : MonoBehaviour
         // Put loading here?
 
         // !!LOAD OBJECTS FROM PROJECT HERE!!
-        roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
+        roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom);
         roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
+        
 
     }
 
-    private void OnJoinedRoomCreate(IRoom room)
+    public void OnJoinCreatedRoom(IRoom room)
     {
         Debug.Log("Created Room: " + room.Name);
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
@@ -283,14 +291,51 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("Failed to create room: Room may already exist.");
         }
         
-        roomClient.OnJoinedRoom.RemoveListener(OnJoinedRoomCreate);
+        roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
     }
-    private void OnJoinedRoom(IRoom room)
+
+    //  ==============   JOIN ROOM   ======================
+    public void JoinRoom(string joinCode)
+    {
+        Debug.Log("Joining room for project: " + currentProjectId); // Log the project ID
+        Debug.Log("Joining room with join code: " + joinCode); // Log the join code
+
+        // Check if a project is selected
+        if (string.IsNullOrEmpty(currentProjectId))
+        {
+            Debug.LogError("No project selected");
+            return; 
+        }
+        projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
+
+        roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
+
+        Debug.Log("-RIGHT BEFORE EVENT CALL-");
+        roomClient.Join(joinCode); // Join Room Based on Room Code
+        Debug.Log("-RIGHT AFTER EVENT CALL-");
+    }
+    private void OnJoinedExistingRoom(IRoom room)
     {
         Debug.Log("Joined room: " + room.Name);
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
+
+        roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
+    }
+
+    // ========= LEAVE ROOM =========
+    public void LeaveRoom()
+    {
+        // Implementation for leaving a room
+
+    }
+
+    // ========= DELETE ROOM =========
+    public void DeleteRoom()
+    {
+        // Implementation for deleting a room
+
     }
 
     public JObject SendQueryAsync(GraphQLRequest payload)
@@ -361,16 +406,6 @@ public class RealityFlowClient : MonoBehaviour
         return response;
     }
 
-    public void LeaveRoom()
-    {
-        // Implementation for leaving a room
-
-    }
-
-    public string GetCurrentProjectId()
-    {
-        return currentProjectId;
-    }
 
     public void SetCurrentProject(string projectId)
     {
@@ -508,22 +543,4 @@ public class RealityFlowClient : MonoBehaviour
         }
         OnRoomsReceived?.Invoke(rooms);
     }
-    // Wrapper method to call RoomManager's CreateRoom
-    public void CallCreateRoom()
-    {
-        CreateRoom(currentProjectId);
-    }
-
-    // Wrapper method to call RoomManager's JoinRoom
-    public void CallJoinRoom(string joinCode)
-    {
-        
-        roomClient.OnJoinedRoom.AddListener(OnJoinedRoomCreate);
-        projectManager.SetActive(false);
-        Debug.Log("[JOIN ROOM] from database; Join code!: " + joinCode);
-        roomClient.Join(joinCode);
-        // onjoinroom call
-        
-    }
-
 }

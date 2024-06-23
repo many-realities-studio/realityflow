@@ -38,7 +38,7 @@ public class MyProjectsDisplay : MonoBehaviour
         {
             // TODO -ReFresh Button-
             // refreshRoomsBtn.onClick.AddListener(rfClient.GetRoomsByProjectId);
-            createRoomBtn.onClick.AddListener(rfClient.CallCreateRoom);
+            createRoomBtn.onClick.AddListener(rfClient.CreateRoom);
             Debug.Log("RoomManager found and listener added.");
         }
         else
@@ -226,7 +226,7 @@ public class MyProjectsDisplay : MonoBehaviour
                 {
                     int x = i;
                     string joinCode = (string)rooms[x]["joinCode"];
-                    child.GetComponent<Button>().onClick.AddListener(() => rfClient.CallJoinRoom(joinCode));
+                    child.GetComponent<Button>().onClick.AddListener(() => rfClient.JoinRoom(joinCode));
                 }
             }
         }
