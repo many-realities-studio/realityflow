@@ -611,7 +611,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         obj.GetComponent<Rigidbody>().AddRelativeForce(dirMag, ForceMode.Impulse);
     }
 
-    // ---Spawn/Save Object---
+    // // ---Spawn/Save Object---
+    // public GameObject UpdatePrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
+    // {
+
+    // }
     public GameObject SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
         var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
@@ -647,7 +651,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         spawnedMesh.GetComponent<EditableMesh>().LoadMeshData();
         SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
         RfObject rfObject = new RfObject
-        { 
+        {
             name = "PrimitiveBase",
             type = "Primitive",
             graphId = null,
@@ -655,6 +659,30 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             meshJson = JsonUtility.ToJson(smi),
             projectId = client.GetCurrentProjectId()
         };
+        // Manually serialize faces into a json array of arrays
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < smi.faces.Length; i++)
+        {
+            sb.Append("[");
+            for (int j = 0; j < smi.faces[i].Length; j++)
+            {
+                sb.Append(smi.faces[i][j]);
+                if (j < smi.faces[i].Length - 1)
+                {
+                    sb.Append(",");
+                }
+            }
+            sb.Append("]");
+            if (i < smi.faces.Length - 1)
+            {
+                sb.Append(",");
+            }
+        }
+        sb.Append("]");
+        Debug.Log(sb.ToString());
+        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
         Debug.Log(rfObject);
 
         var createObject = new GraphQLRequest
@@ -682,8 +710,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
-            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
             var graphQLResponse = client.SendQueryAsync(createObject);
             if (graphQLResponse["data"] != null)
             {
@@ -1188,48 +1214,96 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
                 var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
-                    if(spawnedObject.GetComponent<EditableMesh>() != null) 
+                if (spawnedObject.GetComponent<EditableMesh>() != null)
+                {
+                    Debug.Log("Primitive Base");
+
+                    var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
+                    // Deserialize the two dimensional array of integers from the json string and assign it to serializableMesh.faces
+
+                    // StringBuilder sb = new StringBuilder();
+                    // sb.Append("[");
+                    // for (int i = 0; i < smi.faces.Length; i++)
+                    // {
+                    //     sb.Append("[");
+                    //     for (int j = 0; j < smi.faces[i].Length; j++)
+                    //     {
+                    //         sb.Append(smi.faces[i][j]);
+                    //         if (j < smi.faces[i].Length - 1)
+                    //         {
+                    //             sb.Append(",");
+                    //         }
+                    //     }
+                    //     sb.Append("]");
+                    //     if (i < smi.faces.Length - 1)
+                    //     {
+                    //         sb.Append(",");
+                    //     }
+                    // }
+                    // sb.Append("]");
+
+                    // Reverse the above serialization for the faces property of the string contained in obj.meshJson and assign it to serializableMesh.faces
+                    //
+                    obj.meshJson = obj.meshJson.Remove(obj.meshJson.Length - 1);
+                    int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
+                    int end = obj.meshJson.Length;
+                    string faces = obj.meshJson.Substring(start, end - start - 1);
+                    Debug.Log(faces);
+                    string[] faceArray = faces.Split('[');
+                    int[][] facesArray = new int[faceArray.Length - 1][];
+                    for (int i = 1; i < faceArray.Length; i++)
                     {
-                        Debug.Log("Primitive Base");
-
-                        var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
-                        Debug.Log(serializableMesh);
-                        // Error can't deserialize here for some reason. Can check with team or investigate 
-                        spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;    
+                        // If the last character is a , remove it
+                        faceArray[i] =faceArray[i].TrimEnd(',');
+                        string[] face = faceArray[i].Split(',');
+                        // Remove any "]" characters from the last element of the array
+                        facesArray[i - 1] = new int[face.Length];
+                        for (int j = 0; j < face.Length; j++)
+                        {
+                            face[j] = face[j].Replace("]", "");
+                            facesArray[i - 1][j] = int.Parse(face[j]);
+                        }
                     }
-                    Debug.Log("Spawned object with room scope");
-                    if (spawnedObject == null)
-                    {
-                        Debug.LogError("Spawned object is null.");
-                        return;
-                    }
+                    Debug.Log(facesArray);
+                    serializableMesh.faces = facesArray;
 
-                    spawnedObject.AddComponent<AttachedWhiteboard>();
-                    if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
-                    {
-                        Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
-                        Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
-                        spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
-                    }
+                    Debug.Log(serializableMesh);
+                    // Error can't deserialize here for some reason. Can check with team or investigate 
+                    spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
+                }
+                Debug.Log("Spawned object with room scope");
+                if (spawnedObject == null)
+                {
+                    Debug.LogError("Spawned object is null.");
+                    return;
+                }
 
-                    // Set the name of the spawned object to its ID for unique identification
-                    spawnedObject.name = obj.id;
+                spawnedObject.AddComponent<AttachedWhiteboard>();
+                if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
+                {
+                    Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
+                    Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
+                }
 
-                    // Apply the transform properties
-                    TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
-                    if (transformData != null)
-                    {
-                        spawnedObject.transform.position = transformData.position;
-                        spawnedObject.transform.rotation = transformData.rotation;
-                        spawnedObject.transform.localScale = transformData.scale;
-                    }
+                // Set the name of the spawned object to its ID for unique identification
+                spawnedObject.name = obj.id;
 
-                    Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
+                // Apply the transform properties
+                TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
+                if (transformData != null)
+                {
+                    spawnedObject.transform.position = transformData.position;
+                    spawnedObject.transform.rotation = transformData.rotation;
+                    spawnedObject.transform.localScale = transformData.scale;
+                }
 
-                    spawnedObjects.Add(spawnedObject, obj);
-                    spawnedObjectsById.Add(obj.id, spawnedObject);
+                Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
-                    Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
+                spawnedObjects.Add(spawnedObject, obj);
+                spawnedObjectsById.Add(obj.id, spawnedObject);
+
+                Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
                 // Find the spawned object in the scene (assuming it's named the same as the prefab)
             }
             catch (Exception ex)
