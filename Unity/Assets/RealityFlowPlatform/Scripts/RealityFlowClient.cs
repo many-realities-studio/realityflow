@@ -45,6 +45,7 @@ public class RealityFlowClient : MonoBehaviour
     public event Action<bool> LoginSuccess;
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
+    public event Action OnRoomCreated;
 
     private void Awake()
     {
@@ -292,6 +293,7 @@ public class RealityFlowClient : MonoBehaviour
         }
         
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
+        OnRoomCreated?.Invoke();
     }
 
     //  ==============   JOIN ROOM   ======================
@@ -454,7 +456,7 @@ public class RealityFlowClient : MonoBehaviour
     public void OpenProject(string id)
     {
         Debug.Log("Opening project with ID: " + id);
-
+        SetCurrentProject(id);
         // Create a new GraphQL query request to get the project details by ID.
         var GetProjectData = new GraphQLRequest
         {
