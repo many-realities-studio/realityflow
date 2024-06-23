@@ -75,7 +75,6 @@ GameObject:
   - component: {fileID: 2737897488279056391}
   - component: {fileID: 9198879172476123655}
   - component: {fileID: 5601081862906987903}
-  - component: {fileID: 4662657167068270933}
   m_Layer: 0
   m_Name: pCube29.005_MiscItems_0
   m_TagString: Untagged
@@ -148,28 +147,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &4662657167068270933
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6389034435890451207}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -5074643427822778647, guid: ca2c7b2fe0723904f90f649c1a8b29ad, type: 3}
 --- !u!1 &6529279438931279709
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,7 +188,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4244065406030276358}
-  - component: {fileID: 5698054954875022810}
   m_Layer: 0
   m_Name: Haybale
   m_TagString: Untagged
@@ -235,30 +211,3 @@ Transform:
   - {fileID: 25597799362820938}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!54 &5698054954875022810
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7220279452706614225}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0

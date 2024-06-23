@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8145734710505290361}
-  - component: {fileID: 7185233013821493368}
   m_Layer: 0
   m_Name: Lion
   m_TagString: Untagged
@@ -38,33 +37,6 @@ Transform:
   - {fileID: 6993031573086258464}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!54 &7185233013821493368
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283396144980605367}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &939748633448287542
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,7 +48,6 @@ GameObject:
   - component: {fileID: 7029035476867474995}
   - component: {fileID: 25953756992452685}
   - component: {fileID: 8261722256941290631}
-  - component: {fileID: 6307179210637046324}
   m_Layer: 0
   m_Name: lion_fur_0
   m_TagString: Untagged
@@ -149,28 +120,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6307179210637046324
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 939748633448287542}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 333036252973628047, guid: 2dfbf2652c532684ab831ed9a88930be, type: 3}
 --- !u!1 &2663644619331445544
 GameObject:
   m_ObjectHideFlags: 0
@@ -182,7 +131,6 @@ GameObject:
   - component: {fileID: 6993031573086258464}
   - component: {fileID: 6762750664125767061}
   - component: {fileID: 9197839358508878907}
-  - component: {fileID: 1910345246807674434}
   m_Layer: 0
   m_Name: lion_inhear_0
   m_TagString: Untagged
@@ -255,28 +203,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1910345246807674434
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2663644619331445544}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 3299248339822437361, guid: 2dfbf2652c532684ab831ed9a88930be, type: 3}
 --- !u!1 &6365425803640431760
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,7 +214,6 @@ GameObject:
   - component: {fileID: 8512640282935763901}
   - component: {fileID: 2982487740912877076}
   - component: {fileID: 692218658341750646}
-  - component: {fileID: 2392625100333085972}
   m_Layer: 0
   m_Name: lion_darker_0
   m_TagString: Untagged
@@ -361,28 +286,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2392625100333085972
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6365425803640431760}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -3818516547001971114, guid: 2dfbf2652c532684ab831ed9a88930be, type: 3}
 --- !u!1 &6574508300332025766
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,7 +297,6 @@ GameObject:
   - component: {fileID: 7831899266075651710}
   - component: {fileID: 1647178418941008257}
   - component: {fileID: 1225884894662778001}
-  - component: {fileID: 1395761178080355858}
   m_Layer: 0
   m_Name: lion_dark_0
   m_TagString: Untagged
@@ -467,28 +369,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1395761178080355858
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6574508300332025766}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 2587541878574240044, guid: 2dfbf2652c532684ab831ed9a88930be, type: 3}
 --- !u!1 &8315921575881537530
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +380,6 @@ GameObject:
   - component: {fileID: 4984850222662611257}
   - component: {fileID: 8015220758028038634}
   - component: {fileID: 3957185997267815791}
-  - component: {fileID: 4925338914476494090}
   m_Layer: 0
   m_Name: lion_main_0
   m_TagString: Untagged
@@ -573,28 +452,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &4925338914476494090
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8315921575881537530}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7454162378540992431, guid: 2dfbf2652c532684ab831ed9a88930be, type: 3}
 --- !u!1 &8971277516950018373
 GameObject:
   m_ObjectHideFlags: 0
@@ -606,7 +463,6 @@ GameObject:
   - component: {fileID: 5239151675913875452}
   - component: {fileID: 1785722144255148473}
   - component: {fileID: 6490006753904538800}
-  - component: {fileID: 2922358110071172327}
   m_Layer: 0
   m_Name: lion_sub_0
   m_TagString: Untagged
@@ -679,25 +535,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2922358110071172327
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8971277516950018373}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -5162643662834564239, guid: 2dfbf2652c532684ab831ed9a88930be, type: 3}

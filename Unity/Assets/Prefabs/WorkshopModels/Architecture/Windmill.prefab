@@ -105,7 +105,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7087713584520121414}
-  - component: {fileID: 8916266075240615849}
   m_Layer: 0
   m_Name: Windmill
   m_TagString: Untagged
@@ -129,33 +128,6 @@ Transform:
   - {fileID: 4424018644693308434}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!54 &8916266075240615849
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2800627587382692357}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &3145291019032230031
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,7 +172,6 @@ GameObject:
   - component: {fileID: 1465422433478314441}
   - component: {fileID: 1677756023944210233}
   - component: {fileID: 6290219360113463631}
-  - component: {fileID: 3328958998429379834}
   m_Layer: 0
   m_Name: Mill-wind_Texture-base-gloss-jpg_0
   m_TagString: Untagged
@@ -273,28 +244,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3328958998429379834
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5649222220595380703}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -3992225996739006087, guid: e8706683f70d04e4fb17bb75182add5e, type: 3}
 --- !u!1 &8787270389152733293
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +255,6 @@ GameObject:
   - component: {fileID: 7178780375799235098}
   - component: {fileID: 6966954275474323144}
   - component: {fileID: 2773713108325493863}
-  - component: {fileID: 7347866077031043833}
   m_Layer: 0
   m_Name: Mill-wind_Texture-base_0
   m_TagString: Untagged
@@ -379,25 +327,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7347866077031043833
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8787270389152733293}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 3624393335093177876, guid: e8706683f70d04e4fb17bb75182add5e, type: 3}

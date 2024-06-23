@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 4783892597301042342}
   - component: {fileID: 1713930189116561066}
   - component: {fileID: 4666958320450007951}
-  - component: {fileID: 8280658101900758295}
   m_Layer: 0
   m_Name: Object_5
   m_TagString: Untagged
@@ -116,28 +115,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8280658101900758295
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2256907395049451582}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4977131475666943381, guid: b9b94a7b4a4dd334db4a060b15cc8aac, type: 3}
 --- !u!1 &3482899900018256788
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,7 +156,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1301011939824199362}
-  - component: {fileID: 8620857525219602955}
   m_Layer: 0
   m_Name: Basketball Hoop
   m_TagString: Untagged
@@ -203,33 +179,6 @@ Transform:
   - {fileID: 485769980664237658}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!54 &8620857525219602955
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3611032189238578590}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &7149134611947789236
 GameObject:
   m_ObjectHideFlags: 0
@@ -275,7 +224,6 @@ GameObject:
   - component: {fileID: 8784849008753134605}
   - component: {fileID: 3825065162661398565}
   - component: {fileID: 9117836948725786525}
-  - component: {fileID: 7183434230865887185}
   m_Layer: 0
   m_Name: Object_4
   m_TagString: Untagged
@@ -348,28 +296,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7183434230865887185
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8109614537218703978}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7227129179611170996, guid: b9b94a7b4a4dd334db4a060b15cc8aac, type: 3}
 --- !u!1 &8663957492313305028
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,7 +307,6 @@ GameObject:
   - component: {fileID: 7251816163681649393}
   - component: {fileID: 1186122341877283641}
   - component: {fileID: 3920095434862858224}
-  - component: {fileID: 6407997572753584620}
   m_Layer: 0
   m_Name: Object_6
   m_TagString: Untagged
@@ -454,25 +379,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6407997572753584620
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8663957492313305028}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4763983586728042654, guid: b9b94a7b4a4dd334db4a060b15cc8aac, type: 3}

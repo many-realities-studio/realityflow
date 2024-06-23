@@ -75,7 +75,6 @@ GameObject:
   - component: {fileID: 5063036944773277620}
   - component: {fileID: 63382800724527479}
   - component: {fileID: 1206363014925473569}
-  - component: {fileID: 6770821356129220423}
   m_Layer: 0
   m_Name: chuck_Material #28_0
   m_TagString: Untagged
@@ -148,28 +147,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6770821356129220423
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 528852683867577019}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 3890287763814877203, guid: c7c37e207793f4943ac330f382995656, type: 3}
 --- !u!1 &1170665283730294689
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,7 +189,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5311481525701624217}
-  - component: {fileID: 4217824090947039646}
   m_Layer: 0
   m_Name: Drill
   m_TagString: Untagged
@@ -236,33 +212,6 @@ Transform:
   - {fileID: 4750327435320028687}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -0.291, y: 0, z: 0}
---- !u!54 &4217824090947039646
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1278555227062650211}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &1742662578186373425
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +255,6 @@ GameObject:
   - component: {fileID: 1644573488149293332}
   - component: {fileID: 3108466577023395435}
   - component: {fileID: 7268937386535829707}
-  - component: {fileID: 5692256945792564447}
   m_Layer: 0
   m_Name: trigger_Material #27_0
   m_TagString: Untagged
@@ -379,28 +327,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &5692256945792564447
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2974983883708794408}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2508338494640777104, guid: c7c37e207793f4943ac330f382995656, type: 3}
 --- !u!1 &3107029231763614091
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,7 +338,6 @@ GameObject:
   - component: {fileID: 8654849924788895498}
   - component: {fileID: 8000989865465503679}
   - component: {fileID: 2825693546948831564}
-  - component: {fileID: 2625104367945170146}
   m_Layer: 0
   m_Name: drill-bit-a_Material #29_0
   m_TagString: Untagged
@@ -485,28 +410,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &2625104367945170146
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3107029231763614091}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 2062525586624997127, guid: c7c37e207793f4943ac330f382995656, type: 3}
 --- !u!1 &3987793520133443384
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,7 +453,6 @@ GameObject:
   - component: {fileID: 1063618370814519050}
   - component: {fileID: 326715464955562041}
   - component: {fileID: 7263774062453269858}
-  - component: {fileID: 6269945956100498231}
   m_Layer: 0
   m_Name: power-drill-80s_Material #26_0
   m_TagString: Untagged
@@ -623,28 +525,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6269945956100498231
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5671514600215211868}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 8161756675912284622, guid: c7c37e207793f4943ac330f382995656, type: 3}
 --- !u!1 &6514774539557329388
 GameObject:
   m_ObjectHideFlags: 0

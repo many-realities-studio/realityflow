@@ -145,7 +145,7 @@ public class PrefabIconComponentAdder : EditorWindow
         }
     }
 
-    /*private void resetPrefabsToBase()
+    private void resetPrefabsToBase()
     {
         if (!Directory.Exists(prefabsFolderPath))
         {
@@ -166,8 +166,11 @@ public class PrefabIconComponentAdder : EditorWindow
 
                 if (instance != null)
                 {
-                    // Add MeshColliders and Rigidbody
+                    // removes everything but the tranform on the base prefab
                     removeAllButTransform(instance);
+
+                    // removes the colliders in children of the prefab.
+                    removeCollidersInChildren(instance);
 
                     // Apply changes to the prefab
                     PrefabUtility.SaveAsPrefabAsset(instance, assetPath);
@@ -196,5 +199,15 @@ public class PrefabIconComponentAdder : EditorWindow
                 DestroyImmediate(comp);
             }
         }
-    }*/
+    }
+
+    private void removeCollidersInChildren(GameObject instance)
+    {
+        MeshCollider[] meshColliders = instance.GetComponentsInChildren<MeshCollider>();
+ 
+        foreach (MeshCollider collider in meshColliders)
+        {
+            DestroyImmediate(collider);
+        }
+    }
 }

@@ -73,7 +73,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8526809357733401459}
-  - component: {fileID: 7518541188522002889}
   m_Layer: 0
   m_Name: Baseball
   m_TagString: Untagged
@@ -97,33 +96,6 @@ Transform:
   - {fileID: 6605277406752644675}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -50.189, y: -90, z: 90}
---- !u!54 &7518541188522002889
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3720474672021083233}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &5140440054094455027
 GameObject:
   m_ObjectHideFlags: 0
@@ -135,7 +107,6 @@ GameObject:
   - component: {fileID: 2544214621984852132}
   - component: {fileID: 8426582146253436741}
   - component: {fileID: 4567517133654375874}
-  - component: {fileID: 3703322460936770380}
   m_Layer: 0
   m_Name: polySurface5_lambert1_0
   m_TagString: Untagged
@@ -208,28 +179,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3703322460936770380
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5140440054094455027}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8133810611981411044, guid: 3cf42443d27cb7041b0a0551ab318f3e, type: 3}
 --- !u!1 &5721967420990899076
 GameObject:
   m_ObjectHideFlags: 0

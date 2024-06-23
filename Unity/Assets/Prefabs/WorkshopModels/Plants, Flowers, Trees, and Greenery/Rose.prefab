@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1158402846388634625}
   - component: {fileID: 6310348545761635661}
   - component: {fileID: 2041502358251568083}
-  - component: {fileID: 4586350164155030966}
   m_Layer: 0
   m_Name: Cylinder_0
   m_TagString: Untagged
@@ -84,28 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &4586350164155030966
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2635953646758459217}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4450778879166279180, guid: 892ea6d4f148fca47a83288ea1ce4744, type: 3}
 --- !u!1 &2951854158219990000
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,7 +126,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2421339855700942489}
-  - component: {fileID: 8032332558007905325}
   m_Layer: 0
   m_Name: Rose
   m_TagString: Untagged
@@ -173,33 +149,6 @@ Transform:
   - {fileID: 8482480536239125282}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!54 &8032332558007905325
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4354381111060616984}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &5280464902438300797
 GameObject:
   m_ObjectHideFlags: 0
@@ -244,7 +193,6 @@ GameObject:
   - component: {fileID: 5213323228944232801}
   - component: {fileID: 3501523739872333656}
   - component: {fileID: 2081923985130330193}
-  - component: {fileID: 1535593583730228346}
   m_Layer: 0
   m_Name: Cylinder_1
   m_TagString: Untagged
@@ -317,28 +265,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1535593583730228346
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6234068068395104376}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 346709268315465695, guid: 892ea6d4f148fca47a83288ea1ce4744, type: 3}
 --- !u!1 &8132783237719685327
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,7 +276,6 @@ GameObject:
   - component: {fileID: 5766161379250655992}
   - component: {fileID: 5481993629997310820}
   - component: {fileID: 2063156664740120432}
-  - component: {fileID: 7874300373564505099}
   m_Layer: 0
   m_Name: Cylinder_2
   m_TagString: Untagged
@@ -423,28 +348,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7874300373564505099
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8132783237719685327}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4435154092143180895, guid: 892ea6d4f148fca47a83288ea1ce4744, type: 3}
 --- !u!1 &9037144742479321472
 GameObject:
   m_ObjectHideFlags: 0

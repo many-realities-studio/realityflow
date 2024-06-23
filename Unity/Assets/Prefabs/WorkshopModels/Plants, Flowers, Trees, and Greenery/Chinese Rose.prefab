@@ -41,7 +41,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6064268366303215884}
-  - component: {fileID: 2641300913122608703}
   m_Layer: 0
   m_Name: Chinese Rose
   m_TagString: Untagged
@@ -65,33 +64,6 @@ Transform:
   - {fileID: 861457948713328419}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!54 &2641300913122608703
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3956290153419269313}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &4123622418764598143
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,7 +139,6 @@ GameObject:
   - component: {fileID: 4046884243618223484}
   - component: {fileID: 951884789481108569}
   - component: {fileID: 5411734447107980644}
-  - component: {fileID: 8089204212726747726}
   m_Layer: 0
   m_Name: chinese_rose_small_chinese_rose_mat_0
   m_TagString: Untagged
@@ -240,28 +211,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8089204212726747726
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6119338860493495678}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -4039696312682174149, guid: 2ad252c3be2df514bb793e82afb13215, type: 3}
 --- !u!1 &6180269011208528709
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +255,6 @@ GameObject:
   - component: {fileID: 27750518525150599}
   - component: {fileID: 6651522843440730753}
   - component: {fileID: 9146692273568795662}
-  - component: {fileID: 7340729083902515151}
   m_Layer: 0
   m_Name: chinese_rose_chinese_rose_mat_0
   m_TagString: Untagged
@@ -379,25 +327,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7340729083902515151
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8486972609895543723}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7156369473192668821, guid: 2ad252c3be2df514bb793e82afb13215, type: 3}

@@ -1,6 +1,10 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using Ubiq.Messaging;
+using Microsoft.MixedReality.Toolkit.UX;
+using Microsoft.MixedReality.Toolkit.Examples.Demos;
+using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 
 public class PrefabColliderAndRigidbodyAdder : EditorWindow
 {
@@ -26,6 +30,11 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
         {
             UpdateComponentSettingsOnPrefabs();
         }
+
+        /*if (GUILayout.Button("Add Remaining Components (not rigidbody)"))
+        {
+            AddRemainingComponentsOnPrefabs();
+        }*/
     }
 
     private void AddCollidersAndRigidbodiesToPrefabs()
@@ -137,5 +146,96 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
             instance.GetComponent<Rigidbody>().useGravity = false;
             instance.GetComponent<Rigidbody>().isKinematic = true;
         }
+    }
+
+    private void AddRemainingComponentsOnPrefabs()
+    {
+        if (!Directory.Exists(prefabsFolderPath))
+        {
+            Debug.LogError("Prefabs folder path does not exist.");
+            return;
+        }
+
+        string[] prefabFiles = Directory.GetFiles(prefabsFolderPath, "*.prefab", SearchOption.AllDirectories);
+
+        foreach (string filePath in prefabFiles)
+        {
+            string assetPath = filePath.Substring(filePath.IndexOf("Assets"));
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+
+            if (prefab != null)
+            {
+                GameObject instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+
+                if (instance != null)
+                {
+                    // Add MeshColliders and Rigidbody
+
+                    AddRemainingComponents(instance);
+
+                    // Apply changes to the prefab
+                    PrefabUtility.SaveAsPrefabAsset(instance, assetPath);
+                    DestroyImmediate(instance);
+                    Debug.Log($"Updated prefab: {assetPath}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed to load prefab at path: {assetPath}");
+            }
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    private void AddRemainingComponents(GameObject instance)
+    {
+        // Add All the expected components, check if a component already exists for each type
+        if (instance.GetComponent<UGUIInputAdapterDraggable>() == null)
+        {
+            instance.AddComponent<UGUIInputAdapterDraggable>();
+        }
+
+        if (instance.GetComponent<MyNetworkedObject>() == null)
+        {
+            instance.AddComponent<MyNetworkedObject>();
+        }
+
+        if (instance.GetComponent<NetworkedMesh>() == null)
+        {
+            instance.AddComponent<NetworkedMesh>();
+        }
+
+        if (instance.GetComponent<Hover>() == null)
+        {
+            instance.AddComponent<Hover>();
+        }
+
+        if (instance.GetComponent<ConstraintManager>() == null)
+        {
+            instance.AddComponent<ConstraintManager>();
+        }
+
+        if (instance.GetComponent<ObjectManipulator>() == null)
+        {
+            instance.AddComponent<ObjectManipulator>();
+        }
+
+        /*if (instance.GetComponent<TetheredPlacement>() == null)
+        {
+            instance.AddComponent<TetheredPlacement>();
+        }*/
+
+        if (instance.GetComponent<CacheMeshData>() == null)
+        {
+            instance.AddComponent<CacheMeshData>();
+        }
+
+        if (instance.GetComponent<NetworkedOperationCache>() == null)
+        {
+            instance.AddComponent<NetworkedOperationCache>();
+        }
+
+        
     }
 }
