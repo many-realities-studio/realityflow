@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PlasticPipe.PlasticProtocol.Client.Proxies;
 using Ubiq.Dictionaries;
 using Ubiq.Messaging;
 using Ubiq.Networking;
