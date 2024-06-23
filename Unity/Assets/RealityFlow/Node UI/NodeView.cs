@@ -49,6 +49,7 @@ namespace RealityFlow.NodeUI
                 [NodeValueType.Vector3] = Resources.Load<GameObject>(basePath + "Vector3 Editor"),
                 [NodeValueType.String] = Resources.Load<GameObject>(basePath + "String Editor"),
                 [NodeValueType.GameObject] = Resources.Load<GameObject>(basePath + "GameObject Editor"),
+                [NodeValueType.TemplateObject] = Resources.Load<GameObject>(basePath + "TemplateObject Editor"),
                 [NodeValueType.Any] = Resources.Load<GameObject>(basePath + "Any Editor"),
                 [NodeValueType.Bool] = Resources.Load<GameObject>(basePath + "Bool Editor"),
                 [NodeValueType.Variable] = Resources.Load<GameObject>(basePath + "Variable Editor"),

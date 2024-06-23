@@ -45,6 +45,7 @@ public class RealityFlowClient : MonoBehaviour
     public event Action<bool> LoginSuccess;
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
+    public event Action OnRoomCreated;
 
     private void Awake()
     {
@@ -108,7 +109,7 @@ public class RealityFlowClient : MonoBehaviour
         };
 
         accessToken = PlayerPrefs.GetString("accessToken");
-        
+
         // Check to see if PlayerPrefs already has an access token
         if (string.IsNullOrEmpty(accessToken))
         {
@@ -134,7 +135,8 @@ public class RealityFlowClient : MonoBehaviour
 
     // ========= LOGIN/AUTHORIZAITON FUNCTIONS =========
 
-    private void ShowOTP() {
+    private void ShowOTP()
+    {
         projectManager.SetActive(false);
         loginMenu.gameObject.SetActive(true);
         loginMenu.onOTPSubmitted += SubmitOTP;
@@ -179,7 +181,7 @@ public class RealityFlowClient : MonoBehaviour
     public void Login(string inputAccessToken)
     {
         Debug.Log("Logging in....");
-        
+
 
         userDecoded = DecodeJwt(inputAccessToken);
         Debug.Log("User decoded: " + userDecoded);
@@ -207,7 +209,14 @@ public class RealityFlowClient : MonoBehaviour
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
             LoginSuccess.Invoke(true);
-            if(Whisper.rootWhisper != null) {
+            //find object type ChatGPT and enable it
+            var chatGPTObject = GameObject.Find("ChatGPT");
+            if (chatGPTObject != null)
+            {
+                chatGPTObject.SetActive(true);
+            }
+            if (Whisper.rootWhisper != null)
+            {
                 Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
             }
         }
@@ -243,7 +252,7 @@ public class RealityFlowClient : MonoBehaviour
         // !!LOAD OBJECTS FROM PROJECT HERE!!
         roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom);
         roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
-        
+
 
     }
 
@@ -255,11 +264,11 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " Publish: " + room.Publish);
 
         levelEditor.SetActive(true);
-        
+
         RealityFlowAPI.Instance.FetchAndPopulateObjects();
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
-        { 
+        {
             Query = @"
             mutation AddRoom($input: AddRoomInput!, $input2: UpdateExpiredTimeInput!, $input3: UpdateUserRoomIdInput!) {
                 addRoom(input: $input) {
@@ -312,6 +321,7 @@ public class RealityFlowClient : MonoBehaviour
         
         
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
+        OnRoomCreated?.Invoke();
     }
 
     private void KeepRoomAlive()
@@ -356,7 +366,7 @@ public class RealityFlowClient : MonoBehaviour
         if (string.IsNullOrEmpty(currentProjectId))
         {
             Debug.LogError("No project selected");
-            return; 
+            return;
         }
         projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
 
@@ -506,7 +516,7 @@ public class RealityFlowClient : MonoBehaviour
     public void OpenProject(string id)
     {
         Debug.Log("Opening project with ID: " + id);
-
+        SetCurrentProject(id);
         // Create a new GraphQL query request to get the project details by ID.
         var GetProjectData = new GraphQLRequest
         {

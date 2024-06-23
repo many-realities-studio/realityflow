@@ -47,7 +47,8 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         BiMultiValueDict<PortIndex, NodeIndex> executionEdges = new();
 
-        public IEnumerable<KeyValuePair<PortIndex, List<NodeIndex>>> ExecutionEdges => executionEdges;
+        public IEnumerable<KeyValuePair<PortIndex, ImmutableList<NodeIndex>>> ExecutionEdges
+            => executionEdges.Select(kv => new KeyValuePair<PortIndex, ImmutableList<NodeIndex>>(kv.Key, kv.Value.ToImmutableList()));
 
         /// <summary>
         /// Input ports, usually only present in subgraphs (such as within a for loop node)
@@ -199,34 +200,38 @@ namespace RealityFlow.NodeGraph
         {
             Node node = GetNode(index);
 
-            for (int i = 0; i < node.Definition.Inputs.Count; i++)
+            if (node.Definition != null)
             {
-                PortIndex to = new(index, i);
-                if (reverseEdges.ContainsKey(to))
-                    reverseEdges.Remove(to);
-            }
-
-            for (int i = 0; i < node.Definition.Outputs.Count; i++)
-            {
-                PortIndex from = new(index, i);
-                if (reverseEdges.TryGetKeys(from, out ImmutableList<PortIndex> targets))
-                    foreach (PortIndex to in targets)
+                for (int i = 0; i < node.Definition.Inputs.Count; i++)
+                {
+                    PortIndex to = new(index, i);
+                    if (reverseEdges.ContainsKey(to))
                         reverseEdges.Remove(to);
+                }
+
+                for (int i = 0; i < node.Definition.Outputs.Count; i++)
+                {
+                    PortIndex from = new(index, i);
+                    if (reverseEdges.TryGetKeys(from, out ImmutableList<PortIndex> targets))
+                        foreach (PortIndex to in targets)
+                            reverseEdges.Remove(to);
+                }
+
+                for (int i = 0; i < node.Definition.ExecutionOutputs.Count; i++)
+                {
+                    PortIndex from = new(index, i);
+                    if (executionEdges.ContainsKey(from))
+                        executionEdges.RemoveAll(from);
+                }
+
+                if (node.Definition.ExecutionInput)
+                    if (executionEdges.TryGetKeys(index, out ImmutableList<PortIndex> ports))
+                        foreach (PortIndex from in ports)
+                            executionEdges.Remove(from, index);
+
+                MutableNodesOfType(node.Definition.name).Remove(index);
             }
 
-            for (int i = 0; i < node.Definition.ExecutionOutputs.Count; i++)
-            {
-                PortIndex from = new(index, i);
-                if (executionEdges.ContainsKey(from))
-                    executionEdges.RemoveAll(from);
-            }
-
-            if (node.Definition.ExecutionInput)
-                if (executionEdges.TryGetKeys(index, out ImmutableList<PortIndex> ports))
-                    foreach (PortIndex from in ports)
-                        executionEdges.Remove(from, index);
-
-            MutableNodesOfType(node.Definition.name).Remove(index);
             return nodes.Remove(index);
         }
 
@@ -244,6 +249,9 @@ namespace RealityFlow.NodeGraph
             exec.Clear();
 
             Node node = GetNode(nodeIndex);
+
+            if (node.Definition == null)
+                return;
 
             for (int i = 0; i < node.Definition.Inputs.Count; i++)
             {
@@ -502,7 +510,7 @@ namespace RealityFlow.NodeGraph
                 if (!ContainsNode(to.Node) || !ContainsNode(from.Node))
                     RemoveDataEdge(from, to);
 
-            foreach ((PortIndex from, List<NodeIndex> tos) in executionEdges)
+            foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in executionEdges)
                 foreach (NodeIndex to in tos)
                     if (!ContainsNode(from.Node) || !ContainsNode(to))
                         RemoveExecutionEdge(from, to);

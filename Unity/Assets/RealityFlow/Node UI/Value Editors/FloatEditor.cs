@@ -22,7 +22,7 @@ namespace RealityFlow.NodeUI
         public float Value
         {
             get => float.TryParse(input.text, out float val) ? val : default;
-            set => input.text = value.ToString();
+            set => input.SetTextWithoutNotify(value.ToString());
         }
 
         public NodeValue NodeValue
@@ -41,7 +41,7 @@ namespace RealityFlow.NodeUI
             if (!float.TryParse(input.text, out _))
                 input.text = "0";
 
-            OnTick(new FloatValue(Value));
+            OnTick?.Invoke(new FloatValue(Value));
         }
     }
 }

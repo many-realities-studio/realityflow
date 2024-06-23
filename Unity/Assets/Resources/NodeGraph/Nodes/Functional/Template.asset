@@ -12,16 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bec6d8e18daaab4e85909e6f63bdae2, type: 3}
   m_Name: Template
   m_EditorClassIdentifier: 
-  Fields: []
+  Fields:
+  - Name: template
+    DefaultType: 9
+    DefaultValue:
+      rid: -2
   Inputs: []
-  Outputs: []
+  Outputs:
+  - Name: 
+    Optional: 0
+    Type: 9
   IsVariadic: 0
   IsVariadicOutput: 0
-  EvaluationMethod: 0
+  EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 
+  EvalCode: ctx.SetOutput(0, template);
   ExecutionInput: 0
   ExecutionOutputs: []
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

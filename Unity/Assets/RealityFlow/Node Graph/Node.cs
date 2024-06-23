@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Org.BouncyCastle.Crypto.Modes;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -151,6 +152,9 @@ namespace RealityFlow.NodeGraph
             }
             
             RealityFlowAPI.Instance.NodeDefinitionDict.TryGetValue(DefinitionName, out Definition);
+
+            if (Definition == null)
+                Debug.LogWarning("Node definition with unknown definition name");
         }
     }
 }
