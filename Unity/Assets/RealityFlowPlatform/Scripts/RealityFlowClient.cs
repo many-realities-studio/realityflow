@@ -36,7 +36,7 @@ public class RealityFlowClient : MonoBehaviour
 
     // GraphQL client and access token variables
     public Dictionary<string, string> userDecoded;
-    public bool debug = true;
+    // public bool debug = true;
 #if REALITYFLOW_LIVE
     public string server = @"https://reality.gaim.ucf.edu/";
 #else
@@ -50,9 +50,9 @@ public class RealityFlowClient : MonoBehaviour
 
     private void Awake()
     {
-        if(debug==true) {
-            server = @"http://localhost:4000/";
-        }
+        // if(debug==true) {
+            // server = @"http://localhost:4000/";
+        // }
         Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
         if (transform.parent == null)
@@ -442,8 +442,13 @@ public class RealityFlowClient : MonoBehaviour
     // ========= LEAVE ROOM =========
     public void LeaveRoom()
     {
-        // Implementation for leaving a room
+        Debug.Log("=== LEAVING ROOM ==="); // Log the project ID
+        roomClient.Join("", false);
 
+        levelEditor.SetActive(false);
+        projectManager.SetActive(true);
+
+        RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
     }
 
     // ========= DELETE ROOM =========
@@ -462,9 +467,15 @@ public class RealityFlowClient : MonoBehaviour
             request.SetRequestHeader("Authorization", "Bearer " + accessToken);
 
         // Send request
+        // TODO: Actually make this occur over multiple frames by way of coroutines. 
+        // Seems to take 50-100ms on a decent connection, which will drop multiple frames if not
+        // asynchronous.
+        double start = Time.realtimeSinceStartupAsDouble;
         UnityWebRequestAsyncOperation task = request.SendWebRequest();
         while (!task.isDone)
-            Thread.Sleep(3);
+            Thread.Sleep(1);
+        double end = Time.realtimeSinceStartupAsDouble;
+        Debug.Log($"Query took {(end - start) * 1000}ms to complete");
 
         // Handle response
         JObject response = null;

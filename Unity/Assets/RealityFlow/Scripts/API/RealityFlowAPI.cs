@@ -20,6 +20,8 @@ using RealityFlow.NodeUI;
 using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
 using System.Collections.Immutable;
+using Unity.VisualScripting;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -63,6 +65,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     readonly Dictionary<string, GameObject> spawnedObjectsById = new();
     public ImmutableDictionary<string, GameObject> SpawnedObjectsById
         => spawnedObjectsById.ToImmutableDictionary();
+
+    readonly Dictionary<GameObject, int> templatesDict = new();
+    public ImmutableDictionary<GameObject, int> TemplatesDict => templatesDict.ToImmutableDictionary();
+    readonly List<GameObject> templates = new();
+    public IEnumerable<GameObject> Templates => templates;
+    public Action OnTemplatesChanged;
+
     public enum SpawnScope
     {
         Room,
@@ -375,6 +384,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return;
     }
 
+    public void SetTemplate(VisualScript obj, bool becomeTemplate)
+    {
+        // TODO: Persist to database
+
+        if (!templatesDict.ContainsKey(obj.gameObject) && becomeTemplate)
+        {
+            templatesDict.Add(obj.gameObject, templates.Count);
+            templates.Add(obj.gameObject);
+        }
+        else if (templatesDict.TryGetValue(obj.gameObject, out int index) && !becomeTemplate)
+        {
+            templatesDict.Remove(obj.gameObject);
+            templates.RemoveAt(index);
+        }
+
+        obj.isTemplate = becomeTemplate;
+
+        OnTemplatesChanged?.Invoke();
+    }
+
     // -- EDIT GRAPH FUNCTIONS --
     public void SendGraphUpdateToDatabase(string graphJson, string graphId)
     {
@@ -611,7 +640,128 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         obj.GetComponent<Rigidbody>().AddRelativeForce(dirMag, ForceMode.Impulse);
     }
 
-    // ---Spawn/Save Object---
+    // // ---Spawn/Save Object---
+    public GameObject UpdatePrimitive(GameObject spawnedMesh)
+    {
+        Debug.Log("Updating primitive...");
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        TransformData transformData = new TransformData
+        {
+            position = spawnedMesh.transform.position,
+            rotation = spawnedMesh.transform.rotation,
+            scale = spawnedMesh.transform.localScale
+        };
+        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
+
+        RfObject rfObject = spawnedObjects[spawnedMesh];
+        rfObject.transformJson = JsonUtility.ToJson(transformData);
+        rfObject.meshJson = JsonUtility.ToJson(smi);
+        // Manually serialize faces into a json array of arrays
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < smi.faces.Length; i++)
+        {
+            sb.Append("[");
+            for (int j = 0; j < smi.faces[i].Length; j++)
+            {
+                sb.Append(smi.faces[i][j]);
+                if (j < smi.faces[i].Length - 1)
+                {
+                    sb.Append(",");
+                }
+            }
+            sb.Append("]");
+            if (i < smi.faces.Length - 1)
+            {
+                sb.Append(",");
+            }
+        }
+        sb.Append("]");
+        Debug.Log(sb.ToString());
+        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation updateObject($input: CreateObjectInput!) {
+                updateObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "CreateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            var graphQLResponse = client.SendQueryAsync(createObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Object saved to the database successfully.");
+
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                rfObject.id = returnedId;
+                Debug.Log($"Assigned ID from database: {rfObject.id}");
+                spawnedObjects[spawnedMesh] = rfObject;
+                spawnedObjectsById[returnedId] = spawnedMesh;
+
+                // Update the name of the spawned object in the scene
+                if (spawnedMesh != null)
+                {
+                    spawnedMesh.name = rfObject.id;
+                    Debug.Log($"Updated spawned object name to: {spawnedMesh.name}");
+                }
+                else
+                {
+                    Debug.LogError("Could not find the spawned object to update its name.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
+                }
+            }
+            // actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+        }
+
+        return spawnedMesh;
+    }
+
     public GameObject SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
         var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
@@ -655,6 +805,30 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             meshJson = JsonUtility.ToJson(smi),
             projectId = client.GetCurrentProjectId()
         };
+        // Manually serialize faces into a json array of arrays
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < smi.faces.Length; i++)
+        {
+            sb.Append("[");
+            for (int j = 0; j < smi.faces[i].Length; j++)
+            {
+                sb.Append(smi.faces[i][j]);
+                if (j < smi.faces[i].Length - 1)
+                {
+                    sb.Append(",");
+                }
+            }
+            sb.Append("]");
+            if (i < smi.faces.Length - 1)
+            {
+                sb.Append(",");
+            }
+        }
+        sb.Append("]");
+        Debug.Log(sb.ToString());
+        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
         Debug.Log(rfObject);
 
         var createObject = new GraphQLRequest
@@ -682,8 +856,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
-            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
             var graphQLResponse = client.SendQueryAsync(createObject);
             if (graphQLResponse["data"] != null)
             {
@@ -761,6 +933,32 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.position = spawnPosition;
                     spawnedObject.transform.rotation = spawnRotation;
                     spawnedObject.transform.localScale = scale;
+
+                    // Add Rigidbody
+                    if (spawnedObject.GetComponent<Rigidbody>() == null)
+                    {
+                        spawnedObject.AddComponent<Rigidbody>();
+                    }
+
+                    // Add MeshCollider
+                    if (spawnedObject.GetComponent<MeshCollider>() == null)
+                    {
+                        var meshFilter = spawnedObject.GetComponent<MeshFilter>();
+                        if (meshFilter != null)
+                        {
+                            spawnedObject.AddComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh;
+                        }
+                        else
+                        {
+                            // Handle case where mesh is on a child object
+                            var childMeshFilter = spawnedObject.GetComponentInChildren<MeshFilter>();
+                            if (childMeshFilter != null)
+                            {
+                                var childMeshCollider = spawnedObject.AddComponent<MeshCollider>();
+                                childMeshCollider.sharedMesh = childMeshFilter.sharedMesh;
+                            }
+                        }
+                    }
                 }
                 if (scope == SpawnScope.Room)
                 {
@@ -1193,6 +1391,54 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     Debug.Log("Primitive Base");
 
                     var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
+                    // Deserialize the two dimensional array of integers from the json string and assign it to serializableMesh.faces
+
+                    // StringBuilder sb = new StringBuilder();
+                    // sb.Append("[");
+                    // for (int i = 0; i < smi.faces.Length; i++)
+                    // {
+                    //     sb.Append("[");
+                    //     for (int j = 0; j < smi.faces[i].Length; j++)
+                    //     {
+                    //         sb.Append(smi.faces[i][j]);
+                    //         if (j < smi.faces[i].Length - 1)
+                    //         {
+                    //             sb.Append(",");
+                    //         }
+                    //     }
+                    //     sb.Append("]");
+                    //     if (i < smi.faces.Length - 1)
+                    //     {
+                    //         sb.Append(",");
+                    //     }
+                    // }
+                    // sb.Append("]");
+
+                    // Reverse the above serialization for the faces property of the string contained in obj.meshJson and assign it to serializableMesh.faces
+                    //
+                    obj.meshJson = obj.meshJson.Remove(obj.meshJson.Length - 1);
+                    int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
+                    int end = obj.meshJson.Length;
+                    string faces = obj.meshJson.Substring(start, end - start - 1);
+                    Debug.Log(faces);
+                    string[] faceArray = faces.Split('[');
+                    int[][] facesArray = new int[faceArray.Length - 1][];
+                    for (int i = 1; i < faceArray.Length; i++)
+                    {
+                        // If the last character is a , remove it
+                        faceArray[i] =faceArray[i].TrimEnd(',');
+                        string[] face = faceArray[i].Split(',');
+                        // Remove any "]" characters from the last element of the array
+                        facesArray[i - 1] = new int[face.Length];
+                        for (int j = 0; j < face.Length; j++)
+                        {
+                            face[j] = face[j].Replace("]", "");
+                            facesArray[i - 1][j] = int.Parse(face[j]);
+                        }
+                    }
+                    Debug.Log(facesArray);
+                    serializableMesh.faces = facesArray;
+
                     Debug.Log(serializableMesh);
                     // Error can't deserialize here for some reason. Can check with team or investigate 
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
@@ -1340,8 +1586,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
-
-
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -1395,7 +1639,18 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    // ---Despawn/Delete---
+    // ---Despawn/Delete--
+    public void DespawnAllObjectsInBothDictionarys()
+    {
+        foreach (var kvp in spawnedObjects)
+        {
+            DespawnObject(kvp.Key);
+        }
+        foreach (var kvp in spawnedObjectsById)
+        {
+            DespawnObject(kvp.Value);
+        }
+    }
 
     //This function is primarily for peer scope
     public void DespawnObject(GameObject objectToDespawn)
@@ -1423,7 +1678,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private async void RemoveObjectFromDatabase(string objectId, System.Action onSuccess)
+    private void RemoveObjectFromDatabase(string objectId, Action onSuccess)
     {
         if (client == null)
         {

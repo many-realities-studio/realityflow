@@ -126,6 +126,7 @@ public class PrimitiveSpawner : MonoBehaviour
         // Mesh has been created, owner can now exit mesh creation at any time
         ReEnableCancelButton(leftHandDominant);
 
+        RealityFlowAPI.Instance.UpdatePrimitive(spawnedMesh);
         resizingMesh = false;
         CreateMeshProxy();
         Destroy(XZplane);
