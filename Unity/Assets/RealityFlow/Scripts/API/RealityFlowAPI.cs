@@ -761,6 +761,32 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.position = spawnPosition;
                     spawnedObject.transform.rotation = spawnRotation;
                     spawnedObject.transform.localScale = scale;
+
+                    // Add Rigidbody
+                    if (spawnedObject.GetComponent<Rigidbody>() == null)
+                    {
+                        spawnedObject.AddComponent<Rigidbody>();
+                    }
+
+                    // Add MeshCollider
+                    if (spawnedObject.GetComponent<MeshCollider>() == null)
+                    {
+                        var meshFilter = spawnedObject.GetComponent<MeshFilter>();
+                        if (meshFilter != null)
+                        {
+                            spawnedObject.AddComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh;
+                        }
+                        else
+                        {
+                            // Handle case where mesh is on a child object
+                            var childMeshFilter = spawnedObject.GetComponentInChildren<MeshFilter>();
+                            if (childMeshFilter != null)
+                            {
+                                var childMeshCollider = spawnedObject.AddComponent<MeshCollider>();
+                                childMeshCollider.sharedMesh = childMeshFilter.sharedMesh;
+                            }
+                        }
+                    }
                 }
                 if (scope == SpawnScope.Room)
                 {
