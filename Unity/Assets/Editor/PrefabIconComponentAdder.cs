@@ -69,10 +69,11 @@ public class PrefabIconComponentAdder : EditorWindow
 
     private void removeAllButTransform(GameObject instance)
     {
-        Component[] components = instance.GetComponentsInChildren<Component>();
+        Component[] components = instance.GetComponents<Component>();
  
         foreach (Component comp in components)
         {
+            Debug.Log(comp.GetType());
             if(!(comp is Transform))
             {
                 Destroy(comp);
