@@ -113,7 +113,6 @@ public class PrimitiveSpawner : MonoBehaviour
     {
         DestroyProxy();
         active = false;
-        RealityFlowAPI.Instance.UpdatePrimitive(spawnedMesh);
         // Default ray cast distance when not in mesh creation mode
         rayInteractor.maxRaycastDistance = 10f;
         rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = true;
@@ -127,6 +126,7 @@ public class PrimitiveSpawner : MonoBehaviour
         // Mesh has been created, owner can now exit mesh creation at any time
         ReEnableCancelButton(leftHandDominant);
 
+        RealityFlowAPI.Instance.UpdatePrimitive(spawnedMesh);
         resizingMesh = false;
         CreateMeshProxy();
         Destroy(XZplane);

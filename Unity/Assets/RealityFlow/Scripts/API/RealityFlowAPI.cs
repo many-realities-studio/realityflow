@@ -614,6 +614,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // // ---Spawn/Save Object---
     public GameObject UpdatePrimitive(GameObject spawnedMesh)
     {
+        Debug.Log("Updating primitive...");
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
         TransformData transformData = new TransformData
         {
