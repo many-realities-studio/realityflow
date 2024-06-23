@@ -705,6 +705,10 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             playButtonStateVisualizer = buttonStates[44].enabled,
             playButtonActiveHover = buttonStates[44].Interactable.IsActiveHovered,
             playButtonHover = buttonStates[44].Interactable.IsRayHovered,
+            
+            leaveButtonStateVisualizer = buttonStates[47].enabled,
+            leaveButtonActiveHover = buttonStates[47].Interactable.IsActiveHovered,
+            leaveButtonHover = buttonStates[47].Interactable.IsRayHovered,
 
             // Edit related buttons
             editButtonStateVisualizer = buttonStates[29].enabled,
@@ -865,6 +869,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public bool redoButtonStateVisualizer; public bool redoButtonActiveHover; public bool redoButtonHover;
         public bool combineButtonStateVisualizer; public bool combineButtonActiveHover; public bool combineButtonHover;
         public bool playButtonStateVisualizer; public bool playButtonActiveHover; public bool playButtonHover;
+        public bool leaveButtonStateVisualizer; public bool leaveButtonActiveHover; public bool leaveButtonHover;
 
         // Manipulate related buttons
         public bool manipulateButtonStateVisualizer; public bool manipulateButtonActiveHover; public bool manipulateButtonHover;
@@ -1005,7 +1010,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                 { m.colorsButtonStateVisualizer, m.colorsButtonActiveHover, m.colorsButtonHover }, { m.colorsBackButtonStateVisualizer, m.colorsBackButtonActiveHover, m.colorsBackButtonHover },
                 { m.moreOptionsButtonStateVisualizer, m.moreOptionsButtonActiveHover, m.moreOptionsButtonHover }, { m.metallicButtonStateVisualizer, m.metallicButtonActiveHover, m.metallicButtonHover },
                 { m.smoothnessButtonStateVisualizer, m.smoothnessButtonActiveHover, m.smoothnessButtonHover }, { m.colorButtonStateVisualizer, m.colorButtonActiveHover, m.colorButtonHover },
-                { m.copyButtonStateVisualizer, m.copyButtonActiveHover, m.copyButtonHover }, { m.playButtonStateVisualizer, m.playButtonActiveHover, m.playButtonHover },
+                { m.copyButtonStateVisualizer, m.copyButtonActiveHover, m.copyButtonHover }, { m.playButtonStateVisualizer, m.playButtonActiveHover, m.playButtonHover }, { m.leaveButtonStateVisualizer, m.leaveButtonActiveHover, m.leaveButtonHover },
                 {m.wedgeButtonStateVisualizer, m.wedgeButtonActiveHover, m.wedgeButtonHover }, {m.pipeButtonStateVisualizer, m.pipeButtonActiveHover, m.pipeButtonHover}
             };
 

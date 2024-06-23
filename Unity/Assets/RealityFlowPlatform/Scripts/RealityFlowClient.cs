@@ -452,8 +452,13 @@ public class RealityFlowClient : MonoBehaviour
     // ========= LEAVE ROOM =========
     public void LeaveRoom()
     {
-        // Implementation for leaving a room
+        Debug.Log("=== LEAVING ROOM ==="); // Log the project ID
+        roomClient.Join("", false);
 
+        levelEditor.SetActive(false);
+        projectManager.SetActive(true);
+
+        RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
     }
 
     // ========= DELETE ROOM =========

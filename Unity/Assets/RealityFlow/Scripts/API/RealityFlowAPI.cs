@@ -1557,8 +1557,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
-
-
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -1612,7 +1610,18 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    // ---Despawn/Delete---
+    // ---Despawn/Delete--
+    public void DespawnAllObjectsInBothDictionarys()
+    {
+        foreach (var kvp in spawnedObjects)
+        {
+            DespawnObject(kvp.Key);
+        }
+        foreach (var kvp in spawnedObjectsById)
+        {
+            DespawnObject(kvp.Value);
+        }
+    }
 
     //This function is primarily for peer scope
     public void DespawnObject(GameObject objectToDespawn)
