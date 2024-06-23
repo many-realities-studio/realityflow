@@ -108,7 +108,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ===== SUPPORT FUNCTIONS =====
     public string ExportSpawnedObjectsData()
     {
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         foreach (var kvp in spawnManager.GetSpawnedForRoom())
         {
@@ -712,7 +712,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             Debug.Log("Object saved to the database successfully.");
 
                             // Extract the ID from the response and assign it to the rfObject
-                            var returnedId = graphQLResponse["data"]["saveObject"]["id"].ToString();
+                            var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
                             rfObject.id = returnedId;
                             Debug.Log($"Assigned ID from database: {rfObject.id}");
                             spawnedObjects[spawnedObject] = rfObject;
