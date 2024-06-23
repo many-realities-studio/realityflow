@@ -632,9 +632,109 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Error!!");
             return null;
         }
+
+        // Set the Primitive's transform Data
         spawnedMesh.transform.position = position;
         spawnedMesh.transform.rotation = rotation;
         spawnedMesh.transform.localScale = scale;
+        TransformData transformData = new TransformData
+        {
+            position = position,
+            rotation = rotation,
+            scale = scale
+        };
+        RfObject rfObject = new RfObject
+        { 
+            name = "PrimitiveBase",
+            type = "Primitive",
+            graphId = null,
+            transformJson = JsonUtility.ToJson(transformData),
+            meshJson = JsonUtility.ToJson(spawnedMesh.GetComponent<EditableMesh>().smi),
+            projectId = client.GetCurrentProjectId()
+        };
+        Debug.Log(rfObject);
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation CreateObject($input: CreateObjectInput!) {
+                createObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "CreateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectId = rfObject.projectId,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    type = rfObject.type,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
+            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
+            var graphQLResponse = client.SendQueryAsync(createObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Object saved to the database successfully.");
+
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                rfObject.id = returnedId;
+                Debug.Log($"Assigned ID from database: {rfObject.id}");
+                spawnedObjects[spawnedMesh] = rfObject;
+                spawnedObjectsById[returnedId] = spawnedMesh;
+
+                // Update the name of the spawned object in the scene
+                if (spawnedMesh != null)
+                {
+                    spawnedMesh.name = rfObject.id;
+                    Debug.Log($"Updated spawned object name to: {spawnedMesh.name}");
+                }
+                else
+                {
+                    Debug.LogError("Could not find the spawned object to update its name.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
+                }
+            }
+            actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+        }
+
         return spawnedMesh;
     }
 
@@ -1084,42 +1184,50 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             try
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
-                spawnManager.SpawnWithRoomScope(prefab);
+                var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
+                    /*if(spawnedObject.GetComponent<EditableMesh>() != null) 
+                    {
+                        Debug.Log("Primitive Base");
 
+                        var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
+                        Debug.Log(serializableMesh);
+                        // Error can't deserialize here for some reason. Can check with team or investigate 
+                        spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;                    
+                    }*/
+                    Debug.Log("Spawned object with room scope");
+                    if (spawnedObject == null)
+                    {
+                        Debug.LogError("Spawned object is null.");
+                        return;
+                    }
+
+                    spawnedObject.AddComponent<AttachedWhiteboard>();
+                    if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
+                    {
+                        Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
+                        Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                        spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
+                    }
+
+                    // Set the name of the spawned object to its ID for unique identification
+                    spawnedObject.name = obj.id;
+
+                    // Apply the transform properties
+                    TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
+                    if (transformData != null)
+                    {
+                        spawnedObject.transform.position = transformData.position;
+                        spawnedObject.transform.rotation = transformData.rotation;
+                        spawnedObject.transform.localScale = transformData.scale;
+                    }
+
+                    Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
+
+                    spawnedObjects.Add(spawnedObject, obj);
+                    spawnedObjectsById.Add(obj.id, spawnedObject);
+
+                    Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
                 // Find the spawned object in the scene (assuming it's named the same as the prefab)
-                GameObject spawnedObject = GameObject.Find(objectName);
-                spawnedObject.AddComponent<AttachedWhiteboard>();
-                if (spawnedObject == null)
-                {
-                    Debug.LogError("Spawned object is null.");
-                    continue;
-                }
-
-                if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
-                {
-                    Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
-                    Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
-                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
-                }
-
-                // Set the name of the spawned object to its ID for unique identification
-                spawnedObject.name = obj.id;
-
-                // Apply the transform properties
-                TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
-                if (transformData != null)
-                {
-                    spawnedObject.transform.position = transformData.position;
-                    spawnedObject.transform.rotation = transformData.rotation;
-                    spawnedObject.transform.localScale = transformData.scale;
-                }
-
-                Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
-
-                spawnedObjects.Add(spawnedObject, obj);
-                spawnedObjectsById.Add(obj.id, spawnedObject);
-
-                Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
             }
             catch (Exception ex)
             {

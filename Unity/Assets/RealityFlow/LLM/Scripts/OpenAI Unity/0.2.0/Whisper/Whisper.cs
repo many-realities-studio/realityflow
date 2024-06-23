@@ -44,7 +44,7 @@ namespace Samples.Whisper
             else
             {
                 gameObject.SetActive(false);
-                DestroyObject(gameObject);
+                Object.Destroy(gameObject);
                 return;
             }
             inputActions = new RealityFlowActions();

@@ -18,7 +18,7 @@ public class ChatGPTProgress : Singleton<ChatGPTProgress>
 
     private int dotCount = 0;
 
-    private bool done = false;
+    // private bool done = false;
 
     private void Awake()
     {
@@ -32,7 +32,7 @@ public class ChatGPTProgress : Singleton<ChatGPTProgress>
     }
     public void StopProgress()
     {
-        done = true;
+        // done = true;
     }
 
     IEnumerator ProcessProgress()
