@@ -113,6 +113,7 @@ public class PrimitiveSpawner : MonoBehaviour
     {
         DestroyProxy();
         active = false;
+        RealityFlowAPI.Instance.UpdatePrimitive(spawnedMesh);
         // Default ray cast distance when not in mesh creation mode
         rayInteractor.maxRaycastDistance = 10f;
         rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = true;

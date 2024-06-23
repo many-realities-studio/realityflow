@@ -2558,7 +2558,7 @@ PrefabInstance:
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 15.285045
+      value: 0.649
       objectReference: {fileID: 0}
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
@@ -2583,12 +2583,12 @@ PrefabInstance:
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -4.6980934
+      value: 0.038
       objectReference: {fileID: 0}
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -18.411137
+      value: 1.303
       objectReference: {fileID: 0}
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
@@ -4292,7 +4292,7 @@ PrefabInstance:
     - target: {fileID: 1480099864430483591, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 15.184045
+      value: 0.647
       objectReference: {fileID: 0}
     - target: {fileID: 1480099864430483591, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
@@ -4317,12 +4317,12 @@ PrefabInstance:
     - target: {fileID: 1480099864430483591, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -4.7420936
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1480099864430483591, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -18.427137
+      value: 1.318
       objectReference: {fileID: 0}
     - target: {fileID: 1480099864430483591, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
@@ -4740,7 +4740,7 @@ Transform:
   m_GameObject: {fileID: 1165061545}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.6980934, y: -7.079137, z: 14.559045}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9017,7 +9017,7 @@ Transform:
   m_GameObject: {fileID: 1859582588}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.6980934, y: -19.869137, z: 14.559045}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10196,7 +10196,7 @@ Transform:
   m_GameObject: {fileID: 2142340396}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.6980934, y: 19.869137, z: -14.559045}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10226,8 +10226,7 @@ MonoBehaviour:
   loginMenu: {fileID: 323530833}
   levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  debug: 1
-  server: https://reality.gaim.ucf.edu/
+  server: http://localhost:4000/
   graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:
