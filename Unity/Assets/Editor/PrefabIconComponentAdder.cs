@@ -17,71 +17,20 @@ public class PrefabIconComponentAdder : EditorWindow
         GUILayout.Label("Prefab Icon Component Adder", EditorStyles.boldLabel);
         prefabsFolderPath = EditorGUILayout.TextField("Prefabs Folder Path", prefabsFolderPath);
 
-        if (GUILayout.Button("Reset"))
+        // Be VERY careful if using this functionality.
+        /*if (GUILayout.Button("Reset"))
         {
             resetPrefabsToBase();
-        }
+        }*/
 
-        /*if (GUILayout.Button("Add Icon Components"))
+        if (GUILayout.Button("Add Icon Components"))
         {
             AddIconComponentsToPrefabs();
-        }*/
-    }
-
-    private void resetPrefabsToBase()
-    {
-        if (!Directory.Exists(prefabsFolderPath))
-        {
-            Debug.LogError("Prefabs folder path does not exist.");
-            return;
-        }
-
-        string[] prefabFiles = Directory.GetFiles(prefabsFolderPath, "*.prefab", SearchOption.AllDirectories);
-
-        foreach (string filePath in prefabFiles)
-        {
-            string assetPath = filePath.Substring(filePath.IndexOf("Assets"));
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-
-            if (prefab != null)
-            {
-                GameObject instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-
-                if (instance != null)
-                {
-                    // Add MeshColliders and Rigidbody
-                    removeAllButTransform(instance);
-
-                    // Apply changes to the prefab
-                    PrefabUtility.SaveAsPrefabAsset(instance, assetPath);
-                    DestroyImmediate(instance);
-                    Debug.Log($"Updated prefab: {assetPath}");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Failed to load prefab at path: {assetPath}");
-            }
-        }
-
-        AssetDatabase.Refresh();
-    }
-
-    private void removeAllButTransform(GameObject instance)
-    {
-        Component[] components = instance.GetComponents<Component>();
- 
-        foreach (Component comp in components)
-        {
-            Debug.Log(comp.GetType());
-            if(!(comp is Transform))
-            {
-                Destroy(comp);
-            }
         }
     }
 
-   /*private void AddIconComponentsToPrefabs()
+
+   private void AddIconComponentsToPrefabs()
     {
         if (!Directory.Exists(prefabsFolderPath))
         {
@@ -140,6 +89,59 @@ public class PrefabIconComponentAdder : EditorWindow
         if (instance.GetComponent<Rigidbody>() == null)
         {
             instance.AddComponent<Rigidbody>();
+        }
+    }
+
+    /*private void resetPrefabsToBase()
+    {
+        if (!Directory.Exists(prefabsFolderPath))
+        {
+            Debug.LogError("Prefabs folder path does not exist.");
+            return;
+        }
+
+        string[] prefabFiles = Directory.GetFiles(prefabsFolderPath, "*.prefab", SearchOption.AllDirectories);
+
+        foreach (string filePath in prefabFiles)
+        {
+            string assetPath = filePath.Substring(filePath.IndexOf("Assets"));
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+
+            if (prefab != null)
+            {
+                GameObject instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+
+                if (instance != null)
+                {
+                    // Add MeshColliders and Rigidbody
+                    removeAllButTransform(instance);
+
+                    // Apply changes to the prefab
+                    PrefabUtility.SaveAsPrefabAsset(instance, assetPath);
+                    DestroyImmediate(instance);
+                    Debug.Log($"Updated prefab: {assetPath}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed to load prefab at path: {assetPath}");
+            }
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    private void removeAllButTransform(GameObject instance)
+    {
+        Component[] components = instance.GetComponents<Component>();
+ 
+        foreach (Component comp in components)
+        {
+            Debug.Log(comp.GetType());
+            if(!(comp is Transform))
+            {
+                DestroyImmediate(comp);
+            }
         }
     }*/
 }
