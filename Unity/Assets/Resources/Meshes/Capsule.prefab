@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 1748889175914978294}
   - component: {fileID: -3830287946888473711}
   - component: {fileID: -6708346019706695128}
-  - component: {fileID: 3848875142390444687}
   - component: {fileID: 2506362059740405422}
   - component: {fileID: -2794054414887458671}
   - component: {fileID: 1416405337142170999}
@@ -399,7 +398,7 @@ MonoBehaviour:
   useForcesForNearManipulation: 0
   rotationAnchorNear: 1
   rotationAnchorFar: 1
-  releaseBehavior: 3
+  releaseBehavior: 0
   transformSmoothingLogicType:
     reference: Microsoft.MixedReality.Toolkit.SpatialManipulation.DefaultTransformSmoothingLogic,
       Microsoft.MixedReality.Toolkit.SpatialManipulation
@@ -475,24 +474,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   owner: 0
   isHeld: 0
---- !u!114 &3848875142390444687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4580671458235758380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 078514ed693653a4481ca9b43383e738, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  owner: 0
-  isHeld: 0
-  isSelected: 0
-  wasBake: 0
-  isDuplicate: 0
-  originalName: 
 --- !u!114 &2506362059740405422
 MonoBehaviour:
   m_ObjectHideFlags: 0
