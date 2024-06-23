@@ -325,7 +325,7 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
     /// <summary>
     /// Uses existing mesh data to populate the fields of Editable Mesh
     /// </summary>
-    private void LoadMeshData()
+    public void LoadMeshData()
     {
         Mesh m = meshFilter.mesh;
 

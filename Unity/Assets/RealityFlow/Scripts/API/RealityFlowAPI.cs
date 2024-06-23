@@ -643,13 +643,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             rotation = rotation,
             scale = scale
         };
+        // Generate faces
+        spawnedMesh.GetComponent<EditableMesh>().LoadMeshData();
+        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
         RfObject rfObject = new RfObject
-        { 
+        {
             name = "PrimitiveBase",
             type = "Primitive",
             graphId = null,
             transformJson = JsonUtility.ToJson(transformData),
-            meshJson = JsonUtility.ToJson(spawnedMesh.GetComponent<EditableMesh>().smi),
+            meshJson = JsonUtility.ToJson(smi),
             projectId = client.GetCurrentProjectId()
         };
         Debug.Log(rfObject);
@@ -1185,48 +1188,48 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
                 var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
-                    /*if(spawnedObject.GetComponent<EditableMesh>() != null) 
-                    {
-                        Debug.Log("Primitive Base");
+                if (spawnedObject.GetComponent<EditableMesh>() != null)
+                {
+                    Debug.Log("Primitive Base");
 
-                        var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
-                        Debug.Log(serializableMesh);
-                        // Error can't deserialize here for some reason. Can check with team or investigate 
-                        spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;                    
-                    }*/
-                    Debug.Log("Spawned object with room scope");
-                    if (spawnedObject == null)
-                    {
-                        Debug.LogError("Spawned object is null.");
-                        return;
-                    }
+                    var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
+                    Debug.Log(serializableMesh);
+                    // Error can't deserialize here for some reason. Can check with team or investigate 
+                    spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
+                }
+                Debug.Log("Spawned object with room scope");
+                if (spawnedObject == null)
+                {
+                    Debug.LogError("Spawned object is null.");
+                    return;
+                }
 
-                    spawnedObject.AddComponent<AttachedWhiteboard>();
-                    if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
-                    {
-                        Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
-                        Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
-                        spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
-                    }
+                spawnedObject.AddComponent<AttachedWhiteboard>();
+                if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
+                {
+                    Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
+                    Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
+                }
 
-                    // Set the name of the spawned object to its ID for unique identification
-                    spawnedObject.name = obj.id;
+                // Set the name of the spawned object to its ID for unique identification
+                spawnedObject.name = obj.id;
 
-                    // Apply the transform properties
-                    TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
-                    if (transformData != null)
-                    {
-                        spawnedObject.transform.position = transformData.position;
-                        spawnedObject.transform.rotation = transformData.rotation;
-                        spawnedObject.transform.localScale = transformData.scale;
-                    }
+                // Apply the transform properties
+                TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
+                if (transformData != null)
+                {
+                    spawnedObject.transform.position = transformData.position;
+                    spawnedObject.transform.rotation = transformData.rotation;
+                    spawnedObject.transform.localScale = transformData.scale;
+                }
 
-                    Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
+                Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
-                    spawnedObjects.Add(spawnedObject, obj);
-                    spawnedObjectsById.Add(obj.id, spawnedObject);
+                spawnedObjects.Add(spawnedObject, obj);
+                spawnedObjectsById.Add(obj.id, spawnedObject);
 
-                    Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
+                Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
                 // Find the spawned object in the scene (assuming it's named the same as the prefab)
             }
             catch (Exception ex)
@@ -1393,17 +1396,111 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // ---Despawn/Delete---
+
+    //This function is primarily for peer scope
     public void DespawnObject(GameObject objectToDespawn)
     {
         if (objectToDespawn != null)
         {
+            string objectId = objectToDespawn.name;
             actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
-            spawnManager.Despawn(objectToDespawn);
-            Debug.Log("Despawned: " + objectToDespawn.name);
+
+            // Remove object from the database
+            RemoveObjectFromDatabase(objectId, () =>
+            {
+                // Only despawn the object if it was successfully removed from the database
+                spawnManager.Despawn(objectToDespawn);
+                Debug.Log("Despawned: " + objectToDespawn.name);
+
+                // Remove the object from local dictionaries
+                spawnedObjects.Remove(objectToDespawn);
+                spawnedObjectsById.Remove(objectId);
+            });
         }
         else
         {
             Debug.LogError("Object to despawn is null");
+        }
+    }
+
+    private async void RemoveObjectFromDatabase(string objectId, System.Action onSuccess)
+    {
+        if (client == null)
+        {
+            Debug.LogError("RealityFlowClient is not initialized.");
+            return;
+        }
+
+        var deleteObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation DeleteObject($input: DeleteObjectInput!) {
+                deleteObject(input: $input) {
+                    id
+                }
+            }",
+            Variables = new
+            {
+                input = new
+                {
+                    objectId = objectId
+                }
+            }
+        };
+
+        try
+        {
+            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
+            Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
+            var graphQLResponse = client.SendQueryAsync(deleteObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Object removed from the database successfully.");
+
+                // Extract the ID from the response and ensure it matches the requested ID
+                //var returnedId = graphQLResponse.Data.deleteObject.id;
+                var returnedId = graphQLResponse["data"]["deleteObject"]["id"].ToString();
+                if (returnedId == objectId)
+                {
+                    Debug.Log($"Successfully removed object with ID: {objectId} from the database.");
+                    onSuccess?.Invoke();
+                }
+                else
+                {
+                    Debug.LogError($"Mismatch in deleted object ID. Requested: {objectId}, Returned: {returnedId}");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to remove object from the database.");
+                if (graphQLResponse["errors"] != null)
+                {
+                    foreach (var error in graphQLResponse["errors"])
+                    {
+                        Debug.LogError($"GraphQL Error: {error["message"]}");
+                        if (error["extensions"] != null)
+                        {
+                            Debug.LogError($"Error Extensions: {error["extensions"]}");
+                        }
+                    }
+                }
+            }
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
         }
     }
 

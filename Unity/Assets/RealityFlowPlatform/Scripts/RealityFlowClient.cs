@@ -36,6 +36,7 @@ public class RealityFlowClient : MonoBehaviour
 
     // GraphQL client and access token variables
     public Dictionary<string, string> userDecoded;
+    public bool debug = true;
 #if REALITYFLOW_LIVE
     public string server = @"https://reality.gaim.ucf.edu/";
 #else
@@ -49,6 +50,9 @@ public class RealityFlowClient : MonoBehaviour
 
     private void Awake()
     {
+        if(debug==true) {
+            server = @"http://localhost:4000/";
+        }
         Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
         if (transform.parent == null)
@@ -176,6 +180,65 @@ public class RealityFlowClient : MonoBehaviour
         {
             Debug.Log(errors[0]["message"]);
         }
+    }
+
+    public void CreateProject()
+    {
+        /* Create project input
+        input CreateProjectInput{
+        projectName: String,
+        projectOwnerId: String,
+        description: String,
+        details: String,
+        thumbnailImg: String,
+        categories: [String]
+        isPublic: Boolean
+        gallery: [String]
+        publicUrl: String,
+        globalId: String
+
+        createProject(input: CreateProjectInput) :Project!
+
+        */
+        // Create a new project with reasonable defaults and then open it
+        var createProject = new GraphQLRequest
+        {
+            Query = @"
+                mutation CreateProject($input: CreateProjectInput!) {
+                    createProject(input: $input) {
+                        id
+                    }
+                }
+            ",
+            OperationName = "CreateProject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectName = "New Project " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    description = "A new project",
+                    details = "A new project",
+                    thumbnailImg = "https://via.placeholder.com/150",
+                    categories = new string[] { "Education" },
+                    isPublic = false,
+                    gallery = new string[] { "https://via.placeholder.com/150" },
+                    publicUrl = "https://reality.gaim.ucf.edu/",
+                    globalId = "New Project"
+                }
+            }
+        };
+        var graphQL = SendQueryAsync(createProject);
+        if (graphQL["data"] != null)
+        {
+            Debug.Log("Room created successfully");
+            SetCurrentProject((string)graphQL["data"]["createProject"]["id"]);
+            CreateRoom();
+        }
+        else
+        {
+            Debug.LogError("Failed to create room: Room may already exist.");
+        }
+
     }
 
     public void Login(string inputAccessToken)
