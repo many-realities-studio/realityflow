@@ -26,7 +26,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {
-        context = NetworkScene.Register(this);
+        if (!context.Id.Valid)
+            context = NetworkScene.Register(this);
+        else
+            Debug.Log("ID is already valid");
         Debug.Log(context.Scene.Id);
         owner = false;
         isHeld = false;
@@ -77,6 +80,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             color = obj.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         });
+        rb.isKinematic = true;
     }
 
     // Update is called once per frame
