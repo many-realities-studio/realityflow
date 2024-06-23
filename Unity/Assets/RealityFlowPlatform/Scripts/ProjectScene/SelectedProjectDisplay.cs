@@ -130,31 +130,27 @@ public class MyProjectsDisplay : MonoBehaviour
                     {
                         if (c.name == "ProjectTitle")
                         {
-                            int x = i;
-                            c.GetComponent<TextMeshProUGUI>().text = (string)projects[x]["projectName"];
+                            c.GetComponent<TextMeshProUGUI>().text = (string)projects[i]["projectName"];
                         }
-                        else if (c.name == "Categories")
-                        {
-                            int x = i;
-                            c.GetComponent<TextMeshProUGUI>().text = string.Join(" | ", projects[x]["categories"]);
-                        }
+                        // else if (c.name == "Categories")
+                        // {
+                        //     int x = i;
+                        //     c.GetComponent<TextMeshProUGUI>().text = string.Join(" | ", projects[x]["categories"]);
+                        // }
 
-                        else if (c.name == "Publicity")
-                        {
-                            int x = i;
-                            bool isPublic = (bool)projects[x]["isPublic"];
-                            c.GetComponent<TextMeshProUGUI>().text = isPublic ? "public" : "private";
-                        }
+                        // else if (c.name == "Publicity")
+                        // {
+                        //     int x = i;
+                        //     bool isPublic = (bool)projects[x]["isPublic"];
+                        //     c.GetComponent<TextMeshProUGUI>().text = isPublic ? "public" : "private";
+                        // }
                     }
-
-                }
-                else if (child.name == "OpenProjectBtn")
-                {
-                    int x = i;
+                    int x2 = i;
                     child.GetComponent<Button>().onClick.AddListener(delegate
                     {
-                        OpenProject((string)projects[x]["id"]);
+                        OpenProject((string)projects[x2]["id"]);
                     });
+
                 }
 
             }
