@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2627,7 +2627,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 488727133}
+    m_TransformParent: {fileID: 1803236453}
     m_Modifications:
     - target: {fileID: 6640862661555942798, guid: f276eae926feb5245bfac141b7424208,
         type: 3}
@@ -3528,10 +3528,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1803236453}
-    - targetCorrespondingSourceObject: {fileID: 3066899959337477420, guid: 4674852d403b2214ca01439e5720d554,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1842473398}
     - targetCorrespondingSourceObject: {fileID: 3066899959337477420, guid: 4674852d403b2214ca01439e5720d554,
         type: 3}
       insertIndex: -1
@@ -7138,7 +7134,7 @@ PrefabInstance:
     - target: {fileID: 3327737482178259357, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0011834078
+      value: 0.000089645386
       objectReference: {fileID: 0}
     - target: {fileID: 3327737482178259357, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
@@ -7716,12 +7712,12 @@ PrefabInstance:
     - target: {fileID: 3895853455702012099, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
         type: 3}
       propertyPath: additionalOffset.z
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3895853455702012099, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
         type: 3}
       propertyPath: additionalRotation.y
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5382200689051380719, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
         type: 3}
@@ -7772,6 +7768,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7903878065878983475, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
+        type: 3}
+      propertyPath: minDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7903878065878983475, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
+        type: 3}
+      propertyPath: maxViewDegrees
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8309497705888167983, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
         type: 3}
@@ -8331,7 +8337,7 @@ PrefabInstance:
         type: 3}
       propertyPath: rayInteractor
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 6562185173771593387}
     - target: {fileID: 4295565110628730561, guid: 0b43262dfc8339541aca016d7a710497,
         type: 3}
       propertyPath: visualIndicatorPrefab
@@ -8415,7 +8421,11 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 4711203790962144156, guid: 0b43262dfc8339541aca016d7a710497, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6893092818289266715, guid: 0b43262dfc8339541aca016d7a710497,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1842473398}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b43262dfc8339541aca016d7a710497, type: 3}
 --- !u!114 &1803236449 stripped
