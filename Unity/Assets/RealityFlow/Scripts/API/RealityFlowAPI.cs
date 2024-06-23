@@ -607,8 +607,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)
     {
-        // TODO: Punted implementation until rewrite for less to rewrite
-        // ^ also punting undo functionality
+        // TODO: NETWORK IT AAAAAA
+        obj.GetComponent<Rigidbody>().AddRelativeForce(dirMag, ForceMode.Impulse);
     }
 
     // ---Spawn/Save Object---

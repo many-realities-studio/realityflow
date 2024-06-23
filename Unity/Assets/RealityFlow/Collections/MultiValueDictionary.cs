@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using UnityEngine;
 
 namespace RealityFlow.Collections
@@ -10,7 +11,7 @@ namespace RealityFlow.Collections
     /// A simple wrapper over a Dictionary<Key, List<Value>> which is also serializable.
     /// </summary>
     [Serializable]
-    public class MultiValueDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, List<TValue>>>
+    public class MultiValueDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ImmutableList<TValue>>>
     {
         [SerializeField]
         SerializableDict<TKey, List<TValue>> dict = new();
@@ -65,11 +66,13 @@ namespace RealityFlow.Collections
         public bool ContainsKey(TKey key)
             => dict.ContainsKey(key);
 
-        public IEnumerator<KeyValuePair<TKey, List<TValue>>> GetEnumerator()
-            => dict.GetEnumerator();
+        public IEnumerator<KeyValuePair<TKey, ImmutableList<TValue>>> GetEnumerator()
+            => dict
+                .Select(kv => new KeyValuePair<TKey, ImmutableList<TValue>>(kv.Key, kv.Value.ToImmutableList()))
+                .GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
-            => dict.GetEnumerator();
+            => GetEnumerator();
 
         public ImmutableList<TValue> this[TKey key] => GetOrCreateList(key).ToImmutableList();
     }

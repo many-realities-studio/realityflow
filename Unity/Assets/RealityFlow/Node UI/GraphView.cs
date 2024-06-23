@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
@@ -101,8 +102,12 @@ namespace RealityFlow.NodeUI
 
             foreach ((NodeIndex index, Node node) in graph.Nodes)
             {
+                if (node.Definition == null)
+                    RealityFlowAPI.Instance.RemoveNodeFromGraph(graph, index);
+
                 GameObject nodeUi = Instantiate(nodeUIPrefab, transform);
                 NodeView view = nodeUi.GetComponent<NodeView>();
+
                 view.NodeInfo = (index, node);
 
                 nodeUis.Add(index, view);
@@ -110,11 +115,13 @@ namespace RealityFlow.NodeUI
 
             foreach ((PortIndex from, PortIndex to) in graph.Edges)
             {
+                if (!nodeUis.TryGetValue(from.Node, out NodeView fromView))
+                    continue;
+                if (!nodeUis.TryGetValue(to.Node, out NodeView toView))
+                    continue;
+
                 GameObject edgeUi = Instantiate(edgeUIPrefab, transform);
                 EdgeView view = edgeUi.GetComponent<EdgeView>();
-
-                NodeView fromView = nodeUis[from.Node];
-                NodeView toView = nodeUis[to.Node];
 
                 OutputPortView fromPortView = fromView.outputPortViews[from.Port];
                 InputPortView toPortView = toView.inputPortViews[to.Port];
@@ -128,14 +135,16 @@ namespace RealityFlow.NodeUI
                 dataEdgeUis.Add((from, to), view);
             }
 
-            foreach ((PortIndex from, List<NodeIndex> targets) in graph.ExecutionEdges)
+            foreach ((PortIndex from, ImmutableList<NodeIndex> targets) in graph.ExecutionEdges)
                 foreach (NodeIndex to in targets)
                 {
+                    if (!nodeUis.TryGetValue(from.Node, out NodeView fromView))
+                        continue;
+                    if (!nodeUis.TryGetValue(to, out NodeView toView))
+                        continue;
+
                     GameObject edgeUi = Instantiate(edgeUIPrefab, transform);
                     EdgeView view = edgeUi.GetComponent<EdgeView>();
-
-                    NodeView fromView = nodeUis[from.Node];
-                    NodeView toView = nodeUis[to];
 
                     OutputExecutionPort fromPortView = fromView.outputExecutionPorts[from.Port];
                     InputExecutionPort toPortView = toView.inputExecutionPort;

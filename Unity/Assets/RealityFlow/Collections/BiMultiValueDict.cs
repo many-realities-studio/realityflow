@@ -11,7 +11,7 @@ namespace RealityFlow.Collections
     /// Contains back edges; This forms a many-to-many relationship. 
     /// </summary>
     [Serializable]
-    public class BiMultiValueDict<TKey, TValue> : IEnumerable<KeyValuePair<TKey, List<TValue>>>, ISerializationCallbackReceiver
+    public class BiMultiValueDict<TKey, TValue> : IEnumerable<KeyValuePair<TKey, ImmutableList<TValue>>>, ISerializationCallbackReceiver
     {
         [SerializeField]
         MultiValueDictionary<TKey, TValue> forward = new();
@@ -63,20 +63,20 @@ namespace RealityFlow.Collections
         public bool ContainsKey(TKey key)
             => forward.ContainsKey(key);
 
-        public IEnumerator<KeyValuePair<TKey, List<TValue>>> GetEnumerator()
-            => forward.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => forward.GetEnumerator();
-
         public void OnBeforeSerialize() { }
 
         public void OnAfterDeserialize()
         {
-            foreach ((TKey key, List<TValue> values) in forward)
+            foreach ((TKey key, ImmutableList<TValue> values) in forward)
                 foreach (TValue value in values)
                     backward.Add(value, key);
         }
+
+        public IEnumerator<KeyValuePair<TKey, ImmutableList<TValue>>> GetEnumerator()
+            => forward.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
 
         public ImmutableList<TValue> this[TKey key] => forward[key];
     }
