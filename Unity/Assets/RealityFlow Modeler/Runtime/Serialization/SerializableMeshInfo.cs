@@ -118,6 +118,12 @@ public class SerializableMeshInfo
             }*/
         }
 
+        // Debug Log to show the Faces array.
+        for (int i = 0; i < faces.Length; i++)
+        {
+            Debug.Log("[SMI]Face " + i + ": " + faces[i][0] + " " + faces[i][1] + " " + faces[i][2]);
+        }
+
         shapeID = getShapeID(em.baseShape);
     }
 

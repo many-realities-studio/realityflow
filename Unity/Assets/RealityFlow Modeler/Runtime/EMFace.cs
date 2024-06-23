@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,10 @@ public class EMFace
 
     public EMFace(int[] indices)
     {
-        if (indicies == null)
-            indicies = new int[indices.Length];
+        if (indices == null)
+            throw new ArgumentNullException(nameof(indices));
+
+        indicies = new int[indices.Length];
 
         for (int i = 0; i < indices.Length; i++)
         {
@@ -28,6 +31,7 @@ public class EMFace
 
         uniqueIndicies = null;
     }
+
 
     public int[] GetUniqueIndicies()
     {

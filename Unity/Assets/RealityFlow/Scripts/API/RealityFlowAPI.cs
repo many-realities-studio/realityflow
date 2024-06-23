@@ -1185,23 +1185,23 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
                 var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
-                    if(spawnedObject.GetComponent<EditableMesh>() != null) 
+                    /*if(spawnedObject.GetComponent<EditableMesh>() != null) 
                     {
                         Debug.Log("Primitive Base");
 
                         var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
                         Debug.Log(serializableMesh);
-// Error can't deserialize here for some reason. Can check with team or investigate 
-                        // spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;                    
-                    }
+                        // Error can't deserialize here for some reason. Can check with team or investigate 
+                        spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;                    
+                    }*/
                     Debug.Log("Spawned object with room scope");
-                    spawnedObject.AddComponent<AttachedWhiteboard>();
                     if (spawnedObject == null)
                     {
                         Debug.LogError("Spawned object is null.");
                         return;
                     }
 
+                    spawnedObject.AddComponent<AttachedWhiteboard>();
                     if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
                     {
                         Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
