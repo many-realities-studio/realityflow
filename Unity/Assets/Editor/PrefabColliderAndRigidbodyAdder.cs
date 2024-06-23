@@ -21,6 +21,11 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
         {
             AddCollidersAndRigidbodiesToPrefabs();
         }
+
+        if (GUILayout.Button("Update Component Settings"))
+        {
+            UpdateComponentSettingsOnPrefabs();
+        }
     }
 
     private void AddCollidersAndRigidbodiesToPrefabs()
@@ -82,6 +87,55 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
         if (instance.GetComponent<Rigidbody>() == null)
         {
             instance.AddComponent<Rigidbody>();
+        }
+    }
+
+    private void UpdateComponentSettingsOnPrefabs()
+    {
+        if (!Directory.Exists(prefabsFolderPath))
+        {
+            Debug.LogError("Prefabs folder path does not exist.");
+            return;
+        }
+
+        string[] prefabFiles = Directory.GetFiles(prefabsFolderPath, "*.prefab", SearchOption.AllDirectories);
+
+        foreach (string filePath in prefabFiles)
+        {
+            string assetPath = filePath.Substring(filePath.IndexOf("Assets"));
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+
+            if (prefab != null)
+            {
+                GameObject instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+
+                if (instance != null)
+                {
+                    // Add MeshColliders and Rigidbody
+                    UpdateComponentSettings(instance);
+
+                    // Apply changes to the prefab
+                    PrefabUtility.SaveAsPrefabAsset(instance, assetPath);
+                    DestroyImmediate(instance);
+                    Debug.Log($"Updated prefab: {assetPath}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed to load prefab at path: {assetPath}");
+            }
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    private void UpdateComponentSettings(GameObject instance)
+    {
+        // Set RigidBody Settings
+        if (instance.GetComponent<Rigidbody>() != null)
+        {
+            instance.GetComponent<Rigidbody>().useGravity = false;
+            instance.GetComponent<Rigidbody>().isKinematic = true;
         }
     }
 }
