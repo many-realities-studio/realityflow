@@ -284,6 +284,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         isHeld = false;
         // Debug.Log("Run the EndHold() networking messages");
         
+        RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
         context.SendJson(new Message()
         {
             position = transform.localPosition,

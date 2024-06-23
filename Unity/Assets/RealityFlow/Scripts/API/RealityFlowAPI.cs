@@ -612,10 +612,127 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // // ---Spawn/Save Object---
-    // public GameObject UpdatePrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
-    // {
+    public GameObject UpdatePrimitive(GameObject spawnedMesh)
+    {
+        Debug.Log("Updating primitive...");
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        TransformData transformData = new TransformData
+        {
+            position = spawnedMesh.transform.position,
+            rotation = spawnedMesh.transform.rotation,
+            scale = spawnedMesh.transform.localScale
+        };
+        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
 
-    // }
+        RfObject rfObject = spawnedObjects[spawnedMesh];
+        rfObject.transformJson = JsonUtility.ToJson(transformData);
+        rfObject.meshJson = JsonUtility.ToJson(smi);
+        // Manually serialize faces into a json array of arrays
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < smi.faces.Length; i++)
+        {
+            sb.Append("[");
+            for (int j = 0; j < smi.faces[i].Length; j++)
+            {
+                sb.Append(smi.faces[i][j]);
+                if (j < smi.faces[i].Length - 1)
+                {
+                    sb.Append(",");
+                }
+            }
+            sb.Append("]");
+            if (i < smi.faces.Length - 1)
+            {
+                sb.Append(",");
+            }
+        }
+        sb.Append("]");
+        Debug.Log(sb.ToString());
+        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation updateObject($input: CreateObjectInput!) {
+                updateObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "CreateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            var graphQLResponse = client.SendQueryAsync(createObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Object saved to the database successfully.");
+
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                rfObject.id = returnedId;
+                Debug.Log($"Assigned ID from database: {rfObject.id}");
+                spawnedObjects[spawnedMesh] = rfObject;
+                spawnedObjectsById[returnedId] = spawnedMesh;
+
+                // Update the name of the spawned object in the scene
+                if (spawnedMesh != null)
+                {
+                    spawnedMesh.name = rfObject.id;
+                    Debug.Log($"Updated spawned object name to: {spawnedMesh.name}");
+                }
+                else
+                {
+                    Debug.LogError("Could not find the spawned object to update its name.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
+                }
+            }
+            // actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+        }
+
+        return spawnedMesh;
+    }
+
     public GameObject SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
         var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
@@ -787,6 +904,32 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.position = spawnPosition;
                     spawnedObject.transform.rotation = spawnRotation;
                     spawnedObject.transform.localScale = scale;
+
+                    // Add Rigidbody
+                    if (spawnedObject.GetComponent<Rigidbody>() == null)
+                    {
+                        spawnedObject.AddComponent<Rigidbody>();
+                    }
+
+                    // Add MeshCollider
+                    if (spawnedObject.GetComponent<MeshCollider>() == null)
+                    {
+                        var meshFilter = spawnedObject.GetComponent<MeshFilter>();
+                        if (meshFilter != null)
+                        {
+                            spawnedObject.AddComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh;
+                        }
+                        else
+                        {
+                            // Handle case where mesh is on a child object
+                            var childMeshFilter = spawnedObject.GetComponentInChildren<MeshFilter>();
+                            if (childMeshFilter != null)
+                            {
+                                var childMeshCollider = spawnedObject.AddComponent<MeshCollider>();
+                                childMeshCollider.sharedMesh = childMeshFilter.sharedMesh;
+                            }
+                        }
+                    }
                 }
                 if (scope == SpawnScope.Room)
                 {
