@@ -37,7 +37,7 @@ public class ChatGPTTester : MonoBehaviour
     {
         { "SpawnObject", "Create an object: {0}" },
         { "DespawnObject", "Remove the object: {0}" },
-        { "UpdateObjectTransform", "Update the transform of object: {0}" },
+        { "UpdateObjectTransform", "Move the object: {0}" },
         { "AddNodeToGraph", "Add a node to the graph: {0}" },
         // Add more mappings as needed
     };
@@ -95,10 +95,11 @@ public class ChatGPTTester : MonoBehaviour
 
             WriteResponseToFile(ChatGPTMessage);
             //Log the API calls in plain English
-            //LogApiCalls(ChatGPTMessage);
+            Debug.Log("Logging message in plain English");
+            LogApiCalls(ChatGPTMessage);
 
             //If you want to see the code produced by ChatGPT uncomment out the line below
-            Logger.Instance.LogInfo(ChatGPTMessage);
+            //Logger.Instance.LogInfo(ChatGPTMessage);
 
             // Log the generated code instead of executing it immediately
             RealityFlowAPI.Instance.actionLogger.LogGeneratedCode(ChatGPTMessage);
@@ -151,20 +152,33 @@ public class ChatGPTTester : MonoBehaviour
 
     private string ExtractObjectName(string code, string functionName)
     {
-        // This method should extract the object name or relevant parameter from the generated code
-        // You can implement this based on the expected structure of the generated code
-        // For example, if the generated code is like "SpawnObject('Ladder', ...)", you can extract 'Ladder'
-
-        // Here's a simple example assuming the object name is always the first parameter
         int startIndex = code.IndexOf(functionName) + functionName.Length + 1;
+        if (startIndex < functionName.Length + 1)
+        {
+            return "Unknown Object";
+        }
+
         int endIndex = code.IndexOf(',', startIndex);
         if (endIndex == -1) endIndex = code.IndexOf(')', startIndex);
         if (startIndex >= 0 && endIndex > startIndex)
         {
-            return code.Substring(startIndex, endIndex - startIndex).Trim(' ', '\'', '\"');
+            string parameter = code.Substring(startIndex, endIndex - startIndex).Trim(' ', '\'', '\"');
+
+            // Check if the parameter is a variable name and resolve it if necessary
+            if (parameter.StartsWith("prefabName"))
+            {
+                int nameStartIndex = code.IndexOf("string prefabName = ") + "string prefabName = ".Length;
+                int nameEndIndex = code.IndexOf(';', nameStartIndex);
+                if (nameStartIndex >= 0 && nameEndIndex > nameStartIndex)
+                {
+                    parameter = code.Substring(nameStartIndex, nameEndIndex - nameStartIndex).Trim(' ', '\'', '\"');
+                }
+            }
+            return parameter;
         }
         return "Unknown Object";
     }
+
 
     public void ExecuteLoggedActions()
     {
