@@ -37,7 +37,7 @@ public class PrefabIconComponentAdder : EditorWindow
     }
 
 
-   private void AddIconComponentsToPrefabs()
+    private void AddIconComponentsToPrefabs()
     {
         if (!Directory.Exists(prefabsFolderPath))
         {
@@ -95,7 +95,7 @@ public class PrefabIconComponentAdder : EditorWindow
         }
     }
 
-     private void updateSimpleRotation()
+    private void updateSimpleRotation()
     {
         if (!Directory.Exists(prefabsFolderPath))
         {
@@ -140,7 +140,8 @@ public class PrefabIconComponentAdder : EditorWindow
         {
             SimpleRotation srComponent = instance.GetComponent<SimpleRotation>();
             srComponent.speed = 20f;
-            srComponent.ForwardY = true;
+            srComponent.ForwardZ = true;
+            srComponent.ForwardY = false;
         }
     }
 

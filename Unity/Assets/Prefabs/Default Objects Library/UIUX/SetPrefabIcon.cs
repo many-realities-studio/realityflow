@@ -10,13 +10,15 @@ public class SetPrefabIcon : MonoBehaviour
     // Said instantiated prefab acts as the icon for that objects button in the toolbox
     public void Start()
     {
-        
+
         /*turn off prefab phsyics? (it literally modifies the prefab even outside playmode???)
         prefab.GetComponent<Rigidbody>().useGravity = false;
         prefab.GetComponent<Rigidbody>().isKinematic = true;*/
+        //Quaternion defaultRotation = this.transform.rotation;
 
-        GameObject newButtonIcon = Instantiate(prefab, transform.position + new Vector3(0f, 0.025f, 0f), Quaternion.identity, this.gameObject.transform);
+        GameObject newButtonIcon = Instantiate(prefab, transform.position + new Vector3(0f, 0.025f, 0f), this.gameObject.transform.rotation, this.gameObject.transform);
         newButtonIcon.transform.localScale *= 15f;
+        Debug.Log("Spawned with rotation" + this.gameObject.transform.rotation);
 
         /*resets the states:
         prefab.GetComponent<Rigidbody>().useGravity = true;
