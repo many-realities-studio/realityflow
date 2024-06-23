@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 2971653812016193995}
   - component: {fileID: 7005752312904177285}
   - component: {fileID: 649185507303522645}
+  - component: {fileID: 4459962666536517992}
   m_Layer: 0
   m_Name: Cylinder003_01 - Default_0
   m_TagString: Untagged
@@ -115,6 +116,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4459962666536517992
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2747304215333165343}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6650814826481370737, guid: 663f9c9e493af8048a0ed833e95b22ae, type: 3}
 --- !u!1 &6452147363264686155
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,6 +181,7 @@ GameObject:
   - component: {fileID: 7632808627691039255}
   - component: {fileID: 3175744698319639928}
   - component: {fileID: 3511014729637689945}
+  - component: {fileID: 9123945667433926907}
   m_Layer: 0
   m_Name: Box001_02 - Default_0
   m_TagString: Untagged
@@ -230,6 +254,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &9123945667433926907
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6817254443380355120}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6620170608364875323, guid: 663f9c9e493af8048a0ed833e95b22ae, type: 3}
 --- !u!1 &7588907134601189074
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,6 +317,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4596549867982931775}
+  - component: {fileID: 1164348395582770274}
   m_Layer: 0
   m_Name: soap_dispenser
   m_TagString: Untagged
@@ -293,7 +340,34 @@ Transform:
   m_Children:
   - {fileID: 2972080814882135526}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!54 &1164348395582770274
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8874754982324995834}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &9100349317738742816
 GameObject:
   m_ObjectHideFlags: 0

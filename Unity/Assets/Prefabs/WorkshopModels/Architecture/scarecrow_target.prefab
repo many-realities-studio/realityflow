@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5821601844309540670}
   - component: {fileID: 3998628929574895874}
   - component: {fileID: 7223945101776348594}
+  - component: {fileID: 4625528988292780669}
   m_Layer: 0
   m_Name: scarecrow_circles_0
   m_TagString: Untagged
@@ -83,6 +84,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4625528988292780669
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100896034592163974}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8850373651471284475, guid: a2b9fe7c385bb6042b4e0c4481e932e5, type: 3}
 --- !u!1 &1861711653304422108
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,6 +147,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4941137446551727666}
+  - component: {fileID: 8296121675522101954}
   m_Layer: 0
   m_Name: scarecrow_target
   m_TagString: Untagged
@@ -146,7 +170,34 @@ Transform:
   m_Children:
   - {fileID: 7905067888980536294}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!54 &8296121675522101954
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4150967459051046279}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &4435961744177788442
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,6 +241,7 @@ GameObject:
   - component: {fileID: 5507148566536272243}
   - component: {fileID: 2046912560709663189}
   - component: {fileID: 2682558861111693671}
+  - component: {fileID: 796797184425420464}
   m_Layer: 0
   m_Name: scarecrow.001_0
   m_TagString: Untagged
@@ -262,6 +314,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &796797184425420464
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5401215068193494942}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2911690849801106704, guid: a2b9fe7c385bb6042b4e0c4481e932e5, type: 3}
 --- !u!1 &7644456109569361357
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,6 +347,7 @@ GameObject:
   - component: {fileID: 2385245069616072796}
   - component: {fileID: 791919602537629201}
   - component: {fileID: 3943232681711957656}
+  - component: {fileID: 5808502326987851478}
   m_Layer: 0
   m_Name: scarecrow_target_0
   m_TagString: Untagged
@@ -345,6 +420,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &5808502326987851478
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7644456109569361357}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -7443747781655983317, guid: a2b9fe7c385bb6042b4e0c4481e932e5, type: 3}
 --- !u!1 &7962178941280557522
 GameObject:
   m_ObjectHideFlags: 0

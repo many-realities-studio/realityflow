@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 241162366389013770}
   - component: {fileID: 3265163886344100221}
   - component: {fileID: 1106706973744397277}
+  - component: {fileID: 6866991655097541853}
   m_Layer: 0
   m_Name: red-baron-grass-ornamental-Va7qqJC-600.001_red-baron-grass-ornamental-Va7qqJC-600_0
   m_TagString: Untagged
@@ -180,6 +181,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &6866991655097541853
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4192108389088828325}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5288478513790118834, guid: eeeb1be239db53e4a90a185164a69b1f, type: 3}
 --- !u!1 &7983384373407698498
 GameObject:
   m_ObjectHideFlags: 0
@@ -191,6 +214,7 @@ GameObject:
   - component: {fileID: 7492715172433042918}
   - component: {fileID: 7751344566862262590}
   - component: {fileID: 1439992347686415581}
+  - component: {fileID: 2881238393043352272}
   m_Layer: 0
   m_Name: red-baron-grass-ornamental-Va7qqJC-600_red-baron-grass-ornamental-Va7qqJC-600_0
   m_TagString: Untagged
@@ -263,6 +287,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &2881238393043352272
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7983384373407698498}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6929870476165266405, guid: eeeb1be239db53e4a90a185164a69b1f, type: 3}
 --- !u!1 &8121194270974776069
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,6 +350,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7722877239010779977}
+  - component: {fileID: 1808032528873324594}
   m_Layer: 0
   m_Name: lavender
   m_TagString: Untagged
@@ -326,4 +373,31 @@ Transform:
   m_Children:
   - {fileID: 3102759073761635699}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!54 &1808032528873324594
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8928368026847269937}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
