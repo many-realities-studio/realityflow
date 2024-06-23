@@ -49,9 +49,12 @@ public class NetworkedPlayManager : MonoBehaviour
     {
         // Debug.Log("Network Scene: " + rfScene);
         // Debug.Log("Scene Id" + rfScene.Id);
-        context = NetworkScene.Register(this);
-
-        RequestPlayState();
+        
+        RealityFlowClient.Find(this).OnRoomCreated += () => {
+            context = NetworkScene.Register(this);
+            RequestPlayState();
+        };
+        
     }
 
     private void RequestPlayState()

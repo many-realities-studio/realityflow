@@ -100,9 +100,6 @@ public class ColorTool : MonoBehaviour
                 return;
             }
 
-            // If the game object hit has an interactable
-            Debug.Log(currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>()); 
-
             if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() != null)
             {
                 if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>().IsRaySelected)

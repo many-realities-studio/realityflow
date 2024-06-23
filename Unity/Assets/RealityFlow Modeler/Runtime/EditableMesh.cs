@@ -112,7 +112,6 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
     public void CreateMesh(EditableMesh otherMesh)
     {
-        Debug.Log(otherMesh.gameObject);
         if(otherMesh != null) {
 
         positions = otherMesh.positions;
