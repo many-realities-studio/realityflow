@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.4439372, g: 0.49315345, b: 0.5721989, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -306,7 +306,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164784470}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0bf296fc962d7184ab14ad1841598d5f, type: 3}
   m_Name: 
@@ -2083,7 +2083,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 6562185173771593382}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 03a5df2202a8b96488c744be3bd0c33e, type: 3}
   m_Name: 
@@ -4427,6 +4427,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2263648753594837348, guid: 921739cf2707ed5458794d00f626d027,
         type: 3}
@@ -6131,7 +6132,7 @@ PrefabInstance:
     - target: {fileID: 559345984109643752, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 559345984109643752, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
@@ -6246,7 +6247,7 @@ PrefabInstance:
     - target: {fileID: 3327737482178259357, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0012089891
+      value: -0.0038578396
       objectReference: {fileID: 0}
     - target: {fileID: 3327737482178259357, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
@@ -8219,7 +8220,7 @@ MonoBehaviour:
   loginMenu: {fileID: 323530833}
   levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  server: http://localhost:4000/
+  server: https://reality.gaim.ucf.edu/
   graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:
@@ -8869,7 +8870,7 @@ PrefabInstance:
     - target: {fileID: 6824168364959767028, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6885144376354572857, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
@@ -8881,6 +8882,11 @@ PrefabInstance:
       propertyPath: avatarManager
       value: 
       objectReference: {fileID: 243809658}
+    - target: {fileID: 8635535523361759225, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8668715411161974023, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_IsActive
@@ -8888,7 +8894,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2639955424972361411, guid: 745359975b649aa4cbe3c0d5a0f5f66c, type: 3}
-    - {fileID: 7654031547297261626, guid: 745359975b649aa4cbe3c0d5a0f5f66c, type: 3}
     m_RemovedGameObjects:
     - {fileID: 4282118265579516412, guid: 745359975b649aa4cbe3c0d5a0f5f66c, type: 3}
     - {fileID: 5934526693418853554, guid: 745359975b649aa4cbe3c0d5a0f5f66c, type: 3}
