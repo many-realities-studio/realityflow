@@ -643,13 +643,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             rotation = rotation,
             scale = scale
         };
+        // Generate faces
+        spawnedMesh.GetComponent<EditableMesh>().LoadMeshData();
+        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
         RfObject rfObject = new RfObject
         { 
             name = "PrimitiveBase",
             type = "Primitive",
             graphId = null,
             transformJson = JsonUtility.ToJson(transformData),
-            meshJson = JsonUtility.ToJson(spawnedMesh.GetComponent<EditableMesh>().smi),
+            meshJson = JsonUtility.ToJson(smi),
             projectId = client.GetCurrentProjectId()
         };
         Debug.Log(rfObject);
@@ -1185,15 +1188,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
                 var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
-                    /*if(spawnedObject.GetComponent<EditableMesh>() != null) 
+                    if(spawnedObject.GetComponent<EditableMesh>() != null) 
                     {
                         Debug.Log("Primitive Base");
 
                         var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
                         Debug.Log(serializableMesh);
                         // Error can't deserialize here for some reason. Can check with team or investigate 
-                        spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;                    
-                    }*/
+                        spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;    
+                    }
                     Debug.Log("Spawned object with room scope");
                     if (spawnedObject == null)
                     {
