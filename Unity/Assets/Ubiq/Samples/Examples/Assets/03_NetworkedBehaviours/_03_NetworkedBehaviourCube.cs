@@ -6,7 +6,7 @@ using Ubiq.NetworkedBehaviour;
 
 namespace Ubiq.Examples
 {
-    /// <summary>Net
+    /// <summary>
     /// This class shows how to implement a networked object using
     /// NetworkedBehaviours.
     ///
