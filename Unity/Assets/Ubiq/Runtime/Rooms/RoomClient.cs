@@ -12,6 +12,8 @@ using UnityEngine.SceneManagement;
 
 namespace Ubiq.Rooms
 {
+    // public RoomEvent OnJoinCreatedRoom = new RoomEvent();
+    // public UnityEvent OnJoinExistingRoom = new UnityEvent();
     /// <summary>
     /// Facilitates joining and working with Rooms via a RoomServer somewhere on the Network.
     /// The Rooms system provides the concept of Peers as Remote Players, with their own sets of
@@ -455,7 +457,13 @@ namespace Ubiq.Rooms
 
         private void Awake()
         {
+            //OnJoinedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Room " + room.Name));
+
             OnJoinedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Room " + room.Name));
+            //RoomClient roomClient = gameObject.GetComponent<RoomClient>();
+            //roomClient.OnJoinCreatedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Created and Joined Room " + room.Name));
+            //OnJoinExistingRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Existing Room " + room.Name));
+
             OnPeerUpdated.SetExisting(me);
         }
 
@@ -602,6 +610,7 @@ namespace Ubiq.Rooms
         /// <param name="bool">Whether others should be able to browse for this room</param>
         public void Join(string name, bool publish)
         {
+            Debug.Log("[ROOM CLIENT] Joining room with name: " + name);
             actions.Add(() =>
             {
                 SendToServerSync("Join", new JoinArgs()
@@ -636,6 +645,7 @@ namespace Ubiq.Rooms
         /// </summary>
         public void Join(Guid guid)
         {
+            Debug.Log("[ROOM CLIENT] Joining room with GUID: " + guid.ToString());
             actions.Add(() =>
             {
                 SendToServerSync("Join", new JoinArgs()
