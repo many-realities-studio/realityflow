@@ -108,7 +108,7 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""bc8cfafc-186d-4c3b-b35c-8f6395f10455"",
-                    ""path"": ""<XRController>{LeftHand}/{Primary2DAxisClick}"",
+                    ""path"": ""<XRController>{RightHand}/primaryButton"",
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
@@ -146,17 +146,6 @@ public partial class @RealityFlowActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Execute"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""a7440b53-b797-4d43-9342-4a250657b52c"",
-                    ""path"": ""<XRController>{LeftHand}/primary2DAxisClick"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Undo"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
