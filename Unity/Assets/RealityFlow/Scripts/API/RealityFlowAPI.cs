@@ -1188,19 +1188,43 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void InstantiateNonPersisted(GameObject obj, Vector3 position, Quaternion rotation)
     {
-        GameObject spawned = Instantiate(obj, position, rotation, spawnManager.transform);
-        spawned.SetActive(true);
-        spawned.GetComponent<MyNetworkedObject>().NetworkId = default;
-        nonPersistentObjects.Add(spawned);
+        try
+        {
+            RfObject objectDetails = SpawnedObjects[obj];
+            string prefabName = objectDetails.name;
+            GameObject prefab = GetPrefabByName(prefabName);
 
-        actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+            GameObject spawned = spawnManager.SpawnWithPeerScope(prefab);
+            spawned.transform.SetPositionAndRotation(position, rotation);
+            spawned.SetActive(true);
+
+            if (obj.GetComponent<VisualScript>() is VisualScript script)
+            {
+                VisualScript newScript = spawned.AddComponent<VisualScript>();
+                newScript.graph = script.graph;
+
+                // TODO: If in play mode call OnEnterPlayMode
+            }
+
+            nonPersistentObjects.Add(spawned);
+            spawnedObjects.Add(spawned, objectDetails);
+
+            actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     public void DestroyNonPersisted(GameObject obj)
     {
         bool nonPersistent = nonPersistentObjects.Contains(obj);
         if (nonPersistent)
-            Destroy(obj);
+        {
+            spawnedObjects.Remove(obj);
+            spawnManager.Despawn(obj);
+        }
         else
             obj.SetActive(false);
 
