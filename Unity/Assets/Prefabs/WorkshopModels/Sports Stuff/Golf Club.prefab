@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 166852895879815445}
+  - component: {fileID: 7338842720437758003}
   m_Layer: 0
   m_Name: Golf Club
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 7740070790240150737}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &7338842720437758003
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836750280102844077}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.22286458, y: 2.0104468, z: 0.2896904}
+  m_Center: {x: 0.06981004, y: 0.011672548, z: -0.017560212}
 --- !u!1 &5485686418168970926
 GameObject:
   m_ObjectHideFlags: 0

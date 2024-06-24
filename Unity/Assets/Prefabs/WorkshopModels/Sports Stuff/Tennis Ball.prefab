@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8587044302346089968}
+  - component: {fileID: 8035653273468736945}
   m_Layer: 0
   m_Name: Tennis Ball
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 7832858514556539330}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &8035653273468736945
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946793255618764200}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.7658042, y: 1.7637072, z: 1.784338}
+  m_Center: {x: -0.0736426, y: 0.01411743, z: 0.03664964}
 --- !u!1 &4542316000228639754
 GameObject:
   m_ObjectHideFlags: 0

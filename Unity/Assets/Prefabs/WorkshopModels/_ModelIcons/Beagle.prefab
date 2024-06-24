@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1110451616926918910}
   - component: {fileID: 8421092853365846450}
   - component: {fileID: 1635864110884434829}
+  - component: {fileID: 5185057491170477423}
   m_Layer: 0
   m_Name: Beagle
   m_TagString: Untagged
@@ -111,6 +112,27 @@ MonoBehaviour:
   ReverseX: 0
   ReverseY: 0
   ReverseZ: 0
+--- !u!65 &5185057491170477423
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3269954196674121454}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5519452, y: 1.1788867, z: 1.0211374}
+  m_Center: {x: -0.022817373, y: -0.089443326, z: 0.54079145}
 --- !u!1 &6186959679647183655
 GameObject:
   m_ObjectHideFlags: 0

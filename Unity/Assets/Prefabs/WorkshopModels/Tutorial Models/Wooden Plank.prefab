@@ -124,6 +124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8598358899858848893}
+  - component: {fileID: 6285146665763994364}
   m_Layer: 0
   m_Name: Wooden Plank
   m_TagString: Untagged
@@ -147,6 +148,27 @@ Transform:
   - {fileID: 6248383445576871260}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &6285146665763994364
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4413676337305216812}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.0231676, y: 0.3528793, z: 0.08657145}
+  m_Center: {x: 0.025512017, y: -0.003124773, z: -0.0077138697}
 --- !u!1 &8050361869999023387
 GameObject:
   m_ObjectHideFlags: 0

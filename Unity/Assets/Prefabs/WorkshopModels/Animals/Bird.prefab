@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8849430107020215467}
+  - component: {fileID: 7794431896033600067}
   m_Layer: 0
   m_Name: Bird
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 8615559838121340739}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &7794431896033600067
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933225944059530468}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5954993, y: 0.3356909, z: 0.3227196}
+  m_Center: {x: -0.0027093291, y: -0.01784572, z: 0.110007256}
 --- !u!1 &8245859382306313262
 GameObject:
   m_ObjectHideFlags: 0
