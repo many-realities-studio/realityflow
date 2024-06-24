@@ -651,6 +651,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             rotation = spawnedMesh.transform.rotation,
             scale = spawnedMesh.transform.localScale
         };
+
+        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
         SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
 
         RfObject rfObject = spawnedObjects[spawnedMesh];
@@ -684,12 +686,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         var createObject = new GraphQLRequest
         {
             Query = @"
-            mutation updateObject($input: CreateObjectInput!) {
+            mutation UpdateObject($input: UpdateObjectInput!) {
                 updateObject(input: $input) {
                     id
                 }
             }",
-            OperationName = "CreateObject",
+            OperationName = "UpdateObject",
             Variables = new
             {
                 input = new
@@ -711,7 +713,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.Log("Object saved to the database successfully.");
 
                 // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                var returnedId = graphQLResponse["data"]["updateObject"]["id"].ToString();
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
                 spawnedObjects[spawnedMesh] = rfObject;
@@ -1420,7 +1422,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
                     int end = obj.meshJson.Length;
                     string faces = obj.meshJson.Substring(start, end - start - 1);
-                    Debug.Log(faces);
                     string[] faceArray = faces.Split('[');
                     int[][] facesArray = new int[faceArray.Length - 1][];
                     for (int i = 1; i < faceArray.Length; i++)
@@ -1436,12 +1437,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             facesArray[i - 1][j] = int.Parse(face[j]);
                         }
                     }
-                    Debug.Log(facesArray);
                     serializableMesh.faces = facesArray;
-
-                    Debug.Log(serializableMesh);
+                    Debug.Log(serializableMesh.lastSize);
                     // Error can't deserialize here for some reason. Can check with team or investigate 
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
+                    Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
+                    Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
+                    
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)
@@ -1603,6 +1605,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     id
                 }
             }",
+            OperationName = "UpdateObject",
             Variables = new
             {
                 input = new

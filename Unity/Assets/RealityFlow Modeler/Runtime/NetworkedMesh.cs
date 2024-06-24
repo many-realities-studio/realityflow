@@ -47,7 +47,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Vector3 lastPosition;
     private Vector3 lastScale;
     private Quaternion lastRotation;
-    private float lastSize;
+    public float lastSize = 0.1f;
 
     public bool isDuplicate = false;
     public string originalName = "";
@@ -101,7 +101,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 }
             }
         }
-
         RequestMeshData();
     }
 
@@ -140,7 +139,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         owner = false;
         isHeld = false;
         isSelected = false;
-        lastSize = 0.1f;
+        // if(lastSize ! = 0.1f;
         boundsControl = gameObject.GetComponent<BoundsControl>();
         meshMaterial = gameObject.GetComponent<MeshRenderer>().material;
         //boundsControl.HandlesActive = false;
