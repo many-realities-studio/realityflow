@@ -710,9 +710,9 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             leaveButtonActiveHover = buttonStates[47].Interactable.IsActiveHovered,
             leaveButtonHover = buttonStates[47].Interactable.IsRayHovered,
 
-            EnableNearMenuToolboxButtonStateVisualizer = buttonStates[47].enabled,
-            EnableNearMenuToolboxButtonActiveHover = buttonStates[47].Interactable.IsActiveHovered,
-            EnableNearMenuToolboxButtonHover = buttonStates[47].Interactable.IsRayHovered,
+            EnableNearMenuToolboxButtonStateVisualizer = buttonStates[48].enabled,
+            EnableNearMenuToolboxButtonActiveHover = buttonStates[48].Interactable.IsActiveHovered,
+            EnableNearMenuToolboxButtonHover = buttonStates[48].Interactable.IsRayHovered,
 
             // Edit related buttons
             editButtonStateVisualizer = buttonStates[29].enabled,
