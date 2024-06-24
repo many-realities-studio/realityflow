@@ -67,9 +67,10 @@ public class PaletteSpawner : MonoBehaviour
             // responsible for palette being attached to hand.
             PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
             phm.paletteManager = gameObject;
-            phm.left = GetComponents<OnButtonPress>()[0];
-            phm.right = GetComponents<OnButtonPress>()[1];
-            phm.left.enabled = false;
+            // Got it -- It needs two OnButtonPress components on the same gameObject as the PaletteManager
+            phm.right = GetComponents<OnButtonPress>()[0];
+            // phm.right = GetComponents<OnButtonPress>()[1];
+            // phm.left.enabled = false;
 
             paletteShown = true;
 
@@ -78,7 +79,7 @@ public class PaletteSpawner : MonoBehaviour
             // Set the ownership of the spawned palette to the user who spawned it
             networkedPalette.owner = true;
             playPalette.GetComponent<NetworkedPlayPalette>().owner = true;
-
+            // Where is DominantHandManager?
             try
             {
                 isLeftHandDominant = GameObject.FindGameObjectsWithTag("DominantHandManager")[0].GetComponent<PressableButton>();
