@@ -974,7 +974,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     if (spawnedObject.GetComponent<Rigidbody>() == null)
                     {
                         var rigidbody = spawnedObject.AddComponent<Rigidbody>();
-                        rigidbody.useGravity = true;
+                        rigidbody.useGravity = false;
                         rigidbody.isKinematic = false;
                     }
 
