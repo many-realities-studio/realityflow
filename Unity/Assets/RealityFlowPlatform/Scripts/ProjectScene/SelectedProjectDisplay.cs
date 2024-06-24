@@ -24,6 +24,7 @@ public class MyProjectsDisplay : MonoBehaviour
     public GameObject roomUI;
     public Button createRoomBtn;
     public Button refreshRoomsBtn;
+  // public bool onlyTutorials;
 
     // GraphQL client and access token variables 
     // public GraphQLHttpClient graphQLClient;
@@ -39,7 +40,7 @@ public class MyProjectsDisplay : MonoBehaviour
             // TODO -ReFresh Button-
             // refreshRoomsBtn.onClick.AddListener(rfClient.GetRoomsByProjectId);
             createRoomBtn.onClick.AddListener(rfClient.CreateRoom);
-            // Debug.Log("RoomManager found and listener added.");
+            Debug.Log("RoomManager found and listener added.");
         }
         else
         {

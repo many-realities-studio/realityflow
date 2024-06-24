@@ -213,6 +213,7 @@ public class RealityFlowClient : MonoBehaviour
                 input = new
                 {
                     projectName = "New Project " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    projectOwnerId = userDecoded["id"],
                     description = "A new project",
                     details = "A new project",
                     thumbnailImg = "https://via.placeholder.com/150",
