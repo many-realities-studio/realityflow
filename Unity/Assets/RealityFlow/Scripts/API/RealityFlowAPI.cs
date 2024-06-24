@@ -21,6 +21,8 @@ using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
 using System.Collections.Immutable;
 using Unity.VisualScripting;
+using System.Collections;
+
 
 
 #if UNITY_EDITOR
@@ -108,10 +110,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
             spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated); // Add listener for room updates
-
         }
 
         client = RealityFlowClient.Find(this);
+
+        IEnumerator HookNetworkedPlayManager()
+        {
+            while (!NetworkedPlayManager.Instance)
+                yield return null;
+
+            NetworkedPlayManager.Instance.exitPlayMode.AddListener(ClearNonPersisted);
+        }
+
+        StartCoroutine(HookNetworkedPlayManager());
     }
 
     // ===== SUPPORT FUNCTIONS =====
@@ -312,6 +323,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         return newGraph;
     }
+
     public void SaveGraphAsync(Graph toSave) // Saves the graph to the database
     {
         var query = @"
@@ -1100,6 +1112,38 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedObject;
     }
 
+    readonly HashSet<GameObject> nonPersistentObjects = new();
+
+    public void InstantiateNonPersisted(GameObject obj, Vector3 position, Quaternion rotation)
+    {
+        GameObject spawned = Instantiate(obj, position, rotation, spawnManager.transform);
+        spawned.SetActive(true);
+        spawned.GetComponent<MyNetworkedObject>().NetworkId = default;
+        nonPersistentObjects.Add(spawned);
+
+        actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+    }
+
+    public void DestroyNonPersisted(GameObject obj)
+    {
+        bool nonPersistent = nonPersistentObjects.Contains(obj);
+        if (nonPersistent)
+            Destroy(obj);
+        else
+            obj.SetActive(false);
+
+        actionLogger.LogAction(nameof(DestroyNonPersisted), obj, nonPersistent);
+    }
+
+    public void ClearNonPersisted()
+    {
+        foreach (GameObject obj in nonPersistentObjects)
+        {
+            Destroy(obj);
+        }
+        nonPersistentObjects.Clear();
+    }
+
     private void SaveObjectToDatabase(RfObject rfObject)
     {
         if (client == null)
@@ -1427,7 +1471,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     for (int i = 1; i < faceArray.Length; i++)
                     {
                         // If the last character is a , remove it
-                        faceArray[i] =faceArray[i].TrimEnd(',');
+                        faceArray[i] = faceArray[i].TrimEnd(',');
                         string[] face = faceArray[i].Split(',');
                         // Remove any "]" characters from the last element of the array
                         facesArray[i - 1] = new int[face.Length];
@@ -1443,7 +1487,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
                     Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
-                    
+
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)
@@ -1895,6 +1939,22 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 NodeIndex index = (NodeIndex)action.Parameters[2];
 
                 graph.RemoveNode(index);
+
+                break;
+
+            case nameof(InstantiateNonPersisted):
+                GameObject spawned = (GameObject)action.Parameters[0];
+
+                Destroy(spawned);
+
+                break;
+
+            case nameof(DestroyNonPersisted):
+                GameObject destroyed = (GameObject)action.Parameters[0];
+                bool nonPersistent = (bool)action.Parameters[1];
+
+                if (!nonPersistent)
+                    destroyed.SetActive(true);
 
                 break;
 
