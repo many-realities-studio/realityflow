@@ -12,6 +12,8 @@ public class NetworkedPlayManager : MonoBehaviour
 {
     public NetworkContext context;
 
+    public static NetworkedPlayManager Instance;
+
     public UnityEvent enterPlayMode;
     public UnityEvent exitPlayMode;
 
@@ -40,6 +42,11 @@ public class NetworkedPlayManager : MonoBehaviour
 
     void Awake()
     {
+        if (!Instance)
+            Instance = this;
+        else
+            Debug.LogError("Multiple Network Play Managers!");
+            
         // if (NetworkId == null)
             // Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }

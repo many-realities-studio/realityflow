@@ -33,7 +33,7 @@ public class PaletteSpawner : MonoBehaviour
         paletteSwitcher = gameObject.GetComponent<PaletteSwitcher>();
 
         PaletteHandManager.OnHandChange += SwitchHands;
-        
+
         // Ensure users do not attempt to spawn in a palette immediately on spawn to avoid race conditions
         // with setting up references for paletteSwitcher.networkedPlayManager.
         StartCoroutine(AllowSpawnMechanics(1));
@@ -56,7 +56,7 @@ public class PaletteSpawner : MonoBehaviour
         playPaletteSize = playPalettePrefab.transform.localScale;
 
         // If the palette is not in the current scene, then spawn it in
-        if(palette == null)
+        if (palette == null)
         {
             // Debug.Log("ControlPalette() was triggered to spawn a palette");
             palette = NetworkSpawnManager.Find(this).SpawnWithPeerScope(palettePrefab);
@@ -67,9 +67,10 @@ public class PaletteSpawner : MonoBehaviour
             // responsible for palette being attached to hand.
             PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
             phm.paletteManager = gameObject;
-            phm.left = GetComponents<OnButtonPress>()[0];
-            phm.right = GetComponents<OnButtonPress>()[1];
-            phm.left.enabled = false;
+            // Got it -- It needs two OnButtonPress components on the same gameObject as the PaletteManager
+            phm.right = GetComponents<OnButtonPress>()[0];
+            // phm.right = GetComponents<OnButtonPress>()[1];
+            // phm.left.enabled = false;
 
             paletteShown = true;
 
@@ -78,7 +79,7 @@ public class PaletteSpawner : MonoBehaviour
             // Set the ownership of the spawned palette to the user who spawned it
             networkedPalette.owner = true;
             playPalette.GetComponent<NetworkedPlayPalette>().owner = true;
-
+            // Where is DominantHandManager?
             try
             {
                 isLeftHandDominant = GameObject.FindGameObjectsWithTag("DominantHandManager")[0].GetComponent<PressableButton>();
@@ -107,12 +108,12 @@ public class PaletteSpawner : MonoBehaviour
         {
 
             // If the palette exists and is closing, we re-enable rays
-            if(palette != null)
+            if (palette != null)
             {
                 PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
                 phm.EnableAllControlsOnPaletteClose();
             }
-           
+
 
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
@@ -130,11 +131,11 @@ public class PaletteSpawner : MonoBehaviour
         {
             // If the palette exists and is opened/reactivated, disable the appropriate controls 
             // (the hand holding palette should be inactive)
-            if(palette != null)
+            if (palette != null)
             {
                 PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
                 phm.disableControllerOnReopen();
-             
+
             }
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
@@ -145,7 +146,7 @@ public class PaletteSpawner : MonoBehaviour
             {
                 palette.transform.localScale = paletteSize;
             }
-            
+
             paletteShown = true;
         }
     }
@@ -169,7 +170,7 @@ public class PaletteSpawner : MonoBehaviour
     private void SwitchHands(bool isLeftHandDominant)
     {
         // Switch the grip buttons depending on the dominant hand
-        if(isLeftHandDominant)
+        if (isLeftHandDominant)
         {
             gameObject.GetComponents<OnButtonPress>()[0].enabled = false;
             gameObject.GetComponents<OnButtonPress>()[1].enabled = true;

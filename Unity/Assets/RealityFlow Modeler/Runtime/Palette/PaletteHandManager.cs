@@ -35,6 +35,7 @@ public class PaletteHandManager : MonoBehaviour
         rightHandPokeInteractor = rig.transform.Find("Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor").gameObject;
     }
 
+    // This tracks the hand via the Ubiq Avatar by searching for the owner's avatar and setting the dominant hand based on the Switch Hands Button
     public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars, ParentConstraint otherPaletteParentConstraint, string paletteType, bool handStateAlreadyFound)
     {
         // Debug.Log("Called UpdateHand() from palette " + gameObject.name + " in scene " + gameObject.transform.parent.parent.parent.name);
@@ -53,6 +54,7 @@ public class PaletteHandManager : MonoBehaviour
                 // }
 
                 // If the left hand is not set, and there is no handstate yet, search each avatar to set the correct dominant hand.
+                // A lot of code depends on walking the hierarchy from the DominantHandManager tags
                 if (isLeftHandDominant == null && !handStateAlreadyFound)
                 {
                     for (int j = 0; j < dominantHandManagers.Length; j++)

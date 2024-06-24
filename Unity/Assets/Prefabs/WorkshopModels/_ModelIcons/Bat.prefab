@@ -150,6 +150,7 @@ GameObject:
   - component: {fileID: 3806559435686459401}
   - component: {fileID: 5531609350519384065}
   - component: {fileID: 3312753330353661660}
+  - component: {fileID: 1915580088783589173}
   m_Layer: 0
   m_Name: Bat
   m_TagString: Untagged
@@ -249,6 +250,27 @@ MonoBehaviour:
   ReverseX: 0
   ReverseY: 0
   ReverseZ: 0
+--- !u!65 &1915580088783589173
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5050022677676261859}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.17172447, y: 0.12491019, z: 0.8952155}
+  m_Center: {x: 0.018842198, y: -0.019702077, z: 0.38199422}
 --- !u!1 &7834876322316097132
 GameObject:
   m_ObjectHideFlags: 0

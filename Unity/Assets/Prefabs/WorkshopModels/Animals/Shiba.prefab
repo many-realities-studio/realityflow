@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1912766653151483288}
+  - component: {fileID: 8043346031406203467}
   m_Layer: 0
   m_Name: Shiba
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 4883972796101883092}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &8043346031406203467
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5707293066925455783}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.45372054, y: 1.2055349, z: 1.0074507}
+  m_Center: {x: 0.0029952675, y: -0.10276744, z: 0.4880368}
 --- !u!1 &8003097950422258283
 GameObject:
   m_ObjectHideFlags: 0

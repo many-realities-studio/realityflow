@@ -1,6 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.InputSystem;
+using Microsoft.MixedReality.Toolkit.Input;
+using Ubiq.Spawning;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class RaycastLogger : MonoBehaviour
 {
@@ -21,6 +25,10 @@ public class RaycastLogger : MonoBehaviour
 
     // Store the selected object's name
     private string selectedObjectName;
+
+    // Variables for object spawning
+    private GameObject currentPrefab = null;
+    private bool spawnToggle = false;
 
     private void Awake()
     {
@@ -89,6 +97,12 @@ public class RaycastLogger : MonoBehaviour
             ApplyGlowEffect(hitObject);
             // Store the selected object's name
             selectedObjectName = hitObject.name;
+
+            // Handle object spawning
+            if (spawnToggle && currentPrefab != null)
+            {
+                SpawnObjectAtHitLocation();
+            }
         }
         else
         {
@@ -136,5 +150,40 @@ public class RaycastLogger : MonoBehaviour
     public string GetSelectedObjectName()
     {
         return selectedObjectName;
+    }
+
+    private void SpawnObjectAtHitLocation()
+    {
+        // Instantiate the object in the scene and over the network, then set its position to the hit position
+        GameObject currentObject = RealityFlowAPI.Instance.SpawnObject(selectedObjectName, visualIndicatorInstance.transform.position, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+
+        // Log the spawned object
+        if (currentObject != null)
+        {
+            currentObject.transform.position = visualIndicatorInstance.transform.position;
+            Debug.Log("Spawned " + currentObject.name);
+        }
+        else
+        {
+            Debug.LogError("Failed to spawn object: " + selectedObjectName);
+        }
+    }
+    // Function to cancel spawning of the current prefab
+    public void CancelSpawn()
+    {
+        if (spawnToggle)
+        {
+            Debug.Log("Object spawn cancelled: no longer spawning " + currentPrefab.name);
+            spawnToggle = false;
+            currentPrefab = null;
+        }
+    }
+
+    // Function called by the UI button in the default object library. Sets spawn toggle and prefab.
+    public void RaySpawnToggle(GameObject objectPrefab)
+    {
+        Debug.Log("Spawning toggled on for object: " + objectPrefab.name);
+        spawnToggle = true;
+        currentPrefab = objectPrefab;
     }
 }

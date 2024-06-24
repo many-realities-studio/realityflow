@@ -14,7 +14,7 @@ public class PopulateObjectLibrary : MonoBehaviour
     public GameObject buttonPrefab;
 
     // This should be set to the SpawnObjectAtRay component atttached to one of the hands
-    public SpawnObjectAtRay spawnScript;
+    public RaycastLogger spawnScript;
 
     // Spawn the object as networked
     [SerializeField] private NetworkSpawnManager networkSpawnManager;
@@ -53,13 +53,12 @@ public class PopulateObjectLibrary : MonoBehaviour
     void TriggerObjectSpawn(GameObject objectPrefab)
     {
         Debug.Log("TriggerObjectSpawn");
-        Debug.Log(objectPrefab);
+        Debug.Log(spawnScript.GetVisualIndicatorPosition());
 
         // Use the prefab's default rotation
         Quaternion defaultRotation = objectPrefab.transform.rotation;
-
         // Spawn the object with the default rotation
-        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, Vector3.zero, objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition(), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
 
     }
 }

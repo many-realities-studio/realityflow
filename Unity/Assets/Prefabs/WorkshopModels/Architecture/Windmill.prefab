@@ -105,6 +105,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7087713584520121414}
+  - component: {fileID: 113764169373438760}
   m_Layer: 0
   m_Name: Windmill
   m_TagString: Untagged
@@ -128,6 +129,27 @@ Transform:
   - {fileID: 4424018644693308434}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &113764169373438760
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2800627587382692357}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10.932919, y: 9.447975, z: 14.41736}
+  m_Center: {x: 0.46960735, y: 0.85170746, z: -0.10417724}
 --- !u!1 &3145291019032230031
 GameObject:
   m_ObjectHideFlags: 0

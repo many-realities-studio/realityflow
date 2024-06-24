@@ -28,6 +28,8 @@ using Microsoft.MixedReality.Toolkit.SpatialManipulation; // For ConstraintManag
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Unity.VisualScripting;
+using System.Collections;
+
 
 
 #if UNITY_EDITOR
@@ -51,6 +53,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
     public PrefabCatalogue catalogue; // Prefab Catalog
     public GameObject whiteboardPrefab;
+    public static GameObject NearMenuToolbox;
+    public GameObject nearMenuReference;
+
+    public static GameObject DeleteMenu;
+    public GameObject delteMenuReference;
 
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
@@ -115,10 +122,23 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
             spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated); // Add listener for room updates
-
         }
 
         client = RealityFlowClient.Find(this);
+
+        IEnumerator HookNetworkedPlayManager()
+        {
+            while (!NetworkedPlayManager.Instance)
+                yield return null;
+
+            NetworkedPlayManager.Instance.exitPlayMode.AddListener(ClearNonPersisted);
+        }
+
+        StartCoroutine(HookNetworkedPlayManager());
+
+        // assign the near menu toolbox
+        NearMenuToolbox = nearMenuReference;
+        DeleteMenu = delteMenuReference;
     }
 
     // ===== SUPPORT FUNCTIONS =====
@@ -229,6 +249,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         SaveObjectToDatabase(spawnedObjects[obj]);
     }
 
+
+    #region Graph Functions
     public Graph CreateNodeGraphAsync()
     {
         string name = "New Graph";
@@ -319,6 +341,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         return newGraph;
     }
+
     public void SaveGraphAsync(Graph toSave) // Saves the graph to the database
     {
         var query = @"
@@ -646,7 +669,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // TODO: NETWORK IT AAAAAA
         obj.GetComponent<Rigidbody>().AddRelativeForce(dirMag, ForceMode.Impulse);
     }
+    #endregion
 
+    #region Update and Spawn primitive
     // // ---Spawn/Save Object---
     public GameObject UpdatePrimitive(GameObject spawnedMesh)
     {
@@ -921,6 +946,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return spawnedMesh;
     }
+    #endregion
     #region Spawn Object
     public GameObject SpawnObject(string prefabName, Vector3 spawnPosition,
         Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
@@ -943,32 +969,33 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.rotation = spawnRotation;
                     spawnedObject.transform.localScale = scale;
 
-                    /*
+
                     // Add Rigidbody
                     if (spawnedObject.GetComponent<Rigidbody>() == null)
                     {
                         var rigidbody = spawnedObject.AddComponent<Rigidbody>();
                         rigidbody.useGravity = false;
-                        rigidbody.isKinematic = false;
+                        rigidbody.isKinematic = true;
                     }
 
-                    // Add MeshCollider
-                    if (spawnedObject.GetComponent<MeshCollider>() == null)
+                    // Add BoxCollider based on bounds
+                    if (spawnedObject.GetComponent<BoxCollider>() == null)
                     {
-                        var meshFilter = spawnedObject.GetComponent<MeshFilter>();
-                        if (meshFilter != null)
+                        BoxCollider boxCollider = spawnedObject.AddComponent<BoxCollider>();
+                        Renderer renderer = spawnedObject.GetComponent<Renderer>();
+                        if (renderer != null)
                         {
-                            spawnedObject.AddComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh;
-
+                            boxCollider.center = renderer.bounds.center - spawnedObject.transform.position;
+                            boxCollider.size = renderer.bounds.size;
                         }
                         else
                         {
                             // Handle case where mesh is on a child object
-                            var childMeshFilter = spawnedObject.GetComponentInChildren<MeshFilter>();
-                            if (childMeshFilter != null)
+                            Renderer childRenderer = spawnedObject.GetComponentInChildren<Renderer>();
+                            if (childRenderer != null)
                             {
-                                var childMeshCollider = spawnedObject.AddComponent<MeshCollider>();
-                                childMeshCollider.sharedMesh = childMeshFilter.sharedMesh;
+                                boxCollider.center = childRenderer.bounds.center - spawnedObject.transform.position;
+                                boxCollider.size = childRenderer.bounds.size;
                             }
                         }
                     }
@@ -987,13 +1014,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     draggableAdapter.interactable = true;
                     draggableAdapter.transition = Selectable.Transition.None;
                     draggableAdapter.navigation = new Navigation { mode = Navigation.Mode.Automatic };
-
-
-                    // Add NetworkedMesh script
-                    //if (spawnedObject.GetComponent<NetworkedMesh>() == null)
-                    //{
-                    //spawnedObject.AddComponent<NetworkedMesh>();
-                    //}
 
                     // Add TetheredPlacement script with Distance Threshold set to 20
                     var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
@@ -1021,16 +1041,44 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.UseForcesForNearManipulation = false;
                         objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
                         objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
-                        objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
+                        //objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
+                        objectManipulator.ReleaseBehavior = 0;
                         objectManipulator.SmoothingFar = true;
                         objectManipulator.SmoothingNear = true;
+
+                        /*
+                        objectManipulator.firstSelectEntered.AddListener(async _ => 
+                        {
+                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            {
+                                spawnedObject.GetComponent<MyNetworkedObject>().StartHold();
+                            }
+                        });
+
+                        objectManipulator.lastSelectExited.AddListener(async _ => 
+                        {
+                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            {
+                                spawnedObject.GetComponent<MyNetworkedObject>().EndHold();
+                            }
+                        });
+                        */
+
                         objectManipulator.MoveLerpTime = 0.001f;
                         objectManipulator.RotateLerpTime = 0.001f;
                         objectManipulator.ScaleLerpTime = 0.001f;
                         objectManipulator.EnableConstraints = true;
                         objectManipulator.ConstraintsManager = spawnedObject.GetComponent<ConstraintManager>() ?? spawnedObject.AddComponent<ConstraintManager>();
+
+                        // Assign events
+                        var myNetworkedObject = spawnedObject.GetComponent<MyNetworkedObject>();
+                        if (myNetworkedObject != null)
+                        {
+                            objectManipulator.selectEntered.AddListener((args) => myNetworkedObject.StartHold());
+                            objectManipulator.selectExited.AddListener((args) => myNetworkedObject.EndHold());
+                        }
                     }
-                    */
+
 
                 }
                 if (scope == SpawnScope.Room)
@@ -1171,6 +1219,62 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedObject;
     }
     #endregion
+
+    readonly HashSet<GameObject> nonPersistentObjects = new();
+
+    public void InstantiateNonPersisted(GameObject obj, Vector3 position, Quaternion rotation)
+    {
+        try
+        {
+            RfObject objectDetails = SpawnedObjects[obj];
+            string prefabName = objectDetails.name;
+            GameObject prefab = GetPrefabByName(prefabName);
+
+            GameObject spawned = spawnManager.SpawnWithPeerScope(prefab);
+            spawned.transform.SetPositionAndRotation(position, rotation);
+            spawned.SetActive(true);
+
+            if (obj.GetComponent<VisualScript>() is VisualScript script)
+            {
+                VisualScript newScript = spawned.AddComponent<VisualScript>();
+                newScript.graph = script.graph;
+
+                // TODO: If in play mode call OnEnterPlayMode
+            }
+
+            nonPersistentObjects.Add(spawned);
+            spawnedObjects.Add(spawned, objectDetails);
+
+            actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+    }
+
+    public void DestroyNonPersisted(GameObject obj)
+    {
+        bool nonPersistent = nonPersistentObjects.Contains(obj);
+        if (nonPersistent)
+        {
+            spawnedObjects.Remove(obj);
+            spawnManager.Despawn(obj);
+        }
+        else
+            obj.SetActive(false);
+
+        actionLogger.LogAction(nameof(DestroyNonPersisted), obj, nonPersistent);
+    }
+
+    public void ClearNonPersisted()
+    {
+        foreach (GameObject obj in nonPersistentObjects)
+        {
+            Destroy(obj);
+        }
+        nonPersistentObjects.Clear();
+    }
 
     private void SaveObjectToDatabase(RfObject rfObject)
     {
@@ -1567,6 +1671,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Room population complete.");
     }
 
+    #region FindSpawnedObject By ID
     // ---Select/Edit---
     public GameObject FindSpawnedObject(string id)
     {
@@ -1601,6 +1706,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.LogWarning($"Object named {id} not found in the spawned objects.");
         return null;
     }
+    #endregion
 
     public void SelectAndOutlineObject(string id)
     {
@@ -1635,6 +1741,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    #region UpdateObjectTransform (Move Object)
     // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
@@ -1713,7 +1820,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Exception: " + ex.Message);
         }
     }
+    #endregion
 
+    #region Delete Functions
     // ---Despawn/Delete--
     public void DespawnAllObjectsInBothDictionarys()
     {
@@ -1740,17 +1849,31 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             string objectId = objectToDespawn.name;
             actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
 
-            // Remove object from the database
-            RemoveObjectFromDatabase(objectId, () =>
+            if (IsRoomScoped(objectToDespawn))
             {
-                // Only despawn the object if it was successfully removed from the database
+                // Remove object from the database
+                RemoveObjectFromDatabase(objectId, () =>
+                {
+                    // Only despawn the object if it was successfully removed from the database
+                    spawnManager.Despawn(objectToDespawn);
+                    Debug.Log("Despawned: " + objectToDespawn.name);
+
+                    // Remove the object from local dictionaries
+                    spawnedObjects.Remove(objectToDespawn);
+                    spawnedObjectsById.Remove(objectId);
+                });
+            }
+            else
+            {
+                // Directly despawn the object if it's not room-scoped
                 spawnManager.Despawn(objectToDespawn);
                 Debug.Log("Despawned: " + objectToDespawn.name);
 
                 // Remove the object from local dictionaries
                 spawnedObjects.Remove(objectToDespawn);
                 spawnedObjectsById.Remove(objectId);
-            });
+            }
+
         }
         else
         {
@@ -1838,7 +1961,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("General Exception: " + ex.Message);
         }
     }
+    #endregion
+    private bool IsRoomScoped(GameObject obj)
+    {
+        // Replace with your actual logic to determine if the object is room-scoped
+        return true; // Assuming all objects are room-scoped for now
+    }
 
+    #region Catalogue Code
 #if UNITY_EDITOR
     public void AddPrefabToCatalogue(GameObject prefab)
     {
@@ -1889,7 +2019,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Catalogue saved.");
     }
 #endif
+    #endregion
 
+    #region Undo Functionality
     public void UndoLastAction()
     {
         Debug.Log("Attempting to undo last action.");
@@ -1975,10 +2107,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 break;
 
+            case nameof(InstantiateNonPersisted):
+                GameObject spawned = (GameObject)action.Parameters[0];
+
+                Destroy(spawned);
+
+                break;
+
+            case nameof(DestroyNonPersisted):
+                GameObject destroyed = (GameObject)action.Parameters[0];
+                bool nonPersistent = (bool)action.Parameters[1];
+
+                if (!nonPersistent)
+                    destroyed.SetActive(true);
+
+                break;
+
                 // Add cases for other functions...
         }
     }
-
+    #endregion
     public List<string> GetPrefabNames()
     {
         if (spawnManager != null && spawnManager.catalogue != null)

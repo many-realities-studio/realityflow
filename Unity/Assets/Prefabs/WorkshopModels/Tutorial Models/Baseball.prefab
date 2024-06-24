@@ -73,6 +73,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8526809357733401459}
+  - component: {fileID: 4536332034606118431}
   m_Layer: 0
   m_Name: Baseball
   m_TagString: Untagged
@@ -96,6 +97,27 @@ Transform:
   - {fileID: 6605277406752644675}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -50.189, y: -90, z: 90}
+--- !u!65 &4536332034606118431
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3720474672021083233}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.8603952, y: 0.96517515, z: 0.8016249}
+  m_Center: {x: 0.0028092763, y: 0.017412957, z: 0.036193393}
 --- !u!1 &5140440054094455027
 GameObject:
   m_ObjectHideFlags: 0

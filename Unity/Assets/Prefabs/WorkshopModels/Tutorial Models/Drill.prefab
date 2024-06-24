@@ -189,6 +189,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5311481525701624217}
+  - component: {fileID: 2301263857664899137}
   m_Layer: 0
   m_Name: Drill
   m_TagString: Untagged
@@ -212,6 +213,27 @@ Transform:
   - {fileID: 4750327435320028687}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -0.291, y: 0, z: 0}
+--- !u!65 &2301263857664899137
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1278555227062650211}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 25.850307, y: 21.798601, z: 11.450949}
+  m_Center: {x: -1.8219959, y: 0.9992241, z: 0.09306323}
 --- !u!1 &1742662578186373425
 GameObject:
   m_ObjectHideFlags: 0

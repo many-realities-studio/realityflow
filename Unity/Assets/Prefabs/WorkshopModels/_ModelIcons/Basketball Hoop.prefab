@@ -182,6 +182,7 @@ GameObject:
   - component: {fileID: 5837132603150944053}
   - component: {fileID: 5809957862544048448}
   - component: {fileID: 6987791332784897140}
+  - component: {fileID: 6259601722194867258}
   m_Layer: 0
   m_Name: Basketball Hoop
   m_TagString: Untagged
@@ -281,6 +282,27 @@ MonoBehaviour:
   ReverseX: 0
   ReverseY: 0
   ReverseZ: 0
+--- !u!65 &6259601722194867258
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3611032189238578590}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.1982183, y: 4.2263684, z: 7.5511255}
+  m_Center: {x: 0.87651426, y: -0.09283482, z: 3.2755544}
 --- !u!1 &7149134611947789236
 GameObject:
   m_ObjectHideFlags: 0

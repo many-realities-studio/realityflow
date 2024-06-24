@@ -335,6 +335,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 654481483869172215}
+  - component: {fileID: 1214070800494539989}
   m_Layer: 0
   m_Name: Hospital
   m_TagString: Untagged
@@ -358,6 +359,27 @@ Transform:
   - {fileID: 3255845013848625553}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &1214070800494539989
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 969491022566991592}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 32.220848, y: 30.725744, z: 15.989888}
+  m_Center: {x: 0.24168172, y: -0.37388802, z: 7.4949403}
 --- !u!1 &1187364182439201392
 GameObject:
   m_ObjectHideFlags: 0

@@ -124,6 +124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3288939850004874374}
+  - component: {fileID: 2613262781576340185}
   m_Layer: 0
   m_Name: Rosebush
   m_TagString: Untagged
@@ -147,6 +148,27 @@ Transform:
   - {fileID: 7600650070196033957}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: -180}
+--- !u!65 &2613262781576340185
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4398695075279116298}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 37.114536, y: 36.943592, z: 51.896584}
+  m_Center: {x: -1.3134315, y: -0.48706383, z: -25.448273}
 --- !u!1 &5027596085056511821
 GameObject:
   m_ObjectHideFlags: 0

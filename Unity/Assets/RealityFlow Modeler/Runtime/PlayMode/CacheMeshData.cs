@@ -47,8 +47,11 @@ public class CacheMeshData : MonoBehaviour
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
 
-                gameObject.GetComponent<Rigidbody>().useGravity = false;
-                gameObject.GetComponent<Rigidbody>().isKinematic = true;
+                if (gameObject.GetComponent<Rigidbody>() is Rigidbody rb)
+                {
+                    rb.useGravity = false;
+                    rb.isKinematic = true;
+                }
 
                 // All meshes should be selectable after Play mode is exited
                 gameObject.GetComponent<ObjectManipulator>().enabled = true;
