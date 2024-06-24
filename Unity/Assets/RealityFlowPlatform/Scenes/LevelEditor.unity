@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -10271,7 +10271,7 @@ MonoBehaviour:
   loginMenu: {fileID: 323530833}
   levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  server: https://reality.gaim.ucf.edu/
+  server: http://localhost:4000/
   graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:

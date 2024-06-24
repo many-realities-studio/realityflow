@@ -1645,14 +1645,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ---Despawn/Delete--
     public void DespawnAllObjectsInBothDictionarys()
     {
+        // Despawn objects in spawnedObjects dictionary
         foreach (var kvp in spawnedObjects)
         {
-            DespawnObject(kvp.Key);
+            Destroy(kvp.Key);
         }
+        spawnedObjects.Clear();
+
+        // Despawn objects in spawnedObjectsById dictionary
         foreach (var kvp in spawnedObjectsById)
         {
-            DespawnObject(kvp.Value);
+            Destroy(kvp.Value);
         }
+        spawnedObjectsById.Clear();
     }
 
     //This function is primarily for peer scope

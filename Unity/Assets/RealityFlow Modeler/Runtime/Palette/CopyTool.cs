@@ -40,7 +40,7 @@ public class CopyTool : MonoBehaviour
 
         currentHitResult = new RaycastHit();
         var rig = Object.FindFirstObjectByType<XROrigin>().gameObject.gameObject;
-        Debug.Log(rig);
+        // Debug.Log(rig);
         leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
         rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
