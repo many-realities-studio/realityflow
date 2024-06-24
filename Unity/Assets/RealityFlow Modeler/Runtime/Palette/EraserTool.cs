@@ -61,9 +61,9 @@ public class EraserTool : MonoBehaviour
             }
 
             // If the game object hit has an interactable
-            if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() != null)
+            if (currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>() != null)
             {
-                if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>().IsRaySelected)
+                if (currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().IsRaySelected)
                 {
                     DeleteMesh();
                 }
@@ -88,8 +88,7 @@ public class EraserTool : MonoBehaviour
         {
             Debug.Log("Delete attempted" + currentHitResult.collider.gameObject);
             RealityFlowAPI.Instance.DespawnObject(currentHitResult.collider.gameObject);
-
-            //spawnManager.Despawn(currentHitResult.collider.gameObject);
+            spawnManager.Despawn(currentHitResult.collider.gameObject);
             // You should no longer be able to interact with this mesh
             //currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled = false;
 

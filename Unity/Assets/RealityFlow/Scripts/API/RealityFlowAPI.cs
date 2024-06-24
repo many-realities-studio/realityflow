@@ -56,6 +56,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public static GameObject NearMenuToolbox;
     public GameObject nearMenuReference;
 
+    public static GameObject DeleteMenu;
+    public GameObject delteMenuReference;
+
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
     {
@@ -135,6 +138,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         // assign the near menu toolbox
         NearMenuToolbox = nearMenuReference;
+        DeleteMenu = delteMenuReference;
     }
 
     // ===== SUPPORT FUNCTIONS =====

@@ -57,11 +57,11 @@ namespace RealityFlow.NodeUI
                 whiteboard.SetActive(false);
             }
 
-            GetComponent<ObjectManipulator>().selectExited.AddListener(_ => 
+            /*GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(async _ => 
             {
                 if (PlayManager == null || !PlayManager.playMode || RealityFlowAPI.Instance.SpawnedObjects[gameObject]!=null)
                     ShowWhiteboard(gameObject);
-            });
+            });*/
         }
 
         void ShowWhiteboard(GameObject obj)

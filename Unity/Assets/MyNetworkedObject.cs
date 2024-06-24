@@ -85,38 +85,38 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     void Update()
     {
         // If currently not the owner and the object is being held by someone, disable ObjectManipulator so it can be moved
-        // if (!owner && isHeld)
-        //     this.gameObject.GetComponent<ObjectManipulator>().enabled = false;
-        // else
-        //     this.gameObject.GetComponent<ObjectManipulator>().enabled = true;
+        if (!owner && isHeld)
+            this.gameObject.GetComponent<ObjectManipulator>().enabled = false;
+        else
+            this.gameObject.GetComponent<ObjectManipulator>().enabled = true;
 
-        // // Update object positioning if the object is owned
-        // // If you currently own the object, physics calculations are made on your device and transmitted to the rest for that object
-        // if(owner)
-        // {
-            // if(lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != obj.GetComponent<Renderer>().material.color)
-            // {
-            //     lastPosition = transform.localPosition;
-            //     lastScale = transform.localScale;
-            //     lastRotation = transform.localRotation;
-            //     lastOwner = myObject.owner;
-            //     lastColor = obj.GetComponent<Renderer>().material.color;
-            //     // lastGravity = obj.GetComponent<Rigidbody>().useGravity;
+        // Update object positioning if the object is owned
+        // If you currently own the object, physics calculations are made on your device and transmitted to the rest for that object
+        if(owner)
+        {
+            if(lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != obj.GetComponent<Renderer>().material.color)
+            {
+                lastPosition = transform.localPosition;
+                lastScale = transform.localScale;
+                lastRotation = transform.localRotation;
+                lastOwner = myObject.owner;
+                lastColor = obj.GetComponent<Renderer>().material.color;
+                // lastGravity = obj.GetComponent<Rigidbody>().useGravity;
 
-            //     // Send position details to the rest of the users in the lobby
-            //     context.SendJson(new Message()
-            //     {
-            //         position = transform.localPosition,
-            //         scale = transform.localScale,
-            //         rotation = transform.localRotation,
-            //         owner = false, 
-            //         isHeld = isHeld,
-            //         isKinematic = true,
-            //         color = obj.GetComponent<Renderer>().material.color
-            //         // gravity = obj.GetComponent<Rigidbody>().useGravity
-            //     });
-            // }
-        //}
+                // Send position details to the rest of the users in the lobby
+                context.SendJson(new Message()
+                {
+                    position = transform.localPosition,
+                    scale = transform.localScale,
+                    rotation = transform.localRotation,
+                    owner = false, 
+                    isHeld = isHeld,
+                    isKinematic = true,
+                    color = obj.GetComponent<Renderer>().material.color
+                    // gravity = obj.GetComponent<Rigidbody>().useGravity
+                });
+            }
+        }
     }
 
     public struct Message
