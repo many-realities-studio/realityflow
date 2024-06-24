@@ -51,7 +51,7 @@ public class RealityFlowClient : MonoBehaviour
     private void Awake()
     {
         // if(debug==true) {
-            // server = @"http://localhost:4000/";
+        // server = @"http://localhost:4000/";
         // }
         Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
@@ -269,12 +269,7 @@ public class RealityFlowClient : MonoBehaviour
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
             LoginSuccess.Invoke(true);
-            //find object type ChatGPT and enable it
-            var chatGPTObject = GameObject.Find("ChatGPT");
-            if (chatGPTObject != null)
-            {
-                chatGPTObject.SetActive(true);
-            }
+
             if (Whisper.rootWhisper != null)
             {
                 Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
@@ -347,13 +342,13 @@ public class RealityFlowClient : MonoBehaviour
             {
                 input3 = new
                 {
-                  userId = userDecoded["id"],
-                  defaultProjectId = currentProjectId,
-                  newRoomId = room.UUID
+                    userId = userDecoded["id"],
+                    defaultProjectId = currentProjectId,
+                    newRoomId = room.UUID
                 },
                 input2 = new
                 {
-                  userId = userDecoded["id"]
+                    userId = userDecoded["id"]
                 },
                 input = new
                 {
@@ -378,8 +373,8 @@ public class RealityFlowClient : MonoBehaviour
 
         // Run KeepRoomAlive every 30 seconds
         InvokeRepeating("KeepRoomAlive", 0, 30);
-        
-        
+
+
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
         OnRoomCreated?.Invoke();
     }
