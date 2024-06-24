@@ -5334,7 +5334,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1859582589}
+    m_TransformParent: {fileID: 2142340400}
     m_Modifications:
     - target: {fileID: 1518078766424733163, guid: 4674852d403b2214ca01439e5720d554,
         type: 3}
@@ -5404,7 +5404,7 @@ PrefabInstance:
     - target: {fileID: 7367846944869944764, guid: 4674852d403b2214ca01439e5720d554,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9480,7 +9480,7 @@ PrefabInstance:
     - target: {fileID: 559345984109643752, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.0000011324883
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1370883964485773158, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
@@ -9581,6 +9581,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LLM Window
+      objectReference: {fileID: 0}
+    - target: {fileID: 2947916670492063054, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3327737482178259357, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
@@ -10323,6 +10328,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WhisperNotifier
+      objectReference: {fileID: 0}
+    - target: {fileID: 3338733389592235644, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3895853455702012099, guid: 3ff2b636a5e83cd4dbad48a4dfac410e,
         type: 3}
@@ -11420,7 +11430,6 @@ Transform:
   - {fileID: 1716016692}
   - {fileID: 55995617}
   - {fileID: 502698800}
-  - {fileID: 488727133}
   - {fileID: 158983325}
   m_Father: {fileID: 2142340400}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -13123,6 +13132,7 @@ Transform:
   - {fileID: 243809654}
   - {fileID: 1165061546}
   - {fileID: 1938978928}
+  - {fileID: 488727133}
   - {fileID: 323530831}
   - {fileID: 1710922995}
   - {fileID: 1698069684}
