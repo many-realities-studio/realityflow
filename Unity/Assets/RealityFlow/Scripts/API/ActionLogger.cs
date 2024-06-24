@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using RealityFlow.NodeGraph;
 
-public class ActionLogger
+public class ActionLogger : MonoBehaviour
 {
     public class LoggedAction
     {
@@ -85,15 +85,16 @@ public class ActionLogger
         Debug.Log($"Logged generated code.");
     }
 
-    public void ExecuteLoggedCode()
+    public IEnumerator ExecuteLoggedCodeCoroutine()
     {
         foreach (var code in codeQueue)
         {
-            RoslynCodeRunner.Instance.RunCode(code);
+            yield return StartCoroutine(RoslynCodeRunner.Instance.RunCodeCoroutine(code));
         }
         codeQueue.Clear();
         Debug.Log("Executed all logged code sequentially.");
     }
+
 
     public void ClearCodeQueue()
     {

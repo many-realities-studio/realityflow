@@ -1,6 +1,7 @@
 using DilmerGames.Core.Singletons;
 using Microsoft.CodeAnalysis;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -31,62 +32,90 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 
     private readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
 
-    public void RunCode(string updatedCode = null)
+    public IEnumerator RunCodeCoroutine(string updatedCode = null)
     {
-        Logger.Instance.LogInfo("Doing the actions now...");
+        Logger.Instance.LogInfo("Compiling and executing new script...");
+
+        // Ensure previous diagnostics are cleared
+        diagnostics.Clear();
 
         updatedCode = string.IsNullOrEmpty(updatedCode) ? code : updatedCode;
-        try
+        bool compilationCompleted = false;
+        Assembly asm = null;
+
+        // Run the compilation on a separate thread
+        new System.Threading.Thread(() =>
         {
-            // Compile the provided code into an assembly
-            Assembly asm = RealityFlow.Scripting.ScriptUtilities.CompileToAssembly(updatedCode, diagnostics);
+            asm = RealityFlow.Scripting.ScriptUtilities.CompileToAssembly(updatedCode, diagnostics);
+            compilationCompleted = true;
+        }).Start();
 
-            // Log any compilation diagnostics
-            foreach (var diag in diagnostics)
-            {
-                if (diag.Severity == DiagnosticSeverity.Warning)
-                    Debug.LogWarning(diag);
-                else if (diag.Severity == DiagnosticSeverity.Error)
-                    Debug.LogError(diag);
-                else if (diag.Severity == DiagnosticSeverity.Info)
-                    Debug.Log(diag);
-            }
-
-            // Clear diagnostics for next compilation
-            diagnostics.Clear();
-
-            // Check if the compilation resulted in a valid assembly
-            if (asm == null)
-            {
-                Debug.LogError("Failed to compile code.");
-                return;
-            }
-
-            // Find a type that contains a static 'Execute' method
-            Type type = asm.GetTypes().Where(t => t.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public) != null).FirstOrDefault();
-            if (type == null)
-            {
-                Debug.LogError("No static Execute method found.");
-                return;
-            }
-
-            // Get the static 'Execute' method
-            MethodInfo method = type.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public);
-            if (method == null)
-            {
-                Debug.LogError("Execute method not found.");
-                return;
-            }
-
-            // Invoke the static 'Execute' method
-            method.Invoke(null, null);
+        // Wait until the compilation is done
+        while (!compilationCompleted)
+        {
+            yield return null;
         }
-        catch (Exception ex)
+
+        // Log any compilation diagnostics
+        foreach (var diag in diagnostics)
         {
-            // Log any exceptions that occur during the process
-            Logger.Instance.LogError(ex.Message);
+            if (diag.Severity == DiagnosticSeverity.Warning)
+                Debug.LogWarning(diag);
+            else if (diag.Severity == DiagnosticSeverity.Error)
+                Debug.LogError(diag);
+            else if (diag.Severity == DiagnosticSeverity.Info)
+                Debug.Log(diag);
+        }
+
+        // Clear diagnostics for next compilation
+        diagnostics.Clear();
+
+        // Check if the compilation resulted in a valid assembly
+        if (asm == null)
+        {
+            Debug.LogError("Failed to compile code.");
+            yield break;
+        }
+
+        // Find a type that contains a static 'Execute' method
+        Type type = asm.GetTypes().Where(t => t.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public) != null).FirstOrDefault();
+        if (type == null)
+        {
+            Debug.LogError("No static Execute method found.");
+            yield break;
+        }
+
+        // Get the static 'Execute' method
+        MethodInfo method = type.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public);
+        if (method == null)
+        {
+            Debug.LogError("Execute method not found.");
+            yield break;
+        }
+
+        // Invoke the static 'Execute' method asynchronously on the main thread
+        bool methodInvocationCompleted = false;
+        UnityMainThreadDispatcher.RunOnMainThread(() =>
+        {
+            try
+            {
+                method.Invoke(null, null);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error during script execution: " + e.Message);
+            }
+            methodInvocationCompleted = true;
+        });
+
+        // Wait until the method invocation is done
+        while (!methodInvocationCompleted)
+        {
+            yield return null;
         }
     }
+
+
 
 
 }
