@@ -1041,9 +1041,29 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.UseForcesForNearManipulation = false;
                         objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
                         objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
-                        objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
+                        //objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
+                        objectManipulator.ReleaseBehavior = 0;
                         objectManipulator.SmoothingFar = true;
                         objectManipulator.SmoothingNear = true;
+
+                        /*
+                        objectManipulator.firstSelectEntered.AddListener(async _ => 
+                        {
+                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            {
+                                spawnedObject.GetComponent<MyNetworkedObject>().StartHold();
+                            }
+                        });
+
+                        objectManipulator.lastSelectExited.AddListener(async _ => 
+                        {
+                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            {
+                                spawnedObject.GetComponent<MyNetworkedObject>().EndHold();
+                            }
+                        });
+                        */
+
                         objectManipulator.MoveLerpTime = 0.001f;
                         objectManipulator.RotateLerpTime = 0.001f;
                         objectManipulator.ScaleLerpTime = 0.001f;
