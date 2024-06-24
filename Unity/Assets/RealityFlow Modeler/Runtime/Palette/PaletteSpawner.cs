@@ -33,7 +33,7 @@ public class PaletteSpawner : MonoBehaviour
         paletteSwitcher = gameObject.GetComponent<PaletteSwitcher>();
 
         PaletteHandManager.OnHandChange += SwitchHands;
-
+        
         // Ensure users do not attempt to spawn in a palette immediately on spawn to avoid race conditions
         // with setting up references for paletteSwitcher.networkedPlayManager.
         StartCoroutine(AllowSpawnMechanics(1));

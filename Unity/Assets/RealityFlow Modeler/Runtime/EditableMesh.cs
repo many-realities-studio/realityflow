@@ -54,7 +54,7 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             {
                 faces[i] = new EMFace(value.faces[i]);
                 // Debug log to show the face
-                Debug.Log("[EM]Face " + i + " {" + value.faces[i][0] + " " + value.faces[i][1] + " " + value.faces[i][2]);
+                // Debug.Log("[EM]Face " + i + " {" + value.faces[i][0] + " " + value.faces[i][1] + " " + value.faces[i][2]);
             }
 
             baseShape = value.getShape();
@@ -91,6 +91,7 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             }
 
             GetComponent<NetworkedMesh>().SetLastSize(value.lastSize);
+            
         }
     }
 

@@ -27,6 +27,8 @@ using Microsoft.MixedReality.Toolkit.Input; // For ObjectManipulator
 using Microsoft.MixedReality.Toolkit.SpatialManipulation; // For ConstraintManager and TetheredPlacement
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.Examples.Demos;
+using Unity.VisualScripting;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -70,6 +72,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     readonly Dictionary<string, GameObject> spawnedObjectsById = new();
     public ImmutableDictionary<string, GameObject> SpawnedObjectsById
         => spawnedObjectsById.ToImmutableDictionary();
+
+    readonly Dictionary<GameObject, int> templatesDict = new();
+    public ImmutableDictionary<GameObject, int> TemplatesDict => templatesDict.ToImmutableDictionary();
+    readonly List<GameObject> templates = new();
+    public IEnumerable<GameObject> Templates => templates;
+    public Action OnTemplatesChanged;
+
     public enum SpawnScope
     {
         Room,
@@ -382,6 +391,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return;
     }
 
+    public void SetTemplate(VisualScript obj, bool becomeTemplate)
+    {
+        // TODO: Persist to database
+
+        if (!templatesDict.ContainsKey(obj.gameObject) && becomeTemplate)
+        {
+            templatesDict.Add(obj.gameObject, templates.Count);
+            templates.Add(obj.gameObject);
+        }
+        else if (templatesDict.TryGetValue(obj.gameObject, out int index) && !becomeTemplate)
+        {
+            templatesDict.Remove(obj.gameObject);
+            templates.RemoveAt(index);
+        }
+
+        obj.isTemplate = becomeTemplate;
+
+        OnTemplatesChanged?.Invoke();
+    }
+
     // -- EDIT GRAPH FUNCTIONS --
     public void SendGraphUpdateToDatabase(string graphJson, string graphId)
     {
@@ -621,6 +650,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // // ---Spawn/Save Object---
     public GameObject UpdatePrimitive(GameObject spawnedMesh)
     {
+        Debug.Log("Updating primitive...");
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
         TransformData transformData = new TransformData
         {
@@ -628,6 +658,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             rotation = spawnedMesh.transform.rotation,
             scale = spawnedMesh.transform.localScale
         };
+
+        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
         SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
 
         RfObject rfObject = spawnedObjects[spawnedMesh];
@@ -661,12 +693,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         var createObject = new GraphQLRequest
         {
             Query = @"
-            mutation updateObject($input: CreateObjectInput!) {
+            mutation UpdateObject($input: UpdateObjectInput!) {
                 updateObject(input: $input) {
                     id
                 }
             }",
-            OperationName = "CreateObject",
+            OperationName = "UpdateObject",
             Variables = new
             {
                 input = new
@@ -688,7 +720,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.Log("Object saved to the database successfully.");
 
                 // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                var returnedId = graphQLResponse["data"]["updateObject"]["id"].ToString();
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
                 spawnedObjects[spawnedMesh] = rfObject;
@@ -1460,7 +1492,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
                     int end = obj.meshJson.Length;
                     string faces = obj.meshJson.Substring(start, end - start - 1);
-                    Debug.Log(faces);
                     string[] faceArray = faces.Split('[');
                     int[][] facesArray = new int[faceArray.Length - 1][];
                     for (int i = 1; i < faceArray.Length; i++)
@@ -1476,12 +1507,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             facesArray[i - 1][j] = int.Parse(face[j]);
                         }
                     }
-                    Debug.Log(facesArray);
                     serializableMesh.faces = facesArray;
-
-                    Debug.Log(serializableMesh);
+                    Debug.Log(serializableMesh.lastSize);
                     // Error can't deserialize here for some reason. Can check with team or investigate 
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
+                    Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
+                    Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
+
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)
@@ -1626,8 +1658,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
-
-
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -1645,6 +1675,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     id
                 }
             }",
+            OperationName = "UpdateObject",
             Variables = new
             {
                 input = new
@@ -1681,7 +1712,18 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    // ---Despawn/Delete---
+    // ---Despawn/Delete--
+    public void DespawnAllObjectsInBothDictionarys()
+    {
+        foreach (var kvp in spawnedObjects)
+        {
+            DespawnObject(kvp.Key);
+        }
+        foreach (var kvp in spawnedObjectsById)
+        {
+            DespawnObject(kvp.Value);
+        }
+    }
 
     //This function is primarily for peer scope
     public void DespawnObject(GameObject objectToDespawn)
@@ -1709,7 +1751,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private async void RemoveObjectFromDatabase(string objectId, System.Action onSuccess)
+    private void RemoveObjectFromDatabase(string objectId, Action onSuccess)
     {
         if (client == null)
         {
