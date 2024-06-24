@@ -73,6 +73,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5166523478545210302}
+  - component: {fileID: 6014276285700359034}
   m_Layer: 0
   m_Name: Vervain
   m_TagString: Untagged
@@ -96,6 +97,27 @@ Transform:
   - {fileID: 1420620637281668562}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &6014276285700359034
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4184152062976576145}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 174.56242, y: 231.29893, z: 333.37006}
+  m_Center: {x: -10.942555, y: 17.116358, z: 159.96034}
 --- !u!1 &4901540664459080720
 GameObject:
   m_ObjectHideFlags: 0

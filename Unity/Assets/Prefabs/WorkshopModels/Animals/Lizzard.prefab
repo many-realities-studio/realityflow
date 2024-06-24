@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9020202676053336509}
+  - component: {fileID: 8159741348361780095}
   m_Layer: 0
   m_Name: Lizzard
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 1681803249641836155}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &8159741348361780095
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3909953154135415013}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.2958219, y: 1.1432844, z: 0.25591084}
+  m_Center: {x: -0.008618116, y: 0.07164222, z: 0.049830023}
 --- !u!1 &6179406033193020577
 GameObject:
   m_ObjectHideFlags: 0

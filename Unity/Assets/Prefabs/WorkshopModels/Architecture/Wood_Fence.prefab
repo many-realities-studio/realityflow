@@ -41,6 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5854163539692324414}
+  - component: {fileID: 9120004120299870598}
   m_Layer: 0
   m_Name: Wood_Fence
   m_TagString: Untagged
@@ -64,6 +65,27 @@ Transform:
   - {fileID: 8308447489777186521}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &9120004120299870598
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6305766708494539486}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.776855, y: 4.506083, z: 1.6848372}
+  m_Center: {x: -0.7993846, y: -1.875036, z: 0.76821005}
 --- !u!1 &7464422784923149259
 GameObject:
   m_ObjectHideFlags: 0

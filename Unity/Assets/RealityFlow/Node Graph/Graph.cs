@@ -122,9 +122,7 @@ namespace RealityFlow.NodeGraph
         /// of a given type.
         /// </summary>
         public ImmutableDictionary<string, HashSet<NodeIndex>> NodeTypes
-        {
-            get => nodeTypes.ToImmutableDictionary();
-        }
+            => nodeTypes.ToImmutableDictionary();
 
         HashSet<NodeIndex> MutableNodesOfType(string type)
         {

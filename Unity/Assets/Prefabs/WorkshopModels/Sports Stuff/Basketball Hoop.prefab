@@ -156,6 +156,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1301011939824199362}
+  - component: {fileID: 2060084557121720981}
   m_Layer: 0
   m_Name: Basketball Hoop
   m_TagString: Untagged
@@ -179,6 +180,27 @@ Transform:
   - {fileID: 485769980664237658}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &2060084557121720981
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3611032189238578590}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.532068, y: 3.7997065, z: 7.529777}
+  m_Center: {x: 0.7250149, y: -0.13028765, z: 3.563966}
 --- !u!1 &7149134611947789236
 GameObject:
   m_ObjectHideFlags: 0

@@ -92,6 +92,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3181035439247833508}
+  - component: {fileID: 7946394004153721101}
   m_Layer: 0
   m_Name: Farm House
   m_TagString: Untagged
@@ -115,6 +116,27 @@ Transform:
   - {fileID: 2610114225853298357}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &7946394004153721101
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004662176512784488}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1086.7375, y: 808.2061, z: 462.08554}
+  m_Center: {x: 225.8933, y: -135.6973, z: 223.33142}
 --- !u!1 &5578980084461074213
 GameObject:
   m_ObjectHideFlags: 0

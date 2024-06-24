@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6789898334993214013}
+  - component: {fileID: 6009846261458330397}
   m_Layer: 0
   m_Name: Chicken Smooth
   m_TagString: Untagged
@@ -32,6 +33,27 @@ Transform:
   - {fileID: 406409050765279467}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &6009846261458330397
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971205628291273078}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.21708483, y: 0.5761789, z: 0.49090576}
+  m_Center: {x: 0.0064943433, y: -0.008196712, z: 0.25454718}
 --- !u!1 &6429765693919956325
 GameObject:
   m_ObjectHideFlags: 0

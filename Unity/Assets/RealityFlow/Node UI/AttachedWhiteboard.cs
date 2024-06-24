@@ -59,7 +59,7 @@ namespace RealityFlow.NodeUI
 
             /*GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(async _ => 
             {
-                if (PlayManager == null || !PlayManager.playMode || RealityFlowAPI.Instance.SpawnedObjects[gameObject]!=null)
+                if (PlayManager == null || !PlayManager.playMode || RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(gameObject))
                     ShowWhiteboard(gameObject);
             });*/
         }

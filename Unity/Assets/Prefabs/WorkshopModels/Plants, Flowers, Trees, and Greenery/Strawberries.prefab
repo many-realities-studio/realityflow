@@ -221,6 +221,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6559455305230386324}
+  - component: {fileID: 6483259623629905855}
   m_Layer: 0
   m_Name: Strawberries
   m_TagString: Untagged
@@ -244,6 +245,27 @@ Transform:
   - {fileID: 7900802919632115937}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &6483259623629905855
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7659912905916173263}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.3269153, y: 5.207309, z: 3.730866}
+  m_Center: {x: -0.31386414, y: -0.14148772, z: 1.7111177}
 --- !u!1 &7889784981696964369
 GameObject:
   m_ObjectHideFlags: 0

@@ -354,6 +354,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4298897195735688446}
+  - component: {fileID: 7796209821078122320}
   m_Layer: 0
   m_Name: Calla Lily
   m_TagString: Untagged
@@ -377,6 +378,27 @@ Transform:
   - {fileID: 5227392017771509987}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &7796209821078122320
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111070463613556426}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.37088326, y: 0.3420633, z: 0.46707207}
+  m_Center: {x: -0.018362775, y: 0.0430537, z: 0.22801599}
 --- !u!1 &2365923796792480884
 GameObject:
   m_ObjectHideFlags: 0

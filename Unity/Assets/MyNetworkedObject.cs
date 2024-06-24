@@ -7,15 +7,14 @@ using Ubiq.NetworkedBehaviour;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
+using System;
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 {
     public NetworkId NetworkId {get; set;}
     NetworkContext context;
     public bool owner;
     public bool isHeld;
-    private GameObject obj;
     private ObjectManipulator manipulator;
-    private MyNetworkedObject myObject;
     private Rigidbody rb;
     bool lastOwner;
     Vector3 lastPosition;
@@ -27,16 +26,24 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     void Start()
     {
         if (!context.Id.Valid)
-            context = NetworkScene.Register(this);
+        {
+            try 
+            {
+                context = NetworkScene.Register(this);
+                Debug.Log(context.Scene.Id);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
         else
             Debug.Log("ID is already valid");
-        Debug.Log(context.Scene.Id);
+
         owner = false;
         isHeld = false;
-        manipulator = this.GetComponent<ObjectManipulator>();
-        myObject = this.GetComponent<MyNetworkedObject>();
-        obj = this.gameObject;
-        rb = this.GetComponent<Rigidbody>();
+        manipulator = GetComponent<ObjectManipulator>();
+        rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
         //color = obj.GetComponent<Renderer>().material.color;
     }
@@ -46,6 +53,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         if (!owner && isHeld)
             return;
+
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
 
         owner = true;
         isHeld = true;
@@ -58,7 +68,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             owner = false,
             isHeld = true,
             isKinematic = true,
-            color = obj.GetComponent<Renderer>().material.color
+            color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         }); 
     }
@@ -66,6 +76,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Set isHeld to false for all users when object is no longer currently being held
     public void EndHold()
     {
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
+
         isHeld = false;
         context.SendJson(new Message()
         {
@@ -75,7 +88,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             owner = true,
             isHeld = false,
             isKinematic = true,
-            color = obj.GetComponent<Renderer>().material.color
+            color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         });
         rb.isKinematic = true;
@@ -140,18 +153,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         transform.localPosition = m.position;
         transform.localScale = m.scale;
         transform.localRotation = m.rotation;
-        myObject.owner = m.owner;
-        myObject.isHeld = m.isHeld;
+        owner = m.owner;
+        isHeld = m.isHeld;
         rb.isKinematic = m.isKinematic;
-        obj.GetComponent<Renderer>().material.color = m.color;
+        gameObject.GetComponent<Renderer>().material.color = m.color;
         //obj.GetComponent<Rigidbody>().useGravity = m.gravity;
 
         // Make sure the logic in Update doesn't trigger as a result of this message
-        lastPosition = obj.transform.localPosition;
-        lastScale = obj.transform.localScale;
-        lastRotation = obj.transform.localRotation;
-        lastOwner = myObject.owner;
-        lastColor = obj.GetComponent<Renderer>().material.color;
+        lastPosition = gameObject.transform.localPosition;
+        lastScale = gameObject.transform.localScale;
+        lastRotation = gameObject.transform.localRotation;
+        lastOwner = owner;
+        lastColor = gameObject.GetComponent<Renderer>().material.color;
         //lastGravity = obj.GetComponent<Rigidbody>().useGravity;
     }
 }

@@ -124,6 +124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4854274224030854838}
+  - component: {fileID: 7678167903573651467}
   m_Layer: 0
   m_Name: Police Station
   m_TagString: Untagged
@@ -147,6 +148,27 @@ Transform:
   - {fileID: 3266766913666100273}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &7678167903573651467
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7449772218777012072}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 597.165, y: 364.98535, z: 293.3452}
+  m_Center: {x: 4.26054, y: 7.9157596, z: 140.92114}
 --- !u!1 &8739382828110312320
 GameObject:
   m_ObjectHideFlags: 0

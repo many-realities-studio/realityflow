@@ -256,6 +256,7 @@ GameObject:
   - component: {fileID: 5769710546381152535}
   - component: {fileID: 1744383304306646284}
   - component: {fileID: 4903179517659726148}
+  - component: {fileID: 1807311903194564535}
   m_Layer: 0
   m_Name: Basketball
   m_TagString: Untagged
@@ -355,6 +356,27 @@ MonoBehaviour:
   ReverseX: 0
   ReverseY: 0
   ReverseZ: 0
+--- !u!65 &1807311903194564535
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3777757503767983429}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.111723, y: 2.2682307, z: 1.5069522}
+  m_Center: {x: 0.024115145, y: 0.07562663, z: 0.25347424}
 --- !u!1 &7078385928417602494
 GameObject:
   m_ObjectHideFlags: 0

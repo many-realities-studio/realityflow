@@ -126,6 +126,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2421339855700942489}
+  - component: {fileID: 7700948776423943847}
   m_Layer: 0
   m_Name: Rose
   m_TagString: Untagged
@@ -149,6 +150,27 @@ Transform:
   - {fileID: 8482480536239125282}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!65 &7700948776423943847
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4354381111060616984}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.32788798, y: 0.19826101, z: 0.5615729}
+  m_Center: {x: 0.021870751, y: 0.01515523, z: 0.32490024}
 --- !u!1 &5280464902438300797
 GameObject:
   m_ObjectHideFlags: 0
