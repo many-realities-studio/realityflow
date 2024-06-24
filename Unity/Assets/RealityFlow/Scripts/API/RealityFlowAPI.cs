@@ -46,7 +46,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private Quaternion previousRotation;
     private Vector3 previousScale;
     public Material outlineMaterial;
-    public ActionLogger actionLogger = new ActionLogger();
+    public ActionLogger actionLogger;
     private NetworkContext networkContext;
     public NetworkId NetworkId { get; set; }
     private static RealityFlowAPI _instance;                // SINGLE INSTANCE OF THE API
@@ -122,6 +122,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Debug.LogError("NetworkSpawnManager not found on the network scene!");
             }
             spawnManager.roomClient.OnRoomUpdated.AddListener(OnRoomUpdated); // Add listener for room updates
+
+            if (actionLogger == null)
+            {
+                actionLogger = gameObject.AddComponent<ActionLogger>();
+            }
         }
 
         client = RealityFlowClient.Find(this);
