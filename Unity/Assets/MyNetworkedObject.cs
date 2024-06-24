@@ -38,8 +38,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         obj = this.gameObject;
         rb = this.GetComponent<Rigidbody>();
         rb.isKinematic = false;
-        if(this.NetworkId == null)
-            Debug.Log("Networked Object " + obj.name + " Network ID is null");
         //color = obj.GetComponent<Renderer>().material.color;
     }
 

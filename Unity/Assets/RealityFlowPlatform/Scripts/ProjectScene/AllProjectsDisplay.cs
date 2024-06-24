@@ -19,6 +19,7 @@ public class ProjectDisplay : MonoBehaviour
     public GameObject projectOwner; 
     public Transform parentContent; 
     private JObject data;
+    public bool tutorialsOnly;
 
     // GraphQL client and access token variables
     private RealityFlowClient rfClient;

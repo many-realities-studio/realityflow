@@ -49,12 +49,12 @@ public class AttachGizmoState : MonoBehaviour
         var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
         if(rightHand == null) {
             rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
-            Debug.Log(rightHand);
+            // Debug.Log(rightHand);
         }
         //Debug.Log(GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller"));
         if(leftHand == null) {
             leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
-            Debug.Log(leftHand);
+            // Debug.Log(leftHand);
         }
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
@@ -352,7 +352,7 @@ public class AttachGizmoState : MonoBehaviour
 
         farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;
         // 6 is gizmo layer
-        //SetLayerOfFarRay(farRay, 6);
+        SetLayerOfFarRay(farRay, 7);
     }
 
     public void DisableMeshRaySelection()
@@ -364,7 +364,7 @@ public class AttachGizmoState : MonoBehaviour
 
         farRay.GetComponent<XRRayInteractor>().raycastMask = everything;
         // 0 is default layer
-        //SetLayerOfFarRay(farRay, 0);
+        SetLayerOfFarRay(farRay, 0);
     }
 
     private void SetLayerOfFarRay(GameObject farRay, int layer)

@@ -51,7 +51,7 @@ public class RealityFlowClient : MonoBehaviour
     private void Awake()
     {
         // if(debug==true) {
-            // server = @"http://localhost:4000/";
+        // server = @"http://localhost:4000/";
         // }
         Debug.Log(" === RealityFlowClient Awake === ");
         // Ensure only one instance
@@ -117,16 +117,13 @@ public class RealityFlowClient : MonoBehaviour
         // Check to see if PlayerPrefs already has an access token
         if (string.IsNullOrEmpty(accessToken))
         {
-            // The access token is null or empty
-            Debug.Log("Access token is null or empty.");
+            // Debug.Log("Access token is null or empty.");
             ShowOTP();
         }
         else
         {
-            // The access token is not null or empty
-            Debug.Log("Access token is valid.");
+            // Debug.Log("Access token is valid.");
             Login(accessToken);
-            // Add your handling code here
         }
     }
 
@@ -216,6 +213,7 @@ public class RealityFlowClient : MonoBehaviour
                 input = new
                 {
                     projectName = "New Project " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    projectOwnerId = userDecoded["id"],
                     description = "A new project",
                     details = "A new project",
                     thumbnailImg = "https://via.placeholder.com/150",
@@ -247,7 +245,7 @@ public class RealityFlowClient : MonoBehaviour
 
 
         userDecoded = DecodeJwt(inputAccessToken);
-        Debug.Log("User decoded: " + userDecoded);
+        // Debug.Log("User decoded: " + userDecoded);
 
         // Create a new room using the GraphQL API
         var verifyToken = new GraphQLRequest
@@ -268,16 +266,11 @@ public class RealityFlowClient : MonoBehaviour
         var graphQL = SendQueryAsync(verifyToken);
         if (graphQL["data"] != null)
         {
-            Debug.Log("User Logged In successfully");
+            // Debug.Log("User Logged In successfully");
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
             LoginSuccess.Invoke(true);
-            //find object type ChatGPT and enable it
-            var chatGPTObject = GameObject.Find("ChatGPT");
-            if (chatGPTObject != null)
-            {
-                chatGPTObject.SetActive(true);
-            }
+
             if (Whisper.rootWhisper != null)
             {
                 Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
@@ -299,7 +292,7 @@ public class RealityFlowClient : MonoBehaviour
 
     public void CreateRoom()
     {
-        Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
+        // Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
 
         // Check if a project is selected
         if (string.IsNullOrEmpty(currentProjectId))
@@ -321,10 +314,10 @@ public class RealityFlowClient : MonoBehaviour
 
     public void OnJoinCreatedRoom(IRoom room)
     {
-        Debug.Log("Created Room: " + room.Name);
-        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
-        Debug.Log(room.Name + " UUID: " + room.UUID);
-        Debug.Log(room.Name + " Publish: " + room.Publish);
+        //Debug.Log("Created Room: " + room.Name);
+        // Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
+        // Debug.Log(room.Name + " UUID: " + room.UUID);
+        // Debug.Log(room.Name + " Publish: " + room.Publish);
 
         levelEditor.SetActive(true);
 
@@ -350,13 +343,13 @@ public class RealityFlowClient : MonoBehaviour
             {
                 input3 = new
                 {
-                  userId = userDecoded["id"],
-                  defaultProjectId = currentProjectId,
-                  newRoomId = room.UUID
+                    userId = userDecoded["id"],
+                    defaultProjectId = currentProjectId,
+                    newRoomId = room.UUID
                 },
                 input2 = new
                 {
-                  userId = userDecoded["id"]
+                    userId = userDecoded["id"]
                 },
                 input = new
                 {
@@ -381,8 +374,8 @@ public class RealityFlowClient : MonoBehaviour
 
         // Run KeepRoomAlive every 30 seconds
         InvokeRepeating("KeepRoomAlive", 0, 30);
-        
-        
+
+
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
         OnRoomCreated?.Invoke();
     }
@@ -455,17 +448,11 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log("=== LEAVING ROOM ==="); // Log the project ID
         roomClient.Join("", false);
 
-        levelEditor.SetActive(false);
+        RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
+        // levelEditor.SetActive(false);
         projectManager.SetActive(true);
 
-        RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
-    }
-
-    // ========= DELETE ROOM =========
-    public void DeleteRoom()
-    {
-        // Implementation for deleting a room
-
+        
     }
 
     public JObject SendQueryAsync(GraphQLRequest payload)
@@ -516,7 +503,7 @@ public class RealityFlowClient : MonoBehaviour
         {
             try
             {
-                Debug.Log(request.downloadHandler.text);
+                // Debug.Log(request.downloadHandler.text);
                 response = JsonConvert.DeserializeObject<JObject>(
                     request.downloadHandler.text // This is failing
                 );
@@ -622,15 +609,15 @@ public class RealityFlowClient : MonoBehaviour
         var projectdata = graphQL["data"];
         if (projectdata != null)
         {
-            Debug.Log("Fetched project data: " + projectdata.ToString());
+           //Debug.Log("Fetched project data: " + projectdata.ToString());
 
             // Set the project details in the UI
             OnProjectUpdated.Invoke((JObject)projectdata);
             var roomsData = projectdata["getProjectById"]["rooms"];
             if (roomsData != null)
             {
-                Debug.Log("Fetched rooms data: " + roomsData.ToString());
-                Debug.Log("Rooms: " + roomsData.ToString());
+                //Debug.Log("Fetched rooms data: " + roomsData.ToString());
+                //Debug.Log("Rooms: " + roomsData.ToString());
                 OnRoomsReceived.Invoke(roomsData as JArray);
             }
             else
@@ -669,9 +656,9 @@ public class RealityFlowClient : MonoBehaviour
         JArray rooms = null;
         if (roomsData != null)
         {
-            Debug.Log("Fetched rooms data: " + roomsData.ToString());
+            // Debug.Log("Fetched rooms data: " + roomsData.ToString());
             rooms = (JArray)roomsData["getRoomsByProjectId"];
-            Debug.Log("Rooms: " + rooms.ToString());
+            // Debug.Log("Rooms: " + rooms.ToString());
         }
         else
         {
