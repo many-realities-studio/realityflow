@@ -20,6 +20,13 @@ using RealityFlow.NodeUI;
 using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
 using System.Collections.Immutable;
+using System.Reflection;
+using UnityEngine.UI; // For Selectable and Navigation
+using UnityEngine.EventSystems; // For UGUIInputAdapterDraggable
+using Microsoft.MixedReality.Toolkit.Input; // For ObjectManipulator
+using Microsoft.MixedReality.Toolkit.SpatialManipulation; // For ConstraintManager and TetheredPlacement
+using Microsoft.MixedReality.Toolkit.UX;
+using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Unity.VisualScripting;
 
 
@@ -939,7 +946,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // Add Rigidbody
                     if (spawnedObject.GetComponent<Rigidbody>() == null)
                     {
-                        spawnedObject.AddComponent<Rigidbody>();
+                        var rigidbody = spawnedObject.AddComponent<Rigidbody>();
+                        rigidbody.useGravity = false;
+                        rigidbody.isKinematic = false;
                     }
 
                     // Add MeshCollider
@@ -949,6 +958,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         if (meshFilter != null)
                         {
                             spawnedObject.AddComponent<MeshCollider>().sharedMesh = meshFilter.sharedMesh;
+
                         }
                         else
                         {
@@ -961,6 +971,66 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             }
                         }
                     }
+                    // Add MyNetworkedObject script
+                    if (spawnedObject.GetComponent<MyNetworkedObject>() == null)
+                    {
+                        spawnedObject.AddComponent<MyNetworkedObject>();
+                    }
+
+                    // Add ConstraintManager
+                    var constraintManager = spawnedObject.AddComponent<ConstraintManager>();
+                    constraintManager.AutoConstraintSelection = true;
+
+                    // Add UGUIInputAdapterDraggable
+                    var draggableAdapter = spawnedObject.AddComponent<UGUIInputAdapterDraggable>();
+                    draggableAdapter.interactable = true;
+                    draggableAdapter.transition = Selectable.Transition.None;
+                    draggableAdapter.navigation = new Navigation { mode = Navigation.Mode.Automatic };
+
+
+                    // Add NetworkedMesh script
+                    //if (spawnedObject.GetComponent<NetworkedMesh>() == null)
+                    //{
+                    //spawnedObject.AddComponent<NetworkedMesh>();
+                    //}
+
+                    // Add TetheredPlacement script with Distance Threshold set to 20
+                    var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
+                    tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
+
+                    // Add CacheMeshData script
+                    if (spawnedObject.GetComponent<CacheMeshData>() == null)
+                    {
+                        spawnedObject.AddComponent<CacheMeshData>();
+                    }
+
+                    // Add NetworkedOperationCache script
+                    if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
+                    {
+                        spawnedObject.AddComponent<NetworkedOperationCache>();
+                    }
+
+                    // Add ObjectManipulator
+                    if (spawnedObject.GetComponent<ObjectManipulator>() == null)
+                    {
+                        var objectManipulator = spawnedObject.AddComponent<ObjectManipulator>();
+                        objectManipulator.HostTransform = spawnedObject.transform;
+                        //objectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate | TransformFlags.Scale;
+                        objectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic;
+                        objectManipulator.UseForcesForNearManipulation = false;
+                        objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
+                        objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
+                        objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
+                        objectManipulator.SmoothingFar = true;
+                        objectManipulator.SmoothingNear = true;
+                        objectManipulator.MoveLerpTime = 0.001f;
+                        objectManipulator.RotateLerpTime = 0.001f;
+                        objectManipulator.ScaleLerpTime = 0.001f;
+                        objectManipulator.EnableConstraints = true;
+                        objectManipulator.ConstraintsManager = spawnedObject.GetComponent<ConstraintManager>() ?? spawnedObject.AddComponent<ConstraintManager>();
+                    }
+
+
                 }
                 if (scope == SpawnScope.Room)
                 {
@@ -1427,7 +1497,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     for (int i = 1; i < faceArray.Length; i++)
                     {
                         // If the last character is a , remove it
-                        faceArray[i] =faceArray[i].TrimEnd(',');
+                        faceArray[i] = faceArray[i].TrimEnd(',');
                         string[] face = faceArray[i].Split(',');
                         // Remove any "]" characters from the last element of the array
                         facesArray[i - 1] = new int[face.Length];
@@ -1443,7 +1513,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
                     Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
-                    
+
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)
