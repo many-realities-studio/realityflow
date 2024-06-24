@@ -53,6 +53,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
     public PrefabCatalogue catalogue; // Prefab Catalog
     public GameObject whiteboardPrefab;
+    public static GameObject NearMenuToolbox;
+    public GameObject nearMenuReference;
 
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
@@ -130,6 +132,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
 
         StartCoroutine(HookNetworkedPlayManager());
+
+        // assign the near menu toolbox
+        NearMenuToolbox = nearMenuReference;
     }
 
     // ===== SUPPORT FUNCTIONS =====
