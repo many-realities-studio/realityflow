@@ -24,6 +24,7 @@ public class MyProjectsDisplay : MonoBehaviour
     public GameObject roomUI;
     public Button createRoomBtn;
     public Button refreshRoomsBtn;
+  // public bool onlyTutorials;
 
     // GraphQL client and access token variables 
     // public GraphQLHttpClient graphQLClient;

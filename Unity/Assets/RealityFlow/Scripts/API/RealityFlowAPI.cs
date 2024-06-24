@@ -921,7 +921,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return spawnedMesh;
     }
-
+    #region Spawn Object
     public GameObject SpawnObject(string prefabName, Vector3 spawnPosition,
         Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
     {
@@ -943,6 +943,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.rotation = spawnRotation;
                     spawnedObject.transform.localScale = scale;
 
+                    /*
                     // Add Rigidbody
                     if (spawnedObject.GetComponent<Rigidbody>() == null)
                     {
@@ -1029,7 +1030,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.EnableConstraints = true;
                         objectManipulator.ConstraintsManager = spawnedObject.GetComponent<ConstraintManager>() ?? spawnedObject.AddComponent<ConstraintManager>();
                     }
-
+                    */
 
                 }
                 if (scope == SpawnScope.Room)
@@ -1169,6 +1170,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return spawnedObject;
     }
+    #endregion
 
     private void SaveObjectToDatabase(RfObject rfObject)
     {
@@ -1715,14 +1717,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ---Despawn/Delete--
     public void DespawnAllObjectsInBothDictionarys()
     {
+        // Despawn objects in spawnedObjects dictionary
         foreach (var kvp in spawnedObjects)
         {
-            DespawnObject(kvp.Key);
+            Destroy(kvp.Key);
         }
+        spawnedObjects.Clear();
+
+        // Despawn objects in spawnedObjectsById dictionary
         foreach (var kvp in spawnedObjectsById)
         {
-            DespawnObject(kvp.Value);
+            Destroy(kvp.Value);
         }
+        spawnedObjectsById.Clear();
     }
 
     //This function is primarily for peer scope

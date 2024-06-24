@@ -49,12 +49,12 @@ public class AttachGizmoState : MonoBehaviour
         var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
         if(rightHand == null) {
             rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
-            Debug.Log(rightHand);
+            // Debug.Log(rightHand);
         }
         //Debug.Log(GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller"));
         if(leftHand == null) {
             leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
-            Debug.Log(leftHand);
+            // Debug.Log(leftHand);
         }
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
