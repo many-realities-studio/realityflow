@@ -8,10 +8,13 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
+
+// The render component lines have been removed to work for ObjectManipulator Dynamically. Addding a check for the field
+// is required if we want to load dynamically. I'm not sure what color is used for though, maybe the bounding boxes on meshes?
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 {
     public NetworkId NetworkId {get; set;}
-    NetworkContext context;
+    public NetworkContext context;
     public bool owner;
     public bool isHeld;
     private ObjectManipulator manipulator;
@@ -25,6 +28,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {
+        // If our context is invalid, register this instance of myNetworkedObject with the scene.
         if (!context.Id.Valid)
         {
             try 
@@ -67,8 +71,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = false,
             isHeld = true,
-            isKinematic = true,
-            color = gameObject.GetComponent<Renderer>().material.color
+            isKinematic = true//,
+            //color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         }); 
     }
@@ -87,8 +91,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = true,
             isHeld = false,
-            isKinematic = true,
-            color = gameObject.GetComponent<Renderer>().material.color
+            isKinematic = true//,
+            //color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         });
         rb.isKinematic = true;
@@ -158,7 +162,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = m.owner;
         isHeld = m.isHeld;
         rb.isKinematic = m.isKinematic;
-        gameObject.GetComponent<Renderer>().material.color = m.color;
+        //gameObject.GetComponent<Renderer>().material.color = m.color;
         //obj.GetComponent<Rigidbody>().useGravity = m.gravity;
 
         // Make sure the logic in Update doesn't trigger as a result of this message
@@ -166,7 +170,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastScale = gameObject.transform.localScale;
         lastRotation = gameObject.transform.localRotation;
         lastOwner = owner;
-        lastColor = gameObject.GetComponent<Renderer>().material.color;
+        //lastColor = gameObject.GetComponent<Renderer>().material.color;
         //lastGravity = obj.GetComponent<Rigidbody>().useGravity;
     }
 }

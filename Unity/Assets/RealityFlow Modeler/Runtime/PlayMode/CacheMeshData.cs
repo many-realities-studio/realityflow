@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Org.BouncyCastle.Crypto.Engines;
 
 /// <summary>
 /// Class CacheMeshData is attached to every networked mesh and caches it's information when Play mode is entered. Upon exit of Play mode
@@ -16,6 +17,8 @@ public class CacheMeshData : MonoBehaviour
     private Vector3 cachedPosition, cachedScale;
     private Quaternion cachedRotation;
 
+    private Rigidbody rb;
+
     void Start()
     {
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
@@ -24,6 +27,11 @@ public class CacheMeshData : MonoBehaviour
         cachedPosition = transform.localPosition;
         cachedScale = transform.localScale;
         cachedRotation = transform.localRotation;
+
+        if(gameObject.GetComponent<Rigidbody>() != null)
+        {
+            rb = gameObject.GetComponent<Rigidbody>();
+        }
     }
 
     void Update()
@@ -39,6 +47,9 @@ public class CacheMeshData : MonoBehaviour
                 cachedPosition = transform.localPosition;
                 cachedScale = transform.localScale;
                 cachedRotation = transform.localRotation;
+
+                rb.useGravity = true;
+                rb.isKinematic = false;
             }
             // Revert values back to cached information upon leaving Play mode
             else
@@ -47,14 +58,11 @@ public class CacheMeshData : MonoBehaviour
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
 
-                if (gameObject.GetComponent<Rigidbody>() is Rigidbody rb)
-                {
-                    rb.useGravity = false;
-                    rb.isKinematic = true;
-                }
+                rb.useGravity = false;
+                rb.isKinematic = true;
 
                 // All meshes should be selectable after Play mode is exited
-                gameObject.GetComponent<ObjectManipulator>().enabled = true;
+                //gameObject.GetComponent<ObjectManipulator>().enabled = true;
             }
         }
     }

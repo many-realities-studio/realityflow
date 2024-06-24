@@ -1043,6 +1043,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.HostTransform = spawnedObject.transform;
                         //objectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate | TransformFlags.Scale;
                         objectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic;
+                        objectManipulator.selectMode = InteractableSelectMode.Multiple;
                         objectManipulator.UseForcesForNearManipulation = false;
                         objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
                         objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
@@ -1051,23 +1052,23 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.SmoothingFar = true;
                         objectManipulator.SmoothingNear = true;
 
-                        /*
-                        objectManipulator.firstSelectEntered.AddListener(async _ => 
+                        
+                        objectManipulator.firstSelectEntered.AddListener(_ =>
                         {
-                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            if (spawnedObject.GetComponent<MyNetworkedObject>() != null)
                             {
                                 spawnedObject.GetComponent<MyNetworkedObject>().StartHold();
                             }
                         });
 
-                        objectManipulator.lastSelectExited.AddListener(async _ => 
+                        objectManipulator.lastSelectExited.AddListener(_ =>
                         {
-                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            if (spawnedObject.GetComponent<MyNetworkedObject>() != null)
                             {
                                 spawnedObject.GetComponent<MyNetworkedObject>().EndHold();
                             }
                         });
-                        */
+                        
 
                         objectManipulator.MoveLerpTime = 0.001f;
                         objectManipulator.RotateLerpTime = 0.001f;
