@@ -97,6 +97,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Update is called once per frame
     void Update()
     {
+        /*
         // If currently not the owner and the object is being held by someone, disable ObjectManipulator so it can be moved
         if (!owner && isHeld)
             this.gameObject.GetComponent<ObjectManipulator>().enabled = false;
@@ -130,6 +131,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 });
             }
         }
+        */
     }
 
     public struct Message
