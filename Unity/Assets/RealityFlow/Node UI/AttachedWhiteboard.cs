@@ -59,13 +59,14 @@ namespace RealityFlow.NodeUI
 
             GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
             {
-                if (PlayManager == null || !PlayManager.playMode)
+                if (PlayManager == null || !PlayManager.playMode || RealityFlowAPI.Instance.SpawnedObjects[gameObject]!=null)
                     ShowWhiteboard(gameObject);
             });
         }
 
         void ShowWhiteboard(GameObject obj)
         {
+            Debug.Log("Showing whiteboard for this");
             if (!Whiteboard.Instance)
                 return;
 
