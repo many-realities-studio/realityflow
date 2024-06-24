@@ -975,7 +975,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     {
                         var rigidbody = spawnedObject.AddComponent<Rigidbody>();
                         rigidbody.useGravity = false;
-                        rigidbody.isKinematic = false;
+                        rigidbody.isKinematic = true;
                     }
 
                     // Add BoxCollider based on bounds
