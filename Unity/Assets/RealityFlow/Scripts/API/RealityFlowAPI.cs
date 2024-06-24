@@ -53,6 +53,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
     public PrefabCatalogue catalogue; // Prefab Catalog
     public GameObject whiteboardPrefab;
+    public static GameObject NearMenuToolbox;
+    public GameObject nearMenuReference;
 
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
@@ -130,6 +132,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
 
         StartCoroutine(HookNetworkedPlayManager());
+
+        // assign the near menu toolbox
+        NearMenuToolbox = nearMenuReference;
     }
 
     // ===== SUPPORT FUNCTIONS =====
@@ -1195,19 +1200,43 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void InstantiateNonPersisted(GameObject obj, Vector3 position, Quaternion rotation)
     {
-        GameObject spawned = Instantiate(obj, position, rotation, spawnManager.transform);
-        spawned.SetActive(true);
-        spawned.GetComponent<MyNetworkedObject>().NetworkId = default;
-        nonPersistentObjects.Add(spawned);
+        try
+        {
+            RfObject objectDetails = SpawnedObjects[obj];
+            string prefabName = objectDetails.name;
+            GameObject prefab = GetPrefabByName(prefabName);
 
-        actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+            GameObject spawned = spawnManager.SpawnWithPeerScope(prefab);
+            spawned.transform.SetPositionAndRotation(position, rotation);
+            spawned.SetActive(true);
+
+            if (obj.GetComponent<VisualScript>() is VisualScript script)
+            {
+                VisualScript newScript = spawned.AddComponent<VisualScript>();
+                newScript.graph = script.graph;
+
+                // TODO: If in play mode call OnEnterPlayMode
+            }
+
+            nonPersistentObjects.Add(spawned);
+            spawnedObjects.Add(spawned, objectDetails);
+
+            actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     public void DestroyNonPersisted(GameObject obj)
     {
         bool nonPersistent = nonPersistentObjects.Contains(obj);
         if (nonPersistent)
-            Destroy(obj);
+        {
+            spawnedObjects.Remove(obj);
+            spawnManager.Despawn(obj);
+        }
         else
             obj.SetActive(false);
 
