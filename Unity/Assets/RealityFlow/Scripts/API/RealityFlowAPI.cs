@@ -1080,7 +1080,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             input2 = new
             {
                 eventType = action,
-                eventData = new JObject(data),
+                eventData = JObject.FromObject(data),
             }
         }
     };
