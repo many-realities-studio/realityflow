@@ -1015,26 +1015,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     constraintManager.AutoConstraintSelection = true;
 
                     // Add UGUIInputAdapterDraggable
-                    var draggableAdapter = spawnedObject.AddComponent<UGUIInputAdapterDraggable>();
-                    draggableAdapter.interactable = true;
-                    draggableAdapter.transition = Selectable.Transition.None;
-                    draggableAdapter.navigation = new Navigation { mode = Navigation.Mode.Automatic };
+                    // var draggableAdapter = spawnedObject.AddComponent<UGUIInputAdapterDraggable>();
+                    // draggableAdapter.interactable = true;
+                    // draggableAdapter.transition = Selectable.Transition.None;
+                    // draggableAdapter.navigation = new Navigation { mode = Navigation.Mode.Automatic };
 
                     // Add TetheredPlacement script with Distance Threshold set to 20
-                    var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
-                    tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
+                    // var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
+                    // tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
 
                     // Add CacheMeshData script
-                    if (spawnedObject.GetComponent<CacheMeshData>() == null)
-                    {
-                        spawnedObject.AddComponent<CacheMeshData>();
-                    }
+                    // if (spawnedObject.GetComponent<CacheMeshData>() == null)
+                    // {
+                    //     spawnedObject.AddComponent<CacheMeshData>();
+                    // }
 
                     // Add NetworkedOperationCache script
-                    if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
-                    {
-                        spawnedObject.AddComponent<NetworkedOperationCache>();
-                    }
+                    // if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
+                    // {
+                    //     spawnedObject.AddComponent<NetworkedOperationCache>();
+                    // }
 
                     // Add ObjectManipulator
                     if (spawnedObject.GetComponent<ObjectManipulator>() == null)
@@ -1318,7 +1318,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
 
             var graphQLResponse = client.SendQueryAsync(saveObject);
-            if (graphQLResponse["data"] != null)
+            if (graphQLResponse["data"] != null && graphQLResponse["errors"]==null)
             {
                 Debug.Log("Object saved to the database successfully.");
 
@@ -1327,8 +1327,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
 
-                // Update the name of the spawned object in the scene
-                GameObject spawnedObject = GameObject.Find(rfObject.name);
+        // Update the name of the spawned object in the scene
+                GameObject spawnedObject = spawnedObjectsById[rfObject.id];//GameObject.Find(rfObject.name);
                 if (spawnedObject != null)
                 {
                     spawnedObject.name = rfObject.id;
