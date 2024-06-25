@@ -65,6 +65,7 @@ namespace RealityFlow.NodeGraph
                 NodeValueType.TemplateObject,
                 NodeValueType.String,
                 NodeValueType.Text,
+                NodeValueType.Audio,
             };
 
         public static bool IsAssignableTo(NodeValueType assigned, NodeValueType to)
@@ -94,6 +95,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.String => typeof(string),
             NodeValueType.Variable => typeof(string),
             NodeValueType.Text => typeof(GameObject),
+            NodeValueType.Audio => typeof(string),
             _ => throw new ArgumentException(),
         };
 
@@ -116,6 +118,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.String => new StringValue(string.Empty),
             NodeValueType.Variable => new VariableValue(null),
             NodeValueType.Text => null,
+            NodeValueType.Audio => null,
             _ => throw new ArgumentException(),
         };
 
@@ -152,6 +155,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.TemplateObject => new TemplateObjectValue(value.AsType<T, GameObject>()),
             NodeValueType.Variable => new VariableValue(value.AsType<T, string>()),
             NodeValueType.Text => new TextValue(value.AsType<T, GameObject>()),
+            NodeValueType.Audio => new AudioValue(value.AsType<T, string>()),
             _ => throw new ArgumentException(),
         };
     }
@@ -408,5 +412,21 @@ namespace RealityFlow.NodeGraph
         }
 
         public override NodeValueType ValueType => NodeValueType.Text;
+    }
+
+    [Serializable]
+    public class AudioValue : NodeValue
+    {
+        [SerializeField]
+        string clipName;
+
+        public AudioValue(string clip) 
+        {
+            clipName = clip;
+        }
+
+        public override NodeValueType ValueType => NodeValueType.Audio;
+
+        public override object DynValue => clipName;
     }
 }
