@@ -16,6 +16,8 @@ public class EnableNearMenuToolbox : MonoBehaviour
         RealityFlowAPI.NearMenuToolbox.SetActive(!RealityFlowAPI.NearMenuToolbox.activeInHierarchy);
         // Debug.Log("Near Menu Toolbox " + (!isActive ? "enabled" : "disabled") + ".");
 
+        RealityFlowAPI.Instance.LogActionToServer("Toggled NearMenuToolbox", new {});
+
         // Invoke the event to notify subscribers
         EnableNearMenuToolboxAction?.Invoke();
     }
