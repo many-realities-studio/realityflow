@@ -77,8 +77,8 @@ public class ProjectDisplay : MonoBehaviour
             for (int i = 0; i < projects.Count; i++)
             {
             // if(tutorialsOnly && !(projects[i]["isTutorial"] != null && projects[i]["isTutorial"] )) {
-              // continue;
-              // }
+            //   continue;
+            //   }
                 var project = GameObject.Instantiate(projectPrefab, transform.GetChild(0).GetChild(0).transform);  // Instantiate the project prefab
                 var children = new List<GameObject>();
                 project.GetChildGameObjects(children);  // Get the child game objects of the project prefab

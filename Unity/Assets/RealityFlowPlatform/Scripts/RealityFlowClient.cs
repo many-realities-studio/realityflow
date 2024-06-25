@@ -115,7 +115,10 @@ public class RealityFlowClient : MonoBehaviour
 
         accessToken = PlayerPrefs.GetString("accessToken");
 
-        // Check to see if PlayerPrefs already has an access token
+    }
+
+    public void Start() {
+              // Check to see if PlayerPrefs already has an access token
         if (string.IsNullOrEmpty(accessToken))
         {
             // Debug.Log("Access token is null or empty.");
@@ -126,6 +129,7 @@ public class RealityFlowClient : MonoBehaviour
             // Debug.Log("Access token is valid.");
             Login(accessToken);
         }
+
     }
 
     public string GetCurrentProjectId()
