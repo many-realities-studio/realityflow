@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <linker>
   <assembly preserve="all" fullname="UnityEngine.CoreModule"> </assembly>
+  <assembly fullname="Microsoft.CodeAnalysis.CSharp" preserve="all"/>
   <assembly fullname="UnityEngine">
     <type preserve="all" fullname="UnityEngine.Avatar"/>
     <type preserve="all" fullname="UnityEngine.Animator"/>
