@@ -71890,6 +71890,7 @@ GameObject:
   - component: {fileID: 8960552022266071880}
   - component: {fileID: 7645755420279179571}
   - component: {fileID: 2315858075257634009}
+  - component: {fileID: 234057729841340054}
   m_Layer: 5
   m_Name: Undo Button
   m_TagString: Untagged
@@ -72130,7 +72131,7 @@ MonoBehaviour:
         m_Calls: []
   disabledInteractorTypes:
   - reference: Microsoft.MixedReality.Toolkit.IGrabInteractor, Microsoft.MixedReality.Toolkit.Core
-  toggleMode: 0
+  toggleMode: 1
   selectThreshold: 0.9
   deselectThreshold: 0.1
   triggerOnRelease: 1
@@ -72151,7 +72152,19 @@ MonoBehaviour:
         m_Calls: []
   onClicked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 234057729841340054}
+        m_TargetAssemblyTypeName: UndoRedoManager, Assembly-CSharp
+        m_MethodName: PerformUndo
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onEnabled:
     m_PersistentCalls:
       m_Calls: []
@@ -72558,6 +72571,24 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &234057729841340054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4019305740792261600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f81f03dd8856e624ea229f46942f2855, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnUndoPerformed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRedoPerformed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4059168073334731537
 GameObject:
   m_ObjectHideFlags: 0
