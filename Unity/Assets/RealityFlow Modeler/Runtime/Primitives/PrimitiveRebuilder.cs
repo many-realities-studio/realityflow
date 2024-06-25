@@ -11,9 +11,9 @@ public static class PrimitiveRebuilder
     public static float minimumMeshSize = 0.1f;
     public static void RebuildMesh(EditableMesh target, float size)
     {
-    Debug.Log("Resizing...");
+        // Debug.Log("Resizing...");
         EditableMesh em;
-        //PrimitiveData data; replace all instances of em with data
+        // PrimitiveData data; replace all instances of em with data
         size = Mathf.Max(minimumMeshSize, size);
 
         switch (target.baseShape)

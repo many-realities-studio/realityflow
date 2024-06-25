@@ -103,7 +103,7 @@ namespace Samples.Whisper
         // Formerly known as start
         public void InitializeGPT(string apiKey)
         {
-            Debug.Log("################################# the apikey is " + apiKey);
+            // Debug.Log("################################# the apikey is " + apiKey);
             muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
             {

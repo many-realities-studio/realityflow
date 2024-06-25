@@ -2664,7 +2664,7 @@ PrefabInstance:
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.929
+      value: 0.64
       objectReference: {fileID: 0}
     - target: {fileID: 5194758837115005844, guid: 954de71494c77924d8630c0a9d191c85,
         type: 3}
@@ -2956,7 +2956,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 6562185173771593382}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2119306360}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 01f69dc1cb084aa42b2f2f8cd87bc770, type: 3}
@@ -10726,6 +10726,27 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 903586609}
   m_SourcePrefab: {fileID: 100100000, guid: 2ec66dc7ffe37874a9b4183e32448fb8, type: 3}
+--- !u!1 &2119306360 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6566347112225161012, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+    type: 3}
+  m_PrefabInstance: {fileID: 6562185173771593382}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2119306367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119306360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee745d013f9b82c44b5a36a046a420f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 2119306360}
+  safePosition: {x: 0, y: 5, z: 0}
+  fallThreshold: -30
 --- !u!224 &2124104213 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3892213338837048324, guid: 710e7fa43807c76429ee811900752cd9,
@@ -10818,7 +10839,7 @@ MonoBehaviour:
   loginMenu: {fileID: 323530833}
   levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  server: https://reality.gaim.ucf.edu/
+  server: http://localhost:4000/
   graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:
@@ -13011,6 +13032,10 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1231595950}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6566347112225161012, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2119306367}
     - targetCorrespondingSourceObject: {fileID: 3085753549785865120, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       insertIndex: -1
