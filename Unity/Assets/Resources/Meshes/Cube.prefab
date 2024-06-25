@@ -19,8 +19,7 @@ GameObject:
   - component: {fileID: -6321622012781711033}
   - component: {fileID: 7421734273417964813}
   - component: {fileID: -4489845190062905058}
-  - component: {fileID: 2237685008528717883}
-  - component: {fileID: -6832451401266901243}
+  - component: {fileID: 2112126288023249345}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Default Object
@@ -480,7 +479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceThreshold: 20
---- !u!114 &2237685008528717883
+--- !u!114 &2112126288023249345
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -489,19 +488,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 198533854441860031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34071a382df193941b54b83ea76043c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 207f43536db1e4420b3d240d31a5fe00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPlayManager: {fileID: 0}
---- !u!114 &-6832451401266901243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 198533854441860031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

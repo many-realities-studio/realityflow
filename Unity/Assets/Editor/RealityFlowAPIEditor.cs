@@ -12,7 +12,7 @@ public class RealityFlowAPIEditor : Editor
     {
         DrawDefaultInspector();
 
-        RealityFlowAPI realityFlowAPI = (RealityFlowAPI)target;
+        RealityFlowAPI realityFlowAPI = RealityFlowAPI.Instance;
 
         if (GUILayout.Button("Spawn Bear"))
         {
@@ -23,6 +23,9 @@ public class RealityFlowAPIEditor : Editor
         {
             Debug.Log("Pressing Despawn button");
             Debug.Log("The objectToDespawn is " + objectToDespawn);
+            realityFlowAPI.FindSpawnedObject("Bear");
+            //Debug.Log("The objectToDespawn is " + realityFlowAPI.FindSpawnedObjectByName("Bear"));
+
             if (objectToDespawn != null)
             {
                 realityFlowAPI.DespawnObject(objectToDespawn);
@@ -37,6 +40,14 @@ public class RealityFlowAPIEditor : Editor
         {
             Debug.Log("Pressing Despawn Everything button");
             DespawnAllObjects(realityFlowAPI);
+        }
+
+        // Adding the Undo button
+        if (GUILayout.Button("Undo Last Action"))
+        {
+            Debug.Log("Pressing Undo Last Action button");
+            // Assuming RealityFlowAPI has a method to handle the undo last action
+            realityFlowAPI.UndoLastAction();
         }
     }
 

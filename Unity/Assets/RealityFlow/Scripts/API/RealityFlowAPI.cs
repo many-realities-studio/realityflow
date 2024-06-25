@@ -73,6 +73,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     private RealityFlowClient client;
+    public bool isUndoing = false;
     readonly Dictionary<GameObject, RfObject> spawnedObjects = new();
     public ImmutableDictionary<GameObject, RfObject> SpawnedObjects
         => spawnedObjects.ToImmutableDictionary();
@@ -325,8 +326,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
-
-            actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
+            if (!isUndoing)
+                actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
         }
         catch (HttpRequestException httpRequestException)
         {
@@ -513,7 +514,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         // add the node to the graph
         NodeIndex index = graph.AddNode(def);
-        actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
 
         // Serialize the graph object to JSON
         string graphJson = JsonUtility.ToJson(graph);
@@ -530,7 +532,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         List<(PortIndex, NodeIndex)> execEdges = new();
         graph.EdgesOf(node, dataEdges, execEdges);
         graph.RemoveNode(node);
-        actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
         Debug.Log("Removed node from graph");
 
         // Serialize the graph object to JSON
@@ -547,7 +550,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to add edge");
             return;
         }
-        actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
 
         // MUTATIONS TO UPDATE JSON STRING
@@ -560,7 +564,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
     {
         graph.RemoveDataEdge(from, to);
-        actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to);
         Debug.Log($"Deleted edge from {from} to {to}");
 
         string graphJson = JsonUtility.ToJson(graph);
@@ -576,7 +581,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to add edge");
             return;
         }
-        actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
 
         string graphJson = JsonUtility.ToJson(graph);
@@ -588,7 +594,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void RemoveExecEdgeFromGraph(Graph graph, PortIndex from, NodeIndex to)
     {
         graph.RemoveExecutionEdge(from, to);
-        actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
         Debug.Log($"Deleted exec edge from {from} to {to}");
 
         string graphJson = JsonUtility.ToJson(graph);
@@ -606,7 +613,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         Vector2 prevPosition = graph.GetNode(node).Position;
         graph.GetNode(node).Position = position;
-        actionLogger.LogAction(nameof(SetNodePosition), graph, node, prevPosition, position);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(SetNodePosition), graph, node, prevPosition, position);
         Debug.Log($"Moved node {node} to {position}");
 
         string graphJson = JsonUtility.ToJson(graph);
@@ -628,7 +636,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to set node field value");
             return;
         }
-        actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, oldValue);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, oldValue);
         Debug.Log($"Set node {node} field {field} to {value}");
 
         string graphJson = JsonUtility.ToJson(graph);
@@ -650,7 +659,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to set node input port constant value");
             return;
         }
-        actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
         Debug.Log($"Set node {node} input port {port} to {value}");
 
         string graphJson = JsonUtility.ToJson(graph);
@@ -779,7 +789,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
-            // actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+            //if (!isUndoing)
+            //actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
         }
         catch (HttpRequestException httpRequestException)
         {
@@ -930,7 +941,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
-            actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+            if (!isUndoing)
+                actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
         }
         catch (HttpRequestException httpRequestException)
         {
@@ -1024,11 +1036,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
                     // tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
 
-                    // Add CacheMeshData script
-                    // if (spawnedObject.GetComponent<CacheMeshData>() == null)
-                    // {
-                    //     spawnedObject.AddComponent<CacheMeshData>();
-                    // }
+                    // Add CacheObjectData script
+                    if (spawnedObject.GetComponent<CacheObjectData>() == null)
+                    {
+                        spawnedObject.AddComponent<CacheObjectData>();
+                    }
 
                     // Add NetworkedOperationCache script
                     // if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
@@ -1084,8 +1096,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             objectManipulator.selectExited.AddListener((args) => myNetworkedObject.EndHold());
                         }
                     }
-
-
                 }
                 if (scope == SpawnScope.Room)
                 {
@@ -1105,7 +1115,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         graphId = null,
                         transformJson = JsonUtility.ToJson(transformData),
                         meshJson = "{}",
-                        projectId = client.GetCurrentProjectId()
+                        projectId = client.GetCurrentProjectId(),
+                        originalPrefabName = prefabName
                     };
 
                     var createObject = new GraphQLRequest
@@ -1168,7 +1179,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                                 }
                             }
                         }
-                        actionLogger.LogAction(nameof(SpawnObject), prefabName, spawnPosition, scale, spawnRotation, scope);
+                        if (!isUndoing)
+                            actionLogger.LogAction(nameof(SpawnObject), spawnedObject.name, spawnPosition, scale, spawnRotation, scope);
                     }
                     catch (HttpRequestException httpRequestException)
                     {
@@ -1190,6 +1202,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 else
                 {
                     Debug.LogWarning("Could not find the spawned object in the scene or the object was spawned with peer scope.");
+                    if (!isUndoing)
+                        actionLogger.LogAction(nameof(SpawnObject), prefabName, spawnPosition, scale, spawnRotation, scope);
                     return;
                 }
                 spawnManager.OnSpawned.RemoveListener(action);
@@ -1251,7 +1265,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             nonPersistentObjects.Add(spawned);
             spawnedObjects.Add(spawned, objectDetails);
 
-            actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
+            if (!isUndoing)
+                actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
         }
         catch (Exception e)
         {
@@ -1270,7 +1285,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         else
             obj.SetActive(false);
 
-        actionLogger.LogAction(nameof(DestroyNonPersisted), obj, nonPersistent);
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(DestroyNonPersisted), obj, nonPersistent);
     }
 
     public void ClearNonPersisted()
@@ -1848,14 +1864,20 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     //This function is primarily for peer scope
-    public void DespawnObject(GameObject objectToDespawn)
+    public void DespawnObject(GameObject objectToDespawn, SpawnScope scope = SpawnScope.Room)
     {
         if (objectToDespawn != null)
         {
             string objectId = objectToDespawn.name;
-            actionLogger.LogAction(nameof(DespawnObject), objectToDespawn.name, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale);
+            //Set the originalPrefabName to the object's name by default in case of peer scope
+            string originalPrefabName = objectId;
+            if (spawnedObjects.TryGetValue(objectToDespawn, out RfObject rfObject))
+                originalPrefabName = rfObject.originalPrefabName; // Ensure this field exists and is set correctly when spawning objects
 
-            if (IsRoomScoped(objectToDespawn))
+            if (!isUndoing)
+                actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
+
+            if (scope == SpawnScope.Room)
             {
                 // Remove object from the database
                 RemoveObjectFromDatabase(objectId, () =>
@@ -2042,7 +2064,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("No actions to undo.");
             return;
         }
-
+        isUndoing = true;
         if (lastAction is ActionLogger.CompoundAction compoundAction)
         {
             foreach (var action in compoundAction.Actions)
@@ -2059,6 +2081,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         //actionLogger.ClearActionStack();
         Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
         //StopAllCoroutines();
+        isUndoing = false;
     }
 
     private void UndoSingleAction(ActionLogger.LoggedAction action)
@@ -2066,25 +2089,42 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         switch (action.FunctionName)
         {
             case nameof(SpawnObject):
-                string prefabName = (string)action.Parameters[0] + "(Clone)";
+                string prefabName = (string)action.Parameters[0];
                 Debug.Log("The spawned object's name is " + prefabName);
                 GameObject spawnedObject = FindSpawnedObject(prefabName);
                 if (spawnedObject != null)
                 {
+                    Debug.Log(prefabName + " existed, despawning it now");
                     DespawnObject(spawnedObject);
                 }
                 break;
 
             case nameof(DespawnObject):
-                string objName = ((string)action.Parameters[0]).Replace("(Clone)", "").Trim();
-                Debug.Log("Undoing the despawn of object named " + objName);
-                Vector3 position = (Vector3)action.Parameters[1];
-                Quaternion rotation = (Quaternion)action.Parameters[2];
-                Vector3 scale = (Vector3)action.Parameters[3];
-                GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, SpawnScope.Peer);
-                if (respawnedObject != null)
+                string objectId = action.Parameters[0] as string;
+                if (spawnedObjectsById.ContainsKey(objectId))
                 {
-                    respawnedObject.transform.localScale = scale;
+                    RfObject rfObject = spawnedObjects[spawnedObjectsById[objectId]];
+                    string originalPrefabName = rfObject.originalPrefabName;
+                    Vector3 position = (Vector3)action.Parameters[1];
+                    Quaternion rotation = (Quaternion)action.Parameters[2];
+                    Vector3 scale = (Vector3)action.Parameters[3];
+                    SpawnScope scope = (SpawnScope)action.Parameters[4];
+                    SpawnObject(originalPrefabName, position, scale, rotation, scope);
+                }
+                else
+                {
+                    string objName = action.Parameters[0] as string;
+                    Debug.Log("Undoing the despawn of object named " + objName);
+                    Vector3 position = (Vector3)action.Parameters[1];
+                    Quaternion rotation = (Quaternion)action.Parameters[2];
+                    Vector3 scale = (Vector3)action.Parameters[3];
+                    SpawnScope scope = (SpawnScope)action.Parameters[4]; // Ensure the scope is logged during the initial action and passed here.
+
+                    GameObject respawnedObject = SpawnObject(objName, position, scale, rotation, scope);
+                    if (respawnedObject != null)
+                    {
+                        respawnedObject.transform.localScale = scale;
+                    }
                 }
                 break;
 
@@ -2178,7 +2218,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (obj != null)
         {
             // Log the current transform before making changes
-            actionLogger.LogAction(nameof(UpdatePeerObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            if (!isUndoing)
+                actionLogger.LogAction(nameof(UpdatePeerObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
             Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
             Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
 
@@ -2277,6 +2318,7 @@ public class RfObject
     public string type;
     public string transformJson;
     public string meshJson;
+    public string originalPrefabName;
 }
 
 [System.Serializable]
