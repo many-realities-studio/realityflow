@@ -17,7 +17,8 @@ public class CallDeleteCheck : MonoBehaviour
         {
             deleteMenu.SetActive(!deleteMenu.activeInHierarchy);
         }*/
-        
+
+        RealityFlowAPI.Instance.LogActionToServer("Deleted All Objects", new {});
         RealityFlowAPI.DeleteMenu.SetActive(!RealityFlowAPI.DeleteMenu.activeInHierarchy);
         //Debug.Log("Near Menu Toolbox " + (!isActive ? "enabled" : "disabled") + ".");
 

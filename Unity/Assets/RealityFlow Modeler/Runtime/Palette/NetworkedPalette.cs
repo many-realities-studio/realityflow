@@ -145,7 +145,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     Vector3 lastPosition, lastScale;
     Quaternion lastRotation;
     private GameObject realityFlowTools;
-    
+
     public void SelectTool(bool status)
     {
         m_ToolEvent.Invoke(0, status);
@@ -158,6 +158,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     public void ColorTool(bool status)
     {
+        RealityFlowAPI.Instance.LogActionToServer("Color Tool Selected/Deselected", new { ColorStatus = status});
         m_ToolEvent.Invoke(2, status);
     }
 
@@ -188,6 +189,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     public void PlayTool(bool status)
     {
+        RealityFlowAPI.Instance.LogActionToServer("Play Tool Activated/Deactivated", new { PlayStatus = status});
         m_ToolEvent.Invoke(11, status);
     }
 

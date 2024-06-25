@@ -59,6 +59,8 @@ public class PopulateObjectLibrary : MonoBehaviour
         Quaternion defaultRotation = objectPrefab.transform.rotation;
         // Spawn the object with the default rotation
         GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles});
+
 
         if(spawnedObject.GetComponent<Rigidbody>() != null)
         {

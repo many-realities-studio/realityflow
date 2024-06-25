@@ -9,6 +9,7 @@ public class LeaveRoomButton : MonoBehaviour
 
     public void LeaveRoom()
     {
+        RealityFlowAPI.Instance.LogActionToServer("Leave Room", new {});
         Debug.Log("Clicked");
         RealityFlowClient.Find(this).LeaveRoom();
     }

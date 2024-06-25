@@ -91,12 +91,15 @@ public class EraserTool : MonoBehaviour
             
             Whiteboard.Instance.Init();
 
+            RealityFlowAPI.Instance.LogActionToServer("Delete Object", new { deletedObj = currentHitResult.collider.gameObject.name});
+
             RealityFlowAPI.Instance.DespawnObject(currentHitResult.collider.gameObject);
             spawnManager.Despawn(currentHitResult.collider.gameObject);
             // You should no longer be able to interact with this mesh
             //currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled = false;
 
             //NetworkSpawnManager.Find(this).Despawn(currentHitResult.collider.gameObject);
+            
         }
     }
 
