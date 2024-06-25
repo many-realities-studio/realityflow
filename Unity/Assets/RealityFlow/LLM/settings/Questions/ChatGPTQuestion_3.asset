@@ -135,15 +135,6 @@ MonoBehaviour:
   - DO NOT USE MONOBEHAVIOURS
   - If you spawn an object make it have the tag 'Spawned' and let it keep its natural
     scale which you can get with .transform.localScale
-  - 'Do not include any graph methods or code
-
-    -------------------------------------------------------------------------
-
-
-
-    Very
-    important!! Use the object Cube to do anything that the user requests if no other
-    object name is given. If requests have no object name use the object Cube '
   - '
 
     -------------------------------------------------------------------------
@@ -151,19 +142,20 @@ MonoBehaviour:
 
 
     Only
-    use the following prefabs when spawning: Reality Palette, FireworkNew, Cube,
-    Capsule, Cylinder, Rectangle (Horizontal), Rectangle (Vertical), Sphere, Reality
-    Palette, TestCube, PrimitiveBase, DuplicateProxy, PlayModeManager, Reality Palette
-    UPDATED, Reality Palette PlayMode UPDATED, Beagle, Bear, Bird, Bird Small, Bizon,
-    Cat, Chick, Chicken, Chicken Smooth, Corgi, Cow, Deer, Deer Gray, Deer Smooth,
-    Dog, Duck, Elk, Fox, Frog, German Shepard, Giraffe, Horse, lion, Lizzard, Penguin,
-    Rabbit, Seal, Shark, Sheep, Building (Cafe), Building (Long), Building (Modern),
-    Building (Plant), Building (Red), Building (Simple), Farm House, fences, Gazebo,
-    haybale, Home (Beige), Home (Brown), Home (Simple), Hospital, Police Station,
-    Scarecrow, stable, tractor, Windmill, Wood_Fence, Bush, Calla Lily, Cherry Blossom,
-    Chinese Rose, Coconut Tree, corn, Flower (Calendula), Flowerpot, Flowers (Low-Poly),
-    lily, Lotus, Margarita Flower, Margarita Flower (Bush), mushrooms, Rose, Rosebush,
-    Strawberries, sunflower, Tomato Plant, Tree, Tree (Birch), Trees (Many), Vervain,
-    Vervain (Sparse), Watering Can, basketball, Basketball Hoop, Bat, Golf Ball,
-    Golf Club, Tennis Ball, Tennis Racket, Baseball, Battery, Bubble Gun, Drill,
-    pedestal, screw, Soap Dispenser, Targets, Wooden Plank'
+    use the following prefabs when spawning: Reality Palette, FireworkNew, UIText,
+    Cube, Capsule, Cylinder, Rectangle (Horizontal), Rectangle (Vertical), Sphere,
+    Reality Palette, TestCube, PrimitiveBase, DuplicateProxy, PlayModeManager, Reality
+    Palette UPDATED, Reality Palette PlayMode UPDATED, Beagle, Bear, Bird, Bird Small,
+    Bizon, Cat, Chick, Chicken, Chicken Smooth, Corgi, Cow, Deer, Deer Gray, Deer
+    Smooth, Dog, Duck, Elk, Fox, Frog, German Shepard, Giraffe, Horse, lion, Lizzard,
+    Penguin, Rabbit, Seal, Shark, Sheep, Building (Cafe), Building (Long), Building
+    (Modern), Building (Plant), Building (Red), Building (Simple), Farm House, fences,
+    Gazebo, haybale, Home (Beige), Home (Brown), Home (Simple), Hospital, Police
+    Station, Scarecrow, stable, tractor, Windmill, Wood_Fence, Bush, Calla Lily,
+    Cherry Blossom, Chinese Rose, Coconut Tree, corn, Flower (Calendula), Flowerpot,
+    Flowers (Low-Poly), lily, Lotus, Margarita Flower, Margarita Flower (Bush), mushrooms,
+    Rose, Rosebush, Strawberries, sunflower, Tomato Plant, Tree, Tree (Birch), Trees
+    (Many), Vervain, Vervain (Sparse), Watering Can, basketball, Basketball Hoop,
+    Bat, Golf Ball, Golf Club, Tennis Ball, Tennis Racket, Baseball, Battery, Bubble
+    Gun, Drill, pedestal, screw, Soap Dispenser, Targets, Wooden Plank, Shiba, rocks,
+    lavender'
