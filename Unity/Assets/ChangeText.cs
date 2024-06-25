@@ -117,6 +117,6 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         data = SaveWav.Save(fileName, clip);
         Debug.Log("Audio saved to: " + fileName);
         var res = whisperRoot.TranscribeRecording(data);
-        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res);
+        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res, questionNumber });
     }
 }
