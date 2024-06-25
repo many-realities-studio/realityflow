@@ -257,8 +257,7 @@ namespace Samples.Whisper
             }
         }
 
-        public string TranscribeFile(string filename) {
-            byte[] data = SaveWav.Load(filename);
+        public string TranscribeRecording(byte[] data) {
             if (data == null)
             {
                 Debug.LogError("Failed to load audio data.");

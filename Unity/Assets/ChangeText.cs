@@ -11,13 +11,23 @@ using System.Threading.Tasks;
 public class ChangeTextOnButtonPress : MonoBehaviour
 {
     public PressableButton[] PressableButtons; // Changed to StatefulButton for interaction
-    public string[] TextArray; // Array of text messages
     public TMP_Text TextDisplay; // Reference to the TMP text UI element
     public GameObject container;
+    public Whisper whisperRoot;
+
 
     private int currentRecordingIndex = -1; // To keep track of the current recording button
     private AudioClip currentAudioClip; // To store the current audio clip
     private byte[] data;
+    private string[] TextArray = new string[] {
+"I liked the possibilities given by the system. ",
+"I felt immersed in the environment. ",
+"It was simple creating a behavior for an object. ",
+"It was simple to create a system composed of multiple objects. ",
+"Visual appearance properties are simpler to add than changing the kinematics of the object.",
+"The behaviors I added agreed with my description. ",
+"The system was responsive, and the behavior was added in an acceptable time. ",
+"I liked the overall experience."};
     private string[] fileNames = new string[]
     {
         "recording1.wav",
@@ -28,6 +38,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         "recording6.wav",
         "recording7.wav"
     };
+    private int questionNumber = 0;
 
     private void Start()
     {
@@ -46,9 +57,9 @@ public class ChangeTextOnButtonPress : MonoBehaviour
 
     private async void OnButtonClicked(int index)
     {
-        if (index >= 0 && index < TextArray.Length)
+        if (questionNumber >= 0 && questionNumber < TextArray.Length)
         {
-            TextDisplay.text = TextArray[index];
+            TextDisplay.text = TextArray[questionNumber];
 
             // Stop the current recording if another button is pressed or the same button is pressed again
             if (currentRecordingIndex != -1 && currentRecordingIndex != index)
@@ -61,10 +72,9 @@ public class ChangeTextOnButtonPress : MonoBehaviour
                 Microphone.End(null); // Stop recording if still ongoing
             }
 
-            if (currentRecordingIndex != index)
+            if (currentRecordingIndex != questionNumber)
             {
-                StartRecording(index);
-                currentRecordingIndex = index;
+                StartRecording(questionNumber++);
             }
             else
             {
@@ -106,7 +116,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         // Use the provided SaveWav class to save the audio clip
         data = SaveWav.Save(fileName, clip);
         Debug.Log("Audio saved to: " + fileName);
-        Whisper.whisperRoot.TranscribeRecording(fileName, data, index);
-        RealityFlowAPI.Instance.LogAction("ExitSurvey" + index.ToString(), new { transcription = res.Text });
+        var res = whisperRoot.TranscribeRecording(data);
+        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res);
     }
 }
