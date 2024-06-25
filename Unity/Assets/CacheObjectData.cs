@@ -38,6 +38,8 @@ public class CacheObjectData : MonoBehaviour
     {
         // When Play mode is toggled either on or off
         // gameObject.transform.parent.parent.parent.name == "Forest 1"
+        
+        // TODO: ?Because we are constantly checking if play mode is on or off, set the proper gravity/properties relating to the rf obj?
         if (lastPlayModeState != networkedPlayManager.playMode)
         {
             lastPlayModeState = networkedPlayManager.playMode;

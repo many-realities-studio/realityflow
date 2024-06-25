@@ -24,10 +24,16 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     Vector3 lastScale;
     Quaternion lastRotation;
     Color lastColor;
+
+    // variables for entering and exiting playmode
+    public NetworkedPlayManager networkedPlayManager;
+    private bool lastPlayModeState;
     //bool lastGravity;
 
     void Start()
     {
+        networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+
         // If our context is invalid, register this instance of myNetworkedObject with the scene.
         if (!context.Id.Valid)
         {
@@ -63,7 +69,19 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         owner = true;
         isHeld = true;
-        rb.isKinematic = false;
+
+        // If we are not in play mode, have no gravity and allow the object to move while held,
+        // similarly allow th object to be moved in playmode without gravity on hold.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = false;
+        } else
+        {
+            rb.useGravity = false;
+        }
+
+
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -95,7 +113,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             //color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         });
-        rb.isKinematic = true;
+
+        // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
+        // the rf obj for play mode.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+        } else
+        {
+            rb.useGravity = true;
+            rb.isKinematic = false;
+        }
     }
 
     // Update is called once per frame
