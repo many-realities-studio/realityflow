@@ -1036,11 +1036,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
                     // tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
 
-                    // Add CacheMeshData script
-                    // if (spawnedObject.GetComponent<CacheMeshData>() == null)
-                    // {
-                    //     spawnedObject.AddComponent<CacheMeshData>();
-                    // }
+                    // Add CacheObjectData script
+                    if (spawnedObject.GetComponent<CacheObjectData>() == null)
+                    {
+                        spawnedObject.AddComponent<CacheObjectData>();
+                    }
 
                     // Add NetworkedOperationCache script
                     // if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
