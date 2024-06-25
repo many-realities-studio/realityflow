@@ -18,8 +18,7 @@ GameObject:
   - component: {fileID: -5194027043779992916}
   - component: {fileID: -5761853026998737575}
   - component: {fileID: -3201960568950765850}
-  - component: {fileID: 3710087882762359017}
-  - component: {fileID: -7017836739087830196}
+  - component: {fileID: 1438021084411731537}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Default Object
@@ -485,7 +484,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceThreshold: 20
---- !u!114 &3710087882762359017
+--- !u!114 &1438021084411731537
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -494,19 +493,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7456798638562868201}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34071a382df193941b54b83ea76043c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 207f43536db1e4420b3d240d31a5fe00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPlayManager: {fileID: 0}
---- !u!114 &-7017836739087830196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7456798638562868201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
