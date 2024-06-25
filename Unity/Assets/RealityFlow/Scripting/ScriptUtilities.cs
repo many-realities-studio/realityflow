@@ -38,10 +38,14 @@ namespace RealityFlow.Scripting
         public static readonly HashSet<string> CSharpKeywordSet =
             CSharpKeywords.ToHashSet();
 
-        static readonly List<MetadataReference> references;
+        static List<MetadataReference> references;
+        static bool init;
 
-        static ScriptUtilities()
+        public static void Init()
         {
+            if (init)
+                return;
+
             references = Resources.LoadAll<AssemblyReferenceAsset>("AssemblyReferences/")
                 .Select(asm => asm.CompilerReference)
                 .ToList();
@@ -52,10 +56,15 @@ namespace RealityFlow.Scripting
                     OutputKind.DynamicallyLinkedLibrary,
                     reportSuppressedDiagnostics: false
                 ));
+
+            init = true;
         }
 
         static Assembly Compile(CSharpCompilation csc, List<Diagnostic> diagnostics)
         {
+            if (!init)
+                throw new Exception("Must init script utils first");
+
             using var stream = new MemoryStream();
             EmitResult results = csc.Emit(stream);
             stream.Seek(0, SeekOrigin.Begin);

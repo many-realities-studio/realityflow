@@ -31,6 +31,8 @@ using Unity.VisualScripting;
 using System.Collections;
 using TMPro;
 using RealityFlow.Collections;
+using RealityFlow.Scripting;
+
 
 
 
@@ -116,6 +118,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        try
+        {
+            ScriptUtilities.Init();
+        }
+        catch
+        {
+            Debug.LogError("Failed to initialize script utils");
+        }
+
         AudioClipNames = AudioClips.Select(kv => kv.Key).ToList();
 
         if (_instance != null && _instance != this)
