@@ -4,6 +4,7 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using dotnow;
 using dotnow.Reflection;
@@ -12,6 +13,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Scripting;
+using UnityEngine;
 
 namespace RealityFlow.Scripting
 {
@@ -36,16 +38,16 @@ namespace RealityFlow.Scripting
         public static readonly HashSet<string> CSharpKeywordSet =
             CSharpKeywords.ToHashSet();
 
+        static readonly List<MetadataReference> references;
+
         static ScriptUtilities()
         {
+            references = Resources.LoadAll<AssemblyReferenceAsset>("AssemblyReferences/")
+                .Select(asm => asm.CompilerReference)
+                .ToList();
+
             compilation = CSharpCompilation.Create(null)
-                .AddReferences(
-                    System.AppDomain
-                    .CurrentDomain
-                    .GetAssemblies()
-                    .Where(asm => !asm.IsDynamic)
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location))
-                )
+                .AddReferences(references)
                 .WithOptions(new CSharpCompilationOptions(
                     OutputKind.DynamicallyLinkedLibrary,
                     reportSuppressedDiagnostics: false
