@@ -424,8 +424,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void SetTemplate(VisualScript obj, bool becomeTemplate)
     {
-        // TODO: Persist to database
-
         bool contains = templatesDict.TryGetValue(obj.gameObject, out int index);
         if (contains && !becomeTemplate)
         {
@@ -438,9 +436,36 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             templates.Add(obj.gameObject);
         }
 
-        obj.isTemplate = becomeTemplate;
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isTemplate = becomeTemplate;
+
+        SaveObjectToDatabase(rfObj);
 
         OnTemplatesChanged?.Invoke();
+    }
+
+    public void SetStatic(VisualScript obj, bool becomeStatic)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isStatic = becomeStatic;
+
+        SaveObjectToDatabase(rfObj);
+    }
+
+    public void SetCollidable(VisualScript obj, bool becomeCollidable)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isCollidable = becomeCollidable;
+
+        SaveObjectToDatabase(rfObj);
+    }
+
+    public void SetGravity(VisualScript obj, bool becomeGravityEnabled)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isGravityEnabled = becomeGravityEnabled;
+
+        SaveObjectToDatabase(rfObj);
     }
 
     public void SetUIText(GameObject textComp, string text)
@@ -1299,6 +1324,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     graphId = rfObject.graphId,
                     meshJson = rfObject.meshJson,
                     transformJson = rfObject.transformJson,
+                    isTemplate = rfObject.isTemplate,
+                    isStatic = rfObject.isStatic,
+                    isCollidable = rfObject.isCollidable,
+                    isGravityEnabled = rfObject.isGravityEnabled,
                 }
             }
         };
@@ -1387,6 +1416,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     meshJson
                     transformJson
                     graphId
+                    isTemplate
+                    isStatic
+                    isCollidable
+                    isGravityEnabled
                 }
             }",
             Variables = new { projectId = projectId }
@@ -2283,7 +2316,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 }
 
 // ===== RF Object Class =====
-[System.Serializable]
+[Serializable]
 public class RfObject
 {
     public string id; // Unique ID for each object
@@ -2294,6 +2327,10 @@ public class RfObject
     public string transformJson;
     public string meshJson;
     public string originalPrefabName;
+    public bool isTemplate;
+    public bool isStatic;
+    public bool isCollidable = true;
+    public bool isGravityEnabled = true;
 }
 
 [System.Serializable]
