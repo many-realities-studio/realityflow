@@ -215,6 +215,7 @@ public class ChatGPTTester : MonoBehaviour
 
     private void WriteResponseToFile(string response)
     {
+        Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
         string path = Application.persistentDataPath + "/ChatGPTResponse.cs";
         try
         {
