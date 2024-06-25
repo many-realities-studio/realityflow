@@ -16,6 +16,7 @@ namespace RealityFlow.NodeGraph
         public bool IsTemplate => RealityFlowAPI.Instance.SpawnedObjects[gameObject].isTemplate;
 
         ObjectManipulator interactable;
+        XRSocketInteractor socket;
 
         NetworkedPlayManager _playManager;
         NetworkedPlayManager PlayManager
@@ -47,6 +48,10 @@ namespace RealityFlow.NodeGraph
             }
             else
                 Debug.LogError("Couldn't find an object manipulator!");
+
+            socket = this.EnsureComponent<XRSocketInteractor>();
+            socket.enabled = false;
+            socket.selectEntered.AddListener(OnSocket);
         }
 
         public void OnEnterPlayMode()
@@ -56,6 +61,9 @@ namespace RealityFlow.NodeGraph
 
             if (graph is null)
                 return;
+
+            if (graph.NodesOfType("OnSocket").Count > 0)
+                socket.enabled = true;
 
             foreach (NodeIndex node in graph.NodesOfType("OnStart"))
                 // TODO: Instead of playing from each root individually, add all to queue and evaluate
@@ -69,6 +77,8 @@ namespace RealityFlow.NodeGraph
         {
             if (IsTemplate || graph is null)
                 gameObject.SetActive(true);
+
+            socket.enabled = false;
 
             ctx.ClearVariables();
         }
@@ -114,6 +124,25 @@ namespace RealityFlow.NodeGraph
                         "collidedWith", 
                         RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(col.gameObject) 
                             ? new GameObjectValue(col.gameObject) 
+                            : null
+                    )
+                );
+        }
+
+        void OnSocket(SelectEnterEventArgs args)
+        {
+            if (!PlayManager.playMode || graph is null)
+                return;
+
+            foreach (NodeIndex node in graph.NodesOfType("OnSocket"))
+                ctx.EvaluateGraphFromRoot(
+                    gameObject,
+                    new(graph),
+                    node,
+                    (
+                        "_socketed",
+                        RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(args.interactableObject.transform.gameObject)
+                            ? new GameObjectValue(args.interactableObject.transform.gameObject)
                             : null
                     )
                 );
