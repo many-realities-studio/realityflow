@@ -1077,7 +1077,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         OperationName = "LogAction",
         Variables = new
         {
-            input = new
+            input2 = new
             {
                 eventType = "String",
                 eventData = data,
