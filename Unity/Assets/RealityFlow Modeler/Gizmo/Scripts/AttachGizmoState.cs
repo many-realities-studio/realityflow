@@ -347,10 +347,8 @@ public class AttachGizmoState : MonoBehaviour
         if (!lookForTarget) return;
 
         GameObject farRay = GetActiveContollerFarRay();
-        LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
-        LayerMask ui = 1 << LayerMask.NameToLayer("RealityFlowUI");
 
-        farRay.GetComponent<MRTKRayInteractor>().raycastMask = gizmo | ui;
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = ~farRay.GetComponent<MRTKRayInteractor>().raycastMask;
         // 6 is gizmo layer
         SetLayerOfFarRay(farRay, 7);
     }
@@ -360,9 +358,8 @@ public class AttachGizmoState : MonoBehaviour
         if (!lookForTarget) return;
 
         GameObject farRay = GetActiveContollerFarRay();
-        LayerMask everything = ~0;
 
-        farRay.GetComponent<XRRayInteractor>().raycastMask = everything;
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = ~farRay.GetComponent<MRTKRayInteractor>().raycastMask;
         // 0 is default layer
         SetLayerOfFarRay(farRay, 0);
     }
