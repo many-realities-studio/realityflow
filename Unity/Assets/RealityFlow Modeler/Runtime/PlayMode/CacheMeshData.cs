@@ -18,6 +18,7 @@ public class CacheMeshData : MonoBehaviour
     private Quaternion cachedRotation;
 
     private Rigidbody rb;
+    private bool compErr = false;
 
     void Start()
     {
@@ -31,6 +32,9 @@ public class CacheMeshData : MonoBehaviour
         if(gameObject.GetComponent<Rigidbody>() != null)
         {
             rb = gameObject.GetComponent<Rigidbody>();
+        } else
+        {
+            compErr = true;
         }
     }
 
@@ -48,8 +52,12 @@ public class CacheMeshData : MonoBehaviour
                 cachedScale = transform.localScale;
                 cachedRotation = transform.localRotation;
 
-                rb.useGravity = true;
-                rb.isKinematic = false;
+                 // if we have are missing a component don't mess with the object's physics
+                if(!compErr)
+                {
+                    rb.useGravity = true;
+                    rb.isKinematic = false;
+                }
             }
             // Revert values back to cached information upon leaving Play mode
             else
@@ -58,8 +66,12 @@ public class CacheMeshData : MonoBehaviour
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
 
-                rb.useGravity = false;
-                rb.isKinematic = true;
+                 // if we have are missing a component don't mess with the object's physics
+                if(!compErr)
+                {
+                    rb.useGravity = false;
+                    rb.isKinematic = true;
+                }
 
                 // All meshes should be selectable after Play mode is exited
                 //gameObject.GetComponent<ObjectManipulator>().enabled = true;

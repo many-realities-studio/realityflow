@@ -5,6 +5,7 @@ using Ubiq.Messaging;
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using RealityFlow.NodeUI;
 
 public class PrefabColliderAndRigidbodyAdder : EditorWindow
 {
@@ -36,10 +37,10 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
             ConstraintAndObjectManipulatorsOnPrefabs();
         }
 
-        /*if (GUILayout.Button("Add Remaining Components (not rigidbody)"))
+        if (GUILayout.Button("Add Remaining Components"))
         {
             AddRemainingComponentsOnPrefabs();
-        }*/
+        }
     }
 
     private void AddCollidersAndRigidbodiesToPrefabs()
@@ -84,7 +85,7 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
     private void AddMeshColliderAndRigidbody(GameObject instance)
     {
         // Find all MeshFilters in the prefab
-        MeshFilter[] meshFilters = instance.GetComponentsInChildren<MeshFilter>();
+        /*MeshFilter[] meshFilters = instance.GetComponentsInChildren<MeshFilter>();
 
         foreach (MeshFilter meshFilter in meshFilters)
         {
@@ -95,12 +96,14 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
                 meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
                 meshCollider.convex = true; // Set the MeshCollider to convex if required
             }
-        }
+        }*/
 
         // Add Rigidbody to the root GameObject of the prefab if not already present
         if (instance.GetComponent<Rigidbody>() == null)
         {
             instance.AddComponent<Rigidbody>();
+            instance.GetComponent<Rigidbody>().useGravity = false;
+            instance.GetComponent<Rigidbody>().isKinematic = true;
         }
     }
 
@@ -266,51 +269,33 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
     private void AddRemainingComponents(GameObject instance)
     {
         // Add All the expected components, check if a component already exists for each type
-        if (instance.GetComponent<UGUIInputAdapterDraggable>() == null)
-        {
-            instance.AddComponent<UGUIInputAdapterDraggable>();
-        }
-
+        // Add MyNetworkedObject script
         if (instance.GetComponent<MyNetworkedObject>() == null)
         {
             instance.AddComponent<MyNetworkedObject>();
+            // Assign events
+            var myNetworkedObject = instance.GetComponent<MyNetworkedObject>();
+
+            ObjectManipulator objManip = instance.GetComponent<ObjectManipulator>();
+
+            if (objManip != null)
+            {
+                objManip.firstSelectEntered.AddListener((args) => myNetworkedObject.StartHold());
+                objManip.lastSelectExited.AddListener((args) => myNetworkedObject.EndHold());
+            }
         }
 
-        if (instance.GetComponent<NetworkedMesh>() == null)
+        // Add CacheObjectData script
+        if (instance.GetComponent<CacheObjectData>() == null)
         {
-            instance.AddComponent<NetworkedMesh>();
+            instance.AddComponent<CacheObjectData>();
         }
-
-        if (instance.GetComponent<Hover>() == null)
+                        
+        // Add whiteboard attatch
+        if(instance.GetComponent<AttachedWhiteboard>() == null)
         {
-            instance.AddComponent<Hover>();
+            instance.AddComponent<AttachedWhiteboard>();
         }
-
-        if (instance.GetComponent<ConstraintManager>() == null)
-        {
-            instance.AddComponent<ConstraintManager>();
-        }
-
-        if (instance.GetComponent<ObjectManipulator>() == null)
-        {
-            instance.AddComponent<ObjectManipulator>();
-        }
-
-        /*if (instance.GetComponent<TetheredPlacement>() == null)
-        {
-            instance.AddComponent<TetheredPlacement>();
-        }*/
-
-        if (instance.GetComponent<CacheMeshData>() == null)
-        {
-            instance.AddComponent<CacheMeshData>();
-        }
-
-        if (instance.GetComponent<NetworkedOperationCache>() == null)
-        {
-            instance.AddComponent<NetworkedOperationCache>();
-        }
-
         
     }
 }
