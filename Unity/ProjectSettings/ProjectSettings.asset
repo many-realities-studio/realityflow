@@ -76,7 +76,6 @@ PlayerSettings:
   androidMinimumWindowWidth: 400
   androidMinimumWindowHeight: 300
   androidFullscreenMode: 1
-  androidAutoRotationBehavior: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
   runInBackground: 1
@@ -137,8 +136,6 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
-  visionOSBundleVersion: 1.0
-  tvOSBundleVersion: 1.0
   bundleVersion: 0.1.3
   preloadedAssets:
   - {fileID: 0}
@@ -159,10 +156,13 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: -6419017762173040368, guid: 0050cbf66db9f8045a7d304097a354b0, type: 2}
-  - {fileID: 11400000, guid: bd47f13449c1e8a45a1fc0b90b093093, type: 2}
-  - {fileID: -5002498549672890491, guid: f9d948d0a10f0994f80921b91cc6e324, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}
+  - {fileID: 7265713732352231194, guid: 5d39e166bfb264a128132192c6b873d7, type: 2}
+  - {fileID: 11400000, guid: e516d359cef354af4920788f98f1265c, type: 2}
+  - {fileID: 3725396148524240134, guid: 7123b93ddaaba4de594425d744df5993, type: 2}
   - {fileID: 11400000, guid: 75b93e0bffbf44e90bba4e8b99efcade, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -805,7 +805,6 @@ PlayerSettings:
   metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628,
     a: 1}
   metroSplashScreenUseBackgroundColor: 0
-  syncCapabilities: 0
   platformCapabilities: {}
   metroTargetDeviceFamilies: {}
   metroFTAName: 
