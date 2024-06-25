@@ -1131,7 +1131,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         createObject(input: $input) {
                             id
                         }
-                        addLogEntry(input: $input2) {
+                        addLogEntry(input2: $input) {
                             id  
                         }
                     }",

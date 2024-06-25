@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using Org.BouncyCastle.Crypto.Engines;
-using UnityEditor.PackageManager;
 
 /// <summary>
 /// Class CacheMeshData is attached to every networked mesh and caches it's information when Play mode is entered. Upon exit of Play mode
