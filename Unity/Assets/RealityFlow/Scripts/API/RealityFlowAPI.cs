@@ -29,6 +29,8 @@ using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Unity.VisualScripting;
 using System.Collections;
+using TMPro;
+
 
 
 
@@ -424,20 +426,28 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         // TODO: Persist to database
 
-        if (!templatesDict.ContainsKey(obj.gameObject) && becomeTemplate)
-        {
-            templatesDict.Add(obj.gameObject, templates.Count);
-            templates.Add(obj.gameObject);
-        }
-        else if (templatesDict.TryGetValue(obj.gameObject, out int index) && !becomeTemplate)
+        bool contains = templatesDict.TryGetValue(obj.gameObject, out int index);
+        if (contains && !becomeTemplate)
         {
             templatesDict.Remove(obj.gameObject);
             templates.RemoveAt(index);
+        }
+        else if (!contains && becomeTemplate)
+        {
+            templatesDict.Add(obj.gameObject, templates.Count);
+            templates.Add(obj.gameObject);
         }
 
         obj.isTemplate = becomeTemplate;
 
         OnTemplatesChanged?.Invoke();
+    }
+
+    public void SetUIText(GameObject textComp, string text)
+    {
+        // TODO: Network
+        
+        textComp.GetComponent<TMP_Text>().text = text;
     }
 
     // -- EDIT GRAPH FUNCTIONS --

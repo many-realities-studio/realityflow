@@ -37,5 +37,18 @@ namespace RealityFlow.Collections
 
             return afterStart && beforeEnd;
         }
+
+        public static (List<T>, List<U>) UnzipToLists<T, U>(this IEnumerable<(T, U)> enumerable)
+        {
+            List<T> ts = new();
+            List<U> us = new();
+            foreach ((T t, U u) in enumerable)
+            {
+                ts.Add(t);
+                us.Add(u);
+            }
+
+            return (ts, us);
+        }
     }
 }

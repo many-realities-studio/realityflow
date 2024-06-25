@@ -57,7 +57,7 @@ namespace RealityFlow.NodeUI
                 whiteboard.SetActive(false);
             }
 
-            GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(async _ => 
+            GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
             {
                 if (PlayManager == null || !PlayManager.playMode || RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(gameObject))
                     ShowWhiteboard(gameObject);
