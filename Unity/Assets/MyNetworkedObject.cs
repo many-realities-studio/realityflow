@@ -9,7 +9,7 @@ using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
 
-// The render component lines have been removed to work for ObjectManipulator Dynamically. Addding a check for the field
+// The render component lines have been removed to work for ObjectManipulator Dynamically. Adding a check for the field
 // is required if we want to load dynamically. I'm not sure what color is used for though, maybe the bounding boxes on meshes?
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 {
