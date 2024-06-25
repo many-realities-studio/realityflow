@@ -422,6 +422,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return;
     }
 
+    #endregion
+
+    #region Visual Scripting (Template, Static, Collide, Grav, Text)
+
     public void SetTemplate(VisualScript obj, bool becomeTemplate)
     {
         bool contains = templatesDict.TryGetValue(obj.gameObject, out int index);
@@ -1070,31 +1074,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // }
 
                     // Add ObjectManipulator
-
-                    // Add MyNetworkedObject script
-                    if (spawnedObject.GetComponent<MyNetworkedObject>() == null)
-                    {
-                        spawnedObject.AddComponent<MyNetworkedObject>();
-                        // Assign events
-                        var myNetworkedObject = spawnedObject.GetComponent<MyNetworkedObject>();
-
-                        ObjectManipulator objManip = spawnedObject.GetComponent<ObjectManipulator>();
-
-                        if (objManip != null)
-                        {
-                            objManip.firstSelectEntered.AddListener((args) => myNetworkedObject.StartHold());
-                            objManip.lastSelectExited.AddListener((args) => myNetworkedObject.EndHold());
-                        }
-                    }
-
-                    // Add CacheObjectData script
-                    if (spawnedObject.GetComponent<CacheObjectData>() == null)
-                    {
-                        spawnedObject.AddComponent<CacheObjectData>();
-                    }
                         
                     // Add whiteboard attatch
-                    spawnedObject.AddComponent<AttachedWhiteboard>();
+                    if(spawnedObject.GetComponent<AttachedWhiteboard>() == null)
+                    {
+                        spawnedObject.AddComponent<AttachedWhiteboard>();
+                    }
+                    
 
                 }
                 if (scope == SpawnScope.Room)

@@ -28,10 +28,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // variables for entering and exiting playmode
     public NetworkedPlayManager networkedPlayManager;
     private bool lastPlayModeState;
+    private RfObject rfObj;
     //bool lastGravity;
 
     void Start()
     {
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
         // If our context is invalid, register this instance of myNetworkedObject with the scene.
@@ -78,6 +80,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.isKinematic = false;
         } else
         {
+            //if(rfObj.isCollidable)
             rb.useGravity = false;
         }
 
@@ -191,7 +194,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = m.owner;
         isHeld = m.isHeld;
         rb.isKinematic = m.isKinematic;
-        //gameObject.GetComponent<Renderer>().material.color = m.color;
+        gameObject.GetComponent<Renderer>().material.color = m.color;
         //obj.GetComponent<Rigidbody>().useGravity = m.gravity;
 
         // Make sure the logic in Update doesn't trigger as a result of this message
@@ -199,7 +202,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastScale = gameObject.transform.localScale;
         lastRotation = gameObject.transform.localRotation;
         lastOwner = owner;
-        //lastColor = gameObject.GetComponent<Renderer>().material.color;
+        lastColor = gameObject.GetComponent<Renderer>().material.color;
         //lastGravity = obj.GetComponent<Rigidbody>().useGravity;
     }
 }
