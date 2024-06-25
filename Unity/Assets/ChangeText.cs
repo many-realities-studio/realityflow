@@ -67,13 +67,13 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         {
             TextDisplay.text = TextArray[index];
 
-            // If we are switching to a different button, stop the current recording first
-            if (currentRecordingIndex != -1 && currentRecordingIndex != index && Microphone.IsRecording(null))
+            // Stop the current recording if another button is pressed or the same button is pressed again
+            if (currentRecordingIndex != -1 && Microphone.IsRecording(null))
             {
                 StopRecording(currentRecordingIndex);
             }
 
-            // Start recording for the new button or stop if the same button is pressed again
+            // Start recording for the new button if a different button is pressed
             if (currentRecordingIndex != index)
             {
                 StartRecording(index);
@@ -82,7 +82,6 @@ public class ChangeTextOnButtonPress : MonoBehaviour
             }
             else
             {
-                StopRecording(currentRecordingIndex);
                 currentRecordingIndex = -1; // Reset if the same button is pressed again
             }
         }
