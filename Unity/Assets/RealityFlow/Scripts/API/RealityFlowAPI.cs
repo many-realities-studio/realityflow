@@ -979,7 +979,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 Debug.Log("inside the action with the scope" + scope + " ############");
                 spawnedObject = go;
-                spawnedObject.AddComponent<AttachedWhiteboard>();
                 if (spawnedObject != null)
                 {
                     spawnedObject.transform.position = spawnPosition;
@@ -1016,15 +1015,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             }
                         }
                     }
-                    // Add MyNetworkedObject script
-                    if (spawnedObject.GetComponent<MyNetworkedObject>() == null)
-                    {
-                        spawnedObject.AddComponent<MyNetworkedObject>();
-                    }
-
-                    // Add ConstraintManager
-                    var constraintManager = spawnedObject.AddComponent<ConstraintManager>();
-                    constraintManager.AutoConstraintSelection = true;
 
                     // Add UGUIInputAdapterDraggable
                     // var draggableAdapter = spawnedObject.AddComponent<UGUIInputAdapterDraggable>();
@@ -1036,11 +1026,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
                     // tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
 
-                    // Add CacheObjectData script
-                    if (spawnedObject.GetComponent<CacheObjectData>() == null)
-                    {
-                        spawnedObject.AddComponent<CacheObjectData>();
-                    }
+                    
 
                     // Add NetworkedOperationCache script
                     // if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
@@ -1049,53 +1035,32 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // }
 
                     // Add ObjectManipulator
-                    if (spawnedObject.GetComponent<ObjectManipulator>() == null)
+
+                    // Add MyNetworkedObject script
+                    if (spawnedObject.GetComponent<MyNetworkedObject>() == null)
                     {
-                        var objectManipulator = spawnedObject.AddComponent<ObjectManipulator>();
-                        objectManipulator.HostTransform = spawnedObject.transform;
-                        //objectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate | TransformFlags.Scale;
-                        objectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic;
-                        objectManipulator.selectMode = InteractableSelectMode.Multiple;
-                        objectManipulator.UseForcesForNearManipulation = false;
-                        objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
-                        objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
-                        //objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
-                        objectManipulator.ReleaseBehavior = 0;
-                        objectManipulator.SmoothingFar = true;
-                        objectManipulator.SmoothingNear = true;
-
-                        
-                        objectManipulator.firstSelectEntered.AddListener(_ =>
-                        {
-                            if (spawnedObject.GetComponent<MyNetworkedObject>() != null)
-                            {
-                                spawnedObject.GetComponent<MyNetworkedObject>().StartHold();
-                            }
-                        });
-
-                        objectManipulator.lastSelectExited.AddListener(_ =>
-                        {
-                            if (spawnedObject.GetComponent<MyNetworkedObject>() != null)
-                            {
-                                spawnedObject.GetComponent<MyNetworkedObject>().EndHold();
-                            }
-                        });
-                        
-
-                        objectManipulator.MoveLerpTime = 0.001f;
-                        objectManipulator.RotateLerpTime = 0.001f;
-                        objectManipulator.ScaleLerpTime = 0.001f;
-                        objectManipulator.EnableConstraints = true;
-                        objectManipulator.ConstraintsManager = spawnedObject.GetComponent<ConstraintManager>() ?? spawnedObject.AddComponent<ConstraintManager>();
-
+                        spawnedObject.AddComponent<MyNetworkedObject>();
                         // Assign events
                         var myNetworkedObject = spawnedObject.GetComponent<MyNetworkedObject>();
-                        if (myNetworkedObject != null)
+
+                        ObjectManipulator objManip = spawnedObject.GetComponent<ObjectManipulator>();
+
+                        if (objManip != null)
                         {
-                            objectManipulator.selectEntered.AddListener((args) => myNetworkedObject.StartHold());
-                            objectManipulator.selectExited.AddListener((args) => myNetworkedObject.EndHold());
+                            objManip.firstSelectEntered.AddListener((args) => myNetworkedObject.StartHold());
+                            objManip.lastSelectExited.AddListener((args) => myNetworkedObject.EndHold());
                         }
                     }
+
+                    // Add CacheObjectData script
+                    if (spawnedObject.GetComponent<CacheObjectData>() == null)
+                    {
+                        spawnedObject.AddComponent<CacheObjectData>();
+                    }
+                        
+                    // Add whiteboard attatch
+                    spawnedObject.AddComponent<AttachedWhiteboard>();
+
                 }
                 if (scope == SpawnScope.Room)
                 {

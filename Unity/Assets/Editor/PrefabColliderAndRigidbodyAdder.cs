@@ -31,6 +31,11 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
             UpdateComponentSettingsOnPrefabs();
         }
 
+        if (GUILayout.Button("Update Constraint Manager and Object Manipulator Components"))
+        {
+            ConstraintAndObjectManipulatorsOnPrefabs();
+        }
+
         /*if (GUILayout.Button("Add Remaining Components (not rigidbody)"))
         {
             AddRemainingComponentsOnPrefabs();
@@ -145,6 +150,76 @@ public class PrefabColliderAndRigidbodyAdder : EditorWindow
         {
             instance.GetComponent<Rigidbody>().useGravity = false;
             instance.GetComponent<Rigidbody>().isKinematic = true;
+        }
+    }
+
+    private void ConstraintAndObjectManipulatorsOnPrefabs()
+    {
+        if (!Directory.Exists(prefabsFolderPath))
+        {
+            Debug.LogError("Prefabs folder path does not exist.");
+            return;
+        }
+
+        string[] prefabFiles = Directory.GetFiles(prefabsFolderPath, "*.prefab", SearchOption.AllDirectories);
+
+        foreach (string filePath in prefabFiles)
+        {
+            string assetPath = filePath.Substring(filePath.IndexOf("Assets"));
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+
+            if (prefab != null)
+            {
+                GameObject instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+
+                if (instance != null)
+                {
+                    // Add MeshColliders and Rigidbody
+                    ConstraintAndObjectManipulators(instance);
+
+                    // Apply changes to the prefab
+                    PrefabUtility.SaveAsPrefabAsset(instance, assetPath);
+                    DestroyImmediate(instance);
+                    Debug.Log($"Updated prefab: {assetPath}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Failed to load prefab at path: {assetPath}");
+            }
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    private void ConstraintAndObjectManipulators(GameObject instance)
+    {
+        if (instance.GetComponent<ConstraintManager>() == null)
+        {
+            instance.AddComponent<ConstraintManager>();
+            instance.GetComponent<ConstraintManager>().AutoConstraintSelection = true;
+        }
+
+        if (instance.GetComponent<ObjectManipulator>() == null)
+        {
+            ObjectManipulator objectManipulator = instance.AddComponent<ObjectManipulator>();
+            objectManipulator.HostTransform = instance.transform;
+            //objectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate | TransformFlags.Scale;
+            objectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic;
+            //objectManipulator.selectMode = InteractableSelectMode.Multiple;
+            objectManipulator.UseForcesForNearManipulation = false;
+            objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
+            objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
+            //objectManipulator.ReleaseBehavior = ObjectManipulator.ReleaseBehaviorType.KeepVelocity | ObjectManipulator.ReleaseBehaviorType.KeepAngularVelocity;
+            objectManipulator.ReleaseBehavior = 0;
+            objectManipulator.SmoothingFar = true;
+            objectManipulator.SmoothingNear = true;
+
+            objectManipulator.MoveLerpTime = 0.001f;
+            objectManipulator.RotateLerpTime = 0.001f;
+            objectManipulator.ScaleLerpTime = 0.001f;
+            objectManipulator.EnableConstraints = true;
+            objectManipulator.ConstraintsManager = instance.GetComponent<ConstraintManager>() ?? instance.AddComponent<ConstraintManager>();
         }
     }
 
