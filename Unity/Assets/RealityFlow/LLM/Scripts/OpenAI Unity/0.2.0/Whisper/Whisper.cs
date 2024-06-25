@@ -257,7 +257,8 @@ namespace Samples.Whisper
             }
         }
 
-        public string TranscribeRecording(byte[] data) {
+        public string TranscribeRecording(byte[] data)
+        {
             if (data == null)
             {
                 Debug.LogError("Failed to load audio data.");

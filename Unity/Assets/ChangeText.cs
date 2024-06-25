@@ -1,33 +1,45 @@
-using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UX;
+using Samples.Whisper;
+using Org.BouncyCastle.Crypto.Modes;
+using Ubiq.Samples;
+using System.IO;
+using System.Text;
+using UnityEngine;
+using TMPro;
+using Microsoft.MixedReality.Toolkit.UX;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Microsoft.MixedReality.Toolkit.UX;
 using Samples.Whisper;
-using System.IO;
 using Ubiq.Samples;
-using System.Threading.Tasks;
+using System.IO;
 
 public class ChangeTextOnButtonPress : MonoBehaviour
 {
-    public PressableButton[] PressableButtons; // Changed to StatefulButton for interaction
+    public StatefulInteractable[] PressableButtons; // Array of pressable buttons
     public TMP_Text TextDisplay; // Reference to the TMP text UI element
-    public GameObject container;
-    public Whisper whisperRoot;
-
+    public Whisper whisperRoot; // Reference to the Whisper script
 
     private int currentRecordingIndex = -1; // To keep track of the current recording button
     private AudioClip currentAudioClip; // To store the current audio clip
     private byte[] data;
+
     private string[] TextArray = new string[] {
-"I liked the possibilities given by the system. ",
-"I felt immersed in the environment. ",
-"It was simple creating a behavior for an object. ",
-"It was simple to create a system composed of multiple objects. ",
-"Visual appearance properties are simpler to add than changing the kinematics of the object.",
-"The behaviors I added agreed with my description. ",
-"The system was responsive, and the behavior was added in an acceptable time. ",
-"I liked the overall experience."};
+        "I liked the possibilities given by the system. ",
+        "I felt immersed in the environment. ",
+        "It was simple creating a behavior for an object. ",
+        "It was simple to create a system composed of multiple objects. ",
+        "Visual appearance properties are simpler to add than changing the kinematics of the object.",
+        "The behaviors I added agreed with my description. ",
+        "The system was responsive, and the behavior was added in an acceptable time. ",
+        "I liked the overall experience."
+    };
+
     private string[] fileNames = new string[]
     {
         "recording1.wav",
@@ -36,18 +48,12 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         "recording4.wav",
         "recording5.wav",
         "recording6.wav",
-        "recording7.wav"
+        "recording7.wav",
+        "recording8.wav"
     };
-    private int questionNumber = 0;
 
     private void Start()
     {
-        if (PressableButtons.Length != TextArray.Length || PressableButtons.Length != 7)
-        {
-            Debug.LogError("Ensure there are 7 pressable buttons and 7 corresponding text messages.");
-            return;
-        }
-
         for (int i = 0; i < PressableButtons.Length; i++)
         {
             int index = i; // Capture the current index for the lambda
@@ -55,31 +61,26 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         }
     }
 
-    private async void OnButtonClicked(int index)
+    private void OnButtonClicked(int index)
     {
-        if (questionNumber >= 0 && questionNumber < TextArray.Length)
+        if (index >= 0 && index < TextArray.Length)
         {
-            TextDisplay.text = TextArray[questionNumber];
+            TextDisplay.text = TextArray[index];
 
             // Stop the current recording if another button is pressed or the same button is pressed again
-            if (currentRecordingIndex != -1 && currentRecordingIndex != index)
+            if (currentRecordingIndex != -1)
             {
                 StopRecording(currentRecordingIndex);
             }
 
-            if (Microphone.IsRecording(null))
+            // Start recording for the new button if a different button is pressed
+            if (currentRecordingIndex != index)
             {
-                Microphone.End(null); // Stop recording if still ongoing
-            }
-
-            if (currentRecordingIndex != questionNumber)
-            {
-                StartRecording(questionNumber++);
+                StartRecording(index);
+                currentRecordingIndex = index;
             }
             else
             {
-                container.SetActive(false); // Reset the container UI
-                container.SetActive(true);
                 currentRecordingIndex = -1; // Reset if the same button is pressed again
             }
         }
@@ -92,7 +93,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
     private void StartRecording(int index)
     {
         currentAudioClip = Microphone.Start(null, false, 300, 44100); // Start recording with a maximum duration of 300 seconds
-        Debug.Log("Recording started for question index: " + index);
+        Debug.Log("Recording started for button index: " + index);
     }
 
     private void StopRecording(int index)
@@ -101,7 +102,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         {
             Microphone.End(null); // Stop the recording
             SaveRecording(currentAudioClip, fileNames[index]);
-            Debug.Log("Recording stopped and saved for question index: " + index);
+            Debug.Log("Recording stopped and saved for button index: " + index);
         }
     }
 
@@ -116,7 +117,13 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         // Use the provided SaveWav class to save the audio clip
         data = SaveWav.Save(fileName, clip);
         Debug.Log("Audio saved to: " + fileName);
-        var res = whisperRoot.TranscribeRecording(data);
-        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res, questionNumber });
+        TranscribeRecording(data, fileName);
+    }
+
+    private void TranscribeRecording(byte[] audioData, string fileName)
+    {
+        var res = whisperRoot.TranscribeRecording(audioData); // Assuming this is a synchronous call
+        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res, fileName });
+        Debug.Log("Transcription result: " + res);
     }
 }
