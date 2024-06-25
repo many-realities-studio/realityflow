@@ -257,6 +257,38 @@ namespace Samples.Whisper
             }
         }
 
+        public string TranscribeFile(string filename) {
+            byte[] data = SaveWav.Load(filename);
+            if (data == null)
+            {
+                Debug.LogError("Failed to load audio data.");
+                return null;
+            }
+
+            var req = new CreateAudioTranscriptionsRequest
+            {
+                FileData = new FileData() { Data = data, Name = "audio.wav" },
+                Model = "whisper-1",
+                Language = "en"
+            };
+
+            if (openai == null)
+            {
+                Debug.LogError("OpenAI API is not initialized.");
+                return null;
+            }
+
+            Debug.Log("Using API key: " + currentApiKey);
+            var res = openai.CreateAudioTranscription(req).Result;
+            // Write the transcribed text to the MRTKTMPInputField
+            //message.text = $"This is what we heard you say, is this correct:\n\n \"{res.Text}\"?";
+
+            // Print the transcribed message to the debug log
+            Debug.Log("Transcribed message: " + res.Text);
+
+            return res.Text;
+        }
+
         private void Update()
         {
             if (isRecording)
