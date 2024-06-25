@@ -30,6 +30,8 @@ using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Unity.VisualScripting;
 using System.Collections;
 using TMPro;
+using RealityFlow.Collections;
+
 
 
 
@@ -88,6 +90,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     readonly List<GameObject> templates = new();
     public IEnumerable<GameObject> Templates => templates;
     public Action OnTemplatesChanged;
+    [SerializeField]
+    public GameObject audioPlayer; 
 
     public enum SpawnScope
     {
@@ -112,6 +116,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        AudioClipNames = AudioClips.Select(kv => kv.Key).ToList();
+
         if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
@@ -473,6 +479,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // TODO: Network
         
         textComp.GetComponent<TMP_Text>().text = text;
+    }
+
+    [SerializeField]
+    private SerializableDict<string, AudioClip> AudioClips = new();
+    public List<string> AudioClipNames { get; private set; }
+
+    public void PlaySound(string clip, Vector3 position)
+    {
+        GameObject player = Instantiate(audioPlayer, position, Quaternion.identity);
+        AudioSource source = player.GetComponent<AudioSource>();
+        source.clip = AudioClips[clip];
+        source.Play();
+        player.GetComponent<DestroyObject>().lifeTime = AudioClips[clip].length + 1f;
     }
 
     // -- EDIT GRAPH FUNCTIONS --
