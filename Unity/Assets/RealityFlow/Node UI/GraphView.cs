@@ -391,10 +391,10 @@ namespace RealityFlow.NodeUI
         void SetOptions()
         {
             RfObject rfObj = RealityFlowAPI.Instance.SpawnedObjects[currentObject.gameObject];
-            templateToggle.ForceSetToggled(rfObj.isTemplate);
-            staticToggle.ForceSetToggled(rfObj.isStatic);
-            collidableToggle.ForceSetToggled(rfObj.isCollidable);
-            gravityToggle.ForceSetToggled(rfObj.isGravityEnabled);
+            templateToggle.ForceSetToggled(rfObj.isTemplate, false);
+            staticToggle.ForceSetToggled(rfObj.isStatic, false);
+            collidableToggle.ForceSetToggled(rfObj.isCollidable, false);
+            gravityToggle.ForceSetToggled(rfObj.isGravityEnabled, false);
         }
 
         void AddVariableItem(string name, NodeValueType type)
