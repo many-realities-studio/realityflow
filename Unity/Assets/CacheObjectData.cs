@@ -99,7 +99,7 @@ public class CacheObjectData : MonoBehaviour
                         rb.useGravity = false;
                     }
 
-                    // if the object
+                    // if the object is collide enabled, keep that otherwise turn off the collider
                     if(rfObj.isCollidable)
                     {
                         boxCol.enabled = true;
