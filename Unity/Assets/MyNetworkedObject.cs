@@ -98,15 +98,20 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = true;
         isHeld = true;
 
+
         // If we are not in play mode, have no gravity and allow the object to move while held,
         // similarly allow thw object to be moved in playmode without gravity on hold.
         if (!networkedPlayManager.playMode)
         {
             rb.useGravity = false;
             rb.isKinematic = false;
+
+            // This would also be a place to change to boxcolliders collider interaction masks so that
+            // the object can be placed within others to prevent it from colliding with UI.
+            // TODO: 
+            
         } else
         {
-            //if(rfObj.isCollidable)
             rb.useGravity = false;
         }
 
