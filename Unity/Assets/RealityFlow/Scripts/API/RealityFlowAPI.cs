@@ -477,6 +477,28 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         SaveObjectToDatabase(rfObj);
     }
 
+    // should set the game object's rigidbody based on whether or not it is static.
+    public void setRigidbodyFromStaticState(VisualScript obj)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+
+        if(rfObj.isStatic)
+        {
+            if(obj.gameObject.GetComponent<Rigidbody>() != null)
+            {
+                obj.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+                obj.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            }
+        } else
+        {
+            if(obj.gameObject.GetComponent<Rigidbody>() != null)
+            {
+                obj.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+                obj.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            }
+        }
+    }
+
     public void SetCollidable(VisualScript obj, bool becomeCollidable)
     {
         RfObject rfObj = SpawnedObjects[obj.gameObject];
