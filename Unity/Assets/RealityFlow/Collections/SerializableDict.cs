@@ -16,13 +16,14 @@ namespace RealityFlow.Collections
 
         public void OnBeforeSerialize()
         {
-            listDict = this.Select(pair => (pair.Key, pair.Value).Ser()).ToList();
+            listDict ??= this.Select(pair => (pair.Key, pair.Value).Ser()).ToList();
         }
 
         public void OnAfterDeserialize()
         {
-            for (int i = 0; i < listDict.Count; i++)
-                TryAdd(listDict[i].Item1, listDict[i].Item2);
+            if (listDict != null)
+                for (int i = 0; i < listDict.Count; i++)
+                    TryAdd(listDict[i].Item1, listDict[i].Item2);
         }
     }
 }

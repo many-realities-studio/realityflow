@@ -6638,6 +6638,16 @@ PrefabInstance:
       propertyPath: cameraSettings.moveSpeed
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
+        type: 3}
+      propertyPath: leftControllerSettings.simulationMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
+        type: 3}
+      propertyPath: rightControllerSettings.simulationMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3493013819197874656, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6696,7 +6706,7 @@ PrefabInstance:
     - target: {fileID: 7585035320575375756, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9283,6 +9293,12 @@ MonoBehaviour:
   nearMenuReference: {fileID: 1448981244012354375}
   delteMenuReference: {fileID: 1203155907}
   isUndoing: 0
+  audioPlayer: {fileID: 3435842387280994128, guid: d30e801b3fe6a2641b8be993ee310556,
+    type: 3}
+  AudioClips:
+    listDict:
+    - Item1: pop
+      Item2: {fileID: 8300000, guid: 3d22516fbe24309418a3100b656f64b0, type: 3}
 --- !u!114 &1938978930
 MonoBehaviour:
   m_ObjectHideFlags: 0

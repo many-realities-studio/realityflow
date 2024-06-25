@@ -25,16 +25,6 @@ namespace RealityFlow.NodeUI
         readonly List<string> dropdownIds = new();
         readonly List<string> noneList = new[] { "None" }.ToList();
 
-        void Awake()
-        {
-            RealityFlowAPI.Instance.OnTemplatesChanged += UpdateList;
-        }
-
-        void OnDestroy()
-        {
-            RealityFlowAPI.Instance.OnTemplatesChanged -= UpdateList;
-        }
-
         public GameObject Value
         {
             get
