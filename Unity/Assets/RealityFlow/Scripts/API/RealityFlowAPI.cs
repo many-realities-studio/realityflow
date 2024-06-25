@@ -1131,6 +1131,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         createObject(input: $input) {
                             id
                         }
+                        addLogEntry(input: $input2) {
+                            id  
+                        }
                     }",
                         OperationName = "CreateObject",
                         Variables = new
@@ -1143,6 +1146,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                                 type = rfObject.type,
                                 meshJson = rfObject.meshJson,
                                 transformJson = rfObject.transformJson
+                            },
+                            input2 = new
+                            {
+                                eventType = "Create Object",
+                                name = rfObject
                             }
                         }
                     };

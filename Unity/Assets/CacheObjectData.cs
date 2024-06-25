@@ -31,6 +31,7 @@ public class CacheObjectData : MonoBehaviour
     {
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+        Debug.Log(networkedPlayManager.gameObject);
         lastPlayModeState = networkedPlayManager.playMode;
 
         cachedPosition = transform.localPosition;
