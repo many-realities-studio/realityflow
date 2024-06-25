@@ -12,7 +12,8 @@ namespace RealityFlow.NodeGraph
     {
         public Graph graph;
         readonly EvalContext ctx = new();
-        public bool isTemplate;
+
+        public bool IsTemplate => RealityFlowAPI.Instance.SpawnedObjects[gameObject].isTemplate;
 
         ObjectManipulator interactable;
 
@@ -50,7 +51,7 @@ namespace RealityFlow.NodeGraph
 
         public void OnEnterPlayMode()
         {
-            if (isTemplate)
+            if (IsTemplate)
                 gameObject.SetActive(false);
 
             if (graph is null)
@@ -66,7 +67,7 @@ namespace RealityFlow.NodeGraph
 
         public void OnExitPlayMode()
         {
-            if (isTemplate || graph is null)
+            if (IsTemplate || graph is null)
                 gameObject.SetActive(true);
 
             ctx.ClearVariables();

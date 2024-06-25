@@ -21,5 +21,6 @@ namespace RealityFlow.NodeGraph
         String,
         Variable,
         Text,
+        Audio,
     }
 }

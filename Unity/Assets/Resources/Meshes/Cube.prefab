@@ -132,7 +132,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 32
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
@@ -441,6 +441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   owner: 0
   isHeld: 0
+  networkedPlayManager: {fileID: 0}
 --- !u!114 &-6321622012781711033
 MonoBehaviour:
   m_ObjectHideFlags: 0

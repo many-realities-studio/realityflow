@@ -30,6 +30,8 @@ using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Unity.VisualScripting;
 using System.Collections;
 using TMPro;
+using RealityFlow.Collections;
+
 
 
 
@@ -88,6 +90,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     readonly List<GameObject> templates = new();
     public IEnumerable<GameObject> Templates => templates;
     public Action OnTemplatesChanged;
+    [SerializeField]
+    public GameObject audioPlayer; 
 
     public enum SpawnScope
     {
@@ -112,6 +116,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        AudioClipNames = AudioClips.Select(kv => kv.Key).ToList();
+
         if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
@@ -422,10 +428,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return;
     }
 
+    #endregion
+
+    #region Visual Scripting (Template, Static, Collide, Grav, Text)
+
     public void SetTemplate(VisualScript obj, bool becomeTemplate)
     {
-        // TODO: Persist to database
-
         bool contains = templatesDict.TryGetValue(obj.gameObject, out int index);
         if (contains && !becomeTemplate)
         {
@@ -438,9 +446,36 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             templates.Add(obj.gameObject);
         }
 
-        obj.isTemplate = becomeTemplate;
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isTemplate = becomeTemplate;
+
+        SaveObjectToDatabase(rfObj);
 
         OnTemplatesChanged?.Invoke();
+    }
+
+    public void SetStatic(VisualScript obj, bool becomeStatic)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isStatic = becomeStatic;
+
+        SaveObjectToDatabase(rfObj);
+    }
+
+    public void SetCollidable(VisualScript obj, bool becomeCollidable)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isCollidable = becomeCollidable;
+
+        SaveObjectToDatabase(rfObj);
+    }
+
+    public void SetGravity(VisualScript obj, bool becomeGravityEnabled)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+        rfObj.isGravityEnabled = becomeGravityEnabled;
+
+        SaveObjectToDatabase(rfObj);
     }
 
     public void SetUIText(GameObject textComp, string text)
@@ -448,6 +483,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // TODO: Network
         
         textComp.GetComponent<TMP_Text>().text = text;
+    }
+
+    [SerializeField]
+    private SerializableDict<string, AudioClip> AudioClips = new();
+    public List<string> AudioClipNames { get; private set; }
+
+    public void PlaySound(string clip, Vector3 position)
+    {
+        GameObject player = Instantiate(audioPlayer, position, Quaternion.identity);
+        AudioSource source = player.GetComponent<AudioSource>();
+        source.clip = AudioClips[clip];
+        source.Play();
+        player.GetComponent<DestroyObject>().lifeTime = AudioClips[clip].length + 1f;
     }
 
     // -- EDIT GRAPH FUNCTIONS --
@@ -1045,31 +1093,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // }
 
                     // Add ObjectManipulator
-
-                    // Add MyNetworkedObject script
-                    if (spawnedObject.GetComponent<MyNetworkedObject>() == null)
-                    {
-                        spawnedObject.AddComponent<MyNetworkedObject>();
-                        // Assign events
-                        var myNetworkedObject = spawnedObject.GetComponent<MyNetworkedObject>();
-
-                        ObjectManipulator objManip = spawnedObject.GetComponent<ObjectManipulator>();
-
-                        if (objManip != null)
-                        {
-                            objManip.firstSelectEntered.AddListener((args) => myNetworkedObject.StartHold());
-                            objManip.lastSelectExited.AddListener((args) => myNetworkedObject.EndHold());
-                        }
-                    }
-
-                    // Add CacheObjectData script
-                    if (spawnedObject.GetComponent<CacheObjectData>() == null)
-                    {
-                        spawnedObject.AddComponent<CacheObjectData>();
-                    }
                         
                     // Add whiteboard attatch
-                    spawnedObject.AddComponent<AttachedWhiteboard>();
+                    if(spawnedObject.GetComponent<AttachedWhiteboard>() == null)
+                    {
+                        spawnedObject.AddComponent<AttachedWhiteboard>();
+                    }
+                    
 
                 }
                 if (scope == SpawnScope.Room)
@@ -1299,6 +1329,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     graphId = rfObject.graphId,
                     meshJson = rfObject.meshJson,
                     transformJson = rfObject.transformJson,
+                    isTemplate = rfObject.isTemplate,
+                    isStatic = rfObject.isStatic,
+                    isCollidable = rfObject.isCollidable,
+                    isGravityEnabled = rfObject.isGravityEnabled,
                 }
             }
         };
@@ -1387,6 +1421,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     meshJson
                     transformJson
                     graphId
+                    isTemplate
+                    isStatic
+                    isCollidable
+                    isGravityEnabled
                 }
             }",
             Variables = new { projectId = projectId }
@@ -2283,7 +2321,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 }
 
 // ===== RF Object Class =====
-[System.Serializable]
+[Serializable]
 public class RfObject
 {
     public string id; // Unique ID for each object
@@ -2294,6 +2332,10 @@ public class RfObject
     public string transformJson;
     public string meshJson;
     public string originalPrefabName;
+    public bool isTemplate;
+    public bool isStatic;
+    public bool isCollidable = true;
+    public bool isGravityEnabled = true;
 }
 
 [System.Serializable]
