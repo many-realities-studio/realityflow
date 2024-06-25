@@ -462,6 +462,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         SaveObjectToDatabase(rfObj);
 
+        LogActionToServer("SetTemplate", new { objId = rfObj.id, become = becomeTemplate });
+
         OnTemplatesChanged?.Invoke();
     }
 
@@ -469,6 +471,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         RfObject rfObj = SpawnedObjects[obj.gameObject];
         rfObj.isStatic = becomeStatic;
+
+        LogActionToServer("SetStatic", new { objId = rfObj.id, become = becomeStatic });
 
         SaveObjectToDatabase(rfObj);
     }
@@ -478,6 +482,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         RfObject rfObj = SpawnedObjects[obj.gameObject];
         rfObj.isCollidable = becomeCollidable;
 
+        LogActionToServer("SetCollidable", new { objId = rfObj.id, become = becomeCollidable });
+
         SaveObjectToDatabase(rfObj);
     }
 
@@ -485,6 +491,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         RfObject rfObj = SpawnedObjects[obj.gameObject];
         rfObj.isGravityEnabled = becomeGravityEnabled;
+
+        LogActionToServer("SetGravity", new { objId = rfObj.id, become = becomeGravityEnabled });
 
         SaveObjectToDatabase(rfObj);
     }
@@ -590,6 +598,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
+        LogActionToServer("AddNode", new { graphId = graph.Id, defName = def.Name, index });
+
         SendGraphUpdateToDatabase(graphJson, graph.Id);
         return index;
     }
@@ -608,6 +618,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Serialize the graph object to JSON
         string graphJson = JsonUtility.ToJson(graph);
         // Debug.Log($"Adding node {def} to graph at index {index}");
+
+        LogActionToServer("RemoveNode", new { graphId = graph.Id, node });
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
     }
@@ -628,6 +640,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding edge {from}:{to} to graph");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("AddDataEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to.Node, toPort = to.Port });
     }
 
     public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
@@ -641,6 +655,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Deleting edge {from}:{to} to graph");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("RemoveDataEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to.Node, toPort = to.Port });
     }
 
     public void AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex to)
@@ -658,6 +674,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Adding exec edge {from}:{to} to graph");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("AddExecEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to });
     }
 
     public void RemoveExecEdgeFromGraph(Graph graph, PortIndex from, NodeIndex to)
@@ -671,6 +689,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Removing exec edge {from}:{to} to graph");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("RemoveExecEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to });
     }
 
     public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
@@ -690,6 +710,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Moving node {node} to {position}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("MoveNode", new { graphId = graph.Id, node, fromPosition = prevPosition, toPosition = position });
     }
 
     public void SetNodeFieldValue(Graph graph, NodeIndex node, int field, NodeValue value)
@@ -713,6 +735,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Setting node {node} field {field} to value {value}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("SetNodeField", new { graphId = graph.Id, node, field, oldValue, newValue = value });
     }
 
     public void SetNodeInputConstantValue(Graph graph, NodeIndex node, int port, NodeValue value)
@@ -736,16 +760,22 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Setting node {node} port {port} constant to {value}");
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
+        LogActionToServer("SetNodePortConstant", new { graphId = graph.Id, node, port, oldValue, newValue = value });
     }
 
     public void AddVariableToGraph(Graph graph, string name, NodeValueType type)
     {
         graph.AddVariable(name, type);
+
+        LogActionToServer("AddVariable", new { graphId = graph.Id, name, type = type.ToString() });
     }
 
     public void RemoveVariableFromGraph(Graph graph, string name)
     {
         graph.RemoveVariable(name);
+
+        LogActionToServer("RemoveVariable", new { graphId = graph.Id, name });
     }
 
     public void GameObjectAddLocalImpulse(GameObject obj, Vector3 dirMag)
@@ -1034,7 +1064,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
     #endregion
 
-    public void LogActionToServer(string action, JObject data)
+    public void LogActionToServer(string action, object data)
     {
       var createObject = new GraphQLRequest
         {
@@ -1047,7 +1077,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         OperationName = "LogAction",
         Variables = new
         {
-            input = data
+            input = new
+            {
+                eventType = "String",
+                eventData = data,
+            }
         }
     };
     try
