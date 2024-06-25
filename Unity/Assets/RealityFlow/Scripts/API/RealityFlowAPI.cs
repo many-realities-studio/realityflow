@@ -1064,7 +1064,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
     #endregion
 
-    public void LogActionToServer(string action, JObject data)
+    public void LogActionToServer(string action, object data)
     {
       var createObject = new GraphQLRequest
         {
@@ -1077,7 +1077,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         OperationName = "LogAction",
         Variables = new
         {
-            input = data
+            input = new
+            {
+                eventType = "String",
+                eventData = data,
+            }
         }
     };
     try
