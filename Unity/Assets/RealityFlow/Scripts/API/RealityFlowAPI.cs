@@ -1027,26 +1027,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     constraintManager.AutoConstraintSelection = true;
 
                     // Add UGUIInputAdapterDraggable
-                    var draggableAdapter = spawnedObject.AddComponent<UGUIInputAdapterDraggable>();
-                    draggableAdapter.interactable = true;
-                    draggableAdapter.transition = Selectable.Transition.None;
-                    draggableAdapter.navigation = new Navigation { mode = Navigation.Mode.Automatic };
+                    // var draggableAdapter = spawnedObject.AddComponent<UGUIInputAdapterDraggable>();
+                    // draggableAdapter.interactable = true;
+                    // draggableAdapter.transition = Selectable.Transition.None;
+                    // draggableAdapter.navigation = new Navigation { mode = Navigation.Mode.Automatic };
 
                     // Add TetheredPlacement script with Distance Threshold set to 20
-                    var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
-                    tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
+                    // var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
+                    // tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
 
                     // Add CacheMeshData script
-                    if (spawnedObject.GetComponent<CacheMeshData>() == null)
-                    {
-                        spawnedObject.AddComponent<CacheMeshData>();
-                    }
+                    // if (spawnedObject.GetComponent<CacheMeshData>() == null)
+                    // {
+                    //     spawnedObject.AddComponent<CacheMeshData>();
+                    // }
 
                     // Add NetworkedOperationCache script
-                    if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
-                    {
-                        spawnedObject.AddComponent<NetworkedOperationCache>();
-                    }
+                    // if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
+                    // {
+                    //     spawnedObject.AddComponent<NetworkedOperationCache>();
+                    // }
 
                     // Add ObjectManipulator
                     if (spawnedObject.GetComponent<ObjectManipulator>() == null)
@@ -1055,6 +1055,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.HostTransform = spawnedObject.transform;
                         //objectManipulator.AllowedManipulations = TransformFlags.Move | TransformFlags.Rotate | TransformFlags.Scale;
                         objectManipulator.AllowedInteractionTypes = InteractionFlags.Near | InteractionFlags.Ray | InteractionFlags.Gaze | InteractionFlags.Generic;
+                        objectManipulator.selectMode = InteractableSelectMode.Multiple;
                         objectManipulator.UseForcesForNearManipulation = false;
                         objectManipulator.RotationAnchorNear = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
                         objectManipulator.RotationAnchorFar = ObjectManipulator.RotateAnchorType.RotateAboutGrabPoint;
@@ -1063,23 +1064,23 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         objectManipulator.SmoothingFar = true;
                         objectManipulator.SmoothingNear = true;
 
-                        /*
-                        objectManipulator.firstSelectEntered.AddListener(async _ => 
+                        
+                        objectManipulator.firstSelectEntered.AddListener(_ =>
                         {
-                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            if (spawnedObject.GetComponent<MyNetworkedObject>() != null)
                             {
                                 spawnedObject.GetComponent<MyNetworkedObject>().StartHold();
                             }
                         });
 
-                        objectManipulator.lastSelectExited.AddListener(async _ => 
+                        objectManipulator.lastSelectExited.AddListener(_ =>
                         {
-                            if(spawnedObject.GetComponent<MyNetworkedObject>() != null)
+                            if (spawnedObject.GetComponent<MyNetworkedObject>() != null)
                             {
                                 spawnedObject.GetComponent<MyNetworkedObject>().EndHold();
                             }
                         });
-                        */
+                        
 
                         objectManipulator.MoveLerpTime = 0.001f;
                         objectManipulator.RotateLerpTime = 0.001f;
@@ -1333,7 +1334,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
 
             var graphQLResponse = client.SendQueryAsync(saveObject);
-            if (graphQLResponse["data"] != null)
+            if (graphQLResponse["data"] != null && graphQLResponse["errors"]==null)
             {
                 Debug.Log("Object saved to the database successfully.");
 
@@ -1342,8 +1343,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
 
-                // Update the name of the spawned object in the scene
-                GameObject spawnedObject = GameObject.Find(rfObject.name);
+        // Update the name of the spawned object in the scene
+                GameObject spawnedObject = spawnedObjectsById[rfObject.id];//GameObject.Find(rfObject.name);
                 if (spawnedObject != null)
                 {
                     spawnedObject.name = rfObject.id;

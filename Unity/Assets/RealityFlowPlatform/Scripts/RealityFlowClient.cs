@@ -108,6 +108,7 @@ public class RealityFlowClient : MonoBehaviour
             }
             else
             {
+                loginMenu.gameObject.SetActive(true);
                 Debug.Log("Login is unsuccessful, proceeding with setup.");
             }
         };
@@ -264,17 +265,17 @@ public class RealityFlowClient : MonoBehaviour
             }
         };
         var graphQL = SendQueryAsync(verifyToken);
-        if (graphQL["data"] != null)
+        if (graphQL["errors"] == null && graphQL["data"]["verifyAccessToken"] != null)
         {
             // Debug.Log("User Logged In successfully");
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
-            LoginSuccess.Invoke(true);
 
             if (Whisper.rootWhisper != null)
             {
                 Whisper.rootWhisper.InitializeGPT((string)graphQL["data"]["verifyAccessToken"]["apiKey"]);
             }
+            LoginSuccess.Invoke(true);
         }
         else
         {
