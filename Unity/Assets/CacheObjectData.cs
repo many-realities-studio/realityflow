@@ -8,7 +8,7 @@ using Org.BouncyCastle.Crypto.Engines;
 /// Class CacheMeshData is attached to every networked mesh and caches it's information when Play mode is entered. Upon exit of Play mode
 /// the mesh is reverted back to its original state prior to entering Play mode.
 /// </summary>
-public class CacheMeshData : MonoBehaviour
+public class CacheObjectData : MonoBehaviour
 {
     public NetworkedPlayManager networkedPlayManager;
     private bool lastPlayModeState;

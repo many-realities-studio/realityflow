@@ -321,10 +321,9 @@ namespace Samples.Whisper
         {
             if (chatGPTTester != null)
             {
-                chatGPTTester.ExecuteLoggedActions();
+                StartCoroutine(chatGPTTester.ExecuteLoggedActionsCoroutine());
             }
         }
-
         // New method to stop the countdown
         public void StopCountdown()
         {

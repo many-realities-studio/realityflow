@@ -15,13 +15,11 @@ GameObject:
   - component: {fileID: 2498879125359138606}
   - component: {fileID: -1787195226520056605}
   - component: {fileID: -7314581963325419078}
-  - component: {fileID: -7886374779636526642}
   - component: {fileID: 9104739644895375521}
   - component: {fileID: -6321622012781711033}
   - component: {fileID: 7421734273417964813}
   - component: {fileID: -4489845190062905058}
-  - component: {fileID: 2237685008528717883}
-  - component: {fileID: -6832451401266901243}
+  - component: {fileID: 2112126288023249345}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Default Object
@@ -429,49 +427,6 @@ MonoBehaviour:
         Microsoft.MixedReality.Toolkit.SpatialManipulation
     scaleLogicType:
       reference: Microsoft.MixedReality.Toolkit.SpatialManipulation.ScaleLogic, Microsoft.MixedReality.Toolkit.SpatialManipulation
---- !u!114 &-7886374779636526642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 198533854441860031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a1bf44e2291e8741ab3dec75055d9db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 0
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
-  movableAxes: 0
-  onMoveDelta: 0.01
 --- !u!114 &9104739644895375521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -524,7 +479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceThreshold: 20
---- !u!114 &2237685008528717883
+--- !u!114 &2112126288023249345
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -533,19 +488,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 198533854441860031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34071a382df193941b54b83ea76043c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 207f43536db1e4420b3d240d31a5fe00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPlayManager: {fileID: 0}
---- !u!114 &-6832451401266901243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 198533854441860031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

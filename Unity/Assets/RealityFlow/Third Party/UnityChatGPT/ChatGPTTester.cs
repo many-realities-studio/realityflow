@@ -6,6 +6,7 @@ using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
 using System.IO;
+using System.Collections;
 
 public class ChatGPTTester : MonoBehaviour
 {
@@ -100,13 +101,24 @@ public class ChatGPTTester : MonoBehaviour
 
             //If you want to see the code produced by ChatGPT uncomment out the line below
             //Logger.Instance.LogInfo(ChatGPTMessage);
+            if (RealityFlowAPI.Instance == null)
+            {
+                Debug.LogError("RealityFlowAPI.Instance is null.");
+                return;
+            }
+
+            if (RealityFlowAPI.Instance.actionLogger == null)
+            {
+                Debug.LogError("RealityFlowAPI.Instance.actionLogger is null.");
+                return;
+            }
 
             // Log the generated code instead of executing it immediately
             RealityFlowAPI.Instance.actionLogger.LogGeneratedCode(ChatGPTMessage);
 
             if (immediateCompilation)
             {
-                ExecuteLoggedActions();
+                ExecuteLoggedActionsCoroutine();
             }
         }));
 
@@ -178,21 +190,32 @@ public class ChatGPTTester : MonoBehaviour
         }
         return "Unknown Object";
     }
-
-
-    public void ExecuteLoggedActions()
+    public IEnumerator ExecuteLoggedActionsCoroutine()
     {
+        if (RealityFlowAPI.Instance == null)
+        {
+            Debug.LogError("RealityFlowAPI.Instance is null.");
+            yield break;
+        }
+
+        if (RealityFlowAPI.Instance.actionLogger == null)
+        {
+            Debug.LogError("RealityFlowAPI.Instance.actionLogger is null.");
+            yield break;
+        }
+
         // Execute all logged actions (code snippets) sequentially
-        RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCode();
+        yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCodeCoroutine());
     }
 
     public void ProcessAndCompileResponse()
     {
-        RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
+        RoslynCodeRunner.Instance.RunCodeCoroutine(ChatGPTMessage);
     }
 
     private void WriteResponseToFile(string response)
     {
+        Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
         string path = Application.persistentDataPath + "/ChatGPTResponse.cs";
         try
         {
