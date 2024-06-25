@@ -27,7 +27,7 @@ namespace RealityFlow.NodeUI
                 graph = value;
                 EnableVariableButtons();
                 AddInitialVariables();
-                templateToggle.ForceSetToggled(currentObject.isTemplate);
+                templateToggle.ForceSetToggled(currentObject.IsTemplate);
                 Render();
             }
         }
@@ -57,6 +57,12 @@ namespace RealityFlow.NodeUI
         private PressableButton removeVariableButton;
         [SerializeField]
         private PressableButton templateToggle;
+        [SerializeField]
+        private PressableButton staticToggle;
+        [SerializeField]
+        private PressableButton collidableToggle;
+        [SerializeField]
+        private PressableButton gravityToggle;
 
         public PortIndex? selectedInputEdgePort;
         public PortIndex? selectedOutputEdgePort;
@@ -160,6 +166,8 @@ namespace RealityFlow.NodeUI
             SetPortsActive();
 
             EnableVariableButtons();
+
+            SetOptions();
         }
 
         void ClearSelectedEdgeEnds()
@@ -333,6 +341,30 @@ namespace RealityFlow.NodeUI
             RealityFlowAPI.Instance.SetTemplate(CurrentObject, isTemplate);
         }
 
+        public void SetStatic(bool isStatic)
+        {
+            if (!CurrentObject)
+                return;
+
+            RealityFlowAPI.Instance.SetStatic(CurrentObject, isStatic);
+        }
+
+        public void SetCollidable(bool isCollidable)
+        {
+            if (!CurrentObject)
+                return;
+
+            RealityFlowAPI.Instance.SetCollidable(CurrentObject, isCollidable);
+        }
+
+        public void SetGravity(bool isGravityEnabled)
+        {
+            if (!CurrentObject)
+                return;
+
+            RealityFlowAPI.Instance.SetGravity(CurrentObject, isGravityEnabled);
+        }
+
         public void SetSelectedVariable(string variable)
         {
             selectedVariable = variable;
@@ -354,6 +386,15 @@ namespace RealityFlow.NodeUI
             removeVariableButton.enabled =
                 selectedVariable != null
                 && Graph.TryGetVariableType(selectedVariable, out _);
+        }
+
+        void SetOptions()
+        {
+            RfObject rfObj = RealityFlowAPI.Instance.SpawnedObjects[currentObject.gameObject];
+            templateToggle.ForceSetToggled(rfObj.isTemplate);
+            staticToggle.ForceSetToggled(rfObj.isStatic);
+            collidableToggle.ForceSetToggled(rfObj.isCollidable);
+            gravityToggle.ForceSetToggled(rfObj.isGravityEnabled);
         }
 
         void AddVariableItem(string name, NodeValueType type)

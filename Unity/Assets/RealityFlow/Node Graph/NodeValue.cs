@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NaughtyAttributes;
+using TMPro;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -63,6 +64,7 @@ namespace RealityFlow.NodeGraph
                 NodeValueType.GameObject,
                 NodeValueType.TemplateObject,
                 NodeValueType.String,
+                NodeValueType.Text,
             };
 
         public static bool IsAssignableTo(NodeValueType assigned, NodeValueType to)
@@ -91,6 +93,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.TemplateObject => typeof(GameObject),
             NodeValueType.String => typeof(string),
             NodeValueType.Variable => typeof(string),
+            NodeValueType.Text => typeof(GameObject),
             _ => throw new ArgumentException(),
         };
 
@@ -112,6 +115,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.TemplateObject => new TemplateObjectValue(null),
             NodeValueType.String => new StringValue(string.Empty),
             NodeValueType.Variable => new VariableValue(null),
+            NodeValueType.Text => null,
             _ => throw new ArgumentException(),
         };
 
@@ -147,6 +151,7 @@ namespace RealityFlow.NodeGraph
             NodeValueType.GameObject => new GameObjectValue(value.AsType<T, GameObject>()),
             NodeValueType.TemplateObject => new TemplateObjectValue(value.AsType<T, GameObject>()),
             NodeValueType.Variable => new VariableValue(value.AsType<T, string>()),
+            NodeValueType.Text => new TextValue(value.AsType<T, GameObject>()),
             _ => throw new ArgumentException(),
         };
     }
@@ -388,5 +393,20 @@ namespace RealityFlow.NodeGraph
         public override NodeValueType ValueType => NodeValueType.Variable;
 
         public override object DynValue => varName;
+    }
+
+    [Serializable]
+    public class TextValue : GameObjectValue
+    {
+        [SerializeField]
+        string realityflowId;
+
+        public TextValue(GameObject obj) : base(obj)
+        {
+            if (!obj.GetComponent<TMP_Text>())
+                Debug.LogError("Created text value from non-text");
+        }
+
+        public override NodeValueType ValueType => NodeValueType.Text;
     }
 }
