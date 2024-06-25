@@ -1269,6 +1269,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                             Debug.Log($"Assigned ID from database: {rfObject.id}");
                             spawnedObjects[spawnedObject] = rfObject;
                             spawnedObjectsById[returnedId] = spawnedObject;
+
+                            LogActionToServer("SpawnObject", new { rfObject });
+
                             // Update the name of the spawned object in the scene
                             if (spawnedObject != null)
                             {
@@ -1374,6 +1377,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 // TODO: If in play mode call OnEnterPlayMode
             }
+
+            LogActionToServer("SpawnNonPersistentObject", new { obj = prefabName, position, rotation });
 
             nonPersistentObjects.Add(spawned);
             spawnedObjects.Add(spawned, objectDetails);
@@ -2023,6 +2028,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 spawnedObjectsById.Remove(objectId);
             }
 
+            LogActionToServer("DespawnObject", new { rfObject, originalPrefabName });
         }
         else
         {
