@@ -1138,9 +1138,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     var createObject = new GraphQLRequest
                     {
                         Query = @"
-                    mutation CreateObject($input: CreateObjectInput!) {
+                    mutation CreateObject($input: CreateObjectInput!, $input2: LogEntryInput!) {
                         createObject(input: $input) {
                             id
+                        }
+                        addLogEntry(input: $input2) {
+                            id  
                         }
                     }",
                         OperationName = "CreateObject",
@@ -1154,6 +1157,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                                 type = rfObject.type,
                                 meshJson = rfObject.meshJson,
                                 transformJson = rfObject.transformJson
+                            },
+                            input2 = new
+                            {
+                                eventType = "Create Object",
+                                name = rfObject
                             }
                         }
                     };

@@ -9,6 +9,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using Ubiq.Avatars;
 using Unity.XR.CoreUtils;
+using RealityFlow.NodeUI;
 
 /// <summary>
 /// Class EraserTool assigns the eraser tool to the user and allows the deletion of meshes through the Eraser button on the palette.
@@ -87,6 +88,9 @@ public class EraserTool : MonoBehaviour
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
             Debug.Log("Delete attempted" + currentHitResult.collider.gameObject);
+            
+            Whiteboard.Instance.Init();
+
             RealityFlowAPI.Instance.DespawnObject(currentHitResult.collider.gameObject);
             spawnManager.Despawn(currentHitResult.collider.gameObject);
             // You should no longer be able to interact with this mesh
