@@ -19,6 +19,15 @@ using Samples.Whisper;
 using Ubiq.Samples;
 using System.IO;
 
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using Microsoft.MixedReality.Toolkit.UX;
+using Samples.Whisper;
+using Ubiq.Samples;
+using System.IO;
+using System.Threading.Tasks;
+
 public class ChangeTextOnButtonPress : MonoBehaviour
 {
     public StatefulInteractable[] PressableButtons; // Array of pressable buttons
@@ -92,7 +101,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
 
     private void StartRecording(int index)
     {
-        currentAudioClip = Microphone.Start(null, false, 300, 44100); // Start recording with a maximum duration of 300 seconds
+        currentAudioClip = Microphone.Start(null, false, 60, 44100); // Start recording with a maximum duration of 300 seconds
         Debug.Log("Recording started for button index: " + index);
     }
 
@@ -120,9 +129,9 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         TranscribeRecording(data, fileName);
     }
 
-    private void TranscribeRecording(byte[] audioData, string fileName)
+    private async void TranscribeRecording(byte[] audioData, string fileName)
     {
-        var res = whisperRoot.TranscribeRecording(audioData); // Assuming this is a synchronous call
+        var res = await whisperRoot.TranscribeRecordingAsync(audioData);
         RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res, fileName });
         Debug.Log("Transcription result: " + res);
     }
