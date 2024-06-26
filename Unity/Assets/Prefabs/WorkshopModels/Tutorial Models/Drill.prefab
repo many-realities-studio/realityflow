@@ -196,6 +196,7 @@ GameObject:
   - component: {fileID: 1736563493845847734}
   - component: {fileID: 5148212535629245688}
   - component: {fileID: 158477677771856405}
+  - component: {fileID: -7806591267218940399}
   m_Layer: 0
   m_Name: Drill
   m_TagString: Untagged
@@ -558,6 +559,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-7806591267218940399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1278555227062650211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8676e655248d62469367ef11154188c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceThreshold: 20
 --- !u!1 &1742662578186373425
 GameObject:
   m_ObjectHideFlags: 0

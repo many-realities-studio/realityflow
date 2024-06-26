@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2071037622585677284}
   - component: {fileID: 5517050303943904386}
   - component: {fileID: 2642324149971981780}
+  - component: {fileID: 5491424127431712505}
   m_Layer: 0
   m_Name: Chicken Smooth
   m_TagString: Untagged
@@ -378,6 +379,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5491424127431712505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971205628291273078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8676e655248d62469367ef11154188c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceThreshold: 20
 --- !u!1 &6429765693919956325
 GameObject:
   m_ObjectHideFlags: 0

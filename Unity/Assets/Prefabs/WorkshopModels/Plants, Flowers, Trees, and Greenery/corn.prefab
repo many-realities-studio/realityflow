@@ -279,6 +279,7 @@ GameObject:
   - component: {fileID: 3329170723566468609}
   - component: {fileID: 7164238420997747840}
   - component: {fileID: 7781835453541295701}
+  - component: {fileID: 1320450985028692983}
   m_Layer: 0
   m_Name: corn
   m_TagString: Untagged
@@ -641,3 +642,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1320450985028692983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7901432955291755990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8676e655248d62469367ef11154188c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceThreshold: 20
