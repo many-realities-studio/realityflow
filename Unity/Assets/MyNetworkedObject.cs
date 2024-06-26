@@ -69,7 +69,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         if(gameObject.GetComponent<Rigidbody>() != null)
         {
             rb = gameObject.GetComponent<Rigidbody>();
-            rb.isKinematic = false;
+            rb.isKinematic = true;
         } else
         {
             compErr = true;
