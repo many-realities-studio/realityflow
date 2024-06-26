@@ -33,6 +33,7 @@ public class RealityFlowClient : MonoBehaviour
     public GameObject levelEditor;
     public RoomClient roomClient;
     private string currentProjectId;
+    public JArray surveys;
 
     // GraphQL client and access token variables
     public Dictionary<string, string> userDecoded;
@@ -232,7 +233,6 @@ public class RealityFlowClient : MonoBehaviour
         {
             Debug.Log("Room created successfully");
             SetCurrentProject((string)graphQL["data"]["createProject"]["id"]);
-            CreateRoom();
         }
         else
         {
@@ -258,7 +258,7 @@ public class RealityFlowClient : MonoBehaviour
                     apiKey
                 }
             }
-        ",
+            ",
             OperationName = "VerifyAccessToken",
             Variables = new
             {
@@ -272,7 +272,14 @@ public class RealityFlowClient : MonoBehaviour
             accessToken = inputAccessToken;
             PlayerPrefs.SetString("accessToken", accessToken);
             LoginSuccess.Invoke(true);
+
+
             //find object type ChatGPT and enable it
+            // Check if belongs to survey
+            // If user does, save some marker, saying they do
+            //      This marker will make the button to end workshop present
+            // And then check if the user has any beginning of workshop survey 
+            // instances
             var chatGPTObject = GameObject.Find("ChatGPT");
             if (chatGPTObject != null)
             {
@@ -316,7 +323,7 @@ public class RealityFlowClient : MonoBehaviour
         roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom);
         roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
 
-
+        SurveyHandler.Instance.ShowSurvey(currentProjectId);
     }
 
     public void OnJoinCreatedRoom(IRoom room)
@@ -382,6 +389,7 @@ public class RealityFlowClient : MonoBehaviour
         // Run KeepRoomAlive every 30 seconds
         InvokeRepeating("KeepRoomAlive", 0, 30);
         
+        SurveyHandler.Instance.ShowSurvey(currentProjectId);
         
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
         OnRoomCreated?.Invoke();
@@ -425,6 +433,7 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log("Joining room for project: " + currentProjectId); // Log the project ID
         Debug.Log("Joining room with join code: " + joinCode); // Log the join code
 
+
         // Check if a project is selected
         if (string.IsNullOrEmpty(currentProjectId))
         {
@@ -432,8 +441,9 @@ public class RealityFlowClient : MonoBehaviour
             return;
         }
         projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
-
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
+
+        SurveyHandler.Instance.ShowSurvey(currentProjectId);
 
         Debug.Log("-RIGHT BEFORE EVENT CALL-");
         roomClient.Join(joinCode); // Join Room Based on Room Code
@@ -445,6 +455,8 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
+        
+        SurveyHandler.Instance.ShowSurvey(currentProjectId);
 
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
     }
@@ -626,6 +638,12 @@ public class RealityFlowClient : MonoBehaviour
             {
                 Debug.LogError("Failed to fetch rooms data");
             }
+            // var surveyData = projectdata["getProjectById"]["preSurveys"];
+            // if (surveyData != null)
+            // {
+            //     SurveyHandler.Instance.Surveys = (JArray)surveyData;
+            //     SurveyHandler.Instance.ShowSurvey();
+            // }
             // GetRoomsByProjectId(id);
         }
         else
