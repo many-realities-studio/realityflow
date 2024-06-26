@@ -167,7 +167,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // ===== SUPPORT FUNCTIONS =====
-    public string ExportSpawnedObjectsData()
+    /* public string ExportSpawnedObjectsData()  // Should we Delete this
     {
         StringBuilder sb = new StringBuilder();
 
@@ -193,7 +193,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
 
         return sb.ToString();
-    }
+    }*/
 
     public GameObject GetPrefabByName(string name)
     {
@@ -209,26 +209,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.LogWarning($"Prefab named {name} not found in function GetPrefabByName.");
         return null;
     }
-
-    private string GetMeshJson(GameObject spawnedObject)
-    {
-        // This function serializes the mesh data of the spawned object
-        MeshFilter meshFilter = spawnedObject.GetComponent<MeshFilter>();
-        if (meshFilter != null)
-        {
-            Mesh mesh = meshFilter.mesh;
-            MeshData meshData = new MeshData
-            {
-                vertices = mesh.vertices,
-                triangles = mesh.triangles,
-                normals = mesh.normals,
-                uv = mesh.uv
-            };
-            return JsonUtility.ToJson(meshData);
-        }
-        return "{}";
-    }
-
     void OutlineEffect(GameObject obj)
     {
         // Apply the outline effect (using material or component)
@@ -475,6 +455,28 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         LogActionToServer("SetStatic", new { objId = rfObj.id, become = becomeStatic });
 
         SaveObjectToDatabase(rfObj);
+    }
+
+    // should set the game object's rigidbody based on whether or not it is static.
+    public void setRigidbodyFromStaticState(VisualScript obj)
+    {
+        RfObject rfObj = SpawnedObjects[obj.gameObject];
+
+        if(rfObj.isStatic)
+        {
+            if(obj.gameObject.GetComponent<Rigidbody>() != null)
+            {
+                obj.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+                obj.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            }
+        } else
+        {
+            if(obj.gameObject.GetComponent<Rigidbody>() != null)
+            {
+                obj.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+                obj.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            }
+        }
     }
 
     public void SetCollidable(VisualScript obj, bool becomeCollidable)
@@ -975,10 +977,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
         }
         sb.Append("]");
-        Debug.Log(sb.ToString());
+        // Debug.Log(sb.ToString());
         // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
         rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
-        Debug.Log(rfObject);
+        // Debug.Log(rfObject);
 
         var createObject = new GraphQLRequest
         {
@@ -1005,6 +1007,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
+            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
+            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
             var graphQLResponse = client.SendQueryAsync(createObject);
             if (graphQLResponse["data"] != null)
             {
@@ -1013,7 +1017,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Extract the ID from the response and assign it to the rfObject
                 var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
                 rfObject.id = returnedId;
-                Debug.Log($"Assigned ID from database: {rfObject.id}");
+                // Debug.Log($"Assigned ID from database: {rfObject.id}");
                 spawnedObjects[spawnedMesh] = rfObject;
                 spawnedObjectsById[returnedId] = spawnedMesh;
 
@@ -1227,12 +1231,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     var createObject = new GraphQLRequest
                     {
                         Query = @"
-                    mutation CreateObject($input: CreateObjectInput!, $input2: LogEntryInput!) {
+                        mutation CreateObject($input: CreateObjectInput!) {
                         createObject(input: $input) {
                             id
-                        }
-                        addLogEntry(input: $input2) {
-                            id  
                         }
                     }",
                         OperationName = "CreateObject",
@@ -1246,11 +1247,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                                 type = rfObject.type,
                                 meshJson = rfObject.meshJson,
                                 transformJson = rfObject.transformJson
-                            },
-                            input2 = new
-                            {
-                                eventType = "Create Object",
-                                name = rfObject
                             }
                         }
                     };
@@ -1518,6 +1514,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             PopulateRoom(objectsInDatabase);
         }
     }
+
     private List<RfObject> FetchObjectsByProjectId(string projectId)
     {
         Debug.Log("Fetching objects by project ID: " + projectId);
@@ -1608,6 +1605,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return null;
     }
+    
     private void PopulateRoom(List<RfObject> objectsInDatabase)
     {
         Debug.Log("Populating room with objects from database.");

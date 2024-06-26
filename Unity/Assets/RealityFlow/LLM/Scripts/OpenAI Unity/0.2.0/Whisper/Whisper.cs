@@ -7,7 +7,7 @@ using Ubiq.Voip;
 using Microsoft.MixedReality.Toolkit.UX;
 using System.Collections;
 using UnityEngine.InputSystem;
-
+using System.Threading.Tasks;
 namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
@@ -17,7 +17,6 @@ namespace Samples.Whisper
         [SerializeField] private GameObject nearmenutoolbox; // Reference to the nearmenutoolbox
         [SerializeField] private GameObject LLMWindow; // Reference to the LLMWindow
 
-        private readonly string fileName = "output.wav";
         private readonly int maxDuration = 30;
 
         private AudioClip clip;
@@ -100,11 +99,11 @@ namespace Samples.Whisper
         {
             StopCountdown();
         }
-        //Formerly known as start
+
+        // Formerly known as start
         public void InitializeGPT(string apiKey)
         {
-
-            Debug.Log("################################# the apikey is " + apiKey);
+            // Debug.Log("################################# the apikey is " + apiKey);
             muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
             {
@@ -208,6 +207,7 @@ namespace Samples.Whisper
                 return;
             }
 
+            string fileName = GenerateUniqueFileName();
             byte[] data = SaveWav.Save(fileName, clip);
 
             if (data == null)
@@ -218,7 +218,7 @@ namespace Samples.Whisper
 
             var req = new CreateAudioTranscriptionsRequest
             {
-                FileData = new FileData() { Data = data, Name = "audio.wav" },
+                FileData = new FileData() { Data = data, Name = fileName },
                 Model = "whisper-1",
                 Language = "en"
             };
@@ -257,7 +257,7 @@ namespace Samples.Whisper
             }
         }
 
-        public string TranscribeRecording(byte[] data)
+        public async Task<string> TranscribeRecordingAsync(byte[] data)
         {
             if (data == null)
             {
@@ -279,7 +279,7 @@ namespace Samples.Whisper
             }
 
             Debug.Log("Using API key: " + currentApiKey);
-            var res = openai.CreateAudioTranscription(req).Result;
+            var res = await openai.CreateAudioTranscription(req);
             // Write the transcribed text to the MRTKTMPInputField
             //message.text = $"This is what we heard you say, is this correct:\n\n \"{res.Text}\"?";
 
@@ -287,6 +287,11 @@ namespace Samples.Whisper
             Debug.Log("Transcribed message: " + res.Text);
 
             return res.Text;
+        }
+
+        private string GenerateUniqueFileName()
+        {
+            return $"WhisperRecording_{System.DateTime.Now:yyyyMMdd_HHmmss}.wav";
         }
 
         private void Update()
@@ -356,6 +361,7 @@ namespace Samples.Whisper
                 StartCoroutine(chatGPTTester.ExecuteLoggedActionsCoroutine());
             }
         }
+
         // New method to stop the countdown
         public void StopCountdown()
         {
@@ -367,10 +373,10 @@ namespace Samples.Whisper
                 Debug.Log("Countdown stopped.");
             }
         }
+
         public string GetCurrentApiKey()
         {
             return currentApiKey;
         }
-
     }
 }
