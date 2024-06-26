@@ -155,7 +155,12 @@ public class SelectToolManager : MonoBehaviour
         if (!isSelected)
         {
             
-            RealityFlowAPI.Instance.LogActionToServer("Select Mesh", new { SelectedObj = gameObject.name, selectedPos = gameObject.transform.localPosition, selectedRot = gameObject.transform.localRotation, selectedScale = gameObject.transform.localEulerAngles});
+            RealityFlowAPI.Instance.LogActionToServer("Select Mesh", new { 
+                SelectedObj = gameObject.name, 
+                selectedPos = gameObject.transform.localPosition, 
+                selectedRot = gameObject.transform.localRotation, 
+                selectedScale = gameObject.transform.localEulerAngles
+            });
             isSelected = true;
             deselectOnRelease = false;
             MeshSelectionManager.Instance.SelectMesh(gameObject);

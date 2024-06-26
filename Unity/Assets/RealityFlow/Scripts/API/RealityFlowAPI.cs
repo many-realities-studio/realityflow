@@ -32,6 +32,9 @@ using System.Collections;
 using TMPro;
 using RealityFlow.Collections;
 using RealityFlow.Scripting;
+using Newtonsoft.Json.Converters;
+
+
 
 
 
@@ -1068,64 +1071,120 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
     #endregion
 
+    class Vector3Converter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+            => objectType == typeof(Vector3);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                if (objectType.IsNullable() == false)
+                    throw new JsonSerializationException("Cannot convert null value to KeyValuePair.");
+
+                return null;
+            }
+
+            if (reader.TokenType != JsonToken.StartObject)
+                throw new JsonSerializationException("A Vector3 must be deserialized as an object");
+
+            reader.Read();
+
+            Vector3 value = Vector3.zero;
+            while (reader.TokenType == JsonToken.PropertyName)
+            {
+                string property = (string)reader.Value;
+                reader.Read();
+                if (reader.TokenType != JsonToken.Float)
+                    throw new JsonSerializationException("Vector3 properties must be floats");
+                _ = property switch {
+                    "x" => value.x = (float)reader.Value,
+                    "y" => value.y = (float)reader.Value,
+                    "z" => value.z = (float)reader.Value,
+                    _ => throw new JsonSerializationException($"Unknown Vector3 property {property} encountered"),
+                };
+            }
+
+            return value;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            Vector3 vector = (Vector3)value;
+
+            writer.WriteStartObject();
+            writer.WritePropertyName("x");
+            writer.WriteValue(vector.x);
+            writer.WritePropertyName("y");
+            writer.WriteValue(vector.y);
+            writer.WritePropertyName("z");
+            writer.WriteValue(vector.z);
+            writer.WriteEndObject();
+        }
+    }
+
     public void LogActionToServer(string action, object data)
     {
-      var createObject = new GraphQLRequest
+        JsonSerializer ser = new();
+        ser.Converters.Add(new Vector3Converter());
+        var createObject = new GraphQLRequest
         {
             Query = @"
-        mutation LogAction($input2: LogEntryInput!) {
-            addLogEntry(input: $input2) {
-                id  
-            }
-        }",
-        OperationName = "LogAction",
-        Variables = new
-        {
-            input2 = new
+            mutation LogAction($input2: LogEntryInput!) {
+                addLogEntry(input: $input2) {
+                    id  
+                }
+            }",
+            OperationName = "LogAction",
+            Variables = new
             {
-                eventType = action,
-                eventData = JObject.FromObject(data).ToString(),
-            }
-        }
-    };
-    try
-    {
-        var graphQLResponse = client.SendQueryAsync(createObject);
-        if (graphQLResponse["data"] != null)
-        {
-            // Extract the ID from the response and assign it to the rfObject
-            var returnedId = graphQLResponse["data"]["addLogEntry"]["id"].ToString();
-        }
-        else
-        {
-            Debug.LogError("Failed to save object to the database.");
-            foreach (var error in graphQLResponse["errors"])
-            {
-                Debug.LogError($"GraphQL Error: {error["message"]}");
-                if (error["extensions"] != null)
+                input2 = new
                 {
-                    Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    eventType = action,
+                    eventData = JObject.FromObject(data, ser).ToString(),
+                }
+            }
+        };
+        try
+        {
+            var graphQLResponse = client.SendQueryAsync(createObject);
+            if (graphQLResponse["data"] != null)
+            {
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse["data"]["addLogEntry"]["id"].ToString();
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
                 }
             }
         }
-      }
-      catch (HttpRequestException httpRequestException)
-      {
-          Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-      }
-      catch (IOException ioException)
-      {
-          Debug.LogError("IOException: " + ioException.Message);
-      }
-      catch (SocketException socketException)
-      {
-          Debug.LogError("SocketException: " + socketException.Message);
-      }
-      catch (Exception ex)
-      {
-          Debug.LogError("General Exception: " + ex.Message);
-      }
+        catch (HttpRequestException httpRequestException)
+        {
+            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Debug.LogError("IOException: " + ioException.Message);
+        }
+        catch (SocketException socketException)
+        {
+            Debug.LogError("SocketException: " + socketException.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("General Exception: " + ex.Message);
+        }
     }
+
     #region Spawn Object
     public GameObject SpawnObject(string prefabName, Vector3 spawnPosition,
         Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
