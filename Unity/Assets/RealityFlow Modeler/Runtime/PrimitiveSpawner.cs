@@ -21,6 +21,7 @@ public enum PrimitiveSpawningMode
 public class PrimitiveSpawner : MonoBehaviour
 {
     [SerializeField] public GameObject primitive;
+    [SerializeField] public GameObject proxy;
     [SerializeField] private XRRayInteractor rayInteractor;
     [SerializeField] private GameObject leftHand;
     [SerializeField] private GameObject rightHand;
@@ -150,7 +151,7 @@ public class PrimitiveSpawner : MonoBehaviour
             DestroyProxy();
         }
 
-        attachedObject = NetworkSpawnManager.Find(this).SpawnWithPeerScope(primitive);
+        attachedObject = NetworkSpawnManager.Find(this).SpawnWithPeerScope(proxy);
         EditableMesh mesh = PrimitiveGenerator.CreatePrimitive(currentShapeType);
         EditableMesh em = attachedObject.GetComponent<EditableMesh>();
 

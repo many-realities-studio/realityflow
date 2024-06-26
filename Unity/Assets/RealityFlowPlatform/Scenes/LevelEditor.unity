@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1545,6 +1545,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   primitive: {fileID: 1524904045447331170, guid: c1fb14bc60f236a4180dcfa0e873e9ab,
     type: 3}
+  proxy: {fileID: 1524904045447331170, guid: b7f5d6affb11e174c92d17ac2b24069d, type: 3}
   rayInteractor: {fileID: 0}
   leftHand: {fileID: 2074521085}
   rightHand: {fileID: 1463912187}
@@ -7490,7 +7491,7 @@ PrefabInstance:
     - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
@@ -7500,7 +7501,7 @@ PrefabInstance:
     - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: cameraSettings.simulationEnabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2471102458936864900, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
@@ -7570,7 +7571,7 @@ PrefabInstance:
     - target: {fileID: 7585035320575375756, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10839,7 +10840,7 @@ MonoBehaviour:
   loginMenu: {fileID: 323530833}
   levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  server: http://localhost:4000/
+  server: https://reality.gaim.ucf.edu/
   graphQLRoute: graphql
 --- !u!114 &2142340402
 MonoBehaviour:
