@@ -46,19 +46,19 @@ namespace RealityFlow.Scripting
             if (init)
                 return;
 
-            // references = Resources.LoadAll<AssemblyReferenceAsset>("AssemblyReferences/")
-            //     .Select(asm => asm.CompilerReference)
-            //     .ToList();
+            references = Resources.LoadAll<AssemblyReferenceAsset>("AssemblyReferences/")
+                .Select(asm => asm.CompilerReference)
+                .ToList();
 
             compilation = CSharpCompilation.Create(null)
-                // .AddReferences(references)
-                .AddReferences(
-                    System.AppDomain
-                    .CurrentDomain
-                    .GetAssemblies()
-                    .Where(asm => !asm.IsDynamic)
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location))
-                )
+                .AddReferences(references)
+                // .AddReferences(
+                //     System.AppDomain
+                //     .CurrentDomain
+                //     .GetAssemblies()
+                //     .Where(asm => !asm.IsDynamic)
+                //     .Select(asm => MetadataReference.CreateFromFile(asm.Location))
+                // )
                 .WithOptions(new CSharpCompilationOptions(
                     OutputKind.DynamicallyLinkedLibrary,
                     reportSuppressedDiagnostics: false
