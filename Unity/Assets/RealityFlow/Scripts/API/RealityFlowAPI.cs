@@ -64,6 +64,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public GameObject whiteboardPrefab;
     public static GameObject NearMenuToolbox;
     public GameObject nearMenuReference;
+    public Action OnLeaveRoom;
 
     public static GameObject DeleteMenu;
     public GameObject delteMenuReference;
@@ -96,7 +97,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public IEnumerable<GameObject> Templates => templates;
     public Action OnTemplatesChanged;
     [SerializeField]
-    public GameObject audioPlayer; 
+    public GameObject audioPlayer;
 
     public enum SpawnScope
     {
@@ -167,6 +168,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // assign the near menu toolbox
         NearMenuToolbox = nearMenuReference;
         DeleteMenu = delteMenuReference;
+    }
+
+    public void LeaveRoom()
+    {
+        client.LeaveRoom();
+        OnLeaveRoom?.Invoke();
     }
 
     // ===== SUPPORT FUNCTIONS =====
@@ -465,16 +472,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         RfObject rfObj = SpawnedObjects[obj.gameObject];
 
-        if(rfObj.isStatic)
+        if (rfObj.isStatic)
         {
-            if(obj.gameObject.GetComponent<Rigidbody>() != null)
+            if (obj.gameObject.GetComponent<Rigidbody>() != null)
             {
                 obj.gameObject.GetComponent<Rigidbody>().isKinematic = true;
                 obj.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
             }
-        } else
+        }
+        else
         {
-            if(obj.gameObject.GetComponent<Rigidbody>() != null)
+            if (obj.gameObject.GetComponent<Rigidbody>() != null)
             {
                 obj.gameObject.GetComponent<Rigidbody>().isKinematic = false;
                 obj.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
@@ -505,7 +513,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void SetUIText(GameObject textComp, string text)
     {
         // TODO: Network
-        
+
         textComp.GetComponent<TMP_Text>().text = text;
     }
 
@@ -1098,7 +1106,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 reader.Read();
                 if (reader.TokenType != JsonToken.Float)
                     throw new JsonSerializationException("Vector3 properties must be floats");
-                _ = property switch {
+                _ = property switch
+                {
                     "x" => value.x = (float)(double)reader.Value,
                     "y" => value.y = (float)(double)reader.Value,
                     "z" => value.z = (float)(double)reader.Value,
@@ -1106,7 +1115,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 };
                 reader.Read();
             }
-            
+
             if (reader.TokenType != JsonToken.EndObject)
                 throw new JsonSerializationException("A Vector3 must be be ended with EndObject");
 
@@ -1314,7 +1323,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // var tetheredPlacement = spawnedObject.AddComponent<TetheredPlacement>();
                     // tetheredPlacement.GetType().GetField("distanceThreshold", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(tetheredPlacement, 20.0f);
 
-                    
+
 
                     // Add NetworkedOperationCache script
                     // if (spawnedObject.GetComponent<NetworkedOperationCache>() == null)
@@ -1323,13 +1332,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // }
 
                     // Add ObjectManipulator
-                        
+
                     // Add whiteboard attatch
-                    if(spawnedObject.GetComponent<AttachedWhiteboard>() == null)
+                    if (spawnedObject.GetComponent<AttachedWhiteboard>() == null)
                     {
                         spawnedObject.AddComponent<AttachedWhiteboard>();
                     }
-                    
+
 
                 }
                 if (scope == SpawnScope.Room)
@@ -1578,7 +1587,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
 
             var graphQLResponse = client.SendQueryAsync(saveObject);
-            if (graphQLResponse["data"] != null && graphQLResponse["errors"]==null)
+            if (graphQLResponse["data"] != null && graphQLResponse["errors"] == null)
             {
                 Debug.Log("Object saved to the database successfully.");
 
@@ -1587,7 +1596,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 rfObject.id = returnedId;
                 Debug.Log($"Assigned ID from database: {rfObject.id}");
 
-        // Update the name of the spawned object in the scene
+                // Update the name of the spawned object in the scene
                 GameObject spawnedObject = spawnedObjectsById[rfObject.id];//GameObject.Find(rfObject.name);
                 if (spawnedObject != null)
                 {
@@ -1731,7 +1740,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return null;
     }
-    
+
     private void PopulateRoom(List<RfObject> objectsInDatabase)
     {
         Debug.Log("Populating room with objects from database.");

@@ -33,6 +33,8 @@ namespace RealityFlow.NodeUI
                 Destroy(gameObject);
             else
                 Instance = this;
+
+            RealityFlowAPI.Instance.OnLeaveRoom += () => gameObject.SetActive(false);
         }
 
         public void ShowForObject(VisualScript obj)
