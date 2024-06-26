@@ -68,7 +68,7 @@ public class PaletteSpawner : MonoBehaviour
             PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
             phm.paletteManager = gameObject;
             // Got it -- It needs two OnButtonPress components on the same gameObject as the PaletteManager
-            phm.right = GetComponents<OnButtonPress>()[0];
+            phm.right = GetComponent<OnButtonPress>();
             // phm.right = GetComponents<OnButtonPress>()[1];
             // phm.left.enabled = false;
 
@@ -93,12 +93,12 @@ public class PaletteSpawner : MonoBehaviour
             // Hide the opposite palette when spawning in palette for the first time
             if (paletteSwitcher.networkedPlayManager.playMode)
             {
-                Debug.Log("Paly mode is on when you joined");
-                palette.transform.localScale = new Vector3(0, 0, 0);
+                Debug.Log("Play mode is on when you joined");
+                palette.transform.localScale = Vector3.zero;
             }
             else
             {
-                playPalette.transform.localScale = new Vector3(0, 0, 0);
+                playPalette.transform.localScale = Vector3.zero;
             }
         }
 
@@ -117,13 +117,9 @@ public class PaletteSpawner : MonoBehaviour
 
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
-            {
-                playPalette.transform.localScale = new Vector3(0, 0, 0);
-            }
+                playPalette.transform.localScale = Vector3.zero;
             else
-            {
-                palette.transform.localScale = new Vector3(0, 0, 0);
-            }
+                palette.transform.localScale = Vector3.zero;
 
             paletteShown = false;
         }
@@ -135,8 +131,8 @@ public class PaletteSpawner : MonoBehaviour
             {
                 PaletteHandManager phm = palette.GetComponent<PaletteHandManager>();
                 phm.disableControllerOnReopen();
-
             }
+            
             // Hide the current palette that is being used
             if (paletteSwitcher.networkedPlayManager.playMode)
             {
@@ -171,15 +167,9 @@ public class PaletteSpawner : MonoBehaviour
     {
         // Switch the grip buttons depending on the dominant hand
         if (isLeftHandDominant)
-        {
             gameObject.GetComponents<OnButtonPress>()[0].enabled = false;
-            gameObject.GetComponents<OnButtonPress>()[1].enabled = true;
-        }
         else
-        {
             gameObject.GetComponents<OnButtonPress>()[0].enabled = true;
-            gameObject.GetComponents<OnButtonPress>()[1].enabled = false;
-        }
     }
 
     private void SwitchPalettes(bool isPlayMode)

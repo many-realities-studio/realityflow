@@ -1094,7 +1094,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (graphQLResponse["data"] != null)
         {
             // Extract the ID from the response and assign it to the rfObject
-            var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+            var returnedId = graphQLResponse["data"]["addLogEntry"]["id"].ToString();
         }
         else
         {

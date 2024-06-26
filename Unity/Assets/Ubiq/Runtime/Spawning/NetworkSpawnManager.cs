@@ -354,6 +354,7 @@ namespace Ubiq.Spawning
 
             return go;
         }
+
     public void SpawnWithRoomScope(GameObject gameObject)
     {
         var key = $"{ propertyPrefix }{ NetworkId.Unique() }"; // Uniquely id the whole object
@@ -383,7 +384,6 @@ namespace Ubiq.Spawning
             catalogueIndex = catalogueIdx,
         });
     }
-
 
         private static NetworkId ParseNetworkId(string key, string propertyPrefix)
         {
