@@ -33,27 +33,25 @@ public class RealityFlowClient : MonoBehaviour
     public GameObject levelEditor;
     public RoomClient roomClient;
     private string currentProjectId;
-
-    // GraphQL client and access token variables
     public Dictionary<string, string> userDecoded;
-    // public bool debug = true;
-#if REALITYFLOW_LIVE
-    public string server = @"https://reality.gaim.ucf.edu/";
-#else
-    public string server = @"http://localhost:4000/";
-#endif
     public string graphQLRoute = "graphql";
     public event Action<bool> LoginSuccess;
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
     public event Action OnRoomCreated;
 
+    private static RealityFlowClient rootRealityFlowClient;
+
+    #if REALITYFLOW_LIVE
+        public string server = @"https://reality.gaim.ucf.edu/";
+    #else
+        public string server = @"http://localhost:4000/";
+    #endif
+
     private void Awake()
     {
-        // if(debug==true) {
-        // server = @"http://localhost:4000/";
-        // }
         Debug.Log(" === RealityFlowClient Awake === ");
+
         // Ensure only one instance
         if (transform.parent == null)
         {
@@ -118,7 +116,7 @@ public class RealityFlowClient : MonoBehaviour
     }
 
     public void Start() {
-              // Check to see if PlayerPrefs already has an access token
+        // Check to see if PlayerPrefs already has an access token
         if (string.IsNullOrEmpty(accessToken))
         {
             // Debug.Log("Access token is null or empty.");
@@ -132,21 +130,128 @@ public class RealityFlowClient : MonoBehaviour
 
     }
 
-    public string GetCurrentProjectId()
+    #region Utility Methods
+    public static RealityFlowClient Find(MonoBehaviour component)
     {
-        return currentProjectId;
+        return Find(component.transform);
     }
 
-    private static RealityFlowClient rootRealityFlowClient;
+    public static RealityFlowClient Find(Transform component)
+    {
+        // Check if the scene is simply a parent, or if we can find a root scene.
+        // var scene = component.GetComponentInParent<RealityFlowClient>();
+        var scene = NetworkScene.Find(component);
+        var rootRealityFlowClient = scene.GetComponentInChildren<RealityFlowClient>();
+        if (rootRealityFlowClient != null)
+        {
+            return rootRealityFlowClient;
+        }
+        return null;
+    }
 
-    // ========= LOGIN/AUTHORIZAITON FUNCTIONS =========
+    public static Dictionary<string, string> DecodeJwt(string jwt)
+    {
+        string[] jwtParts = jwt.Split('.');
+        byte[] decodedPayload = FromBase64Url(jwtParts[1]);
+        string decodedText = Encoding.UTF8.GetString(decodedPayload);
 
+        Dictionary<string, string> jwtPayload = JsonConvert.DeserializeObject<Dictionary<string, string>>(decodedText);
+
+        return jwtPayload;
+    }
+
+    static byte[] FromBase64Url(string base64Url)
+    {
+        string padded = base64Url.Length % 4 == 0
+        ? base64Url : base64Url + "====".Substring(base64Url.Length % 4);
+        string base64 = padded.Replace("_", "/").Replace("-", "+");
+        return Convert.FromBase64String(base64);
+    }
+
+    public JObject SendQueryAsync(GraphQLRequest payload)
+    {
+        // Describe request
+        UnityWebRequest request = UnityWebRequest.Post(server + graphQLRoute,
+        JsonConvert.SerializeObject(payload), "application/json");
+        if (accessToken != null && accessToken != "")
+            request.SetRequestHeader("Authorization", "Bearer " + accessToken);
+
+        // Send request
+        // TODO: Actually make this occur over multiple frames by way of coroutines. 
+        // Seems to take 50-100ms on a decent connection, which will drop multiple frames if not
+        // asynchronous.
+        double start = Time.realtimeSinceStartupAsDouble;
+        UnityWebRequestAsyncOperation task = request.SendWebRequest();
+        while (!task.isDone)
+            Thread.Sleep(1);
+        double end = Time.realtimeSinceStartupAsDouble;
+        Debug.Log($"Query took {(end - start) * 1000}ms to complete");
+
+        // Handle response
+        JObject response = null;
+
+        // Handle network issues
+        if (request.result != UnityWebRequest.Result.Success
+                && request.downloadHandler.text == "")
+        {
+            response = new JObject();
+            var errors = new JArray();
+            var error = new JObject();
+            var errorExtensions = new JObject();
+
+            error.Add("message", request.error);
+            errorExtensions.Add("code", "INTERNAL_SERVER_ERROR");
+            error.Add("extensions", errorExtensions);
+            errors.Add(error);
+
+            error = new JObject();
+            error.Add("message", request.downloadHandler.text);
+            errors.Add(error);
+
+            response.Add("errors", errors);
+        }
+
+        // Handle response
+        if (response == null)
+        {
+            try
+            {
+                // Debug.Log(request.downloadHandler.text);
+                response = JsonConvert.DeserializeObject<JObject>(
+                    request.downloadHandler.text // This is failing
+                );
+            }
+            catch (Exception e)
+            {
+                Debug.Log(response);
+                Debug.LogError(e);
+                return new JObject();
+            }
+        }
+
+        // Display any errors
+        if (response["errors"] != null)
+        {
+            Debug.LogError("GraphQL Errors");
+            foreach (JObject error in response["errors"])
+            {
+                Debug.LogError(error["message"]);
+            }
+        }
+
+        return response;
+    }
+
+    #endregion
+
+    #region Login Methods
     private void ShowOTP()
     {
         projectManager.SetActive(false);
         loginMenu.gameObject.SetActive(true);
         loginMenu.onOTPSubmitted += SubmitOTP;
     }
+
     public void SubmitOTP(string otp)
     {
 
@@ -182,66 +287,6 @@ public class RealityFlowClient : MonoBehaviour
         {
             Debug.Log(errors[0]["message"]);
         }
-    }
-
-    public void CreateProject()
-    {
-        /* Create project input
-        input CreateProjectInput{
-        projectName: String,
-        projectOwnerId: String,
-        description: String,
-        details: String,
-        thumbnailImg: String,
-        categories: [String]
-        isPublic: Boolean
-        gallery: [String]
-        publicUrl: String,
-        globalId: String
-
-        createProject(input: CreateProjectInput) :Project!
-
-        */
-        // Create a new project with reasonable defaults and then open it
-        var createProject = new GraphQLRequest
-        {
-            Query = @"
-                mutation CreateProject($input: CreateProjectInput!) {
-                    createProject(input: $input) {
-                        id
-                    }
-                }
-            ",
-            OperationName = "CreateProject",
-            Variables = new
-            {
-                input = new
-                {
-                    projectName = "New Project " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    projectOwnerId = userDecoded["id"],
-                    description = "A new project",
-                    details = "A new project",
-                    thumbnailImg = "https://via.placeholder.com/150",
-                    categories = new string[] { "Education" },
-                    isPublic = false,
-                    gallery = new string[] { "https://via.placeholder.com/150" },
-                    publicUrl = "https://reality.gaim.ucf.edu/",
-                    globalId = "New Project"
-                }
-            }
-        };
-        var graphQL = SendQueryAsync(createProject);
-        if (graphQL["data"] != null)
-        {
-            Debug.Log("Room created successfully");
-            SetCurrentProject((string)graphQL["data"]["createProject"]["id"]);
-            CreateRoom();
-        }
-        else
-        {
-            Debug.LogError("Failed to create room: Room may already exist.");
-        }
-
     }
 
     public void Login(string inputAccessToken)
@@ -292,9 +337,127 @@ public class RealityFlowClient : MonoBehaviour
         // Debug.Log("RoomClient successfully initialized and listener added.");
     }
 
-    // ========= CREATE ROOM ============================
-    // Wrapper method to call RoomManager's CreateRoom
+    #endregion
 
+    #region Project Methods
+
+    public void CreateProject()
+    {
+        // Create a new project with reasonable defaults and then open it
+        var createProject = new GraphQLRequest
+        {
+            Query = @"
+                mutation CreateProject($input: CreateProjectInput!) {
+                    createProject(input: $input) {
+                        id
+                    }
+                }
+            ",
+            OperationName = "CreateProject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectName = "New Project " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    projectOwnerId = userDecoded["id"],
+                    description = "A new project",
+                    details = "A new project",
+                    thumbnailImg = "https://via.placeholder.com/150",
+                    categories = new string[] { "Education" },
+                    isPublic = false,
+                    gallery = new string[] { "https://via.placeholder.com/150" },
+                    publicUrl = "https://reality.gaim.ucf.edu/",
+                    globalId = "New Project"
+                }
+            }
+        };
+        var graphQL = SendQueryAsync(createProject);
+        if (graphQL["data"] != null)
+        {
+            Debug.Log("Room created successfully");
+            SetCurrentProject((string)graphQL["data"]["createProject"]["id"]);
+            CreateRoom();
+        }
+        else
+        {
+            Debug.LogError("Failed to create room: Room may already exist.");
+        }
+
+    }
+
+    public void OpenProject(string id)
+    {
+        Debug.Log("Opening project with ID: " + id);
+        SetCurrentProject(id);
+        // Create a new GraphQL query request to get the project details by ID.
+        var GetProjectData = new GraphQLRequest
+        {
+            Query = @"
+                query GetProjectById($getProjectByIdId: String) {
+                    getProjectById(id: $getProjectByIdId) {
+                        projectName
+                        gallery
+                        description
+                        projectOwner {
+                            username
+                        }
+                        rooms {
+                            id
+                            udid
+                            joinCode
+                            isEditable
+                            creatorId
+                        }
+                    }
+                }
+                ",
+            OperationName = "GetProjectById",
+            Variables = new { getProjectByIdId = id }
+        };
+
+        // Send the query request asynchronously and wait for the response.
+        var graphQL = SendQueryAsync(GetProjectData);
+        var projectdata = graphQL["data"];
+        if (projectdata != null)
+        {
+           //Debug.Log("Fetched project data: " + projectdata.ToString());
+
+            // Set the project details in the UI
+            OnProjectUpdated.Invoke((JObject)projectdata);
+            var roomsData = projectdata["getProjectById"]["rooms"];
+            if (roomsData != null)
+            {
+                //Debug.Log("Fetched rooms data: " + roomsData.ToString());
+                //Debug.Log("Rooms: " + roomsData.ToString());
+                OnRoomsReceived.Invoke(roomsData as JArray);
+            }
+            else
+            {
+                Debug.LogError("Failed to fetch rooms data");
+            }
+            // GetRoomsByProjectId(id);
+        }
+        else
+        {
+            Debug.LogError("Failed to fetch project data");
+        }
+    }
+
+    public string GetCurrentProjectId()
+    {
+        return currentProjectId;
+    }
+
+    public void SetCurrentProject(string projectId)
+    {
+        //Debug.Log("Setting current project ID to: " + projectId);
+        currentProjectId = projectId;
+        PlayerPrefs.SetString("currentProjectId", currentProjectId);
+    }
+
+    #endregion
+
+    #region Room Methods
     public void CreateRoom()
     {
         // Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
@@ -385,6 +548,48 @@ public class RealityFlowClient : MonoBehaviour
         OnRoomCreated?.Invoke();
     }
 
+    public void JoinRoom(string joinCode)
+    {
+        Debug.Log("Joining room for project: " + currentProjectId); // Log the project ID
+        Debug.Log("Joining room with join code: " + joinCode); // Log the join code
+
+        // Check if a project is selected
+        if (string.IsNullOrEmpty(currentProjectId))
+        {
+            Debug.LogError("No project selected");
+            return;
+        }
+        projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
+
+        roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
+
+        Debug.Log("-RIGHT BEFORE EVENT CALL-");
+        roomClient.Join(joinCode); // Join Room Based on Room Code
+        Debug.Log("-RIGHT AFTER EVENT CALL-");
+    }
+
+    private void OnJoinedExistingRoom(IRoom room)
+    {
+        Debug.Log("Joined room: " + room.Name);
+        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
+        Debug.Log(room.Name + " UUID: " + room.UUID);
+        Debug.Log(room.Name + " Publish: " + room.Publish);
+
+        roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
+    }
+
+    public void LeaveRoom()
+    {
+        Debug.Log("=== LEAVING ROOM ==="); // Log the project ID
+        roomClient.Join("", false);
+
+        RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
+        // levelEditor.SetActive(false);
+        projectManager.SetActive(true);
+
+        
+    }
+
     private void KeepRoomAlive()
     {
         // Create a new room using the GraphQL API
@@ -417,227 +622,6 @@ public class RealityFlowClient : MonoBehaviour
         }
     }
 
-    //  ==============   JOIN ROOM   ======================
-    public void JoinRoom(string joinCode)
-    {
-        Debug.Log("Joining room for project: " + currentProjectId); // Log the project ID
-        Debug.Log("Joining room with join code: " + joinCode); // Log the join code
-
-        // Check if a project is selected
-        if (string.IsNullOrEmpty(currentProjectId))
-        {
-            Debug.LogError("No project selected");
-            return;
-        }
-        projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
-
-        roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
-
-        Debug.Log("-RIGHT BEFORE EVENT CALL-");
-        roomClient.Join(joinCode); // Join Room Based on Room Code
-        Debug.Log("-RIGHT AFTER EVENT CALL-");
-    }
-    private void OnJoinedExistingRoom(IRoom room)
-    {
-        Debug.Log("Joined room: " + room.Name);
-        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
-        Debug.Log(room.Name + " UUID: " + room.UUID);
-        Debug.Log(room.Name + " Publish: " + room.Publish);
-
-        roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
-    }
-
-    // ========= LEAVE ROOM =========
-    public void LeaveRoom()
-    {
-        Debug.Log("=== LEAVING ROOM ==="); // Log the project ID
-        roomClient.Join("", false);
-
-        RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
-        // levelEditor.SetActive(false);
-        projectManager.SetActive(true);
-
-        
-    }
-
-    public JObject SendQueryAsync(GraphQLRequest payload)
-    {
-        // Describe request
-        UnityWebRequest request = UnityWebRequest.Post(server + graphQLRoute,
-        JsonConvert.SerializeObject(payload), "application/json");
-        if (accessToken != null && accessToken != "")
-            request.SetRequestHeader("Authorization", "Bearer " + accessToken);
-
-        // Send request
-        // TODO: Actually make this occur over multiple frames by way of coroutines. 
-        // Seems to take 50-100ms on a decent connection, which will drop multiple frames if not
-        // asynchronous.
-        double start = Time.realtimeSinceStartupAsDouble;
-        UnityWebRequestAsyncOperation task = request.SendWebRequest();
-        while (!task.isDone)
-            Thread.Sleep(1);
-        double end = Time.realtimeSinceStartupAsDouble;
-        Debug.Log($"Query took {(end - start) * 1000}ms to complete");
-
-        // Handle response
-        JObject response = null;
-
-        // Handle network issues
-        if (request.result != UnityWebRequest.Result.Success
-                && request.downloadHandler.text == "")
-        {
-            response = new JObject();
-            var errors = new JArray();
-            var error = new JObject();
-            var errorExtensions = new JObject();
-
-            error.Add("message", request.error);
-            errorExtensions.Add("code", "INTERNAL_SERVER_ERROR");
-            error.Add("extensions", errorExtensions);
-            errors.Add(error);
-
-            error = new JObject();
-            error.Add("message", request.downloadHandler.text);
-            errors.Add(error);
-
-            response.Add("errors", errors);
-        }
-
-        // Handle response
-        if (response == null)
-        {
-            try
-            {
-                // Debug.Log(request.downloadHandler.text);
-                response = JsonConvert.DeserializeObject<JObject>(
-                    request.downloadHandler.text // This is failing
-                );
-            }
-            catch (Exception e)
-            {
-                Debug.Log(response);
-                Debug.LogError(e);
-                return new JObject();
-            }
-        }
-
-        // Display any errors
-        if (response["errors"] != null)
-        {
-            Debug.LogError("GraphQL Errors");
-            foreach (JObject error in response["errors"])
-            {
-                Debug.LogError(error["message"]);
-            }
-        }
-
-        return response;
-    }
-
-
-    public void SetCurrentProject(string projectId)
-    {
-        //Debug.Log("Setting current project ID to: " + projectId);
-        currentProjectId = projectId;
-        PlayerPrefs.SetString("currentProjectId", currentProjectId);
-    }
-    // Function to decode the JWT token
-    public static Dictionary<string, string> DecodeJwt(string jwt)
-    {
-        string[] jwtParts = jwt.Split('.');
-        byte[] decodedPayload = FromBase64Url(jwtParts[1]);
-        string decodedText = Encoding.UTF8.GetString(decodedPayload);
-
-        Dictionary<string, string> jwtPayload = JsonConvert.DeserializeObject<Dictionary<string, string>>(decodedText);
-
-        return jwtPayload;
-    }
-
-    // Function to convert the base64 URL to byte array
-    static byte[] FromBase64Url(string base64Url)
-    {
-        string padded = base64Url.Length % 4 == 0
-        ? base64Url : base64Url + "====".Substring(base64Url.Length % 4);
-        string base64 = padded.Replace("_", "/").Replace("-", "+");
-        return Convert.FromBase64String(base64);
-    }
-    public static RealityFlowClient Find(MonoBehaviour component)
-    {
-        return Find(component.transform);
-    }
-
-    public static RealityFlowClient Find(Transform component)
-    {
-        // Check if the scene is simply a parent, or if we can find a root scene.
-        // var scene = component.GetComponentInParent<RealityFlowClient>();
-        var scene = NetworkScene.Find(component);
-        var rootRealityFlowClient = scene.GetComponentInChildren<RealityFlowClient>();
-        if (rootRealityFlowClient != null)
-        {
-            return rootRealityFlowClient;
-        }
-        return null;
-    }
-
-    public void OpenProject(string id)
-    {
-        Debug.Log("Opening project with ID: " + id);
-        SetCurrentProject(id);
-        // Create a new GraphQL query request to get the project details by ID.
-        var GetProjectData = new GraphQLRequest
-        {
-            Query = @"
-                query GetProjectById($getProjectByIdId: String) {
-                    getProjectById(id: $getProjectByIdId) {
-                        projectName
-                        gallery
-                        description
-                        projectOwner {
-                            username
-                        }
-                        rooms {
-                            id
-                            udid
-                            joinCode
-                            isEditable
-                            creatorId
-                        }
-                    }
-                }
-                ",
-            OperationName = "GetProjectById",
-            Variables = new { getProjectByIdId = id }
-        };
-
-        // Send the query request asynchronously and wait for the response.
-        var graphQL = SendQueryAsync(GetProjectData);
-        var projectdata = graphQL["data"];
-        if (projectdata != null)
-        {
-           //Debug.Log("Fetched project data: " + projectdata.ToString());
-
-            // Set the project details in the UI
-            OnProjectUpdated.Invoke((JObject)projectdata);
-            var roomsData = projectdata["getProjectById"]["rooms"];
-            if (roomsData != null)
-            {
-                //Debug.Log("Fetched rooms data: " + roomsData.ToString());
-                //Debug.Log("Rooms: " + roomsData.ToString());
-                OnRoomsReceived.Invoke(roomsData as JArray);
-            }
-            else
-            {
-                Debug.LogError("Failed to fetch rooms data");
-            }
-            // GetRoomsByProjectId(id);
-        }
-        else
-        {
-            Debug.LogError("Failed to fetch project data");
-        }
-    }
-
-    // Function to get the rooms associated with the project
     public void GetRoomsByProjectId(string projectId)
     {
         var getRooms = new GraphQLRequest
@@ -671,4 +655,6 @@ public class RealityFlowClient : MonoBehaviour
         }
         OnRoomsReceived?.Invoke(rooms);
     }
+
+    #endregion
 }
