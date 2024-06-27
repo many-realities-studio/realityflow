@@ -16,7 +16,7 @@ namespace RealityFlow.Collections
 
         public void OnBeforeSerialize()
         {
-            listDict ??= this.Select(pair => (pair.Key, pair.Value).Ser()).ToList();
+            listDict = this.Select(pair => (pair.Key, pair.Value).Ser()).ToList();
         }
 
         public void OnAfterDeserialize()

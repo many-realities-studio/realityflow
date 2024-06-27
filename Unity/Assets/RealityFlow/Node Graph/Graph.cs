@@ -494,6 +494,8 @@ namespace RealityFlow.NodeGraph
             variables ??= new();
 
             List<NodeIndex> invalidNodes = new();
+            List<(PortIndex, PortIndex)> invalidDataEdges = new();
+            List<(PortIndex, NodeIndex)> invalidExecEdges = new();
 
             foreach ((NodeIndex index, Node node) in nodes)
                 if (node.Definition != null)
@@ -506,12 +508,18 @@ namespace RealityFlow.NodeGraph
 
             foreach ((PortIndex to, PortIndex from) in reverseEdges)
                 if (!ContainsNode(to.Node) || !ContainsNode(from.Node))
-                    RemoveDataEdge(from, to);
+                    invalidDataEdges.Add((from, to));
+
+            foreach ((PortIndex from, PortIndex to) in invalidDataEdges)
+                RemoveDataEdge(from, to);
 
             foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in executionEdges)
                 foreach (NodeIndex to in tos)
                     if (!ContainsNode(from.Node) || !ContainsNode(to))
-                        RemoveExecutionEdge(from, to);
+                        invalidExecEdges.Add((from, to));
+
+            foreach ((PortIndex from, NodeIndex to) in invalidExecEdges)
+                RemoveExecutionEdge(from, to);
         }
     }
 }
