@@ -7577,7 +7577,7 @@ PrefabInstance:
     - target: {fileID: 7585035320575375756, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12645,6 +12645,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
+      propertyPath: m_UseForceGrab
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
       propertyPath: m_HitClosestOnly
       value: 1
       objectReference: {fileID: 0}
@@ -12653,6 +12658,11 @@ PrefabInstance:
       propertyPath: m_AttachTransform
       value: 
       objectReference: {fileID: 684807928}
+    - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_AllowAnchorControl
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_MaxRaycastDistance
@@ -12779,6 +12789,11 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2313746689446656021, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2321700287067084806, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -13354,7 +13369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8676e655248d62469367ef11154188c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distanceThreshold: 25
+  distanceThreshold: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
