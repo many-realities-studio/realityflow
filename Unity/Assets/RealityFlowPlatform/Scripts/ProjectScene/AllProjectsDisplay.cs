@@ -12,12 +12,12 @@ using UnityEngine.UI;
 public class ProjectDisplay : MonoBehaviour
 {
     // UI elements
-    public GameObject projectPrefab;       
-    public GameObject projectDetailPanel;  
-    public GameObject projectTitle;        
-    public GameObject projectDescription;  
-    public GameObject projectOwner; 
-    public Transform parentContent; 
+    public GameObject projectPrefab;
+    public GameObject projectDetailPanel;
+    public GameObject projectTitle;
+    public GameObject projectDescription;
+    public GameObject projectOwner;
+    public Transform parentContent;
     private JObject data;
     public bool tutorialsOnly;
 
@@ -35,7 +35,8 @@ public class ProjectDisplay : MonoBehaviour
         rfClient.OnProjectUpdated += UpdateProject;
     }
 
-    private void UpdateProject(JObject project) {
+    private void UpdateProject(JObject project)
+    {
         projectDetailPanel.SetActive(true); // Set the project detail panel to active
         projectTitle.GetComponent<TextMeshProUGUI>().text = (string)project["getProjectById"]["projectName"];
         projectDescription.GetComponent<TextMeshProUGUI>().text = (string)project["getProjectById"]["description"];
@@ -65,24 +66,24 @@ public class ProjectDisplay : MonoBehaviour
         };
 
         // Send the query request asynchronously and wait for the response.
-        var queryResult = rfClient.SendQueryAsync(publicProjectsQuery);
+        var queryResult = rfClient.SendQueryBlocking(publicProjectsQuery);
         var data = queryResult["data"];  // Store the data received from the query
 
         // If the data is not null, display the projects on the platform.
         if (data != null)
         {
             Debug.Log("data isn't null");
-                        // Get the list of projects from the data
+            // Get the list of projects from the data
             var projects = (JArray)data["getPublicProjects"];
             for (int i = 0; i < projects.Count; i++)
             {
-            // if(tutorialsOnly && !(projects[i]["isTutorial"] != null && projects[i]["isTutorial"] )) {
-            //   continue;
-            //   }
+                // if(tutorialsOnly && !(projects[i]["isTutorial"] != null && projects[i]["isTutorial"] )) {
+                //   continue;
+                //   }
                 var project = GameObject.Instantiate(projectPrefab, transform.GetChild(0).GetChild(0).transform);  // Instantiate the project prefab
                 var children = new List<GameObject>();
                 project.GetChildGameObjects(children);  // Get the child game objects of the project prefab
-                foreach (var child in children)             
+                foreach (var child in children)
                 {
                     if (child.name == "ProjectInfo")
                     {
@@ -99,9 +100,9 @@ public class ProjectDisplay : MonoBehaviour
                             else if (c.name == "Categories")
                             {
                                 int x = i;
-                                c.GetComponent<TextMeshProUGUI>().text = string.Join(" | ",projects[x]["categories"]);
+                                c.GetComponent<TextMeshProUGUI>().text = string.Join(" | ", projects[x]["categories"]);
                             }
-    
+
                             else if (c.name == "Publicity")
                             {
                                 int x = i;
@@ -115,8 +116,9 @@ public class ProjectDisplay : MonoBehaviour
                     {
                         int x = i;
                         child.GetComponent<Button>().onClick
-                            .AddListener(delegate { 
-                                rfClient.OpenProject((string)projects[x]["id"]); 
+                            .AddListener(delegate
+                            {
+                                rfClient.OpenProject((string)projects[x]["id"]);
                             });
                     }
 
@@ -155,7 +157,7 @@ public class ProjectDisplay : MonoBehaviour
         return Convert.FromBase64String(base64);
     }
 
-        // Function to display the rooms in the project
+    // Function to display the rooms in the project
     private void displayRooms(JArray rooms)
     {
         foreach (Transform child in roomsContent)
@@ -181,7 +183,7 @@ public class ProjectDisplay : MonoBehaviour
     }
     // Wrapper method to call RoomManager's JoinRoom
     public void CallJoinRoom(string joinCode)
-    {  
+    {
         Debug.Log("[JOIN ROOM]Join code!: " + joinCode);
         rfClient.roomClient.Join(joinCode);
     }

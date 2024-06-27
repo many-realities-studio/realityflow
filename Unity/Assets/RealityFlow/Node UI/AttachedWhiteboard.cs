@@ -66,11 +66,15 @@ namespace RealityFlow.NodeUI
 
         void ShowWhiteboard(GameObject obj)
         {
-            Debug.Log("Showing whiteboard for this");
             if (!Whiteboard.Instance)
                 return;
 
             VisualScript script = obj.EnsureComponent<VisualScript>();
+
+            if (Whiteboard.Instance.gameObject.activeInHierarchy && 
+                Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
+                return;
+
             Whiteboard.Instance.ShowForObject(script);
         }
     }

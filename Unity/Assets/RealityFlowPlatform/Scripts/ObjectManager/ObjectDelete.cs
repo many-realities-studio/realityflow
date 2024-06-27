@@ -43,7 +43,7 @@ public class ObjectDelete : MonoBehaviour
 
         try
         {
-            var graphQLResponse = realityFlowClient.SendQueryAsync(deleteObject);
+            var graphQLResponse = realityFlowClient.SendQueryBlocking(deleteObject);
             var data = graphQLResponse["data"];
             var errors = graphQLResponse["errors"];
             if (data != null)
@@ -96,6 +96,6 @@ public class ObjectDelete : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
