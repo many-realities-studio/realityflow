@@ -78,7 +78,7 @@ public class RfObjectManager : MonoBehaviour
 
         try
         {
-            var graphQLResponse = realityFlowClient.SendQueryAsync(saveObject);
+            var graphQLResponse = realityFlowClient.SendQueryBlocking(saveObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Object transform updated in the database successfully.");
@@ -124,7 +124,7 @@ public class RfObjectManager : MonoBehaviour
 
         try
         {
-            var graphQLResponse = realityFlowClient.SendQueryAsync(getObjectsQuery);
+            var graphQLResponse = realityFlowClient.SendQueryBlocking(getObjectsQuery);
             if (graphQLResponse["data"] != null)
             {
                 //Debug.Log("GraphQL Response Data: " + graphQLResponse.Data.ToString());

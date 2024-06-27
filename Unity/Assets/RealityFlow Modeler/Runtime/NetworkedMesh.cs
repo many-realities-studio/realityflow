@@ -40,6 +40,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Material meshMaterial;
     private Material boundsMaterial;
     private ObjectManipulator objectManipulator;
+    private EraserTool eraser;
 
     bool lastOwner;
     public bool wasBake;
@@ -68,6 +69,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         roomClient.OnPeerRemoved.AddListener(OnPeerRemoved);
 
         selectTool = FindObjectOfType<SelectTool>();*/
+        eraser = FindObjectOfType<EraserTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
         // Find the child game object of this mesh that draws the bounds visuals
@@ -144,7 +146,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         meshMaterial = gameObject.GetComponent<MeshRenderer>().material;
         //boundsControl.HandlesActive = false;
 
-        if (this.NetworkId == null)
+        if (NetworkId == null)
             Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }
 
@@ -276,7 +278,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
         }*/
 
-        if (isSelected || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
+        if (isSelected 
+            || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive
+            || eraser.isActive)
             return;
 
         //Debug.Log("EndHold() was called");

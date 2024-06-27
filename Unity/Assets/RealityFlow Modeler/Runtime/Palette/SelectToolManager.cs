@@ -87,11 +87,11 @@ public class SelectToolManager : MonoBehaviour
             gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             boundsVisuals.SetActive(true);
 
-        // If the user is using the select tool then this mesh should be able to be selected
-        if (selectTool.isActive)
-        {
-            gameObject.GetComponent<BoundsControl>().ToggleHandlesOnClick = true;
-        }
+            // If the user is using the select tool then this mesh should be able to be selected
+            if (selectTool.isActive)
+            {
+                gameObject.GetComponent<BoundsControl>().ToggleHandlesOnClick = true;
+            }
 
             // If any tool other than the select tool is active then we don't want to select a mesh but rather do its appropriate action
             if (colorTool.colorToolIsActive || colorTool.metallicToolIsActive || colorTool.smoothnessToolIsActive || eraserTool.isActive || gizmoTool.isActive || manipulationTool.isActive || copyTool.isActive)

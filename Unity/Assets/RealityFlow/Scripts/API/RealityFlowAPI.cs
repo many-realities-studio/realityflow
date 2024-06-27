@@ -304,7 +304,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 OperationName = "CreateGraph",
                 Variables = variables
             };
-            var graphQLResponse = client.SendQueryAsync(queryObject);
+            var graphQLResponse = client.SendQueryBlocking(queryObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Graph saved to the database successfully.");
@@ -330,95 +330,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             if (!isUndoing)
                 actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
         }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
-        }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
         return newGraph;
-    }
-
-    public void SaveGraphAsync(Graph toSave) // Saves the graph to the database
-    {
-        var query = @"
-            mutation SaveGraph($input: SaveGraphInput!) {
-                saveGraph(input: $input) {
-                    id
-                }
-            }
-        ";
-
-        var variables = new
-        {
-            input = new
-            {
-                projectId = client.GetCurrentProjectId(),
-                name = toSave.name,
-                graphJson = JsonUtility.ToJson(toSave)
-            }
-        };
-
-        var queryObject = new GraphQLRequest
-        {
-            Query = query,
-            OperationName = "SaveGraph",
-            Variables = variables
-        };
-        Graph newGraph;
-        try
-        {
-
-            var graphQLResponse = client.SendQueryAsync(queryObject);
-            if (graphQLResponse["data"] != null)
-            {
-                Debug.Log("Graph saved to the database successfully.");
-
-                // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["id"].ToString();
-                newGraph = new Graph(returnedId);
-                Debug.Log($"Assigned ID from database: {returnedId}");
-            }
-            else
-            {
-                Debug.LogError("Failed to save object to the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["extensions"]}");
-                    }
-                }
-            }
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError("General Exception: " + ex.Message);
-        }
-        return;
     }
 
     #endregion
@@ -525,70 +441,34 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // -- EDIT GRAPH FUNCTIONS --
     public void SendGraphUpdateToDatabase(string graphJson, string graphId)
     {
-        var query = @"
-            mutation UpdateGraph($input: UpdateGraphInput!) {
-                updateGraph(input: $input) {
-                    id
-                    graphJson
-                }
-            }
-        ";
-
-        var variables = new
-        {
-            input = new
-            {
-                id = graphId,
-                graphJson = graphJson
-            }
-        };
-
         var queryObject = new GraphQLRequest
         {
-            Query = query,
+            Query = @"
+                mutation UpdateGraph($input: UpdateGraphInput!) {
+                    updateGraph(input: $input) {
+                        id
+                        graphJson
+                    }
+                }
+            ",
             OperationName = "UpdateGraph",
-            Variables = variables
+            Variables = new
+            {
+                input = new
+                {
+                    id = graphId,
+                    graphJson = graphJson
+                }
+            }
         };
 
         try
         {
-            var graphQLResponse = client.SendQueryAsync(queryObject);
-            if (graphQLResponse["data"] != null)
-            {
-                Debug.Log("Graph updated in the database successfully.");
-
-                // Extract the ID from the response
-                var returnedId = graphQLResponse["data"]["updateGraph"]["id"].ToString();
-                Debug.Log($"Assigned ID from database: {returnedId}");
-            }
-            else
-            {
-                Debug.LogError("Failed to update the graph in the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["extensions"]}");
-                    }
-                }
-            }
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
+            client.SendQueryFireAndForget(queryObject);
         }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
     }
 
@@ -832,7 +712,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         sb.Append("]");
         Debug.Log(sb.ToString());
         // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
 
         var createObject = new GraphQLRequest
         {
@@ -858,59 +738,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            var graphQLResponse = client.SendQueryAsync(createObject);
-            if (graphQLResponse["data"] != null)
-            {
-                Debug.Log("Object saved to the database successfully.");
-
-                // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["updateObject"]["id"].ToString();
-                rfObject.id = returnedId;
-                Debug.Log($"Assigned ID from database: {rfObject.id}");
-                spawnedObjects[spawnedMesh] = rfObject;
-                spawnedObjectsById[returnedId] = spawnedMesh;
-
-                // Update the name of the spawned object in the scene
-                if (spawnedMesh != null)
-                {
-                    spawnedMesh.name = rfObject.id;
-                    Debug.Log($"Updated spawned object name to: {spawnedMesh.name}");
-                }
-                else
-                {
-                    Debug.LogError("Could not find the spawned object to update its name.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to save object to the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["extensions"]}");
-                    }
-                }
-            }
-            //if (!isUndoing)
-            //actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
+            client.SendQueryFireAndForget(createObject);
         }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
 
         return spawnedMesh;
@@ -982,17 +814,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         sb.Append("]");
         // Debug.Log(sb.ToString());
         // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb.ToString()}");
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
         // Debug.Log(rfObject);
 
         var createObject = new GraphQLRequest
         {
             Query = @"
-            mutation CreateObject($input: CreateObjectInput!) {
-                createObject(input: $input) {
-                    id
-                }
-            }",
+                mutation CreateObject($input: CreateObjectInput!) {
+                    createObject(input: $input) {
+                        id
+                    }
+                }",
             OperationName = "CreateObject",
             Variables = new
             {
@@ -1012,7 +844,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(createObject));
-            var graphQLResponse = client.SendQueryAsync(createObject);
+            var graphQLResponse = client.SendQueryBlocking(createObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Object saved to the database successfully.");
@@ -1050,26 +882,69 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             if (!isUndoing)
                 actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
         }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
-        }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
 
         return spawnedMesh;
     }
     #endregion
+
+    class Vector2Converter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+            => objectType == typeof(Vector2);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                if (objectType.IsNullable() == false)
+                    throw new JsonSerializationException("Cannot convert null value to Vector2.");
+
+                return null;
+            }
+
+            if (reader.TokenType != JsonToken.StartObject)
+                throw new JsonSerializationException("A Vector2 must be deserialized from an object");
+
+            reader.Read();
+
+            Vector2 value = Vector2.zero;
+            while (reader.TokenType == JsonToken.PropertyName)
+            {
+                string property = (string)reader.Value;
+                reader.Read();
+                if (reader.TokenType != JsonToken.Float)
+                    throw new JsonSerializationException("Vector2 properties must be floats");
+                _ = property switch
+                {
+                    "x" => value.x = (float)(double)reader.Value,
+                    "y" => value.y = (float)(double)reader.Value,
+                    _ => throw new JsonSerializationException($"Unknown Vector2 property {property} encountered"),
+                };
+                reader.Read();
+            }
+
+            if (reader.TokenType != JsonToken.EndObject)
+                throw new JsonSerializationException("A Vector2 must be be ended with EndObject");
+
+            return value;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            Vector2 vector = (Vector2)value;
+
+            writer.WriteStartObject();
+            writer.WritePropertyName("x");
+            writer.WriteValue(vector.x);
+            writer.WritePropertyName("y");
+            writer.WriteValue(vector.y);
+            writer.WriteEndObject();
+        }
+    }
 
     class Vector3Converter : JsonConverter
     {
@@ -1193,6 +1068,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void LogActionToServer(string action, object data)
     {
         JsonSerializer ser = JsonSerializer.CreateDefault();
+        ser.Converters.Add(new Vector2Converter());
         ser.Converters.Add(new Vector3Converter());
         ser.Converters.Add(new QuaternionConverter());
 
@@ -1214,42 +1090,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
             }
         };
+
         try
         {
-            var graphQLResponse = client.SendQueryAsync(createObject);
-            if (graphQLResponse["data"] != null)
-            {
-                // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["addLogEntry"]["id"].ToString();
-            }
-            else
-            {
-                Debug.LogError("Failed to save object to the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["extensions"]}");
-                    }
-                }
-            }
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
+            client.SendQueryFireAndForget(createObject);
         }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
     }
 
@@ -1381,7 +1229,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     {
                         Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
                         Debug.Log("Request: " + JsonUtility.ToJson(createObject));
-                        var graphQLResponse = client.SendQueryAsync(createObject);
+                        var graphQLResponse = client.SendQueryBlocking(createObject);
                         if (graphQLResponse["data"] != null)
                         {
                             Debug.Log("Object saved to the database successfully.");
@@ -1421,21 +1269,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         if (!isUndoing)
                             actionLogger.LogAction(nameof(SpawnObject), spawnedObject.name, spawnPosition, scale, spawnRotation, scope);
                     }
-                    catch (HttpRequestException httpRequestException)
-                    {
-                        Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-                    }
-                    catch (IOException ioException)
-                    {
-                        Debug.LogError("IOException: " + ioException.Message);
-                    }
-                    catch (SocketException socketException)
-                    {
-                        Debug.LogError("SocketException: " + socketException.Message);
-                    }
                     catch (Exception ex)
                     {
-                        Debug.LogError("General Exception: " + ex.Message);
+                        Debug.LogException(ex);
                     }
                 }
                 else
@@ -1550,11 +1386,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         var saveObject = new GraphQLRequest
         {
             Query = @"
-            mutation UpdateObject($input: UpdateObjectInput!) {
-                updateObject(input: $input) {
-                    id
-                }
-            }",
+                mutation UpdateObject($input: UpdateObjectInput!) {
+                    updateObject(input: $input) {
+                        id
+                    }
+                }",
             OperationName = "UpdateObject",
             Variables = new
             {
@@ -1578,56 +1414,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
 
-            var graphQLResponse = client.SendQueryAsync(saveObject);
-            if (graphQLResponse["data"] != null && graphQLResponse["errors"] == null)
-            {
-                Debug.Log("Object saved to the database successfully.");
-
-                // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["updateObject"]["id"].ToString();
-                rfObject.id = returnedId;
-                Debug.Log($"Assigned ID from database: {rfObject.id}");
-
-                // Update the name of the spawned object in the scene
-                GameObject spawnedObject = spawnedObjectsById[rfObject.id];//GameObject.Find(rfObject.name);
-                if (spawnedObject != null)
-                {
-                    spawnedObject.name = rfObject.id;
-                    Debug.Log($"Updated spawned object name to: {spawnedObject.name}");
-                }
-                else
-                {
-                    Debug.LogError("Could not find the spawned object to update its name.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to save object to the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["extensions"]}");
-                    }
-                }
-            }
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
+            client.SendQueryFireAndForget(saveObject);
         }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
     }
 
@@ -1669,7 +1460,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            var graphQLResponse = client.SendQueryAsync(getObjectsQuery);
+            var graphQLResponse = client.SendQueryBlocking(getObjectsQuery);
             if (graphQLResponse["data"] != null)
             {
                 var data = graphQLResponse["data"]["getObjectsByProjectId"];
@@ -1763,7 +1554,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            var graphQLResponse = client.SendQueryAsync(getGraphsQuery);
+            var graphQLResponse = client.SendQueryBlocking(getGraphsQuery);
             if (graphQLResponse["data"] != null)
             {
                 var data = graphQLResponse["data"]["getGraphsByProjectId"];
@@ -1792,21 +1583,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
             }
         }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
-        }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
             Debug.LogError("Exception stack trace: " + ex.StackTrace);
         }
 
@@ -1931,7 +1710,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error spawning object with NetworkSpawnManager: " + ex.Message);
+                Debug.LogException(ex);
                 Debug.LogError("Exception stack trace: " + ex.StackTrace);
             }
         }
@@ -2070,23 +1849,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            var graphQLResponse = client.SendQueryAsync(saveObject);
-            if (graphQLResponse["data"] != null)
-            {
-                Debug.Log("Object transform updated in the database successfully.");
-            }
-            else
-            {
-                Debug.LogError("Failed to update object transform in the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["Extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["Extensions"]}");
-                    }
-                }
-            }
+            client.SendQueryFireAndForget(saveObject);
         }
         catch (Exception ex)
         {
@@ -2128,30 +1891,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             if (!isUndoing)
                 actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
 
-            if (scope == SpawnScope.Room)
+            // Remove object from the database
+            RemoveObjectFromDatabase(objectId, () =>
             {
-                // Remove object from the database
-                RemoveObjectFromDatabase(objectId, () =>
-                {
-                    // Only despawn the object if it was successfully removed from the database
-                    spawnManager.Despawn(objectToDespawn);
-                    Debug.Log("Despawned: " + objectToDespawn.name);
-
-                    // Remove the object from local dictionaries
-                    spawnedObjects.Remove(objectToDespawn);
-                    spawnedObjectsById.Remove(objectId);
-                });
-            }
-            else
-            {
-                // Directly despawn the object if it's not room-scoped
-                spawnManager.Despawn(objectToDespawn);
-                Debug.Log("Despawned: " + objectToDespawn.name);
-
                 // Remove the object from local dictionaries
                 spawnedObjects.Remove(objectToDespawn);
                 spawnedObjectsById.Remove(objectId);
-            }
+
+                // Only despawn the object if it was successfully removed from the database
+                spawnManager.Despawn(objectToDespawn);
+                Debug.Log("Despawned: " + objectToDespawn.name);
+            });
 
             LogActionToServer("DespawnObject", new { rfObject, originalPrefabName });
         }
@@ -2190,55 +1940,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
-            var graphQLResponse = client.SendQueryAsync(deleteObject);
-            if (graphQLResponse["data"] != null)
+            client.SendQueryFireAndForget(deleteObject, request => 
             {
-                Debug.Log("Object removed from the database successfully.");
-
-                // Extract the ID from the response and ensure it matches the requested ID
-                //var returnedId = graphQLResponse.Data.deleteObject.id;
-                var returnedId = graphQLResponse["data"]["deleteObject"]["id"].ToString();
-                if (returnedId == objectId)
-                {
-                    Debug.Log($"Successfully removed object with ID: {objectId} from the database.");
-                    onSuccess?.Invoke();
-                }
-                else
-                {
-                    Debug.LogError($"Mismatch in deleted object ID. Requested: {objectId}, Returned: {returnedId}");
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to remove object from the database.");
-                if (graphQLResponse["errors"] != null)
-                {
-                    foreach (var error in graphQLResponse["errors"])
-                    {
-                        Debug.LogError($"GraphQL Error: {error["message"]}");
-                        if (error["extensions"] != null)
-                        {
-                            Debug.LogError($"Error Extensions: {error["extensions"]}");
-                        }
-                    }
-                }
-            }
-        }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
+                if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+                    onSuccess();
+            });
         }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
+            Debug.LogException(ex);
         }
     }
     #endregion

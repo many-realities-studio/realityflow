@@ -15,6 +15,8 @@ namespace RealityFlow.NodeUI
 
         public GraphView TopLevelGraphView => topLevelGraphView;
 
+        public bool DoNotShow { get; set; }
+
         GraphView selectedGraphView;
         public GraphView SelectedGraphView
         {
@@ -39,14 +41,19 @@ namespace RealityFlow.NodeUI
 
         public void ShowForObject(VisualScript obj)
         {
+            if (DoNotShow)
+                return;
+
             gameObject.SetActive(true);
             // TODO: Probably use API for this later
             transform.position = obj.transform.position + Vector3.up * 1.0f;
-            if (obj.graph == null)
+            if (RealityFlowAPI.Instance.SpawnedObjects[obj.gameObject].graphId == null)
+            {
                 obj.graph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
+                RealityFlowAPI.Instance.AssignGraph(obj.graph, obj.gameObject);
+            }
             topLevelGraphView.CurrentObject = obj;
             topLevelGraphView.Graph = obj.graph;
-            RealityFlowAPI.Instance.AssignGraph(obj.graph, obj.gameObject);
         }
     }
 }

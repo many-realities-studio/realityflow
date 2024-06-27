@@ -59,7 +59,7 @@ public class LoginScript : MonoBehaviour
         };
 
         // Send the mutation request asynchronously and wait for the response.
-        var queryResult = rfClient.SendQueryAsync(verifyOTP);
+        var queryResult = rfClient.SendQueryBlocking(verifyOTP);
         var data = queryResult["data"];
         var errors = queryResult["errors"];
         if (data != null && errors == null)  // Success in retrieving Data

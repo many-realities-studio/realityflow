@@ -30,7 +30,7 @@ public class EraserTool : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
+        var rig = FindFirstObjectByType<XROrigin>().gameObject;
         leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
         rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
@@ -77,6 +77,7 @@ public class EraserTool : MonoBehaviour
         if(tool == 1)
         {
             isActive = status;
+            Whiteboard.Instance.DoNotShow = status;
         }
     }
     
@@ -93,8 +94,8 @@ public class EraserTool : MonoBehaviour
 
             RealityFlowAPI.Instance.LogActionToServer("Delete Object", new { deletedObj = currentHitResult.collider.gameObject.name});
 
+            currentHitResult.collider.gameObject.SetActive(false);
             RealityFlowAPI.Instance.DespawnObject(currentHitResult.collider.gameObject);
-            spawnManager.Despawn(currentHitResult.collider.gameObject);
             // You should no longer be able to interact with this mesh
             //currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled = false;
 
