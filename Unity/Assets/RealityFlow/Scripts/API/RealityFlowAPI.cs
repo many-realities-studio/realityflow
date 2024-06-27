@@ -34,15 +34,8 @@ using RealityFlow.Collections;
 using RealityFlow.Scripting;
 using Newtonsoft.Json.Converters;
 
-
-
-
-
-
-
-
 #if UNITY_EDITOR
-using UnityEditor;
+    using UnityEditor;
 #endif
 
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
@@ -58,17 +51,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public ActionLogger actionLogger;
     private NetworkContext networkContext;
     public NetworkId NetworkId { get; set; }
-    private static RealityFlowAPI _instance;                // SINGLE INSTANCE OF THE API
-    private static readonly object _lock = new object();   // ENSURES THREAD SAFETY
-    public PrefabCatalogue catalogue; // Prefab Catalog
+    private static RealityFlowAPI _instance;                
+    private static readonly object _lock = new object();   
+    public PrefabCatalogue catalogue; 
     public GameObject whiteboardPrefab;
     public static GameObject NearMenuToolbox;
     public GameObject nearMenuReference;
     public Action OnLeaveRoom;
-
     public static GameObject DeleteMenu;
     public GameObject delteMenuReference;
-
+    
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
     {
