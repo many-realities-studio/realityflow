@@ -79,6 +79,12 @@ namespace RealityFlow.NodeUI
 
         void Update()
         {
+            if (currentObject == false)
+            {
+                Whiteboard.Instance.gameObject.SetActive(false);
+                return;
+            }
+
             if (dirty)
             {
                 Render();

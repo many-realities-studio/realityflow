@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1714446635124654819}
   - component: {fileID: 439253757515058350}
   - component: {fileID: 6231712676461187743}
+  - component: {fileID: 284954790176591852}
   m_Layer: 0
   m_Name: Golf Club
   m_TagString: Untagged
@@ -378,6 +379,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &284954790176591852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836750280102844077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8676e655248d62469367ef11154188c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceThreshold: 20
 --- !u!1 &5485686418168970926
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,7 +25,6 @@ public class CacheMeshData : MonoBehaviour
 
     void Start()
     {
-        
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
         lastPlayModeState = networkedPlayManager.playMode;
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];

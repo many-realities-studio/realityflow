@@ -18,7 +18,6 @@ using Microsoft.MixedReality.Toolkit.UX;
 using Samples.Whisper;
 using Ubiq.Samples;
 using System.IO;
-
 public class ChangeTextOnButtonPress : MonoBehaviour
 {
     public StatefulInteractable[] PressableButtons; // Array of pressable buttons
@@ -28,6 +27,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
     private int currentRecordingIndex = -1; // To keep track of the current recording button
     private AudioClip currentAudioClip; // To store the current audio clip
     private byte[] data;
+    private int questionNumber = 0; // To track the question number
 
     private string[] TextArray = new string[] {
         "I liked the possibilities given by the system. ",
@@ -68,7 +68,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
             TextDisplay.text = TextArray[index];
 
             // Stop the current recording if another button is pressed or the same button is pressed again
-            if (currentRecordingIndex != -1)
+            if (currentRecordingIndex != -1 && Microphone.IsRecording(null))
             {
                 StopRecording(currentRecordingIndex);
             }
@@ -78,6 +78,7 @@ public class ChangeTextOnButtonPress : MonoBehaviour
             {
                 StartRecording(index);
                 currentRecordingIndex = index;
+                questionNumber++; // Increment the question number
             }
             else
             {
@@ -92,7 +93,8 @@ public class ChangeTextOnButtonPress : MonoBehaviour
 
     private void StartRecording(int index)
     {
-        currentAudioClip = Microphone.Start(null, false, 300, 44100); // Start recording with a maximum duration of 300 seconds
+        string micName = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
+        currentAudioClip = Microphone.Start(micName, false, 30, 44100); // Start recording with a maximum duration of 30 seconds
         Debug.Log("Recording started for button index: " + index);
     }
 
@@ -101,12 +103,12 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         if (Microphone.IsRecording(null))
         {
             Microphone.End(null); // Stop the recording
-            SaveRecording(currentAudioClip, fileNames[index]);
+            SaveRecording(currentAudioClip, fileNames[index], index);
             Debug.Log("Recording stopped and saved for button index: " + index);
         }
     }
 
-    private void SaveRecording(AudioClip clip, string fileName)
+    private void SaveRecording(AudioClip clip, string fileName, int index)
     {
         if (clip == null)
         {
@@ -117,13 +119,13 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         // Use the provided SaveWav class to save the audio clip
         data = SaveWav.Save(fileName, clip);
         Debug.Log("Audio saved to: " + fileName);
-        TranscribeRecording(data, fileName);
+        TranscribeRecording(data, fileName, index, questionNumber);
     }
 
-    private void TranscribeRecording(byte[] audioData, string fileName)
+    private async void TranscribeRecording(byte[] audioData, string fileName, int index, int questionNumber)
     {
-        var res = whisperRoot.TranscribeRecording(audioData); // Assuming this is a synchronous call
-        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res, fileName });
+        var res = await whisperRoot.TranscribeRecordingAsync(audioData);
+        RealityFlowAPI.Instance.LogActionToServer("ExitSurvey", new { transcription = res, questionNumber, rating = index, fileName });
         Debug.Log("Transcription result: " + res);
     }
 }

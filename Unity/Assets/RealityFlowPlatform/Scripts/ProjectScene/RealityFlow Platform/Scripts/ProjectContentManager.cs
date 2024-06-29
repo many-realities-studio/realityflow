@@ -107,7 +107,7 @@ public class ProjectContentManager : MonoBehaviour
             OperationName = "Query",
             Variables = new { getProjectByIdId = defaultProjectId }
         };
-        var queryResult = rfClient.SendQueryAsync(getProjectObjects);
+        var queryResult = rfClient.SendQueryBlocking(getProjectObjects);
         var data = queryResult["data"];
         var errors = queryResult["errors"];
         Debug.Log("helloyes");
@@ -166,7 +166,7 @@ public class ProjectContentManager : MonoBehaviour
         if (editMode) // And user has permission to edit
         {
             // This is null potentially? It's saying it's null there. 
-            
+
 
             //SerializableMeshInfo smi = new SerializableMeshInfo(go);
 
@@ -210,7 +210,7 @@ public class ProjectContentManager : MonoBehaviour
             Variables = new { input = new { objectJson = em.smi, projectId = defaultProjectId } }
         };
 
-        var queryResult = rfClient.SendQueryAsync(getUserInfoRequest);
+        var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
         var queryData = queryResult["data"];
 
         if (queryData != null)
@@ -226,7 +226,7 @@ public class ProjectContentManager : MonoBehaviour
         Debug.Log(queryData["saveObject"]["id"]);
 
 
-        em.uuid = (string)queryData["saveObject"]["id"];    
+        em.uuid = (string)queryData["saveObject"]["id"];
     }
 
     public void UpdateObject(GameObject go)
@@ -251,10 +251,10 @@ public class ProjectContentManager : MonoBehaviour
                     }
                 ",
                 OperationName = "EditObject",
-                Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid, objectJson = go} }
+                Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid, objectJson = go } }
             };
 
-            var queryResult = rfClient.SendQueryAsync(getUserInfoRequest);
+            var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
         }
     }
 
@@ -282,11 +282,11 @@ public class ProjectContentManager : MonoBehaviour
                 Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid } }
             };
 
-            var queryResult = rfClient.SendQueryAsync(getUserInfoRequest);
+            var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
         }
     }
 
-    
+
     void LoadSceneContent(string content)
     {
 

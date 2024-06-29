@@ -59,18 +59,22 @@ namespace RealityFlow.NodeUI
 
             GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
             {
-                if (PlayManager == null || !PlayManager.playMode || RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(gameObject))
+                if (PlayManager != null && !PlayManager.playMode && RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(gameObject))
                     ShowWhiteboard(gameObject);
             });
         }
 
         void ShowWhiteboard(GameObject obj)
         {
-            Debug.Log("Showing whiteboard for this");
             if (!Whiteboard.Instance)
                 return;
 
             VisualScript script = obj.EnsureComponent<VisualScript>();
+
+            if (Whiteboard.Instance.gameObject.activeInHierarchy && 
+                Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
+                return;
+
             Whiteboard.Instance.ShowForObject(script);
         }
     }
