@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -7583,7 +7583,7 @@ PrefabInstance:
     - target: {fileID: 7585035320575375756, guid: ad5b753b73e311143a85055b15cea562,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10852,8 +10852,8 @@ MonoBehaviour:
   loginMenu: {fileID: 323530833}
   levelEditor: {fileID: 1859582588}
   roomClient: {fileID: 2142340402}
-  server: https://reality.gaim.ucf.edu/
   graphQLRoute: graphql
+  server: http://localhost:4000/
 --- !u!114 &2142340402
 MonoBehaviour:
   m_ObjectHideFlags: 0
