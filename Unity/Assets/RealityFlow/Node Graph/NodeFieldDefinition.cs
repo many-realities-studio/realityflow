@@ -14,6 +14,9 @@ namespace RealityFlow.NodeGraph
     public struct NodeFieldDefinition
     {
         public string Name;
-        public NodeValue Default;
+        public NodeValueType DefaultType;
+        [SerializeReference]
+        [DiscUnion]
+        public NodeValue DefaultValue;
     }
 }

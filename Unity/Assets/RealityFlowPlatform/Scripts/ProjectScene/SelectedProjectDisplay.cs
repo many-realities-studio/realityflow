@@ -24,6 +24,7 @@ public class MyProjectsDisplay : MonoBehaviour
     public GameObject roomUI;
     public Button createRoomBtn;
     public Button refreshRoomsBtn;
+    // public bool onlyTutorials;
 
     // GraphQL client and access token variables 
     // public GraphQLHttpClient graphQLClient;
@@ -38,8 +39,8 @@ public class MyProjectsDisplay : MonoBehaviour
         {
             // TODO -ReFresh Button-
             // refreshRoomsBtn.onClick.AddListener(rfClient.GetRoomsByProjectId);
-            createRoomBtn.onClick.AddListener(rfClient.CallCreateRoom);
-            Debug.Log("RoomManager found and listener added.");
+            createRoomBtn.onClick.AddListener(rfClient.CreateRoom);
+            // Debug.Log("RoomManager found and listener added.");
         }
         else
         {
@@ -48,12 +49,13 @@ public class MyProjectsDisplay : MonoBehaviour
         getProjectsData();
     }
 
-    private async void getProjectsData()
+    private void getProjectsData()
     {
-        if(rfClient == null) {
+        if (rfClient == null)
+        {
             return;
         }
-
+        var userId = rfClient.userDecoded["id"];
         // Create a new GraphQL query request to get the projects owned, co-owned, and joined by the user.
         var projectsQuery = new GraphQLRequest
         {
@@ -82,12 +84,12 @@ public class MyProjectsDisplay : MonoBehaviour
                 }
             ",
             OperationName = "GetUserProjects",
-            Variables = new {getUserByIdId = rfClient.userDecoded["id"]}
-     
+            Variables = new { getUserByIdId = userId }
+
         };
 
         // Send the query request to the GraphQL server
-        var queryResult = await rfClient.SendQueryAsync(projectsQuery);
+        var queryResult = rfClient.SendQueryBlocking(projectsQuery);
         var data = queryResult["data"];  //Get the data from the query result
         if (data != null)
         {
@@ -116,7 +118,7 @@ public class MyProjectsDisplay : MonoBehaviour
         }
         for (int i = 0; i < projects.Count; i++)
         {
-            var project = GameObject.Instantiate(projectPrefab, parentPanel.transform,false);
+            var project = GameObject.Instantiate(projectPrefab, parentPanel.transform, false);
             var children = new List<GameObject>();
             project.GetChildGameObjects(children);
             foreach (var child in children)
@@ -129,29 +131,27 @@ public class MyProjectsDisplay : MonoBehaviour
                     {
                         if (c.name == "ProjectTitle")
                         {
-                            int x = i;
-                            c.GetComponent<TextMeshProUGUI>().text = (string)projects[x]["projectName"];
+                            c.GetComponent<TextMeshProUGUI>().text = (string)projects[i]["projectName"];
                         }
-                        else if (c.name == "Categories")
-                        {
-                            int x = i;
-                            c.GetComponent<TextMeshProUGUI>().text = string.Join(" | ", projects[x]["categories"]);
-                        }
+                        // else if (c.name == "Categories")
+                        // {
+                        //     int x = i;
+                        //     c.GetComponent<TextMeshProUGUI>().text = string.Join(" | ", projects[x]["categories"]);
+                        // }
 
-                        else if (c.name == "Publicity")
-                        {
-                            int x = i;
-                            bool isPublic = (bool)projects[x]["isPublic"];
-                            c.GetComponent<TextMeshProUGUI>().text = isPublic ? "public" : "private";
-                        }
+                        // else if (c.name == "Publicity")
+                        // {
+                        //     int x = i;
+                        //     bool isPublic = (bool)projects[x]["isPublic"];
+                        //     c.GetComponent<TextMeshProUGUI>().text = isPublic ? "public" : "private";
+                        // }
                     }
+                    int x2 = i;
+                    child.GetComponent<Button>().onClick.AddListener(delegate
+                    {
+                        OpenProject((string)projects[x2]["id"]);
+                    });
 
-                }
-                else if (child.name == "OpenProjectBtn")
-                {
-                    int x = i;
-                    child.GetComponent<Button>().onClick.AddListener(delegate { 
-                        OpenProject((string)projects[x]["id"]); });
                 }
 
             }
@@ -159,12 +159,12 @@ public class MyProjectsDisplay : MonoBehaviour
     }
 
     // Function to open the project details panel
-    public async void OpenProject(string id)
+    public void OpenProject(string id)
     {
         // Debug.Log("Opening project with ID: " + id);
         rfClient.SetCurrentProject(id);
-        projectDetailPanel.SetActive(true);    
-        
+        projectDetailPanel.SetActive(true);
+
 
         var getProjectData = new GraphQLRequest
         {
@@ -183,13 +183,13 @@ public class MyProjectsDisplay : MonoBehaviour
             Variables = new { getProjectByIdId = id }
         };
 
-        var graphQL = await rfClient.SendQueryAsync(getProjectData);
+        var graphQL = rfClient.SendQueryBlocking(getProjectData);
 
         var projectdata = graphQL["data"];
         if (projectdata != null)
         {
             // Debug.Log("Fetched project data: " + projectdata.ToString());
-            
+
             projectTitle.GetComponent<TextMeshProUGUI>().text = (string)projectdata["getProjectById"]["projectName"];
             projectDescription.GetComponent<TextMeshProUGUI>().text = (string)projectdata["getProjectById"]["description"];
             projectOwner.GetComponent<TextMeshProUGUI>().text = "by " + (string)projectdata["getProjectById"]["projectOwner"]["username"];
@@ -200,7 +200,7 @@ public class MyProjectsDisplay : MonoBehaviour
         {
             Debug.LogError("Failed to fetch project data");
         }
-    
+
     }
 
 
@@ -223,7 +223,7 @@ public class MyProjectsDisplay : MonoBehaviour
                 {
                     int x = i;
                     string joinCode = (string)rooms[x]["joinCode"];
-                    child.GetComponent<Button>().onClick.AddListener(() => rfClient.CallJoinRoom(joinCode));
+                    child.GetComponent<Button>().onClick.AddListener(() => rfClient.JoinRoom(joinCode));
                 }
             }
         }

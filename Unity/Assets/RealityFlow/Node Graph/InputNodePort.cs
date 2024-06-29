@@ -12,6 +12,7 @@ namespace RealityFlow.NodeGraph
         /// to write out in that UI.
         /// </summary>
         [SerializeReference]
+        [DiscUnion]
         public NodeValue ConstantValue;
     }
 }

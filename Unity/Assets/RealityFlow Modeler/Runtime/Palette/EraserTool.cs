@@ -8,6 +8,8 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using Ubiq.Avatars;
+using Unity.XR.CoreUtils;
+using RealityFlow.NodeUI;
 
 /// <summary>
 /// Class EraserTool assigns the eraser tool to the user and allows the deletion of meshes through the Eraser button on the palette.
@@ -28,8 +30,9 @@ public class EraserTool : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+        var rig = FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
         spawnManager = NetworkSpawnManager.Find(this);
 
@@ -59,9 +62,9 @@ public class EraserTool : MonoBehaviour
             }
 
             // If the game object hit has an interactable
-            if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() != null)
+            if (currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>() != null)
             {
-                if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>().IsRaySelected)
+                if (currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().IsRaySelected)
                 {
                     DeleteMesh();
                 }
@@ -74,21 +77,30 @@ public class EraserTool : MonoBehaviour
         if(tool == 1)
         {
             isActive = status;
+            Whiteboard.Instance.DoNotShow = status;
         }
     }
     
     public void DeleteMesh()
     {
         // Delete the game object if it is a user created mesh and not selected by anyone else
-        if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
+        // && currentHitResult.transform.gameObject.GetComponent<EditableMesh>() <- Removing should allow us to remove any object
+        if (currentHitResult.collider != null
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
             Debug.Log("Delete attempted" + currentHitResult.collider.gameObject);
-            spawnManager.Despawn(currentHitResult.collider.gameObject);
+            
+            Whiteboard.Instance.Init();
+
+            RealityFlowAPI.Instance.LogActionToServer("Delete Object", new { deletedObj = currentHitResult.collider.gameObject.name});
+
+            currentHitResult.collider.gameObject.SetActive(false);
+            RealityFlowAPI.Instance.DespawnObject(currentHitResult.collider.gameObject);
             // You should no longer be able to interact with this mesh
             //currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled = false;
 
             //NetworkSpawnManager.Find(this).Despawn(currentHitResult.collider.gameObject);
+            
         }
     }
 

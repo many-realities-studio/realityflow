@@ -77,7 +77,6 @@ public class ProjectContentManager : MonoBehaviour
         {
             instance = this;
         }
-        client.OnJoinedRoom.AddListener(delegate { onRoomCreation(); });
         accessToken = PlayerPrefs.GetString("accessToken");
 
         rfClient = RealityFlowClient.Find(this);
@@ -88,7 +87,7 @@ public class ProjectContentManager : MonoBehaviour
         return sceneObjects.Find((IRealityFlowObject ro) => ro.transform == obj.transform);
     }
 
-    public async void LoadObject(IRealityFlowObject em)
+    public void LoadObject(IRealityFlowObject em)
     {
         // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
         // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
@@ -108,7 +107,7 @@ public class ProjectContentManager : MonoBehaviour
             OperationName = "Query",
             Variables = new { getProjectByIdId = defaultProjectId }
         };
-        var queryResult = await rfClient.SendQueryAsync(getProjectObjects);
+        var queryResult = rfClient.SendQueryBlocking(getProjectObjects);
         var data = queryResult["data"];
         var errors = queryResult["errors"];
         Debug.Log("helloyes");
@@ -167,7 +166,7 @@ public class ProjectContentManager : MonoBehaviour
         if (editMode) // And user has permission to edit
         {
             // This is null potentially? It's saying it's null there. 
-            
+
 
             //SerializableMeshInfo smi = new SerializableMeshInfo(go);
 
@@ -188,7 +187,7 @@ public class ProjectContentManager : MonoBehaviour
         // Calls an "AddObject route on the server"
     }
 
-    public async void SaveObject(IRealityFlowObject em)
+    public void SaveObject(IRealityFlowObject em)
     {
         //Send the Json file to the dataserver
 
@@ -211,7 +210,7 @@ public class ProjectContentManager : MonoBehaviour
             Variables = new { input = new { objectJson = em.smi, projectId = defaultProjectId } }
         };
 
-        var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
+        var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
         var queryData = queryResult["data"];
 
         if (queryData != null)
@@ -227,10 +226,10 @@ public class ProjectContentManager : MonoBehaviour
         Debug.Log(queryData["saveObject"]["id"]);
 
 
-        em.uuid = (string)queryData["saveObject"]["id"];    
+        em.uuid = (string)queryData["saveObject"]["id"];
     }
 
-    public async void UpdateObject(GameObject go)
+    public void UpdateObject(GameObject go)
     {
         if (editMode)
         {
@@ -252,14 +251,14 @@ public class ProjectContentManager : MonoBehaviour
                     }
                 ",
                 OperationName = "EditObject",
-                Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid, objectJson = go} }
+                Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid, objectJson = go } }
             };
 
-            var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
+            var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
         }
     }
 
-    public async void RemoveObject(GameObject go)
+    public void RemoveObject(GameObject go)
     {
         if (editMode) // And user has permission to edit
         {
@@ -283,40 +282,11 @@ public class ProjectContentManager : MonoBehaviour
                 Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid } }
             };
 
-            var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
+            var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
         }
     }
 
-    async void onRoomCreation()
-    {
-        Debug.Log("LOADING CONTENT");
-        Debug.Log(client.Room.JoinCode);
-        Debug.Log(client.Room.Name);
-        // string[] useText = client.Room.Name.Split('@');
-        // if(useText.Length > 0)
-        // {
 
-        //     // This is extracting the project id from the room name
-        //     // If there isn't any, then it probably won't work
-        //     //If this fails, no network scene to join
-        // // Error here? 
-        // var publicProjectsQuery = new GraphQLRequest
-        // {
-        //     Query = @"
-        //          mutation AddRoom($input: AddRoomInput) {
-        //       addRoom(input: $input) {
-        //         joinCode
-        //       }
-        //     }
-        //     ",
-        //     OperationName = "AddRoom",
-        //     Variables = new { roomId = client.Room.UUID, joinCode = client.Room.JoinCode, projectId = useText[1] }
-        // };
-
-        // var queryResult = await graphQLClient.SendMutationAsync<JObject>(publicProjectsQuery);
-        // }
-    }
-    
     void LoadSceneContent(string content)
     {
 

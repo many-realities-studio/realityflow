@@ -14,10 +14,10 @@ public class PopulateObjectLibrary : MonoBehaviour
     public GameObject buttonPrefab;
 
     // This should be set to the SpawnObjectAtRay component atttached to one of the hands
-    public SpawnObjectAtRay spawnScript;
+    public RaycastLogger spawnScript;
 
-     // Spawn the object as networked
-   [SerializeField] private NetworkSpawnManager networkSpawnManager;
+    // Spawn the object as networked
+    [SerializeField] private NetworkSpawnManager networkSpawnManager;
 
     // These lists should be populated with all of the objects that are expected to appear
     // in the toolbox along with their icon prefabs
@@ -32,7 +32,8 @@ public class PopulateObjectLibrary : MonoBehaviour
     }
 
     // Instantiate a button and set it's prefab
-    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab, GameObject iconPrefab, Transform parent)
+    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab,
+        GameObject iconPrefab, Transform parent)
     {
         // Instantiate the new button, set the text, and set the icon prefab
         GameObject newButton = Instantiate(buttonPrefab, parent);
@@ -41,7 +42,9 @@ public class PopulateObjectLibrary : MonoBehaviour
 
         // Create a new Unity action and add it as a listener to the buttons OnClicked event
         UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
-         newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(Instantiate(objectPrefab)));
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(
+            objectPrefab
+        ));
         //newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
     }
 
@@ -50,13 +53,27 @@ public class PopulateObjectLibrary : MonoBehaviour
     void TriggerObjectSpawn(GameObject objectPrefab)
     {
         Debug.Log("TriggerObjectSpawn");
-        Debug.Log(objectPrefab);
-        //spawnScript.RaySpawnToggle(objectPrefab);
-        //spawnNetworkedObject.SpawnWithPeerScope(objectPrefab);
-        //GameObject newObj = objectPrefab;
-        //GameObject newObj = Instantiate(objectPrefab, networkSpawnManager.transform);
-        GameObject newObj = NetworkSpawnManager.Find(this).SpawnWithPeerScope(objectPrefab);
-        //newObj.GetComponent<NetworkedMesh>().owner = true;
-        //newObj.transform.SetParent(networkSpawnManager.transform);
+        Debug.Log(spawnScript.GetVisualIndicatorPosition());
+
+        // Use the prefab's default rotation
+        Quaternion defaultRotation = objectPrefab.transform.rotation;
+        // Spawn the object with the default rotation
+        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles});
+
+
+        if(spawnedObject.GetComponent<Rigidbody>() != null)
+        {
+            spawnedObject.GetComponent<Rigidbody>().useGravity = true;
+
+            StartCoroutine("setObjectToBeStill", spawnedObject);
+        }
+    }
+
+    private IEnumerator setObjectToBeStill(GameObject spawnedObject)
+    {
+        yield return new WaitForSeconds(2);
+        spawnedObject.GetComponent<Rigidbody>().useGravity = false;
+        spawnedObject.GetComponent<Rigidbody>().isKinematic = true;
     }
 }

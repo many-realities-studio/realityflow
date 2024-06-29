@@ -87,11 +87,11 @@ public class SelectToolManager : MonoBehaviour
             gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             boundsVisuals.SetActive(true);
 
-        // If the user is using the select tool then this mesh should be able to be selected
-        if (selectTool.isActive)
-        {
-            gameObject.GetComponent<BoundsControl>().ToggleHandlesOnClick = true;
-        }
+            // If the user is using the select tool then this mesh should be able to be selected
+            if (selectTool.isActive)
+            {
+                gameObject.GetComponent<BoundsControl>().ToggleHandlesOnClick = true;
+            }
 
             // If any tool other than the select tool is active then we don't want to select a mesh but rather do its appropriate action
             if (colorTool.colorToolIsActive || colorTool.metallicToolIsActive || colorTool.smoothnessToolIsActive || eraserTool.isActive || gizmoTool.isActive || manipulationTool.isActive || copyTool.isActive)
@@ -154,6 +154,13 @@ public class SelectToolManager : MonoBehaviour
 
         if (!isSelected)
         {
+            
+            RealityFlowAPI.Instance.LogActionToServer("Select Mesh", new { 
+                SelectedObj = gameObject.name, 
+                selectedPos = gameObject.transform.localPosition, 
+                selectedRot = gameObject.transform.localRotation, 
+                selectedScale = gameObject.transform.localEulerAngles
+            });
             isSelected = true;
             deselectOnRelease = false;
             MeshSelectionManager.Instance.SelectMesh(gameObject);
@@ -167,6 +174,7 @@ public class SelectToolManager : MonoBehaviour
 
         if (deselectOnRelease)
         {
+            RealityFlowAPI.Instance.LogActionToServer("Deselect Mesh", new { SelectedObj = gameObject.name, selectedPos = gameObject.transform.localPosition, selectedRot = gameObject.transform.localRotation, selectedScale = gameObject.transform.localEulerAngles});
             isSelected = false;
             deselectOnRelease = false;
             MeshSelectionManager.Instance.DeselectMesh(gameObject);

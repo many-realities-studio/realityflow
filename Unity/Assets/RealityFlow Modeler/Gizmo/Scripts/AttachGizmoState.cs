@@ -6,6 +6,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using TransformTypes;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// This class manages which object is the gizmo should attach to
@@ -21,7 +22,7 @@ public class AttachGizmoState : MonoBehaviour
     public GameObject sphere;
     public TransformType transformType;
 
-    public XRRayInteractor interactor;
+    public MRTKRayInteractor interactor;
 
     public bool lookForTarget;
     public bool checkMeshRaySelection;
@@ -45,16 +46,16 @@ public class AttachGizmoState : MonoBehaviour
         checkMeshRaySelection = false;
         attachedGameObject = null;
         lookForTarget = false;
+        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
         if(rightHand == null) {
-            rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+            rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
+            // Debug.Log(rightHand);
         }
-        //Debug.Log("AttachGizmoState righthand set to" + rightHand);
         //Debug.Log(GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller"));
         if(leftHand == null) {
-            leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
+            leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+            // Debug.Log(leftHand);
         }
-        //rightHand = GameObject.Find("MRTK RightHand Controller");
-        //leftHand = GameObject.Find("MRTK LeftHand Controller");
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
     }
@@ -113,7 +114,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <param name="target">The target object the gizmo should attach to</param>
     public void AttachGizmoToObject(GameObject target)
     {
-        //Debug.Log("Attach gizmo");
+        Debug.Log("Attach gizmo");
         attachedGameObject = target;
 
         // If the game object has already been selected with the Select Tool then retain its selectedness
@@ -200,11 +201,11 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if an interactor was found, otherwise, false</returns>
     bool SetActiveInteractor()
     {
-        interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
         //interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         if (interactor == null)
-            interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
+            interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
             //interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
 
         else if (interactor == null)
@@ -336,7 +337,7 @@ public class AttachGizmoState : MonoBehaviour
     {
         GameObject activeContoller = rightHand;
 
-        if (rightHand.GetComponentInChildren<XRRayInteractor>() == null)
+        if (rightHand.GetComponentInChildren<MRTKRayInteractor>() == null)
             activeContoller = leftHand;            
 
         return activeContoller.transform.Find("Far Ray").gameObject;
@@ -346,12 +347,10 @@ public class AttachGizmoState : MonoBehaviour
         if (!lookForTarget) return;
 
         GameObject farRay = GetActiveContollerFarRay();
-        LayerMask gizmo = 1 << LayerMask.NameToLayer("Gizmo");
-        LayerMask ui = 1 << LayerMask.NameToLayer("UI");
 
-        farRay.GetComponent<XRRayInteractor>().raycastMask = gizmo | ui;
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = ~farRay.GetComponent<MRTKRayInteractor>().raycastMask;
         // 6 is gizmo layer
-        //SetLayerOfFarRay(farRay, 6);
+        SetLayerOfFarRay(farRay, 7);
     }
 
     public void DisableMeshRaySelection()
@@ -359,11 +358,10 @@ public class AttachGizmoState : MonoBehaviour
         if (!lookForTarget) return;
 
         GameObject farRay = GetActiveContollerFarRay();
-        LayerMask everything = ~0;
 
-        farRay.GetComponent<XRRayInteractor>().raycastMask = everything;
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = ~farRay.GetComponent<MRTKRayInteractor>().raycastMask;
         // 0 is default layer
-        //SetLayerOfFarRay(farRay, 0);
+        SetLayerOfFarRay(farRay, 0);
     }
 
     private void SetLayerOfFarRay(GameObject farRay, int layer)

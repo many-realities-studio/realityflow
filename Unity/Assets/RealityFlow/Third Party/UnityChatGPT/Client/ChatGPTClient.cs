@@ -2,14 +2,25 @@ using DilmerGames.Core.Singletons;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
+using Samples.Whisper;
 
 public class ChatGPTClient : Singleton<ChatGPTClient>
 {
     [SerializeField]
     private ChatGTPSettings chatGTPSettings;
+    private Whisper whisper;
+
+    private void Start()
+    {
+        // Initialize the whisper reference
+        whisper = FindObjectOfType<Whisper>();
+        if (whisper == null)
+        {
+            Debug.LogError("Whisper instance not found in the scene.");
+        }
+    }
 
     public IEnumerator Ask(string prompt, Action<ChatGPTResponse> callBack)
     {
@@ -40,27 +51,35 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
 
             request.SetRequestHeader("Content-Type", "application/json");
 
-            // Retrieve the API key from the environment manager
-            string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
-            string organization = EnvConfigManager.Instance.OpenAIOrganization;
-
-            // Set the request headers
-            if (!string.IsNullOrEmpty(apiKey))
+            // Retrieve the API key from the Whisper script
+            if (whisper != null)
             {
-                request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+                string apiKey = whisper.GetCurrentApiKey();
+                //string organization = EnvConfigManager.Instance.OpenAIOrganization;
+                string organization = "";
+                // Set the request headers
+                if (!string.IsNullOrEmpty(apiKey))
+                {
+                    request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+                }
+                else
+                {
+                    Debug.LogError("API key is null or empty.");
+                }
+
+                if (!string.IsNullOrEmpty(organization))
+                {
+                    request.SetRequestHeader("OpenAI-Organization", organization);
+                }
+                else
+                {
+                    Debug.LogWarning("OpenAI-Organization is null or empty.");
+                }
             }
             else
             {
-                Debug.LogError("API key is null or empty.");
-            }
-
-            if (!string.IsNullOrEmpty(organization))
-            {
-                request.SetRequestHeader("OpenAI-Organization", organization);
-            }
-            else
-            {
-                Debug.LogWarning("OpenAI-Organization is null or empty.");
+                Debug.LogError("Whisper reference is null.");
+                yield break; // Exit the coroutine if whisper is null
             }
 
             var requestStartDateTime = DateTime.Now;

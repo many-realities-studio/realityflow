@@ -10,6 +10,16 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public class Graph : ISerializationCallbackReceiver
     {
+        [SerializeField]
+        string id;
+        public string Id => id;
+
+        /// <summary>
+        /// The name of this graph.
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        public string name = "Graph";
         /// <summary>
         /// The arena of nodes in this graph.
         /// </summary>
@@ -37,7 +47,8 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         BiMultiValueDict<PortIndex, NodeIndex> executionEdges = new();
 
-        public IEnumerable<KeyValuePair<PortIndex, List<NodeIndex>>> ExecutionEdges => executionEdges;
+        public IEnumerable<KeyValuePair<PortIndex, ImmutableList<NodeIndex>>> ExecutionEdges
+            => executionEdges.Select(kv => new KeyValuePair<PortIndex, ImmutableList<NodeIndex>>(kv.Key, kv.Value.ToImmutableList()));
 
         /// <summary>
         /// Input ports, usually only present in subgraphs (such as within a for loop node)
@@ -104,15 +115,14 @@ namespace RealityFlow.NodeGraph
         bool variadicOutput;
 
         [NonSerialized]
-        readonly Dictionary<string, HashSet<NodeIndex>> nodeTypes = new();
+        Dictionary<string, HashSet<NodeIndex>> nodeTypes = new();
+
         /// <summary>
         /// A mapping of node definition names to node indices. Useful for looking up all nodes
         /// of a given type.
         /// </summary>
         public ImmutableDictionary<string, HashSet<NodeIndex>> NodeTypes
-        {
-            get => nodeTypes.ToImmutableDictionary();
-        }
+            => nodeTypes.ToImmutableDictionary();
 
         HashSet<NodeIndex> MutableNodesOfType(string type)
         {
@@ -128,9 +138,9 @@ namespace RealityFlow.NodeGraph
             MutableNodesOfType(type).ToImmutableHashSet();
 
         [SerializeField]
-        readonly Dictionary<string, NodeValueType> variables = new();
+        SerializableDict<string, NodeValueType> variables = new();
 
-        public ImmutableDictionary<string, NodeValueType> Variables 
+        public ImmutableDictionary<string, NodeValueType> Variables
             => variables.ToImmutableDictionary();
 
         public void AddVariable(string name, NodeValueType type)
@@ -138,9 +148,19 @@ namespace RealityFlow.NodeGraph
             variables.Add(name, type);
         }
 
+        public void RemoveVariable(string name)
+        {
+            variables.Remove(name);
+        }
+
         public bool TryGetVariableType(string name, out NodeValueType type)
         {
             return variables.TryGetValue(name, out type);
+        }
+
+        public Graph(string realityflowId)
+        {
+            id = realityflowId;
         }
 
         public NodeIndex AddNode(NodeDefinition definition)
@@ -156,14 +176,13 @@ namespace RealityFlow.NodeGraph
         /// Can be used to re-add a node to a graph with confidence that it will be valid to do so.
         /// </summary>
         public NodeMemory GetMemory(NodeIndex index)
-            => new(this, index, GetNode(index));
+            => new(Id, index, GetNode(index));
 
-        // TODO: Replace Graph with RealityFlowID of this graph
-        public record NodeMemory(Graph Graph, NodeIndex Index, Node Node);
+        public record NodeMemory(string Graph, NodeIndex Index, Node Node);
 
         public bool RememberNode(NodeMemory node, out NodeIndex index)
         {
-            if (node.Graph != this)
+            if (node.Graph != Id)
             {
                 index = default;
                 return false;
@@ -179,34 +198,38 @@ namespace RealityFlow.NodeGraph
         {
             Node node = GetNode(index);
 
-            for (int i = 0; i < node.Definition.Inputs.Count; i++)
+            if (node.Definition != null)
             {
-                PortIndex to = new(index, i);
-                if (reverseEdges.ContainsKey(to))
-                    reverseEdges.Remove(to);
-            }
-
-            for (int i = 0; i < node.Definition.Outputs.Count; i++)
-            {
-                PortIndex from = new(index, i);
-                if (reverseEdges.TryGetKeys(from, out ImmutableList<PortIndex> targets))
-                    foreach (PortIndex to in targets)
+                for (int i = 0; i < node.Definition.Inputs.Count; i++)
+                {
+                    PortIndex to = new(index, i);
+                    if (reverseEdges.ContainsKey(to))
                         reverseEdges.Remove(to);
+                }
+
+                for (int i = 0; i < node.Definition.Outputs.Count; i++)
+                {
+                    PortIndex from = new(index, i);
+                    if (reverseEdges.TryGetKeys(from, out ImmutableList<PortIndex> targets))
+                        foreach (PortIndex to in targets)
+                            reverseEdges.Remove(to);
+                }
+
+                for (int i = 0; i < node.Definition.ExecutionOutputs.Count; i++)
+                {
+                    PortIndex from = new(index, i);
+                    if (executionEdges.ContainsKey(from))
+                        executionEdges.RemoveAll(from);
+                }
+
+                if (node.Definition.ExecutionInput)
+                    if (executionEdges.TryGetKeys(index, out ImmutableList<PortIndex> ports))
+                        foreach (PortIndex from in ports)
+                            executionEdges.Remove(from, index);
+
+                MutableNodesOfType(node.Definition.name).Remove(index);
             }
 
-            for (int i = 0; i < node.Definition.ExecutionOutputs.Count; i++)
-            {
-                PortIndex from = new(index, i);
-                if (executionEdges.ContainsKey(from))
-                    executionEdges.RemoveAll(from);
-            }
-
-            if (node.Definition.ExecutionInput)
-                if (executionEdges.TryGetKeys(index, out ImmutableList<PortIndex> ports))
-                    foreach (PortIndex from in ports)
-                        executionEdges.Remove(from, index);
-
-            MutableNodesOfType(node.Definition.name).Remove(index);
             return nodes.Remove(index);
         }
 
@@ -224,6 +247,9 @@ namespace RealityFlow.NodeGraph
             exec.Clear();
 
             Node node = GetNode(nodeIndex);
+
+            if (node.Definition == null)
+                return;
 
             for (int i = 0; i < node.Definition.Inputs.Count; i++)
             {
@@ -464,8 +490,36 @@ namespace RealityFlow.NodeGraph
 
         public void OnAfterDeserialize()
         {
+            nodeTypes = new();
+            variables ??= new();
+
+            List<NodeIndex> invalidNodes = new();
+            List<(PortIndex, PortIndex)> invalidDataEdges = new();
+            List<(PortIndex, NodeIndex)> invalidExecEdges = new();
+
             foreach ((NodeIndex index, Node node) in nodes)
-                MutableNodesOfType(node.Definition.Name).Add(index);
+                if (node.Definition != null)
+                    MutableNodesOfType(node.Definition.Name).Add(index);
+                else
+                    invalidNodes.Add(index);
+
+            foreach (NodeIndex index in invalidNodes)
+                RemoveNode(index);
+
+            foreach ((PortIndex to, PortIndex from) in reverseEdges)
+                if (!ContainsNode(to.Node) || !ContainsNode(from.Node))
+                    invalidDataEdges.Add((from, to));
+
+            foreach ((PortIndex from, PortIndex to) in invalidDataEdges)
+                RemoveDataEdge(from, to);
+
+            foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in executionEdges)
+                foreach (NodeIndex to in tos)
+                    if (!ContainsNode(from.Node) || !ContainsNode(to))
+                        invalidExecEdges.Add((from, to));
+
+            foreach ((PortIndex from, NodeIndex to) in invalidExecEdges)
+                RemoveExecutionEdge(from, to);
         }
     }
 }

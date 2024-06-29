@@ -108,7 +108,7 @@ namespace RealityFlow.NodeGraph
 
                 scriptFields.AppendFormat(
                     "{0} {1} => ctx.GetField<{0}>({2});",
-                    def.Default.GetEvalTimeType().FullName,
+                    NodeValue.GetEvalTimeType(def.DefaultType).FullName,
                     def.Name,
                     i
                 );

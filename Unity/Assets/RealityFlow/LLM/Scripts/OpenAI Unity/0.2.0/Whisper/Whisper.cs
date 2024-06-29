@@ -7,18 +7,16 @@ using Ubiq.Voip;
 using Microsoft.MixedReality.Toolkit.UX;
 using System.Collections;
 using UnityEngine.InputSystem;
-
+using System.Threading.Tasks;
 namespace Samples.Whisper
 {
     public class Whisper : MonoBehaviour
     {
-
         [SerializeField] private MRTKTMPInputField message;
         [SerializeField] private GameObject flashingLight; // Reference to the flashing light GameObject
         [SerializeField] private GameObject nearmenutoolbox; // Reference to the nearmenutoolbox
         [SerializeField] private GameObject LLMWindow; // Reference to the LLMWindow
 
-        private readonly string fileName = "output.wav";
         private readonly int maxDuration = 30;
 
         private AudioClip clip;
@@ -28,6 +26,7 @@ namespace Samples.Whisper
         private MuteManager muteManager;
         private string currentApiKey;
 
+        public static Whisper rootWhisper;
         private RealityFlowActions inputActions;
         private ChatGPTTester chatGPTTester; // Reference to the ChatGPTTester
 
@@ -36,6 +35,17 @@ namespace Samples.Whisper
 
         private void Awake()
         {
+            if (rootWhisper == null)
+            {
+                DontDestroyOnLoad(gameObject);
+                rootWhisper = this;
+            }
+            else
+            {
+                gameObject.SetActive(false);
+                Object.Destroy(gameObject);
+                return;
+            }
             inputActions = new RealityFlowActions();
             chatGPTTester = FindObjectOfType<ChatGPTTester>(); // Initialize the ChatGPTTester reference
         }
@@ -46,6 +56,7 @@ namespace Samples.Whisper
             inputActions.RealityFlowXRActions.ToggleRecording.canceled += OnRecordingCanceled;
             inputActions.RealityFlowXRActions.Execute.started += OnExecute; // Register the Execute action
             inputActions.RealityFlowXRActions.OpenLLMMenu.started += OnOpenLLMMenu; // Register the OpenLLMMenu action
+            inputActions.RealityFlowXRActions.StopCountdown.started += OnStopCountdown; // Register the StopCountdown action
             inputActions.Enable();
         }
 
@@ -55,6 +66,7 @@ namespace Samples.Whisper
             inputActions.RealityFlowXRActions.ToggleRecording.canceled -= OnRecordingCanceled;
             inputActions.RealityFlowXRActions.Execute.started -= OnExecute; // Unregister the Execute action
             inputActions.RealityFlowXRActions.OpenLLMMenu.started -= OnOpenLLMMenu; // Unregister the OpenLLMMenu action
+            inputActions.RealityFlowXRActions.StopCountdown.started -= OnStopCountdown; // Unregister the StopCountdown action
             inputActions.Disable();
         }
 
@@ -83,15 +95,22 @@ namespace Samples.Whisper
             }
         }
 
-        private void Start()
+        private void OnStopCountdown(InputAction.CallbackContext context)
         {
+            StopCountdown();
+        }
+
+        // Formerly known as start
+        public void InitializeGPT(string apiKey)
+        {
+            // Debug.Log("################################# the apikey is " + apiKey);
             muteManager = FindObjectOfType<MuteManager>();
             if (muteManager == null)
             {
                 Debug.LogError("MuteManager not found in the scene.");
             }
 
-            string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
+            //string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (!string.IsNullOrEmpty(apiKey))
             {
                 Debug.Log("In whisper API key is :" + apiKey);
@@ -122,7 +141,7 @@ namespace Samples.Whisper
         {
             currentApiKey = apiKey;
             openai = new OpenAIApi(apiKey);
-            Debug.Log("OpenAI API initialized with provided key.");
+            // Debug.Log("OpenAI API initialized with provided key.");
         }
 
         public void ToggleRecording()
@@ -188,6 +207,7 @@ namespace Samples.Whisper
                 return;
             }
 
+            string fileName = GenerateUniqueFileName();
             byte[] data = SaveWav.Save(fileName, clip);
 
             if (data == null)
@@ -198,7 +218,7 @@ namespace Samples.Whisper
 
             var req = new CreateAudioTranscriptionsRequest
             {
-                FileData = new FileData() { Data = data, Name = "audio.wav" },
+                FileData = new FileData() { Data = data, Name = fileName },
                 Model = "whisper-1",
                 Language = "en"
             };
@@ -235,6 +255,43 @@ namespace Samples.Whisper
                 }
                 countdownCoroutine = StartCoroutine(StartCountdown(res.Text));
             }
+        }
+
+        public async Task<string> TranscribeRecordingAsync(byte[] data)
+        {
+            if (data == null)
+            {
+                Debug.LogError("Failed to load audio data.");
+                return null;
+            }
+
+            var req = new CreateAudioTranscriptionsRequest
+            {
+                FileData = new FileData() { Data = data, Name = "audio.wav" },
+                Model = "whisper-1",
+                Language = "en"
+            };
+
+            if (openai == null)
+            {
+                Debug.LogError("OpenAI API is not initialized.");
+                return null;
+            }
+
+            Debug.Log("Using API key: " + currentApiKey);
+            var res = await openai.CreateAudioTranscription(req);
+            // Write the transcribed text to the MRTKTMPInputField
+            //message.text = $"This is what we heard you say, is this correct:\n\n \"{res.Text}\"?";
+
+            // Print the transcribed message to the debug log
+            Debug.Log("Transcribed message: " + res.Text);
+
+            return res.Text;
+        }
+
+        private string GenerateUniqueFileName()
+        {
+            return $"WhisperRecording_{System.DateTime.Now:yyyyMMdd_HHmmss}.wav";
         }
 
         private void Update()
@@ -301,8 +358,25 @@ namespace Samples.Whisper
         {
             if (chatGPTTester != null)
             {
-                chatGPTTester.ExecuteLoggedActions();
+                StartCoroutine(chatGPTTester.ExecuteLoggedActionsCoroutine());
             }
+        }
+
+        // New method to stop the countdown
+        public void StopCountdown()
+        {
+            if (countdownCoroutine != null)
+            {
+                StopCoroutine(countdownCoroutine);
+                countdownCoroutine = null;
+                isCountdownActive = false;
+                Debug.Log("Countdown stopped.");
+            }
+        }
+
+        public string GetCurrentApiKey()
+        {
+            return currentApiKey;
         }
     }
 }

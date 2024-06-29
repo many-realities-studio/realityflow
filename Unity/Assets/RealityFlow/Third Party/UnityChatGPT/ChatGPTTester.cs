@@ -6,6 +6,7 @@ using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
 using System.IO;
+using System.Collections;
 
 public class ChatGPTTester : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class ChatGPTTester : MonoBehaviour
     [SerializeField]
     private bool immediateCompilation = false;
 
+    public RaycastLogger raycastLogger;
+
     public string ChatGPTMessage
     {
         get
@@ -35,32 +38,24 @@ public class ChatGPTTester : MonoBehaviour
     {
         { "SpawnObject", "Create an object: {0}" },
         { "DespawnObject", "Remove the object: {0}" },
-        { "UpdateObjectTransform", "Update the transform of object: {0}" },
+        { "UpdateObjectTransform", "Move the object: {0}" },
         { "AddNodeToGraph", "Add a node to the graph: {0}" },
         // Add more mappings as needed
     };
 
     private void Awake()
     {
-
     }
 
     public void Execute()
     {
-        LLMPromptToBePassed
-
- = $"{chatGPTQuestion.promptPrefixConstant} {UserWhisperInput.text}";
-
+        LLMPromptToBePassed = $"{chatGPTQuestion.promptPrefixConstant} {UserWhisperInput.text}";
 
         ChatGPTProgress.Instance.StartProgress("Generating source code, please wait");
 
         Array.ForEach(chatGPTQuestion.replacements, r =>
         {
-            LLMPromptToBePassed
-
-     = LLMPromptToBePassed
-
-    .Replace("{" + $"{r.replacementType}" + "}", r.value);
+            LLMPromptToBePassed = LLMPromptToBePassed.Replace("{" + $"{r.replacementType}" + "}", r.value);
         });
 
         List<string> prefabNames = RealityFlowAPI.Instance.GetPrefabNames();
@@ -68,45 +63,62 @@ public class ChatGPTTester : MonoBehaviour
         {
             var reminderMessage = "\n-------------------------------------------------------------------------\n\n\nOnly use the following prefabs when spawning: " + string.Join(", ", prefabNames);
             Debug.Log("Only use the following prefabs when generating code: " + string.Join(", ", prefabNames));
+
+            Vector3 indicatorPosition = raycastLogger.GetVisualIndicatorPosition();
+            if (indicatorPosition != Vector3.zero)
+            {
+                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the location {indicatorPosition} as the position data when you spawn any and all objects. Also unless specified otherwise use this location as the updateobjecttransform position";
+                Debug.Log("Visual Indicator Location: " + indicatorPosition);
+            }
+
             AddOrUpdateReminder(reminderMessage);
         }
 
-        //string spawnedObjectsData = RealityFlowAPI.Instance.ExportSpawnedObjectsData();
-        //if (!string.IsNullOrEmpty(spawnedObjectsData))
-        //{
-        //  var reminderMessage = "\n --------------------------------------------------------------\n\n\nCurrent spawned objects data: " + spawnedObjectsData;
-        //Debug.Log("Current spawned objects data: " + spawnedObjectsData);
-        //AddOrUpdateReminder(reminderMessage);
-        //}
+        // Add reminder for selected object if it exists
+        string selectedObjectName = raycastLogger.GetSelectedObjectName();
+        if (!string.IsNullOrEmpty(selectedObjectName))
+        {
+            var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given. If requests have no object name use the object {selectedObjectName} ";
+            Debug.Log($"Selected object: {selectedObjectName}");
+            AddOrUpdateReminder(selectedObjectReminder);
+        }
 
         if (chatGPTQuestion.reminders.Length > 0)
         {
-            LLMPromptToBePassed
-
-     += $", {string.Join(',', chatGPTQuestion.reminders)}";
-            Debug.Log("The complete reminders are: " + LLMPromptToBePassed
-
-    );
+            LLMPromptToBePassed += $", {string.Join(',', chatGPTQuestion.reminders)}";
+            Debug.Log("The complete reminders are: " + LLMPromptToBePassed);
         }
 
-        StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed
-
-, (response) =>
+        StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed, (response) =>
         {
             lastChatGPTResponseCache = response;
             ChatGPTProgress.Instance.StopProgress();
 
             WriteResponseToFile(ChatGPTMessage);
-            // Log the API calls in plain English
+            //Log the API calls in plain English
+            Debug.Log("Logging message in plain English");
             LogApiCalls(ChatGPTMessage);
+
+            //If you want to see the code produced by ChatGPT uncomment out the line below
             //Logger.Instance.LogInfo(ChatGPTMessage);
+            if (RealityFlowAPI.Instance == null)
+            {
+                Debug.LogError("RealityFlowAPI.Instance is null.");
+                return;
+            }
+
+            if (RealityFlowAPI.Instance.actionLogger == null)
+            {
+                Debug.LogError("RealityFlowAPI.Instance.actionLogger is null.");
+                return;
+            }
 
             // Log the generated code instead of executing it immediately
             RealityFlowAPI.Instance.actionLogger.LogGeneratedCode(ChatGPTMessage);
 
             if (immediateCompilation)
             {
-                ExecuteLoggedActions();
+                ExecuteLoggedActionsCoroutine();
             }
         }));
 
@@ -152,35 +164,59 @@ public class ChatGPTTester : MonoBehaviour
 
     private string ExtractObjectName(string code, string functionName)
     {
-        // This method should extract the object name or relevant parameter from the generated code
-        // You can implement this based on the expected structure of the generated code
-        // For example, if the generated code is like "SpawnObject('Ladder', ...)", you can extract 'Ladder'
-
-        // Here's a simple example assuming the object name is always the first parameter
         int startIndex = code.IndexOf(functionName) + functionName.Length + 1;
+        if (startIndex < functionName.Length + 1)
+        {
+            return "Unknown Object";
+        }
+
         int endIndex = code.IndexOf(',', startIndex);
         if (endIndex == -1) endIndex = code.IndexOf(')', startIndex);
         if (startIndex >= 0 && endIndex > startIndex)
         {
-            return code.Substring(startIndex, endIndex - startIndex).Trim(' ', '\'', '\"');
+            string parameter = code.Substring(startIndex, endIndex - startIndex).Trim(' ', '\'', '\"');
+
+            // Check if the parameter is a variable name and resolve it if necessary
+            if (parameter.StartsWith("prefabName"))
+            {
+                int nameStartIndex = code.IndexOf("string prefabName = ") + "string prefabName = ".Length;
+                int nameEndIndex = code.IndexOf(';', nameStartIndex);
+                if (nameStartIndex >= 0 && nameEndIndex > nameStartIndex)
+                {
+                    parameter = code.Substring(nameStartIndex, nameEndIndex - nameStartIndex).Trim(' ', '\'', '\"');
+                }
+            }
+            return parameter;
         }
         return "Unknown Object";
     }
-
-    public void ExecuteLoggedActions()
+    public IEnumerator ExecuteLoggedActionsCoroutine()
     {
+        if (RealityFlowAPI.Instance == null)
+        {
+            Debug.LogError("RealityFlowAPI.Instance is null.");
+            yield break;
+        }
+
+        if (RealityFlowAPI.Instance.actionLogger == null)
+        {
+            Debug.LogError("RealityFlowAPI.Instance.actionLogger is null.");
+            yield break;
+        }
+
         // Execute all logged actions (code snippets) sequentially
-        RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCode();
+        yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCodeCoroutine());
     }
 
     public void ProcessAndCompileResponse()
     {
-        RoslynCodeRunner.Instance.RunCode(ChatGPTMessage);
+        RoslynCodeRunner.Instance.RunCodeCoroutine(ChatGPTMessage);
     }
 
     private void WriteResponseToFile(string response)
     {
-        string path = Application.persistentDataPath + "/ChatGPTResponse.json";
+        Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
+        string path = Application.persistentDataPath + "/ChatGPTResponse.cs";
         try
         {
             File.WriteAllText(path, response);

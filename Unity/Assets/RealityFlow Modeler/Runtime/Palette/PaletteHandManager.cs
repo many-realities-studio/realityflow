@@ -7,6 +7,7 @@ using Ubiq.Networking;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Avatars;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// Class PaletteHandManager manages which hand is the dominant one and attaches the palette to it.
@@ -27,12 +28,14 @@ public class PaletteHandManager : MonoBehaviour
 
     void Awake()
     {   
-        leftHandRay = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray");
-        leftHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor");
-        rightHandRay = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/Far Ray");
-        rightHandPokeInteractor = GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor");
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHandRay = rig.transform.Find("Camera Offset/MRTK LeftHand Controller/Far Ray").gameObject;
+        leftHandPokeInteractor = rig.transform.Find("Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor").gameObject;
+        rightHandRay = rig.transform.Find("Camera Offset/MRTK RightHand Controller/Far Ray").gameObject;
+        rightHandPokeInteractor = rig.transform.Find("Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor").gameObject;
     }
 
+    // This tracks the hand via the Ubiq Avatar by searching for the owner's avatar and setting the dominant hand based on the Switch Hands Button
     public void UpdateHand(NetworkContext context, ParentConstraint parentConstraint, Ubiq.Avatars.Avatar[] avatars, ParentConstraint otherPaletteParentConstraint, string paletteType, bool handStateAlreadyFound)
     {
         // Debug.Log("Called UpdateHand() from palette " + gameObject.name + " in scene " + gameObject.transform.parent.parent.parent.name);
@@ -51,6 +54,7 @@ public class PaletteHandManager : MonoBehaviour
                 // }
 
                 // If the left hand is not set, and there is no handstate yet, search each avatar to set the correct dominant hand.
+                // A lot of code depends on walking the hierarchy from the DominantHandManager tags
                 if (isLeftHandDominant == null && !handStateAlreadyFound)
                 {
                     for (int j = 0; j < dominantHandManagers.Length; j++)
@@ -107,9 +111,9 @@ public class PaletteHandManager : MonoBehaviour
                     // Disable and enable the appropriate selectors for a dominant left hand
                     leftHandRay.SetActive(true);
                     leftHandPokeInteractor.SetActive(true);
-
-                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/Far Ray"),
-                                    GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor")));
+                    var rig = FindFirstObjectByType<XROrigin>().gameObject;
+                    StartCoroutine(disableController(0.25f, rig.transform.Find("Camera Offset/MRTK RightHand Controller/Far Ray").gameObject,
+                                    rig.transform.Find("Camera Offset/MRTK RightHand Controller/IndexTip PokeInteractor").gameObject));
                 }
                 else if (!isLeftHandDominant.IsToggled)
                 {
@@ -134,9 +138,9 @@ public class PaletteHandManager : MonoBehaviour
                     // Disable and enable the appropriate selectors for a dominant right hand
                     rightHandRay.SetActive(true);
                     rightHandPokeInteractor.SetActive(true);
-
-                    StartCoroutine(disableController(0.25f, GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/Far Ray"),
-                                    GameObject.Find("Player (XRI + WebXR)/MRTK XR Rig/Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor")));
+                    var rig = FindFirstObjectByType<XROrigin>().gameObject;
+                    StartCoroutine(disableController(0.25f, rig.transform.Find("Camera Offset/MRTK LeftHand Controller/Far Ray").gameObject,
+                                    rig.transform.Find("Camera Offset/MRTK LeftHand Controller/IndexTip PokeInteractor").gameObject));
                 }
 
                 // By default, parent constraint is set to false in the inspector. Turn it on only for the client. If parent

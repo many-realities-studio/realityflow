@@ -25,6 +25,9 @@ GameObject:
   - component: {fileID: 5954362475428783005}
   - component: {fileID: 5241023694219699609}
   - component: {fileID: 8721132859247098966}
+  - component: {fileID: -2274518277862525055}
+  - component: {fileID: 49663344049347585}
+  - component: {fileID: -4098551581492581748}
   m_Layer: 0
   m_Name: PrimitiveBase
   m_TagString: Untagged
@@ -238,6 +241,7 @@ MonoBehaviour:
   isHeld: 0
   isSelected: 0
   wasBake: 0
+  lastSize: 0.1
   isDuplicate: 0
   originalName: 
 --- !u!114 &-3145124811549111402
@@ -566,7 +570,7 @@ MonoBehaviour:
       m_Calls: []
   hostTransform: {fileID: 606651668786666927}
   allowedManipulations: -1
-  allowedInteractionTypes: 2
+  allowedInteractionTypes: -1
   useForcesForNearManipulation: 0
   rotationAnchorNear: 1
   rotationAnchorFar: 1
@@ -750,6 +754,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graph:
+    id: 
+    name: 
     nodes:
       list:
         listDict: []
@@ -772,7 +778,8 @@ MonoBehaviour:
         listDict: []
     variadicPassthrough: 0
     variadicOutput: 0
-  isTemplate: 0
+    variables:
+      listDict: []
   references:
     version: 2
     RefIds: []
@@ -788,5 +795,64 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fa94b03ab20c9d40baf741a9eb535e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiteboardPrefab: {fileID: 1790523852647275305, guid: 1eb4494b38b188e429bf4d1008b88657,
-    type: 3}
+--- !u!54 &-2274518277862525055
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 32
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &49663344049347585
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4098551581492581748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8676e655248d62469367ef11154188c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceThreshold: 20

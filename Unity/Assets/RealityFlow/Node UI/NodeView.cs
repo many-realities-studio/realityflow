@@ -49,9 +49,12 @@ namespace RealityFlow.NodeUI
                 [NodeValueType.Vector3] = Resources.Load<GameObject>(basePath + "Vector3 Editor"),
                 [NodeValueType.String] = Resources.Load<GameObject>(basePath + "String Editor"),
                 [NodeValueType.GameObject] = Resources.Load<GameObject>(basePath + "GameObject Editor"),
+                [NodeValueType.TemplateObject] = Resources.Load<GameObject>(basePath + "TemplateObject Editor"),
                 [NodeValueType.Any] = Resources.Load<GameObject>(basePath + "Any Editor"),
                 [NodeValueType.Bool] = Resources.Load<GameObject>(basePath + "Bool Editor"),
                 [NodeValueType.Variable] = Resources.Load<GameObject>(basePath + "Variable Editor"),
+                [NodeValueType.Text] = Resources.Load<GameObject>(basePath + "Text Editor"),
+                [NodeValueType.Audio] = Resources.Load<GameObject>(basePath + "Audio Editor"),
             };
         }
 
@@ -85,7 +88,7 @@ namespace RealityFlow.NodeUI
         public void Move()
         {
             RectTransform rect = (RectTransform)transform;
-            Vector2 pos = rect.localPosition;
+            Vector2 pos = rect.anchoredPosition;
             GraphView view = GetComponentInParent<GraphView>();
             RealityFlowAPI.Instance.SetNodePosition(view.Graph, Index, pos);
         }
@@ -109,11 +112,8 @@ namespace RealityFlow.NodeUI
             outputExecutionPorts.Clear();
 
             title.text = Node.Definition.Name;
-            transform.localPosition = new(
-                Node.Position.x,
-                Node.Position.y,
-                transform.localPosition.z
-            );
+            RectTransform rect = (RectTransform)transform;
+            rect.anchoredPosition = Node.Position;
 
             GraphView view = GetComponentInParent<GraphView>();
 
@@ -121,13 +121,13 @@ namespace RealityFlow.NodeUI
             {
                 int current = i;
                 NodeFieldDefinition def = Node.Definition.Fields[i];
-                GameObject field = Instantiate(FieldPrefabs[def.Default.Type], fields);
+                GameObject field = Instantiate(FieldPrefabs[def.DefaultType], fields);
 
                 IValueEditor editor = field.GetComponent<IValueEditor>();
                 if (!Node.TryGetField(i, out NodeValue fieldValue))
                 {
                     Debug.LogError("Failed to get field value on Render()");
-                    fieldValue = def.Default;
+                    fieldValue = def.DefaultValue;
                 }
 
                 editor.NodeValue = fieldValue;

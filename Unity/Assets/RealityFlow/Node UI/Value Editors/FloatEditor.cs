@@ -22,14 +22,14 @@ namespace RealityFlow.NodeUI
         public float Value
         {
             get => float.TryParse(input.text, out float val) ? val : default;
-            set => input.text = value.ToString();
+            set => input.SetTextWithoutNotify(value.ToString());
         }
 
         public NodeValue NodeValue
         {
             set
             {
-                if (value.TryGetValue(out float val))
+                if (NodeValue.TryGetValue(value, out float val))
                     Value = val;
                 else
                     Debug.LogError("incorrect value type assigned to FloatEditor");
@@ -41,7 +41,7 @@ namespace RealityFlow.NodeUI
             if (!float.TryParse(input.text, out _))
                 input.text = "0";
 
-            OnTick(new(Value));
+            OnTick?.Invoke(new FloatValue(Value));
         }
     }
 }

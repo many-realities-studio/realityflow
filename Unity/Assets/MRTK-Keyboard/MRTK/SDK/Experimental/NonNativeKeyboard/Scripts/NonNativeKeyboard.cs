@@ -7,6 +7,8 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using RealityFlow.NodeUI;
+
 
 namespace Microsoft.MixedReality.Toolkit.Experimental.UI
 {
@@ -83,8 +85,13 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// be already assigned.
         /// </summary>
         //[Experimental]
-        public TMP_InputField InputField = null;
+        public Custom_MRTK_InputField InputField = null;
+        public Custom_MRTK_InputField CustomInputField;
 
+        //public void SetTargetInputField(Custom_MRTK_InputField UserinputField)
+        //{
+        //  InputField = UserinputField;
+        //}
         /// <summary>
         /// Move the axis slider based on the camera forward and the keyboard plane projection.
         /// </summary>
@@ -155,7 +162,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// <summary>
         /// Make the keyboard disappear automatically after a timeout
         /// </summary>
-        public bool CloseOnInactivity = true;
+        public bool CloseOnInactivity = false;
 
         /// <summary>
         /// Inactivity time that makes the keyboard disappear automatically.
@@ -332,7 +339,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// Called whenever the keyboard is disabled or deactivated.
         /// </summary>
         protected void OnDisable()
-        {            
+        {
             m_LastKeyboardLayout = LayoutType.Alpha;
             Clear();
         }
@@ -402,6 +409,34 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// <summary>
         /// Present the default keyboard to the camera.
         /// </summary>
+        /// 
+        public void PresentKeyboard(Custom_MRTK_InputField userInputField)
+        {
+            ResetClosingTime();
+            gameObject.SetActive(true);
+            SetTargetInputField(userInputField);
+            ActivateSpecificKeyboard(LayoutType.Alpha);
+            OnPlacement(this, EventArgs.Empty);
+            InputField.ActivateInputField();
+        }
+
+        public void SetTargetInputField(Custom_MRTK_InputField userInputField)
+        {
+            ClearTargetInputField(); // Clear previous listeners
+            InputField = userInputField;
+            if (InputField != null)
+            {
+                InputField.onValueChanged.AddListener(DoTextUpdated);
+            }
+        }
+        private void ClearTargetInputField()
+        {
+            if (InputField != null)
+            {
+                InputField.onValueChanged.RemoveListener(DoTextUpdated);
+                InputField = null;
+            }
+        }
         public void PresentKeyboard()
         {
             ResetClosingTime();
@@ -523,32 +558,32 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             switch (keyboardType)
             {
                 case LayoutType.URL:
-                {
-                    ShowAlphaKeyboard();
-                    TryToShowURLSubkeys();
-                    break;
-                }
+                    {
+                        ShowAlphaKeyboard();
+                        TryToShowURLSubkeys();
+                        break;
+                    }
 
                 case LayoutType.Email:
-                {
-                    ShowAlphaKeyboard();
-                    TryToShowEmailSubkeys();
-                    break;
-                }
+                    {
+                        ShowAlphaKeyboard();
+                        TryToShowEmailSubkeys();
+                        break;
+                    }
 
                 case LayoutType.Symbol:
-                {
-                    ShowSymbolKeyboard();
-                    break;
-                }
+                    {
+                        ShowSymbolKeyboard();
+                        break;
+                    }
 
                 case LayoutType.Alpha:
                 default:
-                {
-                    ShowAlphaKeyboard();
-                    TryToShowAlphaSubkeys();
-                    break;
-                }
+                    {
+                        ShowAlphaKeyboard();
+                        TryToShowAlphaSubkeys();
+                        break;
+                    }
             }
         }
 
@@ -644,46 +679,46 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             switch (functionKey.ButtonFunction)
             {
                 case KeyboardKeyFunc.Function.Enter:
-                {
-                    Enter();
-                    break;
-                }
+                    {
+                        Enter();
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Tab:
-                {
-                    Tab();
-                    break;
-                }
+                    {
+                        Tab();
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.ABC:
-                {
-                    ActivateSpecificKeyboard(m_LastKeyboardLayout);
-                    break;
-                }
+                    {
+                        ActivateSpecificKeyboard(m_LastKeyboardLayout);
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Symbol:
-                {
-                    ActivateSpecificKeyboard(LayoutType.Symbol);
-                    break;
-                }
+                    {
+                        ActivateSpecificKeyboard(LayoutType.Symbol);
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Previous:
-                {
-                    MoveCaretLeft();
-                    break;
-                }
+                    {
+                        MoveCaretLeft();
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Next:
-                {
-                    MoveCaretRight();
-                    break;
-                }
+                    {
+                        MoveCaretRight();
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Close:
-                {
-                    Close();
-                    break;
-                }
+                    {
+                        Close();
+                        break;
+                    }
 
                 //case KeyboardKeyFunc.Function.Dictate:
                 //{
@@ -701,34 +736,34 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
                 //}
 
                 case KeyboardKeyFunc.Function.Shift:
-                {
-                    Shift(!m_IsShifted);
-                    break;
-                }
+                    {
+                        Shift(!m_IsShifted);
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.CapsLock:
-                {
-                    CapsLock(!m_IsCapslocked);
-                    break;
-                }
+                    {
+                        CapsLock(!m_IsCapslocked);
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Space:
-                {
-                    Space();
-                    break;
-                }
+                    {
+                        Space();
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.Backspace:
-                {
-                    Backspace();
-                    break;
-                }
+                    {
+                        Backspace();
+                        break;
+                    }
 
                 case KeyboardKeyFunc.Function.UNDEFINED:
-                {
-                    Debug.LogErrorFormat("The {0} key on this keyboard hasn't been assigned a function.", functionKey.name);
-                    break;
-                }
+                    {
+                        Debug.LogErrorFormat("The {0} key on this keyboard hasn't been assigned a function.", functionKey.name);
+                        break;
+                    }
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -904,7 +939,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             //    dictationSystem.StopRecording();
             //}
             //SetMicrophoneDefault();
-            OnClosed(this, EventArgs.Empty);            
+            OnClosed(this, EventArgs.Empty);
             gameObject.SetActive(false);
         }
 

@@ -7,6 +7,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Unity.XR.CoreUtils;
 
 /// <summary>
 /// Class ColorTool grabs a reference to the active state of the color tool, updates the user's
@@ -29,8 +30,9 @@ public class ColorTool : MonoBehaviour
     void Start()
     {
         currentHitResult = new RaycastHit();
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
         rayInteractor = rightHand.GetComponentInChildren<XRRayInteractor>();
 
         if (rayInteractor == null)
@@ -97,9 +99,6 @@ public class ColorTool : MonoBehaviour
             {
                 return;
             }
-
-            // If the game object hit has an interactable
-            Debug.Log(currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>()); 
 
             if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() != null)
             {

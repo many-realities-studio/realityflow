@@ -17,40 +17,100 @@ MonoBehaviour:
   prompt: 
   replacements: []
   reminders:
-  - 'Only use the RealityFlow API which an example of which is referenced here: ###
-    RealityFlow API Functions and Examples  1. **SpawnObject**    - **Description**:
-    Spawns an object in the virtual room.    - **Usage**:       ```csharp      GameObject
-    ladder = RealityFlowAPI.Instance.SpawnObject("Ladder", new Vector3(0, 0, 0),
-    Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer);      ``` 
-    2. **DespawnObject**    - **Description**: Removes an object from the virtual
-    room.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.FindSpawnedObject("Ladder(Clone)");     
-    if (ladder != null)      {          RealityFlowAPI.Instance.DespawnObject(ladder);     
-    }      ```  3. **UpdateObjectTransform**    - **Description**: Updates the position,
-    rotation, and scale of an object.    - **Usage**:       ```csharp      RealityFlowAPI.Instance.UpdateObjectTransform("Ladder(Clone)",
-    new Vector3(1, 1, 1), Quaternion.Euler(45, 45, 45), new Vector3(1.5f, 1.5f, 1.5f));     
-    ```  4. **FindSpawnedObject**    - **Description**: Finds a spawned object by
-    name.    - **Usage**:       ```csharp      GameObject ladder = RealityFlowAPI.Instance.FindSpawnedObject("Ladder(Clone)");     
-    ```  5. **StartCompoundAction**    - **Description**: Begins a compound action
-    for batching multiple API calls.    - **Usage**:       ```csharp      RealityFlowAPI.Instance.StartCompoundAction();     
-    ```  6. **EndCompoundAction**    - **Description**: Ends a compound action, logging
-    all batched actions as a single undoable action.    - **Usage**:       ```csharp     
-    RealityFlowAPI.Instance.EndCompoundAction();      ```  7. **UndoLastAction**   
-    - **Description**: Undoes the last action or compound action.    - **Usage**:      
-    ```csharp      RealityFlowAPI.Instance.UndoLastAction();      ```  ### Example
-    Scenario  ```csharp // Start a compound action to spawn and move an object RealityFlowAPI.Instance.StartCompoundAction();
-    GameObject ladder = RealityFlowAPI.Instance.SpawnObject("Ladder", new Vector3(0,
-    0, 0), Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Peer); RealityFlowAPI.Instance.UpdateObjectTransform("Ladder(Clone)",
-    new Vector3(2, 2, 2), Quaternion.identity, Vector3.one); RealityFlowAPI.Instance.EndCompoundAction(); 
-    // Undo the compound action RealityFlowAPI.Instance.UndoLastAction(); ```  This
-    compact yet detailed list ensures that ChatGPT will generate code using only
-    the provided RealityFlow API functions, maintaining consistency and compatibility
-    within your project. '
+  - 'Only use the RealityFlow API which an example of which is referenced here: 
+    # RealityFlowAPI Reference Sheet  ## Overview  The `RealityFlowAPI` class provides
+    a set of functions to manage and interact with objects and graphs in a networked
+    Unity environment. This reference sheet details each function and provides short
+    examples of how to use them.  ## API Functions  ### 1. `AssignGraph(Graph newGraph,
+    GameObject obj)`  **Description**: Assigns a graph ID to the specified object. 
+    **Example**:  ```csharp Graph newGraph = CreateNodeGraphAsync(); GameObject obj
+    = FindSpawnedObject("exampleObjectId"); RealityFlowAPI.Instance.AssignGraph(newGraph,
+    obj); ```  ### 2. `CreateNodeGraphAsync()`  **Description**: Creates a new node
+    graph asynchronously.  **Example**:  ```csharp Graph newGraph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
+    ```  ### 3. `SaveGraphAsync(Graph toSave)`  **Description**: Saves the specified
+    graph to the database.  **Example**:  ```csharp RealityFlowAPI.Instance.SaveGraphAsync(newGraph);
+    ```  ### 4. `SendGraphUpdateToDatabase(string graphJson, string graphId)`  **Description**:
+    Sends the updated graph data to the database.  **Example**:  ```csharp string
+    updatedGraphJson = JsonUtility.ToJson(newGraph); RealityFlowAPI.Instance.SendGraphUpdateToDatabase(updatedGraphJson,
+    newGraph.Id); ```  ### 5. `AddNodeToGraph(Graph graph, NodeDefinition def)` 
+    **Description**: Adds a node to the specified graph.  **Example**:  ```csharp
+    NodeDefinition nodeDef = // Get node definition NodeIndex index = RealityFlowAPI.Instance.AddNodeToGraph(graph,
+    nodeDef); ```  ### 6. `RemoveNodeFromGraph(Graph graph, NodeIndex node)`  **Description**:
+    Removes a node from the specified graph.  **Example**:  ```csharp RealityFlowAPI.Instance.RemoveNodeFromGraph(graph,
+    nodeIndex); ```  ### 7. `AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex
+    to)`  **Description**: Adds a data edge between two nodes in the graph.  **Example**: 
+    ```csharp RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, fromPortIndex, toPortIndex);
+    ```  ### 8. `RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)` 
+    **Description**: Removes a data edge between two nodes in the graph.  **Example**: 
+    ```csharp RealityFlowAPI.Instance.RemoveDataEdgeFromGraph(graph, fromPortIndex,
+    toPortIndex); ```  ### 9. `AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex
+    to)`  **Description**: Adds an execution edge between two nodes in the graph. 
+    **Example**:  ```csharp RealityFlowAPI.Instance.AddExecEdgeToGraph(graph, fromPortIndex,
+    toNodeIndex); ```  ### 10. `RemoveExecEdgeFromGraph(Graph graph, PortIndex from,
+    NodeIndex to)`  **Description**: Removes an execution edge between two nodes
+    in the graph.  **Example**:  ```csharp RealityFlowAPI.Instance.RemoveExecEdgeFromGraph(graph,
+    fromPortIndex, toNodeIndex); ```  ### 11. `SetNodePosition(Graph graph, NodeIndex
+    node, Vector2 position)`  **Description**: Sets the position of a node in the
+    graph.  **Example**:  ```csharp RealityFlowAPI.Instance.SetNodePosition(graph,
+    nodeIndex, newPosition); ```  ### 12. `SetNodeFieldValue(Graph graph, NodeIndex
+    node, int field, NodeValue value)`  **Description**: Sets the value of a node
+    field in the graph.  **Example**:  ```csharp RealityFlowAPI.Instance.SetNodeFieldValue(graph,
+    nodeIndex, fieldIndex, newValue); ```  ### 13. `SetNodeInputConstantValue(Graph
+    graph, NodeIndex node, int port, NodeValue value)`  **Description**: Sets a constant
+    value for a node input port in the graph.  **Example**:  ```csharp RealityFlowAPI.Instance.SetNodeInputConstantValue(graph,
+    nodeIndex, portIndex, newValue); ```  ### 14. `AddVariableToGraph(Graph graph,
+    string name, NodeValueType type)`  **Description**: Adds a variable to the graph. 
+    **Example**:  ```csharp RealityFlowAPI.Instance.AddVariableToGraph(graph, variableName,
+    variableType); ```  ### 15. `RemoveVariableFromGraph(Graph graph, string name)` 
+    **Description**: Removes a variable from the graph.  **Example**:  ```csharp
+    RealityFlowAPI.Instance.RemoveVariableFromGraph(graph, variableName); ```  ###
+    16. `SpawnObject(string prefabName, Vector3 spawnPosition, Vector3 scale = default,
+    Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)`  **Description**:
+    Spawns an object from the specified prefab at the given position, scale, and
+    rotation.  **Example**:  ```csharp RealityFlowAPI.Instance.SpawnObject(objectPrefab.name,
+    Vector3.zero, objectPrefab.transform.localScale, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+    GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject("PrefabName",
+    spawnPosition, spawnScale, spawnRotation); ```  ### 17. `DespawnObject(GameObject
+    objectToDespawn)`  **Description**: Despawns the specified object.  **Example**: 
+    ```csharp RealityFlowAPI.Instance.DespawnObject(objectToDespawn); ```  ### 18.
+    `FindSpawnedObject(string id)`  **Description**: Finds a spawned object by its
+    ID.  **Example**:  ```csharp GameObject foundObject = RealityFlowAPI.Instance.FindSpawnedObject("objectId");
+    ```  ### 19. `SelectAndOutlineObject(string id)`  **Description**: Selects and
+    applies an outline effect to the object with the specified ID.  **Example**: 
+    ```csharp RealityFlowAPI.Instance.SelectAndOutlineObject("objectId"); ```  ###
+    20. `UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation,
+    Vector3 scale)`  **Description**: Updates the transform of the specified object. 
+    **Example**:  ```csharp RealityFlowAPI.Instance.UpdateObjectTransform("objectName",
+    newPosition, newRotation, newScale); ```  ### 21. `UndoLastAction()`  **Description**:
+    Undoes the last logged action.  **Example**:  ```csharp RealityFlowAPI.Instance.UndoLastAction();
+    ```  ### 22. `StartCompoundAction()`  **Description**: Starts a compound action
+    for batching multiple actions together.  **Example**:  ```csharp RealityFlowAPI.Instance.StartCompoundAction();
+    ```  ### 23. `EndCompoundAction()`  **Description**: Ends a compound action. 
+    **Example**:  ```csharp RealityFlowAPI.Instance.EndCompoundAction(); ```  ##
+    Support Functions  ### `ExportSpawnedObjectsData()`  **Description**: Exports
+    data for all spawned objects in the room.  **Example**:  ```csharp string data
+    = RealityFlowAPI.Instance.ExportSpawnedObjectsData(); Debug.Log(data); ```  ###
+    `GetPrefabByName(string name)`  **Description**: Retrieves a prefab by its name
+    from the catalogue.  **Example**:  ```csharp GameObject prefab = RealityFlowAPI.Instance.GetPrefabByName("PrefabName");
+    ```  ### `FetchAndPopulateObjects()`  **Description**: Fetches objects from the
+    database and populates the room with them.  **Example**:  ```csharp RealityFlowAPI.Instance.FetchAndPopulateObjects();
+    ```  ### `FindSpawnedObjectByName(string objectName)`  **Description**: Finds
+    a spawned object by its name.  **Example**:  ```csharp GameObject foundObject
+    = RealityFlowAPI.Instance.FindSpawnedObjectByName("ObjectName"); ```  ### `UpdatePeerObjectTransform(GameObject
+    obj, Vector3 position, Quaternion rotation, Vector3 scale)`  **Description**:
+    Updates the transform of a peer object and sends the update to the network. 
+    **Example**:  ```csharp RealityFlowAPI.Instance.UpdatePeerObjectTransform(peerObject,
+    newPosition, newRotation, newScale); ```  ### `ProcessPeerTransformUpdate(string
+    propertyKey, string jsonMessage)`  **Description**: Processes a transform update
+    received from a peer.  **Example**:  ```csharp RealityFlowAPI.Instance.ProcessPeerTransformUpdate("propertyKey",
+    jsonMessage); ``` '
   - do not include any explanations
   - aways include code with markdown
   - do not require any prefabs
   - do not require any references
   - all references should not be null
-  - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets; '
+  - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets;
+    using Graph = RealityFlow.NodeGraph.Graph;  using RealityFlow.NodeGraph; '
   - ONLY GENERATE CODE THAT MATCHES WHAT THE USER IS REQUESTING NOTHING ELSE
   - DO NOT USE COROUTINES
   - All code should be in a static Execute method
@@ -73,3 +133,29 @@ MonoBehaviour:
     // Optionally, destroy the GameObject after spawning to clean up         Destroy(gameObject);    
     } } '
   - DO NOT USE MONOBEHAVIOURS
+  - If you spawn an object make it have the tag 'Spawned' and let it keep its natural
+    scale which you can get with .transform.localScale
+  - '
+
+    -------------------------------------------------------------------------
+
+
+
+    Only
+    use the following prefabs when spawning: Reality Palette, FireworkNew, UIText,
+    Cube, Capsule, Cylinder, Rectangle (Horizontal), Rectangle (Vertical), Sphere,
+    Reality Palette, TestCube, PrimitiveBase, DuplicateProxy, PlayModeManager, Reality
+    Palette UPDATED, Reality Palette PlayMode UPDATED, Beagle, Bear, Bird, Bird Small,
+    Bizon, Cat, Chick, Chicken, Chicken Smooth, Corgi, Cow, Deer, Deer Gray, Deer
+    Smooth, Dog, Duck, Elk, Fox, Frog, German Shepard, Giraffe, Horse, lion, Lizzard,
+    Penguin, Rabbit, Seal, Shark, Sheep, Building (Cafe), Building (Long), Building
+    (Modern), Building (Plant), Building (Red), Building (Simple), Farm House, fences,
+    Gazebo, haybale, Home (Beige), Home (Brown), Home (Simple), Hospital, Police
+    Station, Scarecrow, stable, tractor, Windmill, Wood_Fence, Bush, Calla Lily,
+    Cherry Blossom, Chinese Rose, Coconut Tree, corn, Flower (Calendula), Flowerpot,
+    Flowers (Low-Poly), lily, Lotus, Margarita Flower, Margarita Flower (Bush), mushrooms,
+    Rose, Rosebush, Strawberries, sunflower, Tomato Plant, Tree, Tree (Birch), Trees
+    (Many), Vervain, Vervain (Sparse), Watering Can, basketball, Basketball Hoop,
+    Bat, Golf Ball, Golf Club, Tennis Ball, Tennis Racket, Baseball, Battery, Bubble
+    Gun, Drill, pedestal, screw, Soap Dispenser, Targets, Wooden Plank, Shiba, rocks,
+    lavender'

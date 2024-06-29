@@ -21,8 +21,9 @@ namespace RealityFlow.Collections
 
         public void OnAfterDeserialize()
         {
-            for (int i = 0; i < listDict.Count; i++)
-                TryAdd(listDict[i].Item1, listDict[i].Item2);
+            if (listDict != null)
+                for (int i = 0; i < listDict.Count; i++)
+                    TryAdd(listDict[i].Item1, listDict[i].Item2);
         }
     }
 }

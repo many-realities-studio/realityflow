@@ -141,10 +141,10 @@ namespace Ubiq.Voip.Implementations.Web
             Quaternion listenerRotation)
         {
             // For WebRTC, need source position relative to listener
-            var originToListener = Matrix4x4.TRS(listenerPosition,listenerRotation,Vector3.one);
+            var originToListener = Matrix4x4.TRS(listenerPosition, listenerRotation, Vector3.one);
             var p = originToListener.inverse.MultiplyPoint3x4(sourcePosition);
 
-            JS_WebRTC_SetPanner(peerConnectionId,p.x,p.y,p.z);
+            JS_WebRTC_SetPanner(peerConnectionId, p.x, p.y, p.z);
         }
 
         public void Setup(IPeerConnectionContext context,
@@ -173,16 +173,16 @@ namespace Ubiq.Voip.Implementations.Web
             for (int i = 0; i < iceServers.Count; i++)
             {
                 JS_WebRTC_New_AddIceCandidate(
-                    peerConnectionId,iceServers[i].uri,
-                    iceServers[i].username,iceServers[i].password);
+                    peerConnectionId, iceServers[i].uri,
+                    iceServers[i].username, iceServers[i].password);
             }
-            JS_WebRTC_New_SetPolite(peerConnectionId,polite);
+            JS_WebRTC_New_SetPolite(peerConnectionId, polite);
             JS_WebRTC_New_Start(peerConnectionId);
 
             updateCoroutine = ctx.behaviour.StartCoroutine(Update());
         }
 
-        public void ProcessSignalingMessage (string json)
+        public void ProcessSignalingMessage(string json)
         {
             messageQueue.Enqueue(JsonHelpers.SignalingMessageHelper.FromJson(json));
         }
@@ -207,27 +207,28 @@ namespace Ubiq.Voip.Implementations.Web
                         // non-dotnet peer always takes on the role of polite
                         // peer as the dotnet implementaton isn't smart enough
                         // to handle rollback
-                        JS_WebRTC_SetPolite(peerConnectionId,true);
+                        JS_WebRTC_SetPolite(peerConnectionId, true);
                     }
                 }
 
                 // Workaround for chrome issue, buffer candidates if remote desc
                 // not yet set https://stackoverflow.com/questions/38198751
-                if (!hasRemoteDescription && msg.candidate != null) {
+                if (!hasRemoteDescription && msg.candidate != null)
+                {
                     // Peer Connection isn't ready for this message yet - try again later
                     messageQueue.Enqueue(msg);
                     continue;
                 }
 
-                JS_WebRTC_ProcessSignalingMessage(peerConnectionId,msg.candidate,
-                    msg.sdpMid,msg.sdpMLineIndex == null, msg.sdpMLineIndex ?? 0,
-                    msg.usernameFragment,msg.type,msg.sdp);
+                JS_WebRTC_ProcessSignalingMessage(peerConnectionId, msg.candidate,
+                    msg.sdpMid, msg.sdpMLineIndex == null, msg.sdpMLineIndex ?? 0,
+                    msg.usernameFragment, msg.type, msg.sdp);
             }
         }
 
         private IEnumerator Update()
         {
-            while(true)
+            while (true)
             {
                 UpdateHasRemoteDescription();
                 UpdateIceConnectionState();
@@ -238,7 +239,7 @@ namespace Ubiq.Voip.Implementations.Web
                 ProcessSignalingMessages();
                 SendSignalingMessages();
 
-                JS_WebRTC_EndStats(peerConnectionId,Time.frameCount);
+                JS_WebRTC_EndStats(peerConnectionId, Time.frameCount);
 
                 PushPlaybackStats();
                 PushRecordStats();
@@ -305,8 +306,8 @@ namespace Ubiq.Voip.Implementations.Web
                 {
                     ctx.context.Send(SdpMessage.ToJson(new SdpMessage
                     (
-                        type:JS_WebRTC_SignalingMessages_GetType(peerConnectionId),
-                        sdp:sdp
+                        type: JS_WebRTC_SignalingMessages_GetType(peerConnectionId),
+                        sdp: sdp
                     )));
                 }
                 else
@@ -314,15 +315,27 @@ namespace Ubiq.Voip.Implementations.Web
                     var sdpMLineIndex = JS_WebRTC_SignalingMessages_GetSdpMLineIndex(peerConnectionId);
                     ctx.context.Send(IceCandidateMessage.ToJson(new IceCandidateMessage
                     (
-                        candidate:JS_WebRTC_SignalingMessages_GetCandidate(peerConnectionId),
-                        sdpMid:JS_WebRTC_SignalingMessages_GetSdpMid(peerConnectionId),
-                        sdpMLineIndex:sdpMLineIndex < 0 ? null : (ushort?)sdpMLineIndex,
-                        usernameFragment:JS_WebRTC_SignalingMessages_GetUsernameFragment(peerConnectionId)
+                        candidate: JS_WebRTC_SignalingMessages_GetCandidate(peerConnectionId),
+                        sdpMid: JS_WebRTC_SignalingMessages_GetSdpMid(peerConnectionId),
+                        sdpMLineIndex: sdpMLineIndex < 0 ? null : (ushort?)sdpMLineIndex,
+                        usernameFragment: JS_WebRTC_SignalingMessages_GetUsernameFragment(peerConnectionId)
                     )));
                 }
 
                 JS_WebRTC_SignalingMessages_Pop(peerConnectionId);
             }
+        }
+
+        //MuteMicrophone and UnmuteMicrophone functions are RealityFlow added functions
+        // TODO: Implement these somehow
+        public void MuteMicrophone()
+        {
+
+        }
+
+        public void UnmuteMicrophone()
+        {
+
         }
     }
 }

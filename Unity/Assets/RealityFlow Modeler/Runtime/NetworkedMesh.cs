@@ -40,6 +40,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Material meshMaterial;
     private Material boundsMaterial;
     private ObjectManipulator objectManipulator;
+    private EraserTool eraser;
 
     bool lastOwner;
     public bool wasBake;
@@ -47,7 +48,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Vector3 lastPosition;
     private Vector3 lastScale;
     private Quaternion lastRotation;
-    private float lastSize;
+    public float lastSize = 0.1f;
 
     public bool isDuplicate = false;
     public string originalName = "";
@@ -68,6 +69,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         roomClient.OnPeerRemoved.AddListener(OnPeerRemoved);
 
         selectTool = FindObjectOfType<SelectTool>();*/
+        eraser = FindObjectOfType<EraserTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
         // Find the child game object of this mesh that draws the bounds visuals
@@ -101,7 +103,6 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 }
             }
         }
-
         RequestMeshData();
     }
 
@@ -140,12 +141,12 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         owner = false;
         isHeld = false;
         isSelected = false;
-        lastSize = 0.1f;
+        // if(lastSize ! = 0.1f;
         boundsControl = gameObject.GetComponent<BoundsControl>();
         meshMaterial = gameObject.GetComponent<MeshRenderer>().material;
         //boundsControl.HandlesActive = false;
 
-        if (this.NetworkId == null)
+        if (NetworkId == null)
             Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }
 
@@ -186,7 +187,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     private void RequestMeshData()
     {
-        if (!em.isEmpty)
+        if (em != null && !em.isEmpty)
         {
             return;
         }
@@ -277,13 +278,16 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
         }*/
 
-        if (isSelected || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
+        if (isSelected 
+            || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive
+            || eraser.isActive)
             return;
 
         //Debug.Log("EndHold() was called");
         isHeld = false;
         // Debug.Log("Run the EndHold() networking messages");
         
+        RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
         context.SendJson(new Message()
         {
             position = transform.localPosition,

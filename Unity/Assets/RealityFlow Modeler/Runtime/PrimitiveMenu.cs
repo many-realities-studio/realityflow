@@ -64,6 +64,7 @@ public class PrimitiveMenu : MonoBehaviour
 
     private void SpawnPrimitive(ShapeType type)
     {
+        RealityFlowAPI.Instance.LogActionToServer("Add Primitive", new { ShapeType = type});
         // Only run this script if you are the owner of the palette
         if (gameObject.transform.parent.GetComponent<NetworkedPalette>().owner)
         {

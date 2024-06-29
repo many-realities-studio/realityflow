@@ -145,7 +145,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
     Vector3 lastPosition, lastScale;
     Quaternion lastRotation;
     private GameObject realityFlowTools;
-    
+
     public void SelectTool(bool status)
     {
         m_ToolEvent.Invoke(0, status);
@@ -158,6 +158,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     public void ColorTool(bool status)
     {
+        RealityFlowAPI.Instance.LogActionToServer("Color Tool Selected/Deselected", new { ColorStatus = status});
         m_ToolEvent.Invoke(2, status);
     }
 
@@ -188,6 +189,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
 
     public void PlayTool(bool status)
     {
+        RealityFlowAPI.Instance.LogActionToServer("Play Tool Activated/Deactivated", new { PlayStatus = status});
         m_ToolEvent.Invoke(11, status);
     }
 
@@ -421,7 +423,7 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         }
 
         // Initialize which hand the palette owner has for their dominant (default is right hand)
-        gameObject.GetComponent<PaletteHandManager>().UpdateHand(context, parentConstraint, avatars, otherPaletteParentConstraint, "Palette", handToggleState.IsToggled);
+        // gameObject.GetComponent<PaletteHandManager>().UpdateHand(context, parentConstraint, avatars, otherPaletteParentConstraint, "Palette", handToggleState.IsToggled);
     }
 
     private void UpdatePlayPaletteHand()
@@ -705,6 +707,14 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
             playButtonStateVisualizer = buttonStates[44].enabled,
             playButtonActiveHover = buttonStates[44].Interactable.IsActiveHovered,
             playButtonHover = buttonStates[44].Interactable.IsRayHovered,
+            
+            leaveButtonStateVisualizer = buttonStates[47].enabled,
+            leaveButtonActiveHover = buttonStates[47].Interactable.IsActiveHovered,
+            leaveButtonHover = buttonStates[47].Interactable.IsRayHovered,
+
+            EnableNearMenuToolboxButtonStateVisualizer = buttonStates[48].enabled,
+            EnableNearMenuToolboxButtonActiveHover = buttonStates[48].Interactable.IsActiveHovered,
+            EnableNearMenuToolboxButtonHover = buttonStates[48].Interactable.IsRayHovered,
 
             // Edit related buttons
             editButtonStateVisualizer = buttonStates[29].enabled,
@@ -865,6 +875,8 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
         public bool redoButtonStateVisualizer; public bool redoButtonActiveHover; public bool redoButtonHover;
         public bool combineButtonStateVisualizer; public bool combineButtonActiveHover; public bool combineButtonHover;
         public bool playButtonStateVisualizer; public bool playButtonActiveHover; public bool playButtonHover;
+        public bool leaveButtonStateVisualizer; public bool leaveButtonActiveHover; public bool leaveButtonHover;
+        public bool EnableNearMenuToolboxButtonStateVisualizer; public bool EnableNearMenuToolboxButtonActiveHover; public bool EnableNearMenuToolboxButtonHover;
 
         // Manipulate related buttons
         public bool manipulateButtonStateVisualizer; public bool manipulateButtonActiveHover; public bool manipulateButtonHover;
@@ -1005,8 +1017,8 @@ public class NetworkedPalette : MonoBehaviour, INetworkSpawnable
                 { m.colorsButtonStateVisualizer, m.colorsButtonActiveHover, m.colorsButtonHover }, { m.colorsBackButtonStateVisualizer, m.colorsBackButtonActiveHover, m.colorsBackButtonHover },
                 { m.moreOptionsButtonStateVisualizer, m.moreOptionsButtonActiveHover, m.moreOptionsButtonHover }, { m.metallicButtonStateVisualizer, m.metallicButtonActiveHover, m.metallicButtonHover },
                 { m.smoothnessButtonStateVisualizer, m.smoothnessButtonActiveHover, m.smoothnessButtonHover }, { m.colorButtonStateVisualizer, m.colorButtonActiveHover, m.colorButtonHover },
-                { m.copyButtonStateVisualizer, m.copyButtonActiveHover, m.copyButtonHover }, { m.playButtonStateVisualizer, m.playButtonActiveHover, m.playButtonHover },
-                {m.wedgeButtonStateVisualizer, m.wedgeButtonActiveHover, m.wedgeButtonHover }, {m.pipeButtonStateVisualizer, m.pipeButtonActiveHover, m.pipeButtonHover}
+                { m.copyButtonStateVisualizer, m.copyButtonActiveHover, m.copyButtonHover }, { m.playButtonStateVisualizer, m.playButtonActiveHover, m.playButtonHover }, { m.leaveButtonStateVisualizer, m.leaveButtonActiveHover, m.leaveButtonHover },
+                {m.wedgeButtonStateVisualizer, m.wedgeButtonActiveHover, m.wedgeButtonHover }, {m.pipeButtonStateVisualizer, m.pipeButtonActiveHover, m.pipeButtonHover}, {m.EnableNearMenuToolboxButtonStateVisualizer, m.EnableNearMenuToolboxButtonActiveHover, m.EnableNearMenuToolboxButtonHover}
             };
 
             bool [] toggleProperties = new bool[]

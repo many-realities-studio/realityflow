@@ -21,6 +21,7 @@ public enum PrimitiveSpawningMode
 public class PrimitiveSpawner : MonoBehaviour
 {
     [SerializeField] public GameObject primitive;
+    [SerializeField] public GameObject proxy;
     [SerializeField] private XRRayInteractor rayInteractor;
     [SerializeField] private GameObject leftHand;
     [SerializeField] private GameObject rightHand;
@@ -48,7 +49,7 @@ public class PrimitiveSpawner : MonoBehaviour
     private float offMode = 0f;
     private float surfaceMode = 1f;
     private bool leftHandDominant = false;
-    private bool inMeshCreationMode = false;
+    // private bool inMeshCreationMode = false;
 
     public void Awake()
     {
@@ -115,7 +116,7 @@ public class PrimitiveSpawner : MonoBehaviour
         active = false;
         // Default ray cast distance when not in mesh creation mode
         rayInteractor.maxRaycastDistance = 10f;
-        rayInteractor.GetComponent<MRTKLineVisual>().enabled = true;
+        rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = true;
     }
 
     public void OnSpawnButtonRelease()
@@ -126,6 +127,7 @@ public class PrimitiveSpawner : MonoBehaviour
         // Mesh has been created, owner can now exit mesh creation at any time
         ReEnableCancelButton(leftHandDominant);
 
+        RealityFlowAPI.Instance.UpdatePrimitive(spawnedMesh);
         resizingMesh = false;
         CreateMeshProxy();
         Destroy(XZplane);
@@ -149,7 +151,7 @@ public class PrimitiveSpawner : MonoBehaviour
             DestroyProxy();
         }
 
-        attachedObject = NetworkSpawnManager.Find(this).SpawnWithPeerScope(primitive);
+        attachedObject = NetworkSpawnManager.Find(this).SpawnWithPeerScope(proxy);
         EditableMesh mesh = PrimitiveGenerator.CreatePrimitive(currentShapeType);
         EditableMesh em = attachedObject.GetComponent<EditableMesh>();
 
@@ -276,12 +278,12 @@ public class PrimitiveSpawner : MonoBehaviour
         if (gridTool.currentSnapModeValue == offMode)
         {
             rayInteractor.maxRaycastDistance = 0.15f;
-            rayInteractor.GetComponent<MRTKLineVisual>().enabled = false;
+            rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = false;
         }
         else if (gridTool.currentSnapModeValue == surfaceMode)
         {
             rayInteractor.maxRaycastDistance = 10f;
-            rayInteractor.GetComponent<MRTKLineVisual>().enabled = true;
+            rayInteractor.GetComponent<XRInteractorLineVisual>().enabled = true;
         }
         else
         {
@@ -298,15 +300,18 @@ public class PrimitiveSpawner : MonoBehaviour
         if (!active)
             return;
 
-        spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(primitive);
-        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
-
         if (attachedObject == null) return; 
-
-        em.CreateMesh(attachedObject.GetComponent<EditableMesh>());
-        spawnedMesh.transform.position = attachedObject.transform.position;
-
-        TryEnterResizeMode();
+        Debug.Log(attachedObject);
+        if(attachedObject.GetComponent<EditableMesh>() == null)  {
+            Debug.LogError("EditableMesh component not found on attached object.");
+            return;
+        }
+        spawnedMesh = RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
+            Quaternion.identity, Vector3.one, 
+            attachedObject.GetComponent<EditableMesh>());
+        if(spawnedMesh != null) {
+            TryEnterResizeMode();
+        }
     }
 
     private void TryEnterResizeMode()

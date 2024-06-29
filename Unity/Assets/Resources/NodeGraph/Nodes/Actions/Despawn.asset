@@ -22,7 +22,7 @@ MonoBehaviour:
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'RealityFlowAPI.Instance.DespawnObject(target);
+  EvalCode: 'RealityFlowAPI.Instance.DestroyNonPersisted(target);
 
     then();'
   ExecutionInput: 1

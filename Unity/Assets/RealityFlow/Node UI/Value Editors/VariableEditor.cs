@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using RealityFlow.Collections;
 using RealityFlow.NodeGraph;
 using TMPro;
@@ -31,21 +32,29 @@ namespace RealityFlow.NodeUI
         {
             get
             {
-                if (dropdown.@value.In(0..variables.Count))
-                    return variables[dropdown.@value];
-                else
-                {
-                    dropdown.@value = -1;
+                if (dropdown.@value == 0)
                     return null;
-                }
+
+                if ((dropdown.@value - 1).In(0..variables.Count))
+                    return variables[dropdown.@value - 1];
+                else
+                    return null;
             }
             set
             {
                 variables.Clear();
-                variables.AddRange(whiteboard.TopLevelGraphView.Graph.Variables.Keys);
+                variables.AddRange(
+                    whiteboard.TopLevelGraphView.Graph.Variables
+                    .Where(kv => kv.Value == NodeValueType.Int)
+                    .Select(kv => kv.Key)
+                );
                 dropdown.ClearOptions();
+                dropdown.AddOptions(new[] { "None" }.ToList());
                 dropdown.AddOptions(variables);
-                dropdown.@value = variables.IndexOf(value);
+                if (value == null)
+                    dropdown.SetValueWithoutNotify(0);
+                else
+                    dropdown.SetValueWithoutNotify(variables.IndexOf(value) + 1);
             }
         }
 
@@ -53,7 +62,9 @@ namespace RealityFlow.NodeUI
         {
             set
             {
-                if (value.TryGetValue(out string val))
+                if (value == null)
+                    Value = null;
+                else if (NodeValue.TryGetValue(value, out string val))
                     Value = val;
                 else
                     Debug.LogError("incorrect value type assigned to VariableEditor");
@@ -62,9 +73,7 @@ namespace RealityFlow.NodeUI
 
         public void Tick()
         {
-            if (Value == null)
-                return;
-            OnTick(NodeValue.Variable(Value));
+            OnTick(new VariableValue(Value));
         }
     }
 }

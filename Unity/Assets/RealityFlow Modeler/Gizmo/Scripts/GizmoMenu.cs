@@ -60,6 +60,7 @@ public class GizmoMenu : MonoBehaviour
     /// </summary>
     public void EnableLookForTranslate()
     {
+        RealityFlowAPI.Instance.LogActionToServer("Gizmo Activated", new { GizmoType = TransformType.Translate});
         EnableLookForTarget(TransformType.Translate);
     }
 
@@ -68,6 +69,7 @@ public class GizmoMenu : MonoBehaviour
     /// </summary>
     public void EnableLookForScale()
     {
+        RealityFlowAPI.Instance.LogActionToServer("Gizmo Activated", new { GizmoType = TransformType.Scale});
         EnableLookForTarget(TransformType.Scale);
     }
      
@@ -76,6 +78,7 @@ public class GizmoMenu : MonoBehaviour
     /// </summary>
     public void EnableLookForRotate()
     {
+        RealityFlowAPI.Instance.LogActionToServer("Gizmo Activated", new { GizmoType = TransformType.Rotate});
         EnableLookForTarget(TransformType.Rotate);
     }
 

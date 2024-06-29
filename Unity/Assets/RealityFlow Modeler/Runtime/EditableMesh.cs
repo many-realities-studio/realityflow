@@ -53,6 +53,8 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             for (int i = 0; i < value.faces.Length; i++)
             {
                 faces[i] = new EMFace(value.faces[i]);
+                // Debug log to show the face
+                // Debug.Log("[EM]Face " + i + " {" + value.faces[i][0] + " " + value.faces[i][1] + " " + value.faces[i][2]);
             }
 
             baseShape = value.getShape();
@@ -89,6 +91,7 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             }
 
             GetComponent<NetworkedMesh>().SetLastSize(value.lastSize);
+            
         }
     }
 
@@ -112,6 +115,8 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
     public void CreateMesh(EditableMesh otherMesh)
     {
+        if(otherMesh != null) {
+
         positions = otherMesh.positions;
         faces = otherMesh.faces;
         /*positions = new Vector3[otherMesh.positions.Length];
@@ -126,6 +131,9 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
         meshOperationCache = new MeshOperationCache(this);
 
         FinalizeMesh();
+        } else {
+            Debug.Log("Error! Mesh wrong");
+        }
     }
 
     public void CreateMesh(PrimitiveData input)
@@ -318,7 +326,7 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
     /// <summary>
     /// Uses existing mesh data to populate the fields of Editable Mesh
     /// </summary>
-    private void LoadMeshData()
+    public void LoadMeshData()
     {
         Mesh m = meshFilter.mesh;
 

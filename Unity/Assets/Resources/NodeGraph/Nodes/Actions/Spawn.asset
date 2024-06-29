@@ -25,7 +25,8 @@ MonoBehaviour:
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'RealityFlowAPI.Instance.SpawnObject(template, position);
+  EvalCode: 'RealityFlowAPI.Instance.InstantiateNonPersisted(template, position,
+    Quaternion.identity);
 
     then();'
   ExecutionInput: 1

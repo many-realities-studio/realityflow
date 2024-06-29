@@ -14,10 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fields:
   - Name: variable
-    Default:
-      type: 11
-      value:
-        rid: 4204108440868749313
+    DefaultType: 11
+    DefaultValue:
+      rid: -2
   Inputs:
   - Name: value
     Optional: 0
@@ -36,6 +35,5 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 4204108440868749313
-      type: {class: String, ns: System, asm: mscorlib}
-      data: 
+    - rid: -2
+      type: {class: , ns: , asm: }

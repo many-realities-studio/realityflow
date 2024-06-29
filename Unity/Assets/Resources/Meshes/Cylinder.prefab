@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 3932447572002183659}
   - component: {fileID: 3758449256943222498}
   - component: {fileID: -5097691678373903839}
+  - component: {fileID: 4477133256391187587}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Default Object
@@ -113,7 +114,7 @@ CapsuleCollider:
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2728578906812571922
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -133,11 +134,11 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 32
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -397,7 +398,7 @@ MonoBehaviour:
   useForcesForNearManipulation: 0
   rotationAnchorNear: 1
   rotationAnchorFar: 1
-  releaseBehavior: 3
+  releaseBehavior: 0
   transformSmoothingLogicType:
     reference: Microsoft.MixedReality.Toolkit.SpatialManipulation.DefaultTransformSmoothingLogic,
       Microsoft.MixedReality.Toolkit.SpatialManipulation
@@ -466,13 +467,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 80581929190924221}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a2d86cf89641ced47ac32be57ea60542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   owner: 0
   isHeld: 0
+  networkedPlayManager: {fileID: 0}
 --- !u!114 &3758449256943222498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -488,6 +490,8 @@ MonoBehaviour:
   owner: 0
   isHeld: 0
   isSelected: 0
+  wasBake: 0
+  lastSize: 0.1
   isDuplicate: 0
   originalName: 
 --- !u!114 &-5097691678373903839
@@ -503,3 +507,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distanceThreshold: 20
+--- !u!114 &4477133256391187587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 80581929190924221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 207f43536db1e4420b3d240d31a5fe00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkedPlayManager: {fileID: 0}

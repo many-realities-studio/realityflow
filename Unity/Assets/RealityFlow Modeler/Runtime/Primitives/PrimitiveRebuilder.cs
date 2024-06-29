@@ -11,8 +11,9 @@ public static class PrimitiveRebuilder
     public static float minimumMeshSize = 0.1f;
     public static void RebuildMesh(EditableMesh target, float size)
     {
+        // Debug.Log("Resizing...");
         EditableMesh em;
-        //PrimitiveData data; replace all instances of em with data
+        // PrimitiveData data; replace all instances of em with data
         size = Mathf.Max(minimumMeshSize, size);
 
         switch (target.baseShape)
@@ -25,7 +26,7 @@ public static class PrimitiveRebuilder
                 break;
             //case ShapeType.Wedge:
             //    em = PrimitiveGenerator.CreateWedge(new Vector3(size, size, size));
-                break;
+                // break;
             case ShapeType.Cylinder:
                 em = PrimitiveGenerator.CreateCylinder(16, 1, size);
                 break;
@@ -40,7 +41,7 @@ public static class PrimitiveRebuilder
                 break;
             //case ShapeType.Pipe:
             //   em = PrimitiveGenerator.CreatePipe(8, 0, 0.5f * size, size, 0.2f * size);
-                break;
+                // break;
             default:
                 return;
         }

@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Microsoft.MixedReality.Toolkit.Input;
 using Ubiq.Spawning;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class SpawnObjectAtRay : MonoBehaviour
 {
-    public MRTKRayInteractor rayInteractor;
+    public XRRayInteractor rayInteractor;
     private GameObject currentPrefab = null;
     private bool spawnToggle = false;
 

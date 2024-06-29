@@ -6,6 +6,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using UnityEngine;
+using Unity.XR.CoreUtils;
 
 
 /// <summary>
@@ -38,8 +39,10 @@ public class GizmoTransform : MonoBehaviour
 
     public void Awake()
     {
-        rightHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK RightHand Controller");
-        leftHand = GameObject.Find("MRTK XR Rig/Camera Offset/MRTK LeftHand Controller");
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
+        leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
+        rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
+
         //rightHand = GameObject.Find("MRTK RightHand Controller");
         //leftHand = GameObject.Find("MRTK LeftHand Controller");
         gizmoManager = GameObject.Find("Gizmo Manager");
@@ -99,12 +102,12 @@ public class GizmoTransform : MonoBehaviour
     /// <returns>True if an interactor on an active contoller was found</returns>
     public bool SetActiveInteractor()
     {
-        // interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
-        interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
+        interactor = rightHand.GetComponentInChildren<XRRayInteractor>();
+        //interactor = rightHand.GetComponentInChildren<MRTKRayInteractor>();
 
         if (interactor == null)
-        // interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
-            interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
+            interactor = leftHand.GetComponentInChildren<XRRayInteractor>();
+            // interactor = leftHand.GetComponentInChildren<MRTKRayInteractor>();
 
         else if (interactor == null)
             return false;

@@ -40,9 +40,9 @@ public class RfObjectManager : MonoBehaviour
     }
 
 
-    private async void FetchAndPopulateObjects()
+    private void FetchAndPopulateObjects()
     {
-        var objectsInDatabase = await FetchObjectsByProjectId(projectId);
+        var objectsInDatabase = FetchObjectsByProjectId(projectId);
         if (objectsInDatabase != null)
         {
             ObjectUI.PopulateUI(contentContainer, objectPrefab, objectsInDatabase);
@@ -50,7 +50,7 @@ public class RfObjectManager : MonoBehaviour
         }
     }
 
-    public async Task SaveObjectTransformToDatabase(string objectId, TransformData transformData)
+    public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         var rfObject = new RfObject
         {
@@ -78,7 +78,7 @@ public class RfObjectManager : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await realityFlowClient.SendQueryAsync(saveObject);
+            var graphQLResponse = realityFlowClient.SendQueryBlocking(saveObject);
             if (graphQLResponse["data"] != null)
             {
                 Debug.Log("Object transform updated in the database successfully.");
@@ -102,7 +102,7 @@ public class RfObjectManager : MonoBehaviour
         }
     }
 
-    private async Task<List<RfObject>> FetchObjectsByProjectId(string projectId)
+    private List<RfObject> FetchObjectsByProjectId(string projectId)
     {
         Debug.Log("Fetching objects by project ID: " + projectId);
 
@@ -124,7 +124,7 @@ public class RfObjectManager : MonoBehaviour
 
         try
         {
-            var graphQLResponse = await realityFlowClient.SendQueryAsync(getObjectsQuery);
+            var graphQLResponse = realityFlowClient.SendQueryBlocking(getObjectsQuery);
             if (graphQLResponse["data"] != null)
             {
                 //Debug.Log("GraphQL Response Data: " + graphQLResponse.Data.ToString());

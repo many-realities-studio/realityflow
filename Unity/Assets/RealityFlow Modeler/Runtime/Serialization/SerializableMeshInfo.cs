@@ -109,14 +109,20 @@ public class SerializableMeshInfo
         for (int i = 0; i < em.faces.Length; i++)
         {
 
-            faces[i] = em.faces[i].indicies;
-            /*faces[i] = new int[em.faces[i].indicies.Length];
-            for (int j = 0; i < em.faces[i].indicies.Length; i++)
+            // faces[i] = em.faces[i].indicies;
+            faces[i] = new int[em.faces[i].indicies.Length];
+            for (int j = 0; j < em.faces[i].indicies.Length; j++)
             {
-                Debug.Log("Before faces");
+                //Debug.Log("Before faces");
                 faces[i][j] = em.faces[i].indicies[j];
-            }*/
+            }
         }
+
+        // Debug Log to show the Faces array.
+        // for (int i = 0; i < faces.Length; i++)
+        // {
+        //     Debug.Log("[SMI]Face " + i + ": " + faces[i][0] + " " + faces[i][1] + " " + faces[i][2]);
+        // }
 
         shapeID = getShapeID(em.baseShape);
     }
