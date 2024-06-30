@@ -61,7 +61,8 @@ namespace RealityFlow.Scripting
                 // )
                 .WithOptions(new CSharpCompilationOptions(
                     OutputKind.DynamicallyLinkedLibrary,
-                    reportSuppressedDiagnostics: false
+                    reportSuppressedDiagnostics: false,
+                    concurrentBuild: false
                 ));
 
             init = true;
