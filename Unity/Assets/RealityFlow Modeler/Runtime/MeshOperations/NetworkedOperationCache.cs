@@ -43,11 +43,12 @@ public class NetworkedOperationCache : MonoBehaviour, INetworkSpawnable
             }
         }
         catch { }
-
-        if (Input.GetKeyDown(KeyCode.L))
+#if !ENABLE_INPUT_SYSTEM
+    if (Input.GetKeyDown(KeyCode.L))
         {
             SendAllOperationsCacheData();
         }
+#endif
     }
 
     #region sending
