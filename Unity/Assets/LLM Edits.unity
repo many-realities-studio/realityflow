@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17593624, g: 0.22017018, b: 0.3024987, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -443,13 +443,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a50c06d6aa656da4a97fe6e4669896bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordButton: {fileID: 2106695918}
-  progressBar: {fileID: 853029626}
   message: {fileID: 1330665268}
-  apiKeyInputField: {fileID: 433817392}
-  dropdown: {fileID: 835899908}
-  submitButton: {fileID: 818983787}
-  muteButton: {fileID: 73665653}
+  flashingLight: {fileID: 0}
+  nearmenutoolbox: {fileID: 0}
+  LLMWindow: {fileID: 0}
 --- !u!4 &156419214
 Transform:
   m_ObjectHideFlags: 0
@@ -797,18 +794,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad5b753b73e311143a85055b15cea562, type: 3}
---- !u!114 &433817392 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8116191220695688419, guid: 7647c0f9f40cb6f49b6c638593fad926,
-    type: 3}
-  m_PrefabInstance: {fileID: 2133455832086663751}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b765c7397fd18a841ae637d4240571ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &809140587
 GameObject:
   m_ObjectHideFlags: 0
@@ -884,18 +869,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 809140587}
   m_CullTransparentMesh: 1
---- !u!114 &818983787 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5572222876708448538, guid: 7647c0f9f40cb6f49b6c638593fad926,
-    type: 3}
-  m_PrefabInstance: {fileID: 2133455832086663751}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &835899906
 GameObject:
   m_ObjectHideFlags: 0
@@ -1031,18 +1004,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 835899906}
   m_CullTransparentMesh: 1
---- !u!114 &853029626 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8379241303196475354, guid: 7647c0f9f40cb6f49b6c638593fad926,
-    type: 3}
-  m_PrefabInstance: {fileID: 2133455832086663751}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &860968176
 GameObject:
   m_ObjectHideFlags: 0
@@ -2104,6 +2065,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe9c751d57ca2e40bc867793c739ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnManager: {fileID: 0}
+  outlineMaterial: {fileID: 0}
+  actionLogger: {fileID: 0}
+  catalogue: {fileID: 0}
+  whiteboardPrefab: {fileID: 0}
+  nearMenuReference: {fileID: 0}
+  delteMenuReference: {fileID: 0}
+  isUndoing: 0
+  audioPlayer: {fileID: 0}
+  AudioClips:
+    listDict: []
 --- !u!114 &1330665268 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4195770502770058732, guid: f8425d87fac24f94098c94736abe2d1d,
@@ -2714,7 +2686,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:

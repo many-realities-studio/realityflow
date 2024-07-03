@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43836245, g: 0.48636073, b: 0.5671278, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -113802,6 +113802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   primitive: {fileID: 1524904045447331170, guid: c1fb14bc60f236a4180dcfa0e873e9ab,
     type: 3}
+  proxy: {fileID: 0}
   rayInteractor: {fileID: 0}
   leftHand: {fileID: 134552204}
   rightHand: {fileID: 1629436198}
@@ -118054,9 +118055,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe9c751d57ca2e40bc867793c739ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnManager: {fileID: 0}
   outlineMaterial: {fileID: 0}
+  actionLogger: {fileID: 0}
   catalogue: {fileID: 0}
   whiteboardPrefab: {fileID: 0}
+  nearMenuReference: {fileID: 0}
+  delteMenuReference: {fileID: 0}
+  isUndoing: 0
+  audioPlayer: {fileID: 0}
+  AudioClips:
+    listDict: []
 --- !u!1 &2032794943
 GameObject:
   m_ObjectHideFlags: 0
@@ -119200,7 +119209,8 @@ MonoBehaviour:
   m_fontAsset: {fileID: 11400000, guid: 9b0d0ee11ff70b04d901a29b519cbaa0, type: 2}
   m_sharedMaterial: {fileID: 5762245003366665926, guid: 9b0d0ee11ff70b04d901a29b519cbaa0,
     type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 5762245003366665926, guid: 9b0d0ee11ff70b04d901a29b519cbaa0, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
