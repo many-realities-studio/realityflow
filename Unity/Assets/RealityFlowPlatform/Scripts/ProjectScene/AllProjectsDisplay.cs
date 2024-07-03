@@ -27,7 +27,7 @@ public class ProjectDisplay : MonoBehaviour
     public GameObject roomUI;
     public Button createRoomBtn;
 
-
+    // Transferred to ProjectsDisplay.cs
     void Start()
     {
         rfClient = RealityFlowClient.Find(this);
@@ -35,6 +35,7 @@ public class ProjectDisplay : MonoBehaviour
         rfClient.OnProjectUpdated += UpdateProject;
     }
 
+    // Transferred to ProjectsDisplay.cs
     private void UpdateProject(JObject project)
     {
         projectDetailPanel.SetActive(true); // Set the project detail panel to active
@@ -43,7 +44,7 @@ public class ProjectDisplay : MonoBehaviour
         projectOwner.GetComponent<TextMeshProUGUI>().text = "by " + (string)project["getProjectById"]["projectOwner"]["username"];
     }
 
-    // Function to get the projects data
+    // Transferred to ProjectsDisplay.cs
     private void GetProjectsData()
     {
         Debug.Log("Getting public projects");
@@ -136,7 +137,7 @@ public class ProjectDisplay : MonoBehaviour
 
     }
 
-    // Function to decode the JWT token
+    // Transferred to ProjectsDisplay.cs
     public static Dictionary<string, string> DecodeJwt(string jwt)
     {
         string[] jwtParts = jwt.Split('.');
@@ -148,7 +149,7 @@ public class ProjectDisplay : MonoBehaviour
         return jwtPayload;
     }
 
-    // Function to convert the base64 URL to byte array
+    // Transferred to ProjectsDisplay.cs
     static byte[] FromBase64Url(string base64Url)
     {
         string padded = base64Url.Length % 4 == 0
@@ -157,31 +158,7 @@ public class ProjectDisplay : MonoBehaviour
         return Convert.FromBase64String(base64);
     }
 
-    // Function to display the rooms in the project
-    private void displayRooms(JArray rooms)
-    {
-        foreach (Transform child in roomsContent)
-        {
-            Destroy(child.gameObject);
-        }
-
-        for (int i = 0; i < rooms.Count; i++)
-        {
-            var room = GameObject.Instantiate(roomUI, roomsContent, false);
-            var children = new List<GameObject>();
-            room.GetChildGameObjects(children);
-            foreach (var child in children)
-            {
-                if (child.name == "JoinButton")
-                {
-                    int x = i;
-                    string joinCode = (string)rooms[x]["joinCode"];
-                    child.GetComponent<Button>().onClick.AddListener(() => CallJoinRoom(joinCode));
-                }
-            }
-        }
-    }
-    // Wrapper method to call RoomManager's JoinRoom
+    // Transferred to ProjectsDisplay.cs
     public void CallJoinRoom(string joinCode)
     {
         Debug.Log("[JOIN ROOM]Join code!: " + joinCode);
