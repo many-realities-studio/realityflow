@@ -793,6 +793,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         };
         // Manually serialize faces into a json array of arrays
         StringBuilder sb = new StringBuilder();
+    spawnedMesh.GetComponent<CacheMeshData>().SetRfObject(rfObject);
         sb.Append("[");
         for (int i = 0; i < smi.faces.Length; i++)
         {
