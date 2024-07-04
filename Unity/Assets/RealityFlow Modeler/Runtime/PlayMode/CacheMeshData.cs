@@ -22,6 +22,7 @@ public class CacheMeshData : MonoBehaviour
     private Rigidbody rb;
     private bool compErr = false;
     private BoxCollider boxCol;
+    
     public void SetRfObject(RfObject rfObj)
     {
         this.rfObj = rfObj;

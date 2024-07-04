@@ -35,7 +35,7 @@ using RealityFlow.Scripting;
 using Newtonsoft.Json.Converters;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
@@ -51,16 +51,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public ActionLogger actionLogger;
     private NetworkContext networkContext;
     public NetworkId NetworkId { get; set; }
-    private static RealityFlowAPI _instance;                
-    private static readonly object _lock = new object();   
-    public PrefabCatalogue catalogue; 
+    private static RealityFlowAPI _instance;
+    private static readonly object _lock = new object();
+    public PrefabCatalogue catalogue;
     public GameObject whiteboardPrefab;
     public static GameObject NearMenuToolbox;
     public GameObject nearMenuReference;
     public Action OnLeaveRoom;
     public static GameObject DeleteMenu;
     public GameObject delteMenuReference;
-    
+
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
     {
@@ -118,9 +118,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             ScriptUtilities.Init();
         }
-        catch
+        catch (Exception e)
         {
-            Debug.LogError("Failed to initialize script utils");
+            Debug.LogError("Failed to initialize script utils:");
+            Debug.LogException(e);
         }
 
         AudioClipNames = AudioClips.Select(kv => kv.Key).ToList();
@@ -793,7 +794,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         };
         // Manually serialize faces into a json array of arrays
         StringBuilder sb = new StringBuilder();
-    spawnedMesh.GetComponent<CacheMeshData>().SetRfObject(rfObject);
+        spawnedMesh.GetComponent<CacheMeshData>().SetRfObject(rfObject);
         sb.Append("[");
         for (int i = 0; i < smi.faces.Length; i++)
         {
@@ -1672,7 +1673,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
                     Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
-
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)
@@ -1705,6 +1705,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 spawnedObjects.Add(spawnedObject, obj);
                 spawnedObjectsById.Add(obj.id, spawnedObject);
+
+                CacheMeshData meshData = spawnedObject.GetComponent<CacheMeshData>();
+                if (meshData)
+                    meshData.SetRfObject(obj);
 
                 Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
                 // Find the spawned object in the scene (assuming it's named the same as the prefab)
@@ -1941,7 +1945,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
-            client.SendQueryFireAndForget(deleteObject, request => 
+            client.SendQueryFireAndForget(deleteObject, request =>
             {
                 if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
                     onSuccess();
