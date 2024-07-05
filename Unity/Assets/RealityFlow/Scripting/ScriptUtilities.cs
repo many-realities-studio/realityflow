@@ -66,6 +66,13 @@ namespace RealityFlow.Scripting
                 ));
 
             init = true;
+
+            // Do a dry run (empty file) to kick off compilation init
+            _ = CompileToAssembly("", null);
+
+            // Build local node defs immediately to frontload cost of building them
+            foreach (var def in RealityFlowAPI.Instance.NodeDefinitionDict.Values)
+                def.GetEvaluation();
         }
 
         static Assembly Compile(CSharpCompilation csc, List<Diagnostic> diagnostics)
