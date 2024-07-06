@@ -25,9 +25,7 @@ MonoBehaviour:
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: 'RealityFlowAPI.Instance.UpdateObjectTransform(target.name, position);
-
-    then();'
+  EvalCode: "RealityFlowAPI.Instance.UpdateObjectTransform(\n\ttarget.name, \n\tposition,\n\tQuaternion.identity,\n\tVector3.one\n);\nthen();"
   ExecutionInput: 0
   ExecutionOutputs:
   - then
