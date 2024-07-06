@@ -20,7 +20,7 @@ namespace RealityFlow.Scripting
         [SerializeField, HideInInspector]
         private long lastWriteTimeTicks = 0;
 
-        private DateTime lastWriteTime = DateTime.Now;
+        private DateTime lastWriteTime = DateTime.MinValue;
 
         public MetadataReference CompilerReference
         {
@@ -83,7 +83,7 @@ namespace RealityFlow.Scripting
                 }
             }
         }
-        
+
         public override string ToString()
         {
             string asmName = assemblyName;
