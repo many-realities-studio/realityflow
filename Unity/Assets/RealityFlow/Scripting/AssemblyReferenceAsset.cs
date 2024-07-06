@@ -83,28 +83,8 @@ namespace RealityFlow.Scripting
             }
         }
 
-        public override string ToString()
+        void UpdateIfOutdated()
         {
-            string asmName = assemblyName;
-
-            if (string.IsNullOrEmpty(asmName) == true)
-                asmName = "<Invalid Assembly>";
-
-            return string.Format("{0}({1})", nameof(AssemblyReferenceAsset), asmName);
-        }
-
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
-        {
-            // Store last write time
-            lastWriteTimeTicks = lastWriteTime.Ticks;
-        }
-
-        void ISerializationCallbackReceiver.OnAfterDeserialize()
-        {
-            // Create the last write time
-            lastWriteTime = new DateTime(lastWriteTimeTicks);
-
-            // Check for outdated - we may need to reload the serialized assembly image
             if (File.Exists(assemblyPath) == true)
             {
                 // Get the last write time
@@ -117,6 +97,33 @@ namespace RealityFlow.Scripting
                     UpdateAssemblyReference(assemblyPath, assemblyName);
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            string asmName = assemblyName;
+
+            if (string.IsNullOrEmpty(asmName) == true)
+                asmName = "<Invalid Assembly>";
+
+            return string.Format("{0}({1})", nameof(AssemblyReferenceAsset), asmName);
+        }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            UpdateIfOutdated();
+
+            // Store last write time
+            lastWriteTimeTicks = lastWriteTime.Ticks;
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            // Create the last write time
+            lastWriteTime = new DateTime(lastWriteTimeTicks);
+
+            // Check for outdated - we may need to reload the serialized assembly image
+            UpdateIfOutdated();
         }
 
         private MetadataReference GetReferences()
