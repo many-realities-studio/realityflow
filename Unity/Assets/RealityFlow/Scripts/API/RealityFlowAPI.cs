@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using Ubiq.Messaging;
 using Ubiq.Spawning;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using RealityFlow.NodeGraph;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
@@ -13,26 +11,18 @@ using System.IO;
 using System.Net.Sockets;
 using Newtonsoft.Json;
 using System.Text;
-using Graph = RealityFlow.NodeGraph.Graph;
 using Ubiq.Rooms;
 using UnityEngine.Events;
 using RealityFlow.NodeUI;
-using UnityEngine.Rendering;
 using Microsoft.MixedReality.GraphicsTools;
 using System.Collections.Immutable;
-using System.Reflection;
-using UnityEngine.UI; // For Selectable and Navigation
-using UnityEngine.EventSystems; // For UGUIInputAdapterDraggable
-using Microsoft.MixedReality.Toolkit.Input; // For ObjectManipulator
-using Microsoft.MixedReality.Toolkit.SpatialManipulation; // For ConstraintManager and TetheredPlacement
-using Microsoft.MixedReality.Toolkit.UX;
-using Microsoft.MixedReality.Toolkit.Examples.Demos;
 using Unity.VisualScripting;
 using System.Collections;
 using TMPro;
 using RealityFlow.Collections;
 using RealityFlow.Scripting;
-using Newtonsoft.Json.Converters;
+
+using Graph = RealityFlow.NodeGraph.Graph;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -43,7 +33,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     private string objectId;
     [SerializeField] private NetworkSpawnManager spawnManager;
     private GameObject selectedObject;
-    private Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+    private Dictionary<GameObject, Material> originalMaterials = new();
     private Vector3 previousPosition;
     private Quaternion previousRotation;
     private Vector3 previousScale;
@@ -169,35 +159,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         OnLeaveRoom?.Invoke();
     }
 
-    // ===== SUPPORT FUNCTIONS =====
-    /* public string ExportSpawnedObjectsData()  // Should we Delete this
-    {
-        StringBuilder sb = new StringBuilder();
-
-        foreach (var kvp in spawnManager.GetSpawnedForRoom())
-        {
-            var obj = kvp.Value;
-            if (obj != null)
-            {
-                sb.AppendLine("Object: " + obj.name);
-                Component[] components = obj.GetComponents<Component>();
-                foreach (Component component in components)
-                {
-                    sb.AppendLine("  Component: " + component.GetType().Name);
-                    if (component is Transform transform)
-                    {
-                        sb.AppendLine("    Position: " + transform.position);
-                        sb.AppendLine("    Rotation: " + transform.rotation);
-                        sb.AppendLine("    Scale: " + transform.localScale);
-                    }
-                }
-                sb.AppendLine();
-            }
-        }
-
-        return sb.ToString();
-    }*/
-
     public GameObject GetPrefabByName(string name)
     {
         // This function searches the catalogue for a prefab with the given name
@@ -212,6 +173,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.LogWarning($"Prefab named {name} not found in function GetPrefabByName.");
         return null;
     }
+
     void OutlineEffect(GameObject obj)
     {
         // Apply the outline effect (using material or component)
@@ -256,7 +218,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         spawnedObjects[obj].graphId = newGraph.Id;
         SaveObjectToDatabase(spawnedObjects[obj]);
     }
-
 
     #region Graph Functions
     public Graph CreateNodeGraphAsync()
@@ -377,6 +338,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // should set the game object's rigidbody based on whether or not it is static.
+    // TODO: Nothing is calling this
     public void SetRigidbodyFromStaticState(VisualScript obj)
     {
         RfObject rfObj = SpawnedObjects[obj.gameObject];
@@ -440,7 +402,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // -- EDIT GRAPH FUNCTIONS --
-    public void SendGraphUpdateToDatabase(string graphJson, string graphId)
+    public void SendGraphUpdateToDatabase(Graph graph)
     {
         var queryObject = new GraphQLRequest
         {
@@ -457,8 +419,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 input = new
                 {
-                    id = graphId,
-                    graphJson = graphJson
+                    id = graph.Id,
+                    graphJson = JsonUtility.ToJson(graph),
                 }
             }
         };
@@ -480,13 +442,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (!isUndoing)
             actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
 
-        // Serialize the graph object to JSON
-        string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
         LogActionToServer("AddNode", new { graphId = graph.Id, defName = def.Name, index });
 
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
         return index;
     }
 
@@ -501,13 +461,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
         Debug.Log("Removed node from graph");
 
-        // Serialize the graph object to JSON
-        string graphJson = JsonUtility.ToJson(graph);
-        // Debug.Log($"Adding node {def} to graph at index {index}");
-
         LogActionToServer("RemoveNode", new { graphId = graph.Id, node });
 
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
     }
 
     public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
@@ -517,15 +473,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to add edge");
             return;
         }
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
+
         Debug.Log($"Adding edge at {from}:{to}");
 
-        // MUTATIONS TO UPDATE JSON STRING
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Adding edge {from}:{to} to graph");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("AddDataEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to.Node, toPort = to.Port });
     }
@@ -533,14 +487,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
     {
         graph.RemoveDataEdge(from, to);
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to);
+
         Debug.Log($"Deleted edge from {from} to {to}");
 
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Deleting edge {from}:{to} to graph");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("RemoveDataEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to.Node, toPort = to.Port });
     }
@@ -552,14 +505,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to add edge");
             return;
         }
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
+
         Debug.Log($"Adding edge at {from}:{to}");
 
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Adding exec edge {from}:{to} to graph");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("AddExecEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to });
     }
@@ -567,14 +519,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public void RemoveExecEdgeFromGraph(Graph graph, PortIndex from, NodeIndex to)
     {
         graph.RemoveExecutionEdge(from, to);
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
+
         Debug.Log($"Deleted exec edge from {from} to {to}");
 
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Removing exec edge {from}:{to} to graph");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("RemoveExecEdge", new { graphId = graph.Id, fromNode = from.Node, fromPort = from.Port, toNode = to });
     }
@@ -588,14 +539,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         Vector2 prevPosition = graph.GetNode(node).Position;
         graph.GetNode(node).Position = position;
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(SetNodePosition), graph, node, prevPosition, position);
+
         Debug.Log($"Moved node {node} to {position}");
 
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Moving node {node} to {position}");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("MoveNode", new { graphId = graph.Id, node, fromPosition = prevPosition, toPosition = position });
     }
@@ -613,14 +563,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to set node field value");
             return;
         }
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, oldValue);
+
         Debug.Log($"Set node {node} field {field} to {value}");
 
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Setting node {node} field {field} to value {value}");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("SetNodeField", new { graphId = graph.Id, node, field, oldValue, newValue = value });
     }
@@ -638,14 +587,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to set node input port constant value");
             return;
         }
+
         if (!isUndoing)
             actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
+
         Debug.Log($"Set node {node} input port {port} to {value}");
 
-        string graphJson = JsonUtility.ToJson(graph);
-        Debug.Log($"Setting node {node} port {port} constant to {value}");
-
-        SendGraphUpdateToDatabase(graphJson, graph.Id);
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("SetNodePortConstant", new { graphId = graph.Id, node, port, oldValue, newValue = value });
     }
@@ -654,12 +602,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         graph.AddVariable(name, type);
 
+        SendGraphUpdateToDatabase(graph);
+
         LogActionToServer("AddVariable", new { graphId = graph.Id, name, type = type.ToString() });
     }
 
     public void RemoveVariableFromGraph(Graph graph, string name)
     {
         graph.RemoveVariable(name);
+
+        SendGraphUpdateToDatabase(graph);
 
         LogActionToServer("RemoveVariable", new { graphId = graph.Id, name });
     }
@@ -673,25 +625,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     #region Update and Spawn primitive
     // // ---Spawn/Save Object---
-    public GameObject UpdatePrimitive(GameObject spawnedMesh)
+    string MeshInfoToJson(SerializableMeshInfo smi)
     {
-        Debug.Log("Updating primitive...");
-        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
-        TransformData transformData = new TransformData
-        {
-            position = spawnedMesh.transform.position,
-            rotation = spawnedMesh.transform.rotation,
-            scale = spawnedMesh.transform.localScale
-        };
-
-        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
-        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
-
-        RfObject rfObject = spawnedObjects[spawnedMesh];
-        rfObject.transformJson = JsonUtility.ToJson(transformData);
-        rfObject.meshJson = JsonUtility.ToJson(smi);
-        // Manually serialize faces into a json array of arrays
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append("[");
         for (int i = 0; i < smi.faces.Length; i++)
         {
@@ -711,9 +647,34 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
         }
         sb.Append("]");
-        Debug.Log(sb.ToString());
+
+        return sb.ToString();
+    }
+
+    public GameObject UpdatePrimitive(GameObject spawnedMesh)
+    {
+        Debug.Log("Updating primitive...");
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        TransformData transformData = new TransformData
+        {
+            position = spawnedMesh.transform.position,
+            rotation = spawnedMesh.transform.rotation,
+            scale = spawnedMesh.transform.localScale
+        };
+
+        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
+        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
+
+        RfObject rfObject = spawnedObjects[spawnedMesh];
+        rfObject.transformJson = JsonUtility.ToJson(transformData);
+        rfObject.meshJson = JsonUtility.ToJson(smi);
+
+        string smiJson = MeshInfoToJson(smi);
+
+        Debug.Log(smiJson);
+
         // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{smiJson}");
 
         var createObject = new GraphQLRequest
         {
@@ -792,32 +753,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             meshJson = JsonUtility.ToJson(smi),
             projectId = client.GetCurrentProjectId()
         };
+
         // Manually serialize faces into a json array of arrays
-        StringBuilder sb = new StringBuilder();
         spawnedMesh.GetComponent<CacheMeshData>().SetRfObject(rfObject);
-        sb.Append("[");
-        for (int i = 0; i < smi.faces.Length; i++)
-        {
-            sb.Append("[");
-            for (int j = 0; j < smi.faces[i].Length; j++)
-            {
-                sb.Append(smi.faces[i][j]);
-                if (j < smi.faces[i].Length - 1)
-                {
-                    sb.Append(",");
-                }
-            }
-            sb.Append("]");
-            if (i < smi.faces.Length - 1)
-            {
-                sb.Append(",");
-            }
-        }
-        sb.Append("]");
-        // Debug.Log(sb.ToString());
+
+        string smiJson = MeshInfoToJson(smi);
+
         // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
-        // Debug.Log(rfObject);
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{smiJson}");
 
         var createObject = new GraphQLRequest
         {
@@ -854,7 +797,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Extract the ID from the response and assign it to the rfObject
                 var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
                 rfObject.id = returnedId;
-                // Debug.Log($"Assigned ID from database: {rfObject.id}");
+
                 spawnedObjects[spawnedMesh] = rfObject;
                 spawnedObjectsById[returnedId] = spawnedMesh;
 
@@ -891,181 +834,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return spawnedMesh;
     }
-    #endregion
-
-    class Vector2Converter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-            => objectType == typeof(Vector2);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null)
-            {
-                if (objectType.IsNullable() == false)
-                    throw new JsonSerializationException("Cannot convert null value to Vector2.");
-
-                return null;
-            }
-
-            if (reader.TokenType != JsonToken.StartObject)
-                throw new JsonSerializationException("A Vector2 must be deserialized from an object");
-
-            reader.Read();
-
-            Vector2 value = Vector2.zero;
-            while (reader.TokenType == JsonToken.PropertyName)
-            {
-                string property = (string)reader.Value;
-                reader.Read();
-                if (reader.TokenType != JsonToken.Float)
-                    throw new JsonSerializationException("Vector2 properties must be floats");
-                _ = property switch
-                {
-                    "x" => value.x = (float)(double)reader.Value,
-                    "y" => value.y = (float)(double)reader.Value,
-                    _ => throw new JsonSerializationException($"Unknown Vector2 property {property} encountered"),
-                };
-                reader.Read();
-            }
-
-            if (reader.TokenType != JsonToken.EndObject)
-                throw new JsonSerializationException("A Vector2 must be be ended with EndObject");
-
-            return value;
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            Vector2 vector = (Vector2)value;
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("x");
-            writer.WriteValue(vector.x);
-            writer.WritePropertyName("y");
-            writer.WriteValue(vector.y);
-            writer.WriteEndObject();
-        }
-    }
-
-    class Vector3Converter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-            => objectType == typeof(Vector3);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null)
-            {
-                if (objectType.IsNullable() == false)
-                    throw new JsonSerializationException("Cannot convert null value to Vector3.");
-
-                return null;
-            }
-
-            if (reader.TokenType != JsonToken.StartObject)
-                throw new JsonSerializationException("A Vector3 must be deserialized from an object");
-
-            reader.Read();
-
-            Vector3 value = Vector3.zero;
-            while (reader.TokenType == JsonToken.PropertyName)
-            {
-                string property = (string)reader.Value;
-                reader.Read();
-                if (reader.TokenType != JsonToken.Float)
-                    throw new JsonSerializationException("Vector3 properties must be floats");
-                _ = property switch
-                {
-                    "x" => value.x = (float)(double)reader.Value,
-                    "y" => value.y = (float)(double)reader.Value,
-                    "z" => value.z = (float)(double)reader.Value,
-                    _ => throw new JsonSerializationException($"Unknown Vector3 property {property} encountered"),
-                };
-                reader.Read();
-            }
-
-            if (reader.TokenType != JsonToken.EndObject)
-                throw new JsonSerializationException("A Vector3 must be be ended with EndObject");
-
-            return value;
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            Vector3 vector = (Vector3)value;
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("x");
-            writer.WriteValue(vector.x);
-            writer.WritePropertyName("y");
-            writer.WriteValue(vector.y);
-            writer.WritePropertyName("z");
-            writer.WriteValue(vector.z);
-            writer.WriteEndObject();
-        }
-    }
-
-    class QuaternionConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-            => objectType == typeof(Quaternion);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null)
-            {
-                if (objectType.IsNullable() == false)
-                    throw new JsonSerializationException("Cannot convert null value to Quaternion.");
-
-                return null;
-            }
-
-            if (reader.TokenType != JsonToken.StartObject)
-                throw new JsonSerializationException("A Quaternion must be deserialized from an object");
-
-            reader.Read();
-
-            Quaternion value = Quaternion.identity;
-            while (reader.TokenType == JsonToken.PropertyName)
-            {
-                string property = (string)reader.Value;
-                reader.Read();
-                if (reader.TokenType != JsonToken.Float)
-                    throw new JsonSerializationException("Quaternion properties must be floats");
-                _ = property switch
-                {
-                    "x" => value.x = (float)(double)reader.Value,
-                    "y" => value.y = (float)(double)reader.Value,
-                    "z" => value.z = (float)(double)reader.Value,
-                    "w" => value.w = (float)(double)reader.Value,
-                    _ => throw new JsonSerializationException($"Unknown Quaternion property {property} encountered"),
-                };
-                reader.Read();
-            }
-
-            if (reader.TokenType != JsonToken.EndObject)
-                throw new JsonSerializationException("A Quaternion must be be ended with EndObject");
-
-            return value;
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            Quaternion quat = (Quaternion)value;
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("x");
-            writer.WriteValue(quat.x);
-            writer.WritePropertyName("y");
-            writer.WriteValue(quat.y);
-            writer.WritePropertyName("z");
-            writer.WriteValue(quat.z);
-            writer.WritePropertyName("w");
-            writer.WriteValue(quat.w);
-            writer.WriteEndObject();
-        }
-    }
+    #endregion    
 
     public void LogActionToServer(string action, object data)
     {
@@ -1104,8 +873,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     #region Spawn Object
-    public GameObject SpawnObject(string prefabName, Vector3 spawnPosition,
-        Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
+    public GameObject SpawnObject(
+        string prefabName, 
+        Vector3 spawnPosition,
+        Vector3 scale = default, 
+        Quaternion spawnRotation = default, 
+        SpawnScope scope = SpawnScope.Room
+    )
     {
         //Search for Object in the catalogue
         GameObject newObject = GetPrefabByName(prefabName);
@@ -1180,8 +954,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     {
                         spawnedObject.AddComponent<AttachedWhiteboard>();
                     }
-
-
                 }
                 if (scope == SpawnScope.Room)
                 {
@@ -1505,22 +1277,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
             }
         }
-        catch (HttpRequestException httpRequestException)
-        {
-            Debug.LogError("HttpRequestException: " + httpRequestException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Debug.LogError("IOException: " + ioException.Message);
-        }
-        catch (SocketException socketException)
-        {
-            Debug.LogError("SocketException: " + socketException.Message);
-        }
         catch (Exception ex)
         {
-            Debug.LogError("General Exception: " + ex.Message);
-            Debug.LogError("Exception stack trace: " + ex.StackTrace);
+            Debug.LogException(ex);
         }
 
         return null;
