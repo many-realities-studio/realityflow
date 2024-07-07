@@ -35,7 +35,7 @@ using RealityFlow.Scripting;
 using Newtonsoft.Json.Converters;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
 public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
@@ -51,16 +51,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public ActionLogger actionLogger;
     private NetworkContext networkContext;
     public NetworkId NetworkId { get; set; }
-    private static RealityFlowAPI _instance;                
-    private static readonly object _lock = new object();   
-    public PrefabCatalogue catalogue; 
+    private static RealityFlowAPI _instance;
+    private static readonly object _lock = new object();
+    public PrefabCatalogue catalogue;
     public GameObject whiteboardPrefab;
     public static GameObject NearMenuToolbox;
     public GameObject nearMenuReference;
     public Action OnLeaveRoom;
     public static GameObject DeleteMenu;
     public GameObject delteMenuReference;
-    
+
     ImmutableDictionary<string, NodeDefinition> nodeDefinitionDict;
     public ImmutableDictionary<string, NodeDefinition> NodeDefinitionDict
     {
@@ -76,6 +76,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     private RealityFlowClient client;
     public bool isUndoing = false;
+    public bool isRedoing = false;
     readonly Dictionary<GameObject, RfObject> spawnedObjects = new();
     public ImmutableDictionary<GameObject, RfObject> SpawnedObjects
         => spawnedObjects.ToImmutableDictionary();
@@ -1800,6 +1801,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         GameObject obj = FindSpawnedObject(objectName);
         if (obj != null)
         {
+
+            if (isUndoing)
+                actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdateObjectTransform), new object[] { objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale }));
+
+            //else if (isRedoing)
+            //{
+            //   actionLogger.actionStack.Push(new ActionLogger.LoggedAction(nameof(UpdateObjectTransform), new object[] { obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale }));
+            //}
             // Update the peer object transform
             UpdatePeerObjectTransform(obj, position, rotation, scale);
 
@@ -1940,7 +1949,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
-            client.SendQueryFireAndForget(deleteObject, request => 
+            client.SendQueryFireAndForget(deleteObject, request =>
             {
                 if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
                     onSuccess();
@@ -2134,6 +2143,91 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Add cases for other functions...
         }
     }
+
+    public void RedoLastAction()
+    {
+        Debug.Log("Attempting to redo last action.");
+        Debug.Log($"Redo stack count before redo: {actionLogger.GetRedoStackCount()}");
+
+        actionLogger.StartRedo();
+        var lastRedoAction = actionLogger.GetLastRedoAction();
+        actionLogger.EndRedo();
+
+        if (lastRedoAction == null)
+        {
+            Debug.Log("No actions to redo.");
+            return;
+        }
+        isRedoing = true;
+        if (lastRedoAction is ActionLogger.CompoundAction compoundAction)
+        {
+            foreach (var action in compoundAction.Actions)
+            {
+                RedoSingleAction(action);
+            }
+        }
+        else
+        {
+            RedoSingleAction(lastRedoAction);
+        }
+
+        Debug.Log($"Redo stack after redo: {actionLogger.GetRedoStackCount()}");
+        isRedoing = false;
+    }
+
+    private void RedoSingleAction(ActionLogger.LoggedAction action)
+    {
+        switch (action.FunctionName)
+        {
+            case nameof(SpawnObject):
+                string prefabNameToExecute = (string)action.Parameters[0];
+                Vector3 positionToExecute = (Vector3)action.Parameters[1];
+                Quaternion rotationToExecute = (Quaternion)action.Parameters[2];
+                Vector3 scaleToExecute = (Vector3)action.Parameters[3];
+                SpawnScope scopeToExecute = (SpawnScope)action.Parameters[4];
+                RealityFlowAPI.Instance.SpawnObject(prefabNameToExecute, positionToExecute, scaleToExecute, rotationToExecute, scopeToExecute);
+                break;
+
+            case nameof(DespawnObject):
+                string objNameToExecute = (string)action.Parameters[0];
+                GameObject spawnedObjectToExecute = RealityFlowAPI.Instance.FindSpawnedObject(objNameToExecute);
+                if (spawnedObjectToExecute != null)
+                {
+                    RealityFlowAPI.Instance.DespawnObject(spawnedObjectToExecute);
+                }
+                break;
+
+            case nameof(UpdateObjectTransform):
+                string objectNameToExecute = (string)action.Parameters[0];
+                Vector3 positionToExecuteUpdate = (Vector3)action.Parameters[1];
+                Quaternion rotationToExecuteUpdate = (Quaternion)action.Parameters[2];
+                Vector3 scaleToExecuteUpdate = (Vector3)action.Parameters[3];
+                RealityFlowAPI.Instance.UpdateObjectTransform(objectNameToExecute, positionToExecuteUpdate, rotationToExecuteUpdate, scaleToExecuteUpdate);
+                break;
+
+            case nameof(AddNodeToGraph):
+                Graph graphToExecute = (Graph)action.Parameters[0];
+                NodeDefinition defToExecute = (NodeDefinition)action.Parameters[1];
+                graphToExecute.AddNode(defToExecute);
+                break;
+
+            case nameof(InstantiateNonPersisted):
+                GameObject objToInstantiate = (GameObject)action.Parameters[0];
+                Vector3 instantiatePosition = (Vector3)action.Parameters[1];
+                Quaternion instantiateRotation = (Quaternion)action.Parameters[2];
+                RealityFlowAPI.Instance.InstantiateNonPersisted(objToInstantiate, instantiatePosition, instantiateRotation);
+                break;
+
+            case nameof(DestroyNonPersisted):
+                GameObject objToDestroy = (GameObject)action.Parameters[0];
+                bool nonPersistent = (bool)action.Parameters[1];
+                RealityFlowAPI.Instance.DestroyNonPersisted(objToDestroy);
+                break;
+
+                // Add cases for other functions...
+        }
+    }
+
     #endregion
     public List<string> GetPrefabNames()
     {
@@ -2180,8 +2274,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (obj != null)
         {
             // Log the current transform before making changes
-            if (!isUndoing)
-                actionLogger.LogAction(nameof(UpdatePeerObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            //There are checks to make sure that it does not undo a redo remove the !isRedoing check if you wish it to undo a redo, but this may result in an infinite loop of Undos and redos
+            if (!isUndoing && !isRedoing)
+                actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
             Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
             Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
 
