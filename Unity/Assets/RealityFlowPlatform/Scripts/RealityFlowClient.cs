@@ -3,26 +3,24 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Ubiq.Rooms;
 using Ubiq.Messaging;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Threading;
 using System.Collections;
-using Unity.VisualScripting;
 using Samples.Whisper;
 
 
 // Structure for GraphQL Requests
-public class GraphQLRequest : System.Object
+public class GraphQLRequest
 {
-    [JsonPropertyAttribute(PropertyName = "query")]
+    [JsonProperty(PropertyName = "query")]
     public string Query;
-    [JsonPropertyAttribute(PropertyName = "operationName")]
+    [JsonProperty(PropertyName = "operationName")]
     public string OperationName;
-    [JsonPropertyAttribute(PropertyName = "variables")]
-    public System.Object Variables;
+    [JsonProperty(PropertyName = "variables")]
+    public object Variables;
 }
 
 public class RealityFlowClient : MonoBehaviour
@@ -148,80 +146,6 @@ public class RealityFlowClient : MonoBehaviour
             return rootRealityFlowClient;
         }
         return null;
-    }
-
-    public JObject SendQueryAsync(GraphQLRequest payload)
-    {
-        // Describe request
-        UnityWebRequest request = UnityWebRequest.Post(server + graphQLRoute,
-        JsonConvert.SerializeObject(payload), "application/json");
-        if (accessToken != null && accessToken != "")
-            request.SetRequestHeader("Authorization", "Bearer " + accessToken);
-
-        // Send request
-        // TODO: Actually make this occur over multiple frames by way of coroutines. 
-        // Seems to take 50-100ms on a decent connection, which will drop multiple frames if not
-        // asynchronous.
-        double start = Time.realtimeSinceStartupAsDouble;
-        UnityWebRequestAsyncOperation task = request.SendWebRequest();
-        while (!task.isDone)
-            Thread.Sleep(1);
-        double end = Time.realtimeSinceStartupAsDouble;
-        Debug.Log($"Query took {(end - start) * 1000}ms to complete");
-
-        // Handle response
-        JObject response = null;
-
-        // Handle network issues
-        if (request.result != UnityWebRequest.Result.Success
-                && request.downloadHandler.text == "")
-        {
-            response = new JObject();
-            var errors = new JArray();
-            var error = new JObject();
-            var errorExtensions = new JObject();
-
-            error.Add("message", request.error);
-            errorExtensions.Add("code", "INTERNAL_SERVER_ERROR");
-            error.Add("extensions", errorExtensions);
-            errors.Add(error);
-
-            error = new JObject();
-            error.Add("message", request.downloadHandler.text);
-            errors.Add(error);
-
-            response.Add("errors", errors);
-        }
-
-        // Handle response
-        if (response == null)
-        {
-            try
-            {
-                // Debug.Log(request.downloadHandler.text);
-                response = JsonConvert.DeserializeObject<JObject>(
-                    request.downloadHandler.text // This is failing
-                );
-            }
-            catch (Exception e)
-            {
-                Debug.Log(response);
-                Debug.LogError(e);
-                return new JObject();
-            }
-        }
-
-        // Display any errors
-        if (response["errors"] != null)
-        {
-            Debug.LogError("GraphQL Errors");
-            foreach (JObject error in response["errors"])
-            {
-                Debug.LogError(error["message"]);
-            }
-        }
-
-        return response;
     }
 
     #endregion
@@ -637,7 +561,7 @@ public class RealityFlowClient : MonoBehaviour
         return ProcessQueryResponse(request);
     }
 
-    public void SendQueryFireAndForget(GraphQLRequest payload, Action<UnityWebRequest> onComplete = null)
+    public void SendQueryFireAndForget(GraphQLRequest payload, Action<JObject> onComplete = null)
     {
         UnityWebRequest request = CreateWebRequest(payload);
 
@@ -646,7 +570,7 @@ public class RealityFlowClient : MonoBehaviour
         static IEnumerator WaitForRequestCompletion(
             UnityWebRequestAsyncOperation task, 
             UnityWebRequest request, 
-            Action<UnityWebRequest> onComplete,
+            Action<JObject> onComplete,
             System.Diagnostics.StackTrace trace
         )
         {
@@ -655,9 +579,9 @@ public class RealityFlowClient : MonoBehaviour
             double end = Time.realtimeSinceStartupAsDouble;
             Debug.Log($"Fire & Forget query took {(end - start) * 1000}ms to complete");
 
-            ProcessQueryResponse(request);
+            JObject response = ProcessQueryResponse(request);
 
-            onComplete?.Invoke(request);
+            onComplete?.Invoke(response);
         }
 
         StartCoroutine(WaitForRequestCompletion(

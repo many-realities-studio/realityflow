@@ -6,9 +6,6 @@ using System;
 using System.Linq;
 using RealityFlow.NodeGraph;
 using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System.IO;
-using System.Net.Sockets;
 using Newtonsoft.Json;
 using System.Text;
 using Ubiq.Rooms;
@@ -16,7 +13,6 @@ using UnityEngine.Events;
 using RealityFlow.NodeUI;
 using Microsoft.MixedReality.GraphicsTools;
 using System.Collections.Immutable;
-using Unity.VisualScripting;
 using System.Collections;
 using TMPro;
 using RealityFlow.Collections;
@@ -32,6 +28,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 {
     private string objectId;
     [SerializeField] private NetworkSpawnManager spawnManager;
+    public NetworkSpawnManager SpawnManager => spawnManager;
     private GameObject selectedObject;
     private Dictionary<GameObject, Material> originalMaterials = new();
     private Vector3 previousPosition;
@@ -64,14 +61,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private RealityFlowClient client;
+    public RealityFlowClient client { get; private set; }
     public bool isUndoing = false;
     readonly Dictionary<GameObject, RfObject> spawnedObjects = new();
-    public ImmutableDictionary<GameObject, RfObject> SpawnedObjects
-        => spawnedObjects.ToImmutableDictionary();
+    public Dictionary<GameObject, RfObject> SpawnedObjects => spawnedObjects;
     readonly Dictionary<string, GameObject> spawnedObjectsById = new();
-    public ImmutableDictionary<string, GameObject> SpawnedObjectsById
-        => spawnedObjectsById.ToImmutableDictionary();
+    public Dictionary<string, GameObject> SpawnedObjectsById => spawnedObjectsById;
 
     readonly Dictionary<GameObject, int> templatesDict = new();
     public ImmutableDictionary<GameObject, int> TemplatesDict => templatesDict.ToImmutableDictionary();
@@ -206,6 +201,69 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
         }
     }
+
+    #region Query Methods
+
+    void LogQueryResponseErrors(JObject response)
+    {
+        if (response.TryGetValueAs("errors", out JToken errors))
+        {
+            foreach (JToken error in errors)
+            {
+                if (error is JObject errorObj)
+                {
+                    if (errorObj.TryGetValueAs("message", out JValue message))
+                        Debug.LogError($"GraphQL Error: {message}");
+                    if (errorObj.TryGetValue("extensions", out JToken extensions))
+                        Debug.LogError($"Error Extensions: {extensions}");
+                }
+            }
+        }
+    }
+
+    public void CreateObjectQuery(RfObject obj, Action<string> onReceiveId)
+    {
+        GraphQLRequest query = new()
+        {
+            Query = @"
+                mutation CreateObject($input: CreateObjectInput!) {
+                    createObject(input: $input) {
+                        id
+                    }
+                }",
+            OperationName = "CreateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectId = obj.projectId,
+                    name = obj.name,
+                    graphId = obj.graphId,
+                    type = obj.type,
+                    meshJson = obj.meshJson,
+                    transformJson = obj.transformJson
+                }
+            }
+        };
+
+        client.SendQueryFireAndForget(query, response =>
+        {
+            if (
+                response != null
+                && response.TryGetValueAs("data", out JObject data)
+                && data.TryGetValueAs("createObject", out JObject createObj)
+                && createObj.TryGetValueAs("id", out JValue id)
+            )
+                onReceiveId(id.ToString());
+            else
+            {
+                Debug.LogError("Failed to create object in database");
+                LogQueryResponseErrors(response);
+            }
+        });
+    }
+
+    #endregion
 
     // ===== API FUNCTIONS =====
 
@@ -874,10 +932,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     #region Spawn Object
     public GameObject SpawnObject(
-        string prefabName, 
+        string prefabName,
         Vector3 spawnPosition,
-        Vector3 scale = default, 
-        Quaternion spawnRotation = default, 
+        Vector3 scale = default,
+        Quaternion spawnRotation = default,
         SpawnScope scope = SpawnScope.Room
     )
     {
@@ -1704,9 +1762,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
-            client.SendQueryFireAndForget(deleteObject, request =>
+            client.SendQueryFireAndForget(deleteObject, response =>
             {
-                if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+                if (
+                    response != null && 
+                    response.TryGetValue("data", out JToken data)
+                )
                     onSuccess();
             });
         }
@@ -2051,7 +2112,7 @@ public class RfObject
     public bool isGravityEnabled = true;
 }
 
-[System.Serializable]
+[Serializable]
 public class MeshData
 {
     public Vector3[] vertices;
@@ -2060,13 +2121,14 @@ public class MeshData
     public Vector2[] uv;
 }
 
-[System.Serializable]
+[Serializable]
 public class TransformData
 {
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 scale;
 }
+
 [Serializable]
 public class TransformMessage
 {

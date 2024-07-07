@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace RealityFlow.Collections
 {
@@ -49,6 +51,18 @@ namespace RealityFlow.Collections
             }
 
             return (ts, us);
+        }
+
+        public static bool TryGetValueAs<T>(this JObject coll, string key, out T value)
+        where T: JToken
+        {
+            if (coll.TryGetValue(key, out JToken temp) && temp is T tValue)
+            {
+                value = tValue;
+                return true;
+            }
+            value = default;
+            return false;
         }
     }
 }
