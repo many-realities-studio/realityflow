@@ -4,9 +4,6 @@ using TMPro;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.UI;
-using Newtonsoft.Json;
-using System;
-using System.Text;
 
 public class ProjectsDisplay : MonoBehaviour
 {
@@ -14,6 +11,7 @@ public class ProjectsDisplay : MonoBehaviour
     public GameObject myProjectsPanel;
     public GameObject projectsCoOwnedPanel;
     public GameObject projectsJoinedPanel;
+    public GameObject activeProjectsPanel;
     public GameObject projectPrefab;
     public GameObject projectDetailPanel;
     public GameObject projectTitle;
@@ -29,6 +27,7 @@ public class ProjectsDisplay : MonoBehaviour
     // GraphQL client and access token variables
     private RealityFlowClient rfClient;
 
+    #region Initialization
     void Awake()
     {
         rfClient = RealityFlowClient.Find(this);
@@ -79,12 +78,15 @@ public class ProjectsDisplay : MonoBehaviour
             Debug.LogError("CreateRoomBtn is not assigned.");
         }
 
-        GetProjectsData();
+        GetUserProjectsData();
+        GetActiveProjectsData();
     }
+    #endregion
 
-    #region Projects
-    private void GetProjectsData()
+    #region Display Projects
+    private void GetUserProjectsData()
     {
+        // Check For Essential Components
         if (rfClient == null)
         {
             Debug.LogError("rfClient is null.");
@@ -103,6 +105,7 @@ public class ProjectsDisplay : MonoBehaviour
             return;
         }
 
+        // Get the user's projects
         var userId = rfClient.userDecoded["id"];
         var projectsQuery = new GraphQLRequest
         {
@@ -142,9 +145,9 @@ public class ProjectsDisplay : MonoBehaviour
             var projectsCoOwned = (JArray)data["getUserById"]["projectsCoOwned"];
             var projectsJoined = (JArray)data["getUserById"]["projectsJoined"];
 
-            DisplayProjects(myProjects, myProjectsPanel);
-            DisplayProjects(projectsCoOwned, projectsCoOwnedPanel);
-            DisplayProjects(projectsJoined, projectsJoinedPanel);
+            DisplayUserProjects(myProjects, myProjectsPanel);
+            DisplayUserProjects(projectsCoOwned, projectsCoOwnedPanel);
+            DisplayUserProjects(projectsJoined, projectsJoinedPanel);
         }
         if (queryResult["errors"] != null)
         {
@@ -152,7 +155,47 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
 
-    private void DisplayProjects(JArray projects, GameObject parentPanel)
+    private void GetActiveProjectsData()
+    {
+        Debug.Log("--- Fetching Active Projects Data ---");
+        
+        var activeProjectsQuery = new GraphQLRequest
+        {
+            Query = @"
+                query {
+                    getActiveProjects {
+                        id
+                        projectName
+                        description
+                        projectOwner {
+                            username
+                        }
+                        rooms {
+                            id
+                            joinCode
+                            isEditable
+                        }
+                    }
+                }
+            ",
+            Variables = null
+        };
+
+        var graphQL = rfClient.SendQueryBlocking(activeProjectsQuery);
+        var projectsData = graphQL["data"]["getActiveProjects"] as JArray;
+
+        if (projectsData != null)
+        {
+            Debug.Log($"Fetched {projectsData.Count} active projects.");
+            DisplayActiveProjects(projectsData, activeProjectsPanel); // Pass the fetched data to the display method
+        }
+        else
+        {
+            Debug.LogError("Failed to fetch active projects");
+        }
+    }
+
+    private void DisplayUserProjects(JArray projects, GameObject parentPanel)
     {
         if (projects.Count <= 0)
         {
@@ -176,16 +219,85 @@ public class ProjectsDisplay : MonoBehaviour
                             c.GetComponent<TextMeshProUGUI>().text = (string)projects[i]["projectName"];
                         }
                     }
-                    int x2 = i;
-                    child.GetComponent<Button>().onClick.AddListener(delegate
-                    {
-                        OpenProject((string)projects[x2]["id"]);
-                    });
                 }
+            }
+
+            // Find and set up the join button
+            Button joinButton = project.GetComponent<Button>();
+            if (joinButton != null)
+            {
+                string projectId = (string)projects[i]["id"];
+                joinButton.onClick.AddListener(() => OpenProject(projectId));
+            }
+            else
+            {
+                Debug.LogWarning("Button component not found in the Project prefab.");
             }
         }
     }
 
+    // DisplayActive Projects
+    public void DisplayActiveProjects(JArray projectsData, GameObject parentPanel)
+    {
+        Debug.Log("--- Displaying Active Projects ---");
+        
+        if (projectsData != null)
+        {
+            foreach (var project in projectsData)
+            {
+                Debug.Log($"Processing project: {project["projectName"]}");
+                // Instantiate a new ProjectUI prefab
+                GameObject projectUIInstance = Instantiate(projectPrefab, parentPanel.transform);
+
+                if (projectUIInstance == null)
+                {
+                    Debug.LogError("Failed to instantiate ProjectUI prefab.");
+                    continue;
+                }
+
+                // Ensure the instantiated UI element is active
+                projectUIInstance.SetActive(true);
+
+                // Find the project info
+                Transform projectInfo = projectUIInstance.transform.Find("ProjectInfo");
+                if (projectInfo == null)
+                {
+                    Debug.LogError("ProjectInfo not found in the instantiated ProjectUI prefab.");
+                    continue;
+                }
+
+                // Find the project title Text component
+                TextMeshProUGUI projectTitleText = projectInfo.Find("ProjectTitle")?.GetComponent<TextMeshProUGUI>();
+                if (projectTitleText == null)
+                {
+                    Debug.LogError("ProjectTitle Text component not found in the ProjectInfo.");
+                    continue;
+                }
+
+                // Set the project title
+                projectTitleText.text = project["projectName"].ToString();
+                Debug.Log($"Set project title to: {project["projectName"]}");
+
+                // Find and set up the join button
+                Button joinButton = projectUIInstance.GetComponent<Button>();
+                if (joinButton != null)
+                {
+                    string projectId = project["id"].ToString();
+                    joinButton.onClick.AddListener(() => OpenProject(projectId));
+                    Debug.Log($"Set up join button for project: {project["projectName"]}");
+                }
+                else
+                {
+                    Debug.LogWarning("Button component not found in the ProjectUI prefab.");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("No projects data to display");
+        }
+    }
+    
     public void OpenProject(string id)
     {
         rfClient.SetCurrentProject(id);
@@ -195,15 +307,22 @@ public class ProjectsDisplay : MonoBehaviour
         {
             Query = @"
                 query GetProjectById($getProjectByIdId: String) {
-                getProjectById(id: $getProjectByIdId) {
-                    projectName
-                    gallery
-                    description
-                    projectOwner {
-                        username
+                    getProjectById(id: $getProjectByIdId) {
+                        projectName
+                        gallery
+                        description
+                        projectOwner {
+                            username
+                        }
+                        rooms {
+                            id
+                            udid
+                            joinCode
+                            isEditable
+                            creatorId
+                        }
                     }
-                }
-            }",
+                }",
             OperationName = "GetProjectById",
             Variables = new { getProjectByIdId = id }
         };
@@ -233,7 +352,7 @@ public class ProjectsDisplay : MonoBehaviour
     }
     #endregion
 
-    #region Rooms
+    #region Display Rooms
     private void DisplayRooms(JArray rooms)
     {
         foreach (Transform child in roomsContent)
@@ -259,24 +378,4 @@ public class ProjectsDisplay : MonoBehaviour
     }
     #endregion
 
-    // Function to decode the JWT token
-    public static Dictionary<string, string> DecodeJwt(string jwt)
-    {
-        string[] jwtParts = jwt.Split('.');
-        byte[] decodedPayload = FromBase64Url(jwtParts[1]);
-        string decodedText = Encoding.UTF8.GetString(decodedPayload);
-
-        Dictionary<string, string> jwtPayload = JsonConvert.DeserializeObject<Dictionary<string, string>>(decodedText);
-
-        return jwtPayload;
-    }
-
-    // Function to convert the base64 URL to byte array
-    static byte[] FromBase64Url(string base64Url)
-    {
-        string padded = base64Url.Length % 4 == 0
-        ? base64Url : base64Url + "====".Substring(base64Url.Length % 4);
-        string base64 = padded.Replace("_", "/").Replace("-", "+");
-        return Convert.FromBase64String(base64);
-    }
 }

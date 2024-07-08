@@ -3,16 +3,14 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Ubiq.Rooms;
 using Ubiq.Messaging;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Threading;
 using System.Collections;
-using Unity.VisualScripting;
 using Samples.Whisper;
-using UnityEngine.UI;
+using TMPro;
 
 
 // Structure for GraphQL Requests
@@ -40,8 +38,10 @@ public class RealityFlowClient : MonoBehaviour
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
     public event Action OnRoomCreated;
-    public Transform projectsPanel; // Reference to the ProjectsPanel
-    public GameObject projectUIPrefab; // Reference to the ProjectUI prefab
+    public Transform projectsPanel;
+    public GameObject projectUIPrefab; 
+    public GameObject DiscoveryPanelDetail;
+    public GameObject RoomDescriptionPanel;
 
     private static RealityFlowClient rootRealityFlowClient;
 
@@ -359,7 +359,6 @@ public class RealityFlowClient : MonoBehaviour
             new System.Diagnostics.StackTrace(true)
         ));
     }
-
     #endregion
 
     #region Login Methods
@@ -448,11 +447,9 @@ public class RealityFlowClient : MonoBehaviour
             LoginSuccess?.Invoke(false); // Notify that login failed
         }
     }
-
     #endregion
 
     #region Project Methods
-
     public void CreateProject()
     {
         /* Create project input
@@ -522,132 +519,6 @@ public class RealityFlowClient : MonoBehaviour
     public string GetCurrentProjectId()
     {
         return currentProjectId;
-    }
-
-    public void OpenProject(string id)
-    {
-        Debug.Log("Opening project with ID: " + id);
-        SetCurrentProject(id);
-        // Create a new GraphQL query request to get the project details by ID.
-        var GetProjectData = new GraphQLRequest
-        {
-            Query = @"
-                query GetProjectById($getProjectByIdId: String) {
-                    getProjectById(id: $getProjectByIdId) {
-                        projectName
-                        gallery
-                        description
-                        projectOwner {
-                            username
-                        }
-                        rooms {
-                            id
-                            udid
-                            joinCode
-                            isEditable
-                            creatorId
-                        }
-                    }
-                }
-                ",
-            OperationName = "GetProjectById",
-            Variables = new { getProjectByIdId = id }
-        };
-
-        // Send the query request asynchronously and wait for the response.
-        var graphQL = SendQueryBlocking(GetProjectData);
-        var projectdata = graphQL["data"];
-        if (projectdata != null)
-        {
-            //Debug.Log("Fetched project data: " + projectdata.ToString());
-
-            // Set the project details in the UI
-            OnProjectUpdated.Invoke((JObject)projectdata);
-            var roomsData = projectdata["getProjectById"]["rooms"];
-            if (roomsData != null)
-            {
-                //Debug.Log("Fetched rooms data: " + roomsData.ToString());
-                //Debug.Log("Rooms: " + roomsData.ToString());
-                OnRoomsReceived.Invoke(roomsData as JArray);
-            }
-            else
-            {
-                Debug.LogError("Failed to fetch rooms data");
-            }
-            // GetRoomsByProjectId(id);
-        }
-        else
-        {
-            Debug.LogError("Failed to fetch project data");
-        }
-    }
-
-    public void DisplayActiveProjects()
-    {
-        Debug.Log("--- Displaying Active Projects ---");
-        // Construct the GraphQL query to get all public projects with active rooms
-        var getActiveProjects = new GraphQLRequest
-        {
-            Query = @"
-                query {
-                    getActiveProjects {
-                        id
-                        projectName
-                        description
-                        projectOwner {
-                            username
-                        }
-                        rooms {
-                            id
-                            joinCode
-                            isEditable
-                        }
-                    }
-                }
-            ",
-            Variables = null
-        };
-
-        // Send the query request and get the response
-        var graphQL = SendQueryBlocking(getActiveProjects);
-        var projectsData = graphQL["data"]["getActiveProjects"] as JArray;
-
-        if (projectsData != null)
-        {
-            foreach (var project in projectsData)
-            {
-                // Instantiate a new ProjectUI prefab
-                GameObject projectUIInstance = Instantiate(projectUIPrefab, projectsPanel);
-
-                if (projectUIInstance == null)
-                {
-                    Debug.LogError("Failed to instantiate ProjectUI prefab.");
-                    continue;
-                }
-
-                // Find the project name Text component
-                Transform projectInfo = projectUIInstance.transform.Find("ProjectInfo");
-                if (projectInfo == null)
-                {
-                    Debug.LogError("ProjectInfo not found in the instantiated ProjectUI prefab.");
-                    continue;
-                }
-
-                Text projectNameText = projectInfo.Find("ProjectTitle").GetComponent<Text>();
-                if (projectNameText == null)
-                {
-                    Debug.LogError("ProjectTitle Text component not found in the ProjectInfo.");
-                    continue;
-                }
-
-                // Set the project name
-                projectNameText.text = project["projectName"].ToString();
-            }
-        }
-        else
-        {
-            Debug.LogError("Failed to fetch active projects");
-        }
     }
 
     #endregion
