@@ -246,15 +246,24 @@ namespace RealityFlow.NodeGraph
 
         public string GetDescriptor()
         {
-            string fields = Fields
+            string fields =
+                Fields.Count > 0
+                ? Fields
                 .Select(field => field.GetDescriptor())
-                .Aggregate((acc, next) => $"{acc}{next},\n");
-            string inputs = Inputs
+                .Aggregate((acc, next) => $"{acc}{next},\n")
+                : string.Empty;
+            string inputs =
+                Inputs.Count > 0
+                ? Inputs
                 .Select(input => input.GetDescriptor())
-                .Aggregate((acc, next) => $"{acc}{next},\n");
-            string outputs = Outputs
+                .Aggregate((acc, next) => $"{acc}{next},\n")
+                : string.Empty;
+            string outputs = 
+                Outputs.Count > 0
+                ? Outputs
                 .Select(output => output.GetDescriptor())
-                .Aggregate((acc, next) => $"{acc}{next},\n");
+                .Aggregate((acc, next) => $"{acc}{next},\n")
+                : string.Empty;
 
             string source =
                 EvaluationMethod == EvalMethod.MethodCode
