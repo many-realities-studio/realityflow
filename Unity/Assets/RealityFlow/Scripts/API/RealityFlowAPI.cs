@@ -121,8 +121,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
-        Debug.Log(NodeDefinitionsDescriptor);
-
         try
         {
             ScriptUtilities.Init();
