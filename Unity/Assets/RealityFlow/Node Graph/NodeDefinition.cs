@@ -243,5 +243,49 @@ namespace RealityFlow.NodeGraph
             MethodLookup,
             MethodCode,
         }
+
+        public string GetDescriptor()
+        {
+            string fields = Fields
+                .Select(field => field.GetDescriptor())
+                .Aggregate((acc, next) => $"{acc}{next},\n");
+            string inputs = Inputs
+                .Select(input => input.GetDescriptor())
+                .Aggregate((acc, next) => $"{acc}{next},\n");
+            string outputs = Outputs
+                .Select(output => output.GetDescriptor())
+                .Aggregate((acc, next) => $"{acc}{next},\n");
+
+            string source =
+                EvaluationMethod == EvalMethod.MethodCode
+                ? $@"
+                    csharpSourceCode: ""
+                        {EvalCode}
+                    "",
+                "
+                : string.Empty;
+
+            string execOutputs = ExecutionOutputs
+                .Aggregate((acc, next) => $"{acc}{next},\n");
+
+            return $@"
+            {{
+                name: ""{Name}"",
+                fields: [
+                    {fields}
+                ],
+                inputs: [
+                    {inputs}
+                ],
+                outputs: [
+                    {outputs}
+                ],
+                {source}
+                hasExecutionPathInput: {ExecutionInput},
+                executionPathOutputs: [
+                    {execOutputs}
+                ],
+            }}";
+        }
     }
 }

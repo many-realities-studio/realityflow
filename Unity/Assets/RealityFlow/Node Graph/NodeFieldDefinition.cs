@@ -18,5 +18,16 @@ namespace RealityFlow.NodeGraph
         [SerializeReference]
         [DiscUnion]
         public NodeValue DefaultValue;
+
+        public readonly string GetDescriptor()
+        {
+            return $@"
+                {{
+                    name: ""{Name}"",
+                    defaultType: ""{DefaultType}"",
+                    defaultValue: ""{DefaultValue}"",
+                }}
+            ";
+        }
     }
 }
