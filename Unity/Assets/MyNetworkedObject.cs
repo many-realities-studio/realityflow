@@ -17,17 +17,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public NetworkContext context;
     public bool owner;
     public bool isHeld;
-    private ObjectManipulator manipulator;
-    private Rigidbody rb;
-    private BoxCollider boxCol;
+    public bool isSelected;
     bool lastOwner;
     Vector3 lastPosition;
     Vector3 lastScale;
     Quaternion lastRotation;
     Color lastColor;
-
     // variables for entering and exiting playmode
     public NetworkedPlayManager networkedPlayManager;
+    private ObjectManipulator manipulator;
+    private Rigidbody rb;
+    private BoxCollider boxCol;
     private bool lastPlayModeState;
     private RfObject rfObj;
     //bool lastGravity;
@@ -86,6 +86,20 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         //color = obj.GetComponent<Renderer>().material.color;
     }
 
+    void Awake()
+    {
+        owner = false;
+        isHeld = false;
+        //isSelected = false;
+        // if(lastSize ! = 0.1f;
+        //boundsControl = gameObject.GetComponent<BoundsControl>();
+        //meshMaterial = gameObject.GetComponent<MeshRenderer>().material;
+        //boundsControl.HandlesActive = false;
+
+        if (NetworkId == null)
+            Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
+    }
+
     // Set object owner to whoever picks the object up, and set isHeld to true for every user in scene since object is being held
     public void StartHold()
     {
@@ -123,6 +137,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = false,
             isHeld = true,
+            //isSelected = isSelected,
             isKinematic = true//,
             //color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
@@ -198,6 +213,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
+
     // Update is called once per frame
     void Update()
     {
@@ -237,6 +253,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
         */
     }
+
+    
 
     public struct Message
     {

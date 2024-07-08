@@ -7,6 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using TransformTypes;
 using Unity.XR.CoreUtils;
+using System;
 
 /// <summary>
 /// This class manages which object is the gizmo should attach to
@@ -21,9 +22,7 @@ public class AttachGizmoState : MonoBehaviour
     public GameObject rightHand;
     public GameObject sphere;
     public TransformType transformType;
-
     public MRTKRayInteractor interactor;
-
     public bool lookForTarget;
     public bool checkMeshRaySelection;
     bool lastUpdateRaySelect;
@@ -46,7 +45,7 @@ public class AttachGizmoState : MonoBehaviour
         checkMeshRaySelection = false;
         attachedGameObject = null;
         lookForTarget = false;
-        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
         if(rightHand == null) {
             rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
             // Debug.Log(rightHand);
@@ -85,7 +84,6 @@ public class AttachGizmoState : MonoBehaviour
         {
             if (DoSwitchObjectSelect(target))
                 DetachGizmoFromObject();
-
             AttachGizmoToObject(target);
 
             lastUpdateRaySelect = true;
@@ -93,6 +91,8 @@ public class AttachGizmoState : MonoBehaviour
 
         else if (EndOfRaySelect(target))
         {
+            
+
             lastUpdateRaySelect = false;
         }
     }
@@ -125,9 +125,9 @@ public class AttachGizmoState : MonoBehaviour
 
         try
         {
-            attachedGameObject.GetComponent<MeshCollider>().enabled = false;
+            //attachedGameObject.GetComponent<MeshCollider>().enabled = false;
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = true;
-            attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
+            //attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
             DeactivateFreeTransform(attachedGameObject);
         }
@@ -154,11 +154,21 @@ public class AttachGizmoState : MonoBehaviour
         //Debug.Log("Detach gizmo");
         try
         {
-            attachedGameObject.GetComponent<MeshCollider>().enabled = true;
+            //attachedGameObject.GetComponent<MeshCollider>().enabled = true;
             //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
             // Turn off the handles if all the gizmo tools are off
+            if(attachedGameObject.GetComponent<NetworkedMesh>() != null)
+            {
+                attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
+            } else if (attachedGameObject.GetComponent<MyNetworkedObject>() != null)
+            {
+                attachedGameObject.GetComponent<MyNetworkedObject>().isSelected = false;
+            } else {
+                throw new ArgumentException("Cannot Detatch Gizmo missing a Networked componenet");
+            }
+
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = false;
-            attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
+            //attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             ActivateFreeTransform(attachedGameObject);
         }
         catch { Debug.Log("missing components"); }
@@ -182,6 +192,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>The game object if it meets the condition, otherwise, null</returns>
     private GameObject GetRayCollision()
     {
+        
         RaycastHit currentHitResult = new RaycastHit();
         interactor.TryGetCurrent3DRaycastHit(out currentHitResult);
 
@@ -189,8 +200,8 @@ public class AttachGizmoState : MonoBehaviour
             return null;
         if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() == null)
             return null;
-        if (currentHitResult.transform.gameObject.GetComponent<EditableMesh>() == null)
-            return null;
+        //if (currentHitResult.transform.gameObject.GetComponent<EditableMesh>() == null)
+            //return null;
 
         return currentHitResult.transform.gameObject;
     }

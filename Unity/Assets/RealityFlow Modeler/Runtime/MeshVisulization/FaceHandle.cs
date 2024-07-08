@@ -8,17 +8,19 @@ using UnityEngine;
 /// </summary>
 public class FaceHandle : Handle
 {
-    public int faceIndex;
 
     private MeshFilter meshFilter;
+    public int faceIndex;
     public Mesh faceMesh; //{ get; private set; }
-
     public Vector3[] vpositions;
+   
     //[SerializeField]
     public int[] uniquePositionIndicies;
     public int[] indicies;
     //private int[] sharedVertIndex;
 
+
+    // On awake, prepare mesh and mode for manipulaitng faces.
     public override void Awake()
     {
         base.Awake();
@@ -110,6 +112,7 @@ public class FaceHandle : Handle
         }
     }
 
+    // store the current set of verticy positions
     /*
     private void CacheSharedVertIndex()
     {
@@ -120,6 +123,7 @@ public class FaceHandle : Handle
         }
     }*/
 
+    // 
     public override void UpdateHandlePosition()
     {
         int[] index = uniquePositionIndicies;

@@ -297,11 +297,13 @@ public class GizmoTransform : MonoBehaviour
         if (!gridTool.isActive)
             return position;
 
+        /* Editable mesh is not on the attatched object for prefabs...
         if (GetAttachedObject().GetComponent<EditableMesh>() == null)
             return position;
             
         if (GetAttachedObject().GetComponent<EditableMesh>().baseShape != ShapeType.Plane)
             return position;
+        */
 
         if (Mathf.Abs(position.y) == 0f)
             position.y += 0.05f;
