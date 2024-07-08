@@ -74,12 +74,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
     public string NodeDefinitionsDescriptor =>
-        "{\n" +
+        "[\n" +
             NodeDefinitionDict
             .Values
             .Select(def => def.GetDescriptor())
             .Aggregate((acc, next) => $"{acc}{next},\n") +
-        "}";
+        "]";
 
     private RealityFlowClient client;
     public bool isUndoing = false;
