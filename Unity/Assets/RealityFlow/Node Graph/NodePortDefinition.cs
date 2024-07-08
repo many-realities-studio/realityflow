@@ -12,12 +12,10 @@ namespace RealityFlow.NodeGraph
 
         public string GetDescriptor()
         {
-            return $@"
-                {{
+            return $@"  {{
                     name: ""{Name}"",
                     type: ""{Type}"",
-                }}
-            ";
+                }}";
         }
     }
 }

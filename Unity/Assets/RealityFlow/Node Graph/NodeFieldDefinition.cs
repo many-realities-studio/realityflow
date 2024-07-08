@@ -21,13 +21,11 @@ namespace RealityFlow.NodeGraph
 
         public readonly string GetDescriptor()
         {
-            return $@"
-                {{
+            return $@"  {{
                     name: ""{Name}"",
                     defaultType: ""{DefaultType}"",
                     defaultValue: ""{DefaultValue}"",
-                }}
-            ";
+                }}";
         }
     }
 }

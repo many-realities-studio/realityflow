@@ -250,38 +250,37 @@ namespace RealityFlow.NodeGraph
                 Fields.Count > 0
                 ? Fields
                 .Select(field => field.GetDescriptor())
-                .Aggregate((acc, next) => $"{acc}{next},\n")
+                .Aggregate((acc, next) => $"{acc},\n{next}")
                 : string.Empty;
             string inputs =
                 Inputs.Count > 0
                 ? Inputs
                 .Select(input => input.GetDescriptor())
-                .Aggregate((acc, next) => $"{acc}{next},\n")
+                .Aggregate((acc, next) => $"{acc},\n{next}")
                 : string.Empty;
             string outputs = 
                 Outputs.Count > 0
                 ? Outputs
                 .Select(output => output.GetDescriptor())
-                .Aggregate((acc, next) => $"{acc}{next},\n")
+                .Aggregate((acc, next) => $"{acc},\n{next}")
                 : string.Empty;
 
             string source =
                 EvaluationMethod == EvalMethod.MethodCode
                 ? $@"
-                    csharpSourceCode: ""
-                        {EvalCode}
-                    "",
+                csharpSourceCode: ""
+                    {EvalCode}
+                "",
                 "
                 : string.Empty;
 
             string execOutputs = 
                 ExecutionOutputs.Count > 0
                 ? ExecutionOutputs
-                .Aggregate((acc, next) => $"{acc}{next},\n")
+                .Aggregate((acc, next) => $"{acc},\n{next}")
                 : string.Empty;
 
-            return $@"
-            {{
+            return $@"{{
                 name: ""{Name}"",
                 fields: [
                     {fields}
