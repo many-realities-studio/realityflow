@@ -291,4 +291,22 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastColor = gameObject.GetComponent<Renderer>().material.color;
         //lastGravity = obj.GetComponent<Rigidbody>().useGravity;
     }
+
+    public void ControlSelection()
+    {
+        //Debug.Log("ControlSelection() was called");
+        // If the mesh is selected, then start the selection
+        if (gameObject.GetComponent<BoundsControl>().HandlesActive)
+        {
+            if (!owner && isSelected)
+            return;
+
+            //Debug.Log("This mesh is now selected");
+            owner = true;
+            // ownerName = selectTool.ownerName;
+            isSelected = true;
+            //boundsControl.HandlesActive = true;
+            //boundsVisuals.SetActive(true);
+        }
+    }
 }

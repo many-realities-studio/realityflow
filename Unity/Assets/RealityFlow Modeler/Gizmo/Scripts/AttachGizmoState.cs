@@ -82,8 +82,10 @@ public class AttachGizmoState : MonoBehaviour
 
         if (StartOfRaySelect(target))
         {
+            Debug.Log("ON ATTEMPTED RESELECTION, TRY TO DETATCH GIZMO");
             if (DoSwitchObjectSelect(target))
                 DetachGizmoFromObject();
+
             AttachGizmoToObject(target);
 
             lastUpdateRaySelect = true;
@@ -91,8 +93,6 @@ public class AttachGizmoState : MonoBehaviour
 
         else if (EndOfRaySelect(target))
         {
-            
-
             lastUpdateRaySelect = false;
         }
     }
@@ -125,9 +125,34 @@ public class AttachGizmoState : MonoBehaviour
 
         try
         {
-            //attachedGameObject.GetComponent<MeshCollider>().enabled = false;
+            // If it's an object turn off its collider, if it's a mesh turn off its collider
+            // in the case of neither throw an error
+            if(attachedGameObject.GetComponent<BoxCollider>() != null)
+            {
+                attachedGameObject.GetComponent<BoxCollider>().enabled = false;
+            } else if (attachedGameObject.GetComponent<MeshCollider>() != null)
+            {
+                attachedGameObject.GetComponent<MeshCollider>().enabled = false;
+            } else {
+                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a collider");
+            }
+
+
+            
+            
+            if(attachedGameObject.GetComponent<NetworkedMesh>() != null)
+            {
+                attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
+                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
+            } else if (attachedGameObject.GetComponent<MyNetworkedObject>() != null)
+            {
+                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
+                //attachedGameObject.GetComponent<MyNetworkedObject>().isSelected = false;
+            } else {
+                throw new ArgumentException("Cannot Detatch Gizmo missing a Networked componenet");
+            }
+
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = true;
-            //attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
             DeactivateFreeTransform(attachedGameObject);
         }
@@ -154,21 +179,34 @@ public class AttachGizmoState : MonoBehaviour
         //Debug.Log("Detach gizmo");
         try
         {
-            //attachedGameObject.GetComponent<MeshCollider>().enabled = true;
-            //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
-            // Turn off the handles if all the gizmo tools are off
+            // If it's an object turn off its collider, if it's a mesh turn off its collider
+            // in the case of neither throw an error
+            if(attachedGameObject.GetComponent<BoxCollider>() != null)
+            {
+                attachedGameObject.GetComponent<BoxCollider>().enabled = true;
+            } else if (attachedGameObject.GetComponent<MeshCollider>() != null)
+            {
+                attachedGameObject.GetComponent<MeshCollider>().enabled = true;
+            } else {
+                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a collider");
+            }
+            
+            // :/
             if(attachedGameObject.GetComponent<NetworkedMesh>() != null)
             {
-                attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
+                attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
+                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
             } else if (attachedGameObject.GetComponent<MyNetworkedObject>() != null)
             {
-                attachedGameObject.GetComponent<MyNetworkedObject>().isSelected = false;
+                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
+                //attachedGameObject.GetComponent<MyNetworkedObject>().isSelected = false;
             } else {
                 throw new ArgumentException("Cannot Detatch Gizmo missing a Networked componenet");
             }
 
+
+            // Turn off the handles if all the gizmo tools are off
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = false;
-            //attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             ActivateFreeTransform(attachedGameObject);
         }
         catch { Debug.Log("missing components"); }
@@ -177,6 +215,8 @@ public class AttachGizmoState : MonoBehaviour
 
         Destroy(gizmoContainerInst);       
     }
+
+    
 
     /// <summary>
     /// Sets the gizmo to active. This method was created to be used by Invoke().
