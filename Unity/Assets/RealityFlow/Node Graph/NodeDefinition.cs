@@ -274,8 +274,11 @@ namespace RealityFlow.NodeGraph
                 "
                 : string.Empty;
 
-            string execOutputs = ExecutionOutputs
-                .Aggregate((acc, next) => $"{acc}{next},\n");
+            string execOutputs = 
+                ExecutionOutputs.Count > 0
+                ? ExecutionOutputs
+                .Aggregate((acc, next) => $"{acc}{next},\n")
+                : string.Empty;
 
             return $@"
             {{
