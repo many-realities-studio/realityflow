@@ -73,6 +73,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             return nodeDefinitionDict;
         }
     }
+    public string NodeDefinitionsDescriptor =>
+        "{\n" +
+            NodeDefinitionDict
+            .Values
+            .Select(def => def.GetDescriptor())
+            .Aggregate((acc, next) => $"{acc}{next},\n") +
+        "}";
 
     private RealityFlowClient client;
     public bool isUndoing = false;
@@ -114,6 +121,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        Debug.Log(NodeDefinitionsDescriptor);
+
         try
         {
             ScriptUtilities.Init();
