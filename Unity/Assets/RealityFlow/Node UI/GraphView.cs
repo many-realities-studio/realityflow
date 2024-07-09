@@ -35,7 +35,8 @@ namespace RealityFlow.NodeUI
         public GameObject nodeUIPrefab;
         public GameObject edgeUIPrefab;
 
-        bool dirty;
+        int lastChangeTicks;
+        bool Dirty => graph.ChangeTicks != lastChangeTicks;
         VisualScript currentObject;
         public VisualScript CurrentObject { get => currentObject; set => currentObject = value; }
         string selectedVariable;
@@ -85,17 +86,16 @@ namespace RealityFlow.NodeUI
                 return;
             }
 
-            if (dirty)
+            if (Dirty)
             {
                 Render();
-                dirty = false;
+                MarkClean();
             }
         }
 
-        public void MarkDirty()
-        {
-            dirty = true;
-        }
+        public void MarkDirty() => graph.IncrementChangeTicks();
+
+        void MarkClean() => lastChangeTicks = graph.ChangeTicks;
 
         public void OnPointerDown(PointerEventData eventData)
         {
