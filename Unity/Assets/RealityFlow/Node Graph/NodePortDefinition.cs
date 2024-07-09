@@ -9,5 +9,13 @@ namespace RealityFlow.NodeGraph
         public string Name;
         public bool Optional;
         public NodeValueType Type;
+
+        public string GetDescriptor()
+        {
+            return $@"  {{
+                    name: ""{Name}"",
+                    type: ""{Type}"",
+                }}";
+        }
     }
 }
