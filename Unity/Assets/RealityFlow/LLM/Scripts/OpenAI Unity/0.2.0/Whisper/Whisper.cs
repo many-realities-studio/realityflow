@@ -141,7 +141,7 @@ namespace Samples.Whisper
         {
             currentApiKey = apiKey;
             openai = new OpenAIApi(apiKey);
-            Debug.Log("OpenAI API initialized with provided key.");
+            // Debug.Log("OpenAI API initialized with provided key.");
         }
 
         public void ToggleRecording()
