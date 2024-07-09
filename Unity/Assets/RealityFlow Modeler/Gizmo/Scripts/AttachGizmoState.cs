@@ -127,29 +127,18 @@ public class AttachGizmoState : MonoBehaviour
         {
             // If it's an object turn off its collider, if it's a mesh turn off its collider
             // in the case of neither throw an error
-            if(attachedGameObject.GetComponent<BoxCollider>() != null)
+            if(attachedGameObject.GetComponent<BoxCollider>() != null && attachedGameObject.GetComponent<MyNetworkedObject>() != null)
             {
                 attachedGameObject.GetComponent<BoxCollider>().enabled = false;
-            } else if (attachedGameObject.GetComponent<MeshCollider>() != null)
+                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
+
+            } else if (attachedGameObject.GetComponent<MeshCollider>() != null && attachedGameObject.GetComponent<NetworkedMesh>() != null)
             {
                 attachedGameObject.GetComponent<MeshCollider>().enabled = false;
-            } else {
-                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a collider");
-            }
-
-
-            
-            
-            if(attachedGameObject.GetComponent<NetworkedMesh>() != null)
-            {
+                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
                 attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
-                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
-            } else if (attachedGameObject.GetComponent<MyNetworkedObject>() != null)
-            {
-                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
-                //attachedGameObject.GetComponent<MyNetworkedObject>().isSelected = false;
             } else {
-                throw new ArgumentException("Cannot Detatch Gizmo missing a Networked componenet");
+                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a required component");
             }
 
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = true;
@@ -181,27 +170,18 @@ public class AttachGizmoState : MonoBehaviour
         {
             // If it's an object turn off its collider, if it's a mesh turn off its collider
             // in the case of neither throw an error
-            if(attachedGameObject.GetComponent<BoxCollider>() != null)
+            if(attachedGameObject.GetComponent<BoxCollider>() != null && attachedGameObject.GetComponent<MyNetworkedObject>() != null)
             {
                 attachedGameObject.GetComponent<BoxCollider>().enabled = true;
-            } else if (attachedGameObject.GetComponent<MeshCollider>() != null)
+                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
+
+            } else if (attachedGameObject.GetComponent<MeshCollider>() != null && attachedGameObject.GetComponent<NetworkedMesh>() != null)
             {
                 attachedGameObject.GetComponent<MeshCollider>().enabled = true;
-            } else {
-                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a collider");
-            }
-            
-            // :/
-            if(attachedGameObject.GetComponent<NetworkedMesh>() != null)
-            {
+                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
                 attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
-                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
-            } else if (attachedGameObject.GetComponent<MyNetworkedObject>() != null)
-            {
-                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
-                //attachedGameObject.GetComponent<MyNetworkedObject>().isSelected = false;
             } else {
-                throw new ArgumentException("Cannot Detatch Gizmo missing a Networked componenet");
+                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a required component");
             }
 
 
