@@ -609,7 +609,7 @@ namespace Ubiq.Rooms
         /// <param name="bool">Whether others should be able to browse for this room</param>
         public void Join(string name, bool publish)
         {
-            Debug.Log("[ROOM CLIENT] Joining room with name: " + name);
+            // Debug.Log("[ROOM CLIENT] Joining room with name: " + name);
             actions.Add(() =>
             {
                 SendToServerSync("Join", new JoinArgs()
