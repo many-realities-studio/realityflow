@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,17 +13,17 @@ namespace RealityFlow.Scripting.Editor
         {
             base.OnInspectorGUI();
 
-            // Get instance
             AssemblyReferenceAsset asset = target as AssemblyReferenceAsset;
 
             GUILayout.BeginVertical(EditorStyles.helpBox);
             {
-                GUIStyle style = new GUIStyle(EditorStyles.largeLabel);
-                style.alignment = TextAnchor.MiddleCenter;
+                GUIStyle style = new(EditorStyles.largeLabel)
+                {
+                    alignment = TextAnchor.MiddleCenter
+                };
 
                 GUILayout.Label("Assembly Info", style);
 
-                // Line
                 Rect area = GUILayoutUtility.GetLastRect();
                 area.y += EditorGUIUtility.singleLineHeight + 5;
                 area.height = 2;
@@ -37,7 +33,6 @@ namespace RealityFlow.Scripting.Editor
 
                 EditorGUI.BeginDisabledGroup(true);
                 {
-                    // Assembly name
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("assemblyName"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("assemblyPath"));
 
@@ -52,93 +47,60 @@ namespace RealityFlow.Scripting.Editor
             }
             GUILayout.EndVertical();
 
-
             int widthStretch = 310;
 
-            // Button layout
             GUILayout.Space(10);
             if (Screen.width > widthStretch)
                 GUILayout.BeginHorizontal();
 
-            // Select assembly button
-            if (GUILayout.Button("Select Assembly File", GUILayout.Height(30)) == true)
-            {
-                string path = EditorUtility.OpenFilePanel("Open Assembly File", "Assets", "dll");
-
-                if (string.IsNullOrEmpty(path) == false)
-                {
-                    // Check for file exists
-                    if (File.Exists(path) == false)
-                    {
-                        Debug.LogError("Assembly file does not exist: " + path);
-                        return;
-                    }
-
-                    // Use relative path if possible
-                    string relativePath = path.Replace('\\', '/');
-                    relativePath = FileUtil.GetProjectRelativePath(relativePath);
-
-                    if (string.IsNullOrEmpty(relativePath) == false && File.Exists(relativePath) == true)
-                        path = relativePath;
-
-                    // Set file path
-                    asset.UpdateAssemblyReference(path, Path.GetFileNameWithoutExtension(path));
-
-                    // Mark as dirty
-                    EditorUtility.SetDirty(asset);
-                }
-            }
-
             if (GUILayout.Button("Select Loaded Assembly", GUILayout.Height(30)) == true)
             {
-                GenericMenu menu = new GenericMenu();
+                GenericMenu menu = new();
 
                 foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     string menuName = asm.FullName;
 
                     if (menuName.StartsWith("Unity") == true)
-                        menuName = "Untiy Assemblies/" + menuName;
+                        menuName = "Unity Assemblies/" + menuName;
                     else if (menuName.StartsWith("System") == true)
                         menuName = "System Assemblies/" + menuName;
 
-                    menu.AddItem(new GUIContent(menuName), false, (object value) =>
-                    {
-                        // Get the selected assembly
-                        Assembly selectedAsm = (Assembly)value;
-
-                        // Check for location
-                        if (string.IsNullOrEmpty(selectedAsm.Location) == true || File.Exists(selectedAsm.Location) == false)
+                    menu.AddItem(
+                        new GUIContent(menuName), 
+                        false, 
+                        (object value) =>
                         {
-                            Debug.LogError("The selected assembly could not be referenced because its source location could not be determined. Please add the assembly using the full path!");
-                            return;
-                        }
+                            Assembly selectedAsm = (Assembly)value;
 
-                        string path = selectedAsm.Location;
+                            if (string.IsNullOrEmpty(selectedAsm.Location) == true || File.Exists(selectedAsm.Location) == false)
+                            {
+                                Debug.LogError("The selected assembly could not be referenced because its source location could not be determined. Please add the assembly using the full path!");
+                                return;
+                            }
 
-                        // Use relative path if possible
-                        string relativePath = path.Replace('\\', '/');
-                        relativePath = FileUtil.GetProjectRelativePath(relativePath);
+                            string path = selectedAsm.Location;
 
-                        if (string.IsNullOrEmpty(relativePath) == false && File.Exists(relativePath) == true)
-                            path = relativePath;
+                            string relativePath = path.Replace('\\', '/');
+                            relativePath = FileUtil.GetProjectRelativePath(relativePath);
 
-                        // Update the assembly
-                        asset.UpdateAssemblyReference(path, selectedAsm.FullName);
+                            if (string.IsNullOrEmpty(relativePath) == false && File.Exists(relativePath) == true)
+                                path = relativePath;
 
-                        // Mark as dirty
-                        EditorUtility.SetDirty(asset);
-                    }, asm);
+                            asset.UpdateAssemblyReference(path, selectedAsm.FullName);
+
+                            EditorUtility.SetDirty(asset);
+                        }, 
+                        asm
+                    );
                 }
 
-                // SHow the menu
                 menu.ShowAsContext();
             }
 
             if (Screen.width > widthStretch)
                 GUILayout.EndHorizontal();
 
-            // Check for valid
             if (asset.IsValid == false)
             {
                 EditorGUILayout.HelpBox("The assembly reference is not valid. Select a valid assembly path to reference", MessageType.Warning);

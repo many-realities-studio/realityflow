@@ -17,16 +17,16 @@ MonoBehaviour:
   - Name: target
     Optional: 0
     Type: 8
-  Outputs:
   - Name: color
     Optional: 0
     Type: 3
+  Outputs: []
   IsVariadic: 0
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: "Renderer rend = target.GetComponent<Renderer>();\nif (Renderer)\n\tcolor
-    = (Vector3)(Vector4)rend.material.color;\nthen();"
+  EvalCode: "Renderer rend = target.GetComponent<Renderer>();\nif (rend)\n\trend.material.color
+    = (Color)(Vector4)color;\nthen();"
   ExecutionInput: 1
   ExecutionOutputs:
   - then
