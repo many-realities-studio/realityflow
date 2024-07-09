@@ -475,35 +475,39 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public NodeIndex AddNodeToGraph(Graph graph, NodeDefinition def)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         // add the node to the graph
         NodeIndex index = graph.AddNode(def);
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index);
 
         // Serialize the graph object to JSON
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index, prevJson);
+
         LogActionToServer("AddNode", new { graphId = graph.Id, defName = def.Name, index });
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
+
         return index;
     }
 
     public void RemoveNodeFromGraph(Graph graph, NodeIndex node)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         Graph.NodeMemory nodeMem = graph.GetMemory(node);
         List<(PortIndex, PortIndex)> dataEdges = new();
         List<(PortIndex, NodeIndex)> execEdges = new();
         graph.EdgesOf(node, dataEdges, execEdges);
         graph.RemoveNode(node);
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, nodeMem, dataEdges, execEdges);
         Debug.Log("Removed node from graph");
 
         // Serialize the graph object to JSON
         string graphJson = JsonUtility.ToJson(graph);
         // Debug.Log($"Adding node {def} to graph at index {index}");
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, node, prevJson);
 
         LogActionToServer("RemoveNode", new { graphId = graph.Id, node });
 
@@ -512,18 +516,20 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void AddDataEdgeToGraph(Graph graph, PortIndex from, PortIndex to)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         if (!graph.TryAddEdge(from.Node, from.Port, to.Node, to.Port))
         {
             Debug.LogError("Failed to add edge");
             return;
         }
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
 
         // MUTATIONS TO UPDATE JSON STRING
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding edge {from}:{to} to graph");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, from, to, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -532,13 +538,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void RemoveDataEdgeFromGraph(Graph graph, PortIndex from, PortIndex to)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         graph.RemoveDataEdge(from, to);
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to);
         Debug.Log($"Deleted edge from {from} to {to}");
 
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Deleting edge {from}:{to} to graph");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -547,17 +555,19 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void AddExecEdgeToGraph(Graph graph, PortIndex from, NodeIndex to)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         if (!graph.TryAddExecutionEdge(from.Node, from.Port, to))
         {
             Debug.LogError("Failed to add edge");
             return;
         }
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, (from, to));
         Debug.Log($"Adding edge at {from}:{to}");
 
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding exec edge {from}:{to} to graph");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, from, to, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -566,13 +576,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void RemoveExecEdgeFromGraph(Graph graph, PortIndex from, NodeIndex to)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         graph.RemoveExecutionEdge(from, to);
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to);
         Debug.Log($"Deleted exec edge from {from} to {to}");
 
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Removing exec edge {from}:{to} to graph");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -581,6 +593,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void SetNodePosition(Graph graph, NodeIndex node, Vector2 position)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         if (!graph.ContainsNode(node))
         {
             Debug.LogError("Failed to move node because it does not exist");
@@ -588,12 +601,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         Vector2 prevPosition = graph.GetNode(node).Position;
         graph.GetNode(node).Position = position;
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(SetNodePosition), graph, node, prevPosition, position);
         Debug.Log($"Moved node {node} to {position}");
 
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Moving node {node} to {position}");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(SetNodePosition), graph, node, position, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -602,6 +616,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void SetNodeFieldValue(Graph graph, NodeIndex node, int field, NodeValue value)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         Node nodeData = graph.GetNode(node);
         if (!nodeData.TryGetField(field, out NodeValue oldValue))
         {
@@ -613,12 +628,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to set node field value");
             return;
         }
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, oldValue);
         Debug.Log($"Set node {node} field {field} to {value}");
 
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Setting node {node} field {field} to value {value}");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -627,6 +643,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void SetNodeInputConstantValue(Graph graph, NodeIndex node, int port, NodeValue value)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         Node nodeData = graph.GetNode(node);
         if (!nodeData.TryGetInputValue(port, out NodeValue oldValue))
         {
@@ -638,12 +655,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Failed to set node input port constant value");
             return;
         }
-        if (!isUndoing)
-            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue);
         Debug.Log($"Set node {node} input port {port} to {value}");
 
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Setting node {node} port {port} constant to {value}");
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
@@ -652,14 +670,29 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public void AddVariableToGraph(Graph graph, string name, NodeValueType type)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         graph.AddVariable(name, type);
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(AddVariableToGraph), graph, name, type, prevJson);
+
+        string graphJson = JsonUtility.ToJson(graph);
+
+        SendGraphUpdateToDatabase(graphJson, graph.Id);
 
         LogActionToServer("AddVariable", new { graphId = graph.Id, name, type = type.ToString() });
     }
 
     public void RemoveVariableFromGraph(Graph graph, string name)
     {
+        string prevJson = JsonUtility.ToJson(graph);
         graph.RemoveVariable(name);
+
+        if (!isUndoing)
+            actionLogger.LogAction(nameof(RemoveVariableFromGraph), graph, name, prevJson);
+
+        string graphJson = JsonUtility.ToJson(graph);
+        SendGraphUpdateToDatabase(graphJson, graph.Id);
 
         LogActionToServer("RemoveVariable", new { graphId = graph.Id, name });
     }
@@ -2115,8 +2148,89 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             case nameof(AddNodeToGraph):
                 Graph graph = (Graph)action.Parameters[0];
                 NodeIndex index = (NodeIndex)action.Parameters[2];
+                string graphJson = (string)action.Parameters[3];
 
-                graph.RemoveNode(index);
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(RemoveNodeFromGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[2];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(AddDataEdgeToGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(RemoveDataEdgeFromGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(AddExecEdgeToGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(RemoveExecEdgeFromGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(SetNodePosition):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(SetNodeFieldValue):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(SetNodeInputConstantValue):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[4];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(AddVariableToGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
+
+                break;
+
+            case nameof(RemoveVariableFromGraph):
+                graph = (Graph)action.Parameters[0];
+                graphJson = (string)action.Parameters[3];
+
+                graph.ApplyJson(graphJson);
 
                 break;
 

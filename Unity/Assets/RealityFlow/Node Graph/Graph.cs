@@ -486,6 +486,27 @@ namespace RealityFlow.NodeGraph
         public ImmutableList<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => executionEdges[outputPort];
 
+        public void ApplyJson(string json)
+        {
+            Graph fromJson = JsonUtility.FromJson<Graph>(json);
+
+            id = fromJson.id;
+            name = fromJson.name;
+            nodes = fromJson.nodes;
+            nodeTypes = fromJson.nodeTypes;
+            reverseEdges = fromJson.reverseEdges;
+            executionEdges = fromJson.executionEdges;
+            inputPorts = fromJson.inputPorts;
+            outputPorts = fromJson.outputPorts;
+            reverseInputPortEdges = fromJson.reverseInputPortEdges;
+            reverseOutputPortEdges = fromJson.reverseOutputPortEdges;
+            executionInputs = fromJson.executionInputs;
+            inputExecutionEdges = fromJson.inputExecutionEdges;
+            variadicPassthrough = fromJson.variadicPassthrough;
+            variadicOutput = fromJson.variadicOutput;
+            variables = fromJson.variables;
+        }
+
         public void OnBeforeSerialize() { }
 
         public void OnAfterDeserialize()
