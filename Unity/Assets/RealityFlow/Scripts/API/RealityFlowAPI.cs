@@ -661,7 +661,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log($"Setting node {node} port {port} constant to {value}");
 
         if (!isUndoing)
-            actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, port, oldValue, prevJson);
+            actionLogger.LogAction(nameof(SetNodeInputConstantValue), graph, node, port, oldValue, prevJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
 
