@@ -174,11 +174,6 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: -6419017762173040368, guid: 0050cbf66db9f8045a7d304097a354b0, type: 2}
-  - {fileID: 11400000, guid: bd47f13449c1e8a45a1fc0b90b093093, type: 2}
-  - {fileID: -5002498549672890491, guid: f9d948d0a10f0994f80921b91cc6e324, type: 2}
-  - {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}
-  - {fileID: 11400000, guid: 75b93e0bffbf44e90bba4e8b99efcade, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -272,6 +267,7 @@ PlayerSettings:
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
   metalAPIValidation: 1
+  metalCompileShaderBinary: 0
   iOSRenderExtraFrameOnPause: 0
   iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
@@ -757,10 +753,10 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: USE_INPUT_SYSTEM_POSE_CONTROL;UBIQ_SILENCEWARNING_XRIVERSION
+    Android: USE_INPUT_SYSTEM_POSE_CONTROL;UBIQ_SILENCEWARNING_XRIVERSION;USE_STICK_CONTROL_THUMBSTICKS
     Server: UBIQ_SILENCEWARNING_XRIVERSION
-    Standalone: USE_INPUT_SYSTEM_POSE_CONTROL;UBIQ_SILENCEWARNING_XRIVERSION
-    Windows Store Apps: USE_INPUT_SYSTEM_POSE_CONTROL
+    Standalone: USE_INPUT_SYSTEM_POSE_CONTROL;UBIQ_SILENCEWARNING_XRIVERSION;USE_STICK_CONTROL_THUMBSTICKS
+    Windows Store Apps: USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

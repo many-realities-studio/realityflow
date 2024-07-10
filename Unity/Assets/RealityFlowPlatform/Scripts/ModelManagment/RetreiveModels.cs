@@ -67,7 +67,7 @@ public class RetrieveModel : MonoBehaviour
         }
     }
 
-    private void GetModelsData(string userId)
+    public void GetModelsData(string userId)
     {
         var getModelsRequest = new GraphQLRequest
         {
