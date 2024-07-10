@@ -259,7 +259,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             Debug.Log("NonNativeKeyboard Awake called."); // Debug log
 
             Instance = this;
-            this.gameObject.SetActive(false);
+            gameObject.SetActive(false);
             DontDestroyOnLoad(gameObject); // Optional: If you want the keyboard to persist across scenes
             Debug.Log("NonNativeKeyboard instance set.");
 
