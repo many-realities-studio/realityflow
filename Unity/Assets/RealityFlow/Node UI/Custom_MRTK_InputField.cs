@@ -18,7 +18,7 @@ namespace RealityFlow.NodeUI
         {
             base.Start();
             onSelect.AddListener(OnSelected); // Hook into the onSelect event
-            onDeselect.AddListener(OnDeselected); // Hook into the onDeselect event
+            //onDeselect.AddListener(OnDeselected); // Hook into the onDeselect event
 
             // Ensure NonNativeKeyboard is instantiated
             //EnsureNonNativeKeyboard();
@@ -67,18 +67,6 @@ namespace RealityFlow.NodeUI
         /// Called when the input field is deselected.
         /// </summary>
         /// <param name="text">The current text of the input field.</param>
-        private void OnDeselected(string text)
-        {
-            if (NonNativeKeyboard.Instance != null)
-            {
-                Debug.Log("Input field deselected, closing keyboard.");
-                NonNativeKeyboard.Instance.Close();
-            }
-            else
-            {
-                Debug.LogError("NonNativeKeyboard instance is null.");
-            }
-        }
 
         /// <summary>
         /// Activate the input field.
@@ -101,6 +89,8 @@ namespace RealityFlow.NodeUI
             {
                 base.OnDeselect(eventData);
                 MRTKInputFieldManager.RemoveCurrentInputField(this);
+
+                /*
                 if (NonNativeKeyboard.Instance != null)
                 {
                     Debug.Log("OnDeselect called, closing keyboard.");
@@ -110,6 +100,7 @@ namespace RealityFlow.NodeUI
                 {
                     Debug.LogError("NonNativeKeyboard instance is null.");
                 }
+               */
             }
         }
 
