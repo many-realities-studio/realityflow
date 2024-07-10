@@ -269,10 +269,6 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             RectTransform rect = GetComponent<RectTransform>();
             m_ObjectBounds = new Vector3(canvasBounds.size.x * rect.localScale.x, canvasBounds.size.y * rect.localScale.y, canvasBounds.size.z * rect.localScale.z);
 
-            // Setting the keyboardType to an undefined TouchScreenKeyboardType,
-            // which prevents the MRTK keyboard from triggering the system keyboard itself.
-            InputField.keyboardType = (TouchScreenKeyboardType)(int.MaxValue);
-
             // Keep keyboard deactivated until needed
             gameObject.SetActive(false);
             Debug.Log("NonNativeKeyboard Awake completed and deactivated.");
@@ -932,6 +928,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             //}
             //SetMicrophoneDefault();
             OnClosed(this, EventArgs.Empty);
+            ClearTargetInputField();
             gameObject.SetActive(false);
         }
 

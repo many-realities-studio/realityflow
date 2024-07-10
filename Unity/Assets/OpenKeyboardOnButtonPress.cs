@@ -29,7 +29,7 @@ public class OpenKeyboardOnButtonPress : MonoBehaviour
         NonNativeKeyboard keyboard = NonNativeKeyboard.Instance;
         if (keyboard != null && InputField != null)
         {
-            keyboard.PresentKeyboard(InputField); // Pass the input field to the keyboard
+            //keyboard.PresentKeyboard(InputField); // Pass the input field to the keyboard
         }
     }
 }
