@@ -352,11 +352,11 @@ public class PopulateObjectLibrary : MonoBehaviour
             rb.isKinematic = false; // Allow physics interactions
 
             // Add XRGrabInteractable component for XR interaction
-            XRGrabInteractable grabInteractable = instantiatedModel.gameObject.AddComponent<XRGrabInteractable>();
+            // XRGrabInteractable grabInteractable = instantiatedModel.gameObject.AddComponent<XRGrabInteractable>();
 
             // Optional: Configure XRGrabInteractable properties
-            grabInteractable.movementType = XRBaseInteractable.MovementType.Kinematic; // Example: Set movement type to kinematic
-            grabInteractable.throwOnDetach = true; // Allow throwing the object when released
+            // grabInteractable.movementType = XRBaseInteractable.MovementType.Kinematic; // Example: Set movement type to kinematic
+            // grabInteractable.throwOnDetach = true; // Allow throwing the object when released
 
             Debug.Log("Rigidbody, Collider, and XRGrabInteractable added to the model.");
         }
