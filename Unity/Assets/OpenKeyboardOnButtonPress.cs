@@ -15,7 +15,6 @@ public class OpenKeyboardOnButtonPress : MonoBehaviour
 {
     public PressableButton PressableButton; // Reference to the pressable button
     public Custom_MRTK_InputField InputField; // Reference to the MRTK input field
-    public NonNativeKeyboard Keyboard; // Reference to the NonNativeKeyboard
 
     private void Start()
     {
@@ -27,9 +26,10 @@ public class OpenKeyboardOnButtonPress : MonoBehaviour
 
     private void OpenKeyboard()
     {
-        if (Keyboard != null && InputField != null)
+        NonNativeKeyboard keyboard = NonNativeKeyboard.Instance;
+        if (keyboard != null && InputField != null)
         {
-            Keyboard.PresentKeyboard(InputField); // Pass the input field to the keyboard
+            keyboard.PresentKeyboard(InputField); // Pass the input field to the keyboard
         }
     }
 }
