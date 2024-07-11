@@ -7,6 +7,7 @@ using Microsoft.MixedReality.Toolkit.UX;
 using Ubiq.Spawning;
 using System.IO;
 using System.Collections;
+using Newtonsoft.Json;
 
 public class ChatGPTTester : MonoBehaviour
 {
@@ -58,6 +59,11 @@ public class ChatGPTTester : MonoBehaviour
             LLMPromptToBePassed = LLMPromptToBePassed.Replace("{" + $"{r.replacementType}" + "}", r.value);
         });
 
+        // Fetch and add node definitions to the context
+        var nodeDefinitionsJson = GetNodeDefinitionsJson();
+        var nodeDefinitionsContext = $"The available node definition types are: {nodeDefinitionsJson} \n\n\n\n";
+        LLMPromptToBePassed += $"\n\n{nodeDefinitionsContext}";
+
         List<string> prefabNames = RealityFlowAPI.Instance.GetPrefabNames();
         if (prefabNames.Count > 0)
         {
@@ -78,9 +84,18 @@ public class ChatGPTTester : MonoBehaviour
         string selectedObjectName = raycastLogger.GetSelectedObjectName();
         if (!string.IsNullOrEmpty(selectedObjectName))
         {
-            var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given. If requests have no object name use the object {selectedObjectName} ";
-            Debug.Log($"Selected object: {selectedObjectName}");
-            AddOrUpdateReminder(selectedObjectReminder);
+            GameObject selectedObject = GameObject.Find(selectedObjectName);
+            if (selectedObject != null)
+            {
+                var visualScript = selectedObject.GetComponent<RealityFlow.NodeGraph.VisualScript>();
+                if (visualScript != null && visualScript.graph != null)
+                {
+                    string graphJson = JsonUtility.ToJson(visualScript.graph);
+                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson}";
+                    Debug.Log($"Selected object: {selectedObjectName}, Graph: {graphJson}");
+                    AddOrUpdateReminder(selectedObjectReminder);
+                }
+            }
         }
 
         if (chatGPTQuestion.reminders.Length > 0)
@@ -124,6 +139,18 @@ public class ChatGPTTester : MonoBehaviour
 
         // Clear reminders after use
         chatGPTQuestion.reminders = chatGPTQuestion.reminders.Where(r => !IsTemporaryReminder(r)).ToArray();
+    }
+
+    private string GetNodeDefinitionsJson()
+    {
+        var nodeDefinitions = RealityFlowAPI.Instance.NodeDefinitionDict.Values.ToList();
+        var nodeDefinitionsJson = JsonConvert.SerializeObject(nodeDefinitions.Select(nd => new
+        {
+            name = nd.Name,
+            inputs = nd.Inputs.Select(i => i.Name).ToArray(),
+            outputs = nd.Outputs.Select(o => o.Name).ToArray()
+        }).ToList());
+        return nodeDefinitionsJson;
     }
 
     private void AddOrUpdateReminder(string newReminder)
@@ -190,6 +217,7 @@ public class ChatGPTTester : MonoBehaviour
         }
         return "Unknown Object";
     }
+
     public IEnumerator ExecuteLoggedActionsCoroutine()
     {
         if (RealityFlowAPI.Instance == null)

@@ -135,13 +135,61 @@ MonoBehaviour:
   - DO NOT USE MONOBEHAVIOURS
   - If you spawn an object make it have the tag 'Spawned' and let it keep its natural
     scale which you can get with .transform.localScale
-  - '
+  - 'If you make a node graph or visual script you must do it in a way that is similar
+    to this using the functions you see here DO NOT DO IT ANY OTHER WAY:  private
+    void CreateAndLinkLoopingProcedure(string objId)     {         // Find the object        
+    GameObject obj = GameObject.Find(objId);          if (obj == null)         {            
+    Debug.LogError($"Object with ID {objId} not found.");             return;        
+    }          // Ensure the object has a VisualScript component         var visualScript
+    = obj.GetComponent<VisualScript>();         if (visualScript == null)        
+    {             Debug.LogError("VisualScript component not found on the object.");            
+    return;         }          // Get the current graph         Graph graph = visualScript.graph;        
+    if (graph == null)         {             Debug.LogError("Graph not found on the
+    VisualScript component.");             return;         }          // Create new
+    node definitions         NodeDefinition intAddDef = RealityFlowAPI.Instance.NodeDefinitionDict["IntAdd"];        
+    NodeDefinition thisObjectDef = RealityFlowAPI.Instance.NodeDefinitionDict["ThisObject"];        
+    NodeDefinition setPositionDef = RealityFlowAPI.Instance.NodeDefinitionDict["SetPosition"];        
+    NodeDefinition vector3Def = RealityFlowAPI.Instance.NodeDefinitionDict["Vector3
+    Right"];          // Add new nodes to the graph         NodeIndex intAddNode
+    = RealityFlowAPI.Instance.AddNodeToGraph(graph, intAddDef);         NodeIndex
+    thisObjectNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, thisObjectDef);        
+    NodeIndex setPositionNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, setPositionDef);        
+    NodeIndex vector3Node = RealityFlowAPI.Instance.AddNodeToGraph(graph, vector3Def);         
+    // Set the field values for the new nodes         //RealityFlowAPI.Instance.SetNodeFieldValue(graph,
+    intAddNode, 0, new IntValue(0));         //RealityFlowAPI.Instance.SetNodeFieldValue(graph,
+    intAddNode, 1, new IntValue(1));          // Create connections (edges) between
+    the nodes         PortIndex thisObjectOutput = new PortIndex(thisObjectNode,
+    0);         PortIndex vector3Output = new PortIndex(vector3Node, 0);        
+    PortIndex intAddOutput = new PortIndex(intAddNode, 0);          PortIndex setPositionTarget
+    = new PortIndex(setPositionNode, 0);         PortIndex setPositionValue = new
+    PortIndex(setPositionNode, 1);          RealityFlowAPI.Instance.AddDataEdgeToGraph(graph,
+    thisObjectOutput, setPositionTarget);         RealityFlowAPI.Instance.AddDataEdgeToGraph(graph,
+    vector3Output, setPositionValue);         RealityFlowAPI.Instance.AddDataEdgeToGraph(graph,
+    intAddOutput, setPositionValue);          Debug.Log($"Added and linked nodes
+    for looping procedure in the graph.");     }'
+  - 'Do not try to set input values for the nodes. Also you should really only use
+    the create and linkage features.
 
     -------------------------------------------------------------------------
 
 
 
-    Only
+    Very
+    important!! Use the object 668f02eea81147bb77ec5b83 to do anything that the user
+    requests if no other object name is given. If requests have no object name use
+    the object 668f02eea81147bb77ec5b83. The current graph for this object is: {"id":"668f02f5a81147bb77ec5b87","name":"New
+    Graph","nodes":{"list":{"listDict":[{"Item1":{"value":0},"Item2":{"DefinitionName":"OnActivate","fieldValues":[],"inputs":[],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":1},"Item2":{"DefinitionName":"Despawn","fieldValues":[],"inputs":[{"ConstantValue":{"rid":-2}}],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":2},"Item2":{"DefinitionName":"Vector3
+    Forward","fieldValues":[],"inputs":[],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":3},"Item2":{"DefinitionName":"Vector3
+    Forward","fieldValues":[],"inputs":[],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":4},"Item2":{"DefinitionName":"OnStart","fieldValues":[],"inputs":[],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":5},"Item2":{"DefinitionName":"ThisObject","fieldValues":[],"inputs":[],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":6},"Item2":{"DefinitionName":"Vector3
+    Up","fieldValues":[],"inputs":[],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":7},"Item2":{"DefinitionName":"IntAdd","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1000}},{"ConstantValue":{"rid":1001}}],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":8},"Item2":{"DefinitionName":"If","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1002}}],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":9},"Item2":{"DefinitionName":"SetPosition","fieldValues":[],"inputs":[{"ConstantValue":{"rid":-2}},{"ConstantValue":{"rid":1003}}],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":10},"Item2":{"DefinitionName":"OnActivate","fieldValues":[],"inputs":[],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":11},"Item2":{"DefinitionName":"OnActivate","fieldValues":[],"inputs":[],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":12},"Item2":{"DefinitionName":"FloatDivide","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1004}},{"ConstantValue":{"rid":1005}}],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":13},"Item2":{"DefinitionName":"FloatDivide","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1006}},{"ConstantValue":{"rid":1007}}],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":14},"Item2":{"DefinitionName":"FloatMultiply","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1008}},{"ConstantValue":{"rid":1009}}],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":15},"Item2":{"DefinitionName":"IntMultiply","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1010}},{"ConstantValue":{"rid":1011}}],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":16},"Item2":{"DefinitionName":"Vector3Add","fieldValues":[{"value":{"rid":1012}},{"value":{"rid":1013}}],"inputs":[],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":17},"Item2":{"DefinitionName":"PlaySound","fieldValues":[],"inputs":[{"ConstantValue":{"rid":-2}}],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":18},"Item2":{"DefinitionName":"IntSubtract","fieldValues":[],"inputs":[{"ConstantValue":{"rid":1014}},{"ConstantValue":{"rid":1015}}],"outputs":[{}],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}},{"Item1":{"value":19},"Item2":{"DefinitionName":"Impulse","fieldValues":[],"inputs":[{"ConstantValue":{"rid":-2}},{"ConstantValue":{"rid":1016}},{"ConstantValue":{"rid":1017}}],"outputs":[],"variadicInputs":0,"Position":{"x":0.0,"y":0.0}}}]},"nextIndex":20},"reverseEdges":{"listDict":[]},"executionEdges":{"forward":{"dict":{"listDict":[]}}},"inputPorts":[],"outputPorts":[],"reverseInputPortEdges":{"listDict":[]},"reverseOutputPortEdges":{"listDict":[]},"executionInputs":0,"inputExecutionEdges":{"dict":{"listDict":[]}},"variadicPassthrough":false,"variadicOutput":false,"variables":{"listDict":[]},"references":{"version":2,"RefIds":[{"rid":-2,"type":{"class":"","ns":"","asm":""},"data":{}},{"rid":1000,"type":{"class":"IntValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0}},{"rid":1001,"type":{"class":"IntValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0}},{"rid":1002,"type":{"class":"BoolValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":false}},{"rid":1003,"type":{"class":"Vector3Value","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":{"x":0.0,"y":0.0,"z":0.0}}},{"rid":1004,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}},{"rid":1005,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}},{"rid":1006,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}},{"rid":1007,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}},{"rid":1008,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}},{"rid":1009,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}},{"rid":1010,"type":{"class":"IntValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0}},{"rid":1011,"type":{"class":"IntValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0}},{"rid":1012,"type":{"class":"Vector3Value","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":{"x":0.0,"y":0.0,"z":0.0}}},{"rid":1013,"type":{"class":"Vector3Value","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":{"x":0.0,"y":0.0,"z":0.0}}},{"rid":1014,"type":{"class":"IntValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0}},{"rid":1015,"type":{"class":"IntValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0}},{"rid":1016,"type":{"class":"Vector3Value","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":{"x":0.0,"y":0.0,"z":0.0}}},{"rid":1017,"type":{"class":"FloatValue","ns":"RealityFlow.NodeGraph","asm":"Assembly-CSharp"},"data":{"value":0.0}}]}}'
+  - Use the provided object id which is the Object's name and the graph information
+    to do graph manipulations
+  - Do not send the updated graph to the database
+  - "ONLY DEFINE NODE DEFINITIONS IN THIS WAY: NodeDefinition intAddDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"IntAdd\"];        
+    NodeDefinition thisObjectDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"ThisObject\"];        
+    NodeDefinition setPositionDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"SetPosition\"];        
+    NodeDefinition vector3Def = RealityFlowAPI.Instance.NodeDefinitionDict[\"Vector3
+    Right\"]; \n-------------------------------------------------------------------------\n\n\nOnly
     use the following prefabs when spawning: Reality Palette, FireworkNew, UIText,
     Cube, Capsule, Cylinder, Rectangle (Horizontal), Rectangle (Vertical), Sphere,
     Reality Palette, TestCube, PrimitiveBase, DuplicateProxy, PlayModeManager, Reality
@@ -158,4 +206,18 @@ MonoBehaviour:
     (Many), Vervain, Vervain (Sparse), Watering Can, basketball, Basketball Hoop,
     Bat, Golf Ball, Golf Club, Tennis Ball, Tennis Racket, Baseball, Battery, Bubble
     Gun, Drill, pedestal, screw, Soap Dispenser, Targets, Wooden Plank, Shiba, rocks,
-    lavender'
+    lavender, PrimitiveProxy\n-------------------------------------------------------------------------\n\n\nUse
+    the location (-0.59, -0.05, 2.61) as the position data when you spawn any and
+    all objects. Also unless specified otherwise use this location as the updateobjecttransform
+    position"
+  - '
+
+    -------------------------------------------------------------------------
+
+
+
+    Very
+    important!! Use the object 668f739da81147bb77ec5cea to do anything that the user
+    requests if no other object name is given. If requests have no object name use
+    the object 668f739da81147bb77ec5cea. The current graph for this object is: {"id":"668f739fa81147bb77ec5cee","name":"New
+    Graph","nodes":{"list":{"listDict":[]},"nextIndex":0},"reverseEdges":{"listDict":[]},"executionEdges":{"forward":{"dict":{"listDict":[]}}},"inputPorts":[],"outputPorts":[],"reverseInputPortEdges":{"listDict":[]},"reverseOutputPortEdges":{"listDict":[]},"executionInputs":0,"inputExecutionEdges":{"dict":{"listDict":[]}},"variadicPassthrough":false,"variadicOutput":false,"variables":{"listDict":[]},"references":{"version":2,"RefIds":[]}}'
