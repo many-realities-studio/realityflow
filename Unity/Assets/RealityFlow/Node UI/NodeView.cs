@@ -129,6 +129,10 @@ namespace RealityFlow.NodeUI
                     Debug.LogError("Failed to get field value on Render()");
                     fieldValue = def.DefaultValue;
                 }
+                if (editor is VariableEditor varEditor)
+                {
+                    varEditor.Type = view.Graph.Variables[(string)fieldValue.DynValue];
+                }
 
                 editor.NodeValue = fieldValue;
                 editor.OnTick += value =>
