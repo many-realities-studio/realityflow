@@ -25,7 +25,7 @@ MonoBehaviour:
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: "Renderer rend = target.GetComponent<Renderer>();\nif (Renderer)\n\tcolor
+  EvalCode: "Renderer rend = target.GetComponent<Renderer>();\nif (rend)\n\tcolor
     = (Vector3)(Vector4)rend.material.color;\nthen();"
   ExecutionInput: 1
   ExecutionOutputs:

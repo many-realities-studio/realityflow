@@ -46,25 +46,27 @@ namespace RealityFlow.Scripting
             if (init)
                 return;
 
-            // references = Resources.LoadAll<AssemblyReferenceAsset>("AssemblyReferences/")
-            //     .Select(asm => asm.CompilerReference)
-            //     .ToList();
+            references = Resources.LoadAll<AssemblyReferenceAsset>("AssemblyReferences/")
+                .Select(asm => {
+                    if (asm.AssemblyImage.Length == 0)
+                        Debug.LogError($"Assembly {asm.AssemblyName} had no bytes");
+                    return asm.CompilerReference;
+                })
+                .ToList();
 
             compilation = CSharpCompilation.Create(null)
-                // .AddReferences(references)
-                .AddReferences(
-                    System.AppDomain
-                    .CurrentDomain
-                    .GetAssemblies()
-                    .Where(asm => !asm.IsDynamic)
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location))
-                )
+                .AddReferences(references)
                 .WithOptions(new CSharpCompilationOptions(
                     OutputKind.DynamicallyLinkedLibrary,
-                    reportSuppressedDiagnostics: false
+                    reportSuppressedDiagnostics: false,
+                    concurrentBuild: false
                 ));
 
             init = true;
+
+            // Build local node defs immediately to frontload cost of building them
+            foreach (var def in RealityFlowAPI.Instance.NodeDefinitionDict.Values)
+                def.GetEvaluation();
         }
 
         static Assembly Compile(CSharpCompilation csc, List<Diagnostic> diagnostics)
