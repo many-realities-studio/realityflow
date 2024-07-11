@@ -283,30 +283,36 @@ public class PopulateObjectLibrary : MonoBehaviour
         }
 
         Debug.Log("Successfully parsed the model.");
+
+        // Instantiate the model
         var sceneTask = gltf.InstantiateMainSceneAsync(transform);
         yield return sceneTask;
 
         if (sceneTask.Result)
         {
             Debug.Log("Model instantiated successfully.");
+    
             var instantiatedModel = transform.GetChild(transform.childCount - 1).gameObject;
+
+            // Set the model's position and scale
             instantiatedModel.transform.SetParent(null);
             instantiatedModel.transform.position = spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0);
             instantiatedModel.transform.localScale = Vector3.one;
 
+            // Add Rigidbody and MeshCollider
             Rigidbody rb = instantiatedModel.AddComponent<Rigidbody>();
             MeshCollider meshCollider = instantiatedModel.AddComponent<MeshCollider>();
             meshCollider.convex = true;
 
+            // Set Rigidbody properties
             rb.mass = 1.0f;
             rb.useGravity = true;
             rb.isKinematic = false;
 
-            /*RealityFlowAPI.MeshData meshData = ExtractMeshData(instantiatedModel);
-            string meshJson = JsonUtility.ToJson(meshData);
+            // Use the
+           
 
-            string projectId = rfClient.GetCurrentProjectId();
-            RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, new ModelData(), projectId, meshJson); // Pass your modelData here*/
+
         }
         else
         {

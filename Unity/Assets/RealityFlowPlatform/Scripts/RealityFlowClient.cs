@@ -558,38 +558,42 @@ public class RealityFlowClient : MonoBehaviour
         OnRoomsReceived?.Invoke(rooms);
     }
 
-    public void CreateRoom()
+public void CreateRoom()
+{
+    Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
+
+    // Check if a project is selected
+    if (string.IsNullOrEmpty(currentProjectId))
     {
-        // Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
-
-        // Check if a project is selected
-        if (string.IsNullOrEmpty(currentProjectId))
-        {
-            Debug.LogError("No project selected");
-            return;
-        }
-
-        // Hide Project and Login Menus, show Level Editor
-        projectManager.SetActive(false);
-        // Put loading here?
-
-        // !!LOAD OBJECTS FROM PROJECT HERE!!
-        roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom);
-        roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
-
-
+        Debug.LogError("No project selected");
+        return;
     }
+
+    // Hide Project and Login Menus, show Level Editor
+    projectManager.SetActive(false);
+    Debug.Log("Loading Objects for Project ID: " + currentProjectId);
+
+    roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom); //!ON CREATE ROOM SHOULD TRIGGER!
+    Debug.Log("Listener added for OnJoinCreatedRoom.");
+
+    // Create a new room using the RoomClient
+    Debug.Log("Joining test-room");
+    roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
+
+    RealityFlowAPI.Instance.FetchAndPopulateObjects();
+}
 
     public void OnJoinCreatedRoom(IRoom room)
     {
-        //Debug.Log("Created Room: " + room.Name);
+        Debug.Log("Created Room: " + room.Name);// ON CREATE ROOM SHOULD TRIGGER!
+
         // Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         // Debug.Log(room.Name + " UUID: " + room.UUID);
         // Debug.Log(room.Name + " Publish: " + room.Publish);
 
         levelEditor.SetActive(true);
 
-        RealityFlowAPI.Instance.FetchAndPopulateObjects();
+        
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
         {
