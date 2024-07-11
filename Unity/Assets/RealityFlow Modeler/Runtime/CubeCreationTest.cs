@@ -23,6 +23,7 @@ public class CubeCreationTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+#if !ENABLE_INPUT_SYSTEM  
         if(Input.GetKeyDown(KeyCode.G))
         {
             // Have to use prefabs for network spawning
@@ -66,5 +67,6 @@ public class CubeCreationTest : MonoBehaviour
             /*int[] indices = { 4, 5, 6, 7 };
             //objEM.ScaleVertices(indices, );*/
         }
-    }
+#endif
+  }
 }

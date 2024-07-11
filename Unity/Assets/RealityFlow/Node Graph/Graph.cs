@@ -143,13 +143,20 @@ namespace RealityFlow.NodeGraph
         public ImmutableDictionary<string, NodeValueType> Variables
             => variables.ToImmutableDictionary();
 
+        public int ChangeTicks { get; private set; }
+
+        public void IncrementChangeTicks()
+            => ChangeTicks += 1;
+
         public void AddVariable(string name, NodeValueType type)
         {
+            IncrementChangeTicks();
             variables.Add(name, type);
         }
 
         public void RemoveVariable(string name)
         {
+            IncrementChangeTicks();
             variables.Remove(name);
         }
 
@@ -168,6 +175,7 @@ namespace RealityFlow.NodeGraph
             Node node = new(definition);
             NodeIndex index = nodes.Add(node);
             MutableNodesOfType(definition.Name).Add(index);
+            IncrementChangeTicks();
             return index;
         }
 
@@ -228,9 +236,14 @@ namespace RealityFlow.NodeGraph
                             executionEdges.Remove(from, index);
 
                 MutableNodesOfType(node.Definition.name).Remove(index);
+
+                IncrementChangeTicks();
             }
 
-            return nodes.Remove(index);
+            if (nodes.Remove(index) == false)
+                Debug.LogError("Failed to remove existing node");
+
+            return true;
         }
 
         public Node GetNode(NodeIndex index)
@@ -307,6 +320,7 @@ namespace RealityFlow.NodeGraph
                 return false;
 
             reverseEdges.Add(new(to, toPort), new(from, fromPort));
+            IncrementChangeTicks();
             return true;
         }
 
@@ -462,6 +476,8 @@ namespace RealityFlow.NodeGraph
 
             executionEdges.Add(new(from, fromPort), to);
 
+            IncrementChangeTicks();
+
             return true;
         }
 
@@ -473,11 +489,15 @@ namespace RealityFlow.NodeGraph
         public void RemoveDataEdge(PortIndex from, PortIndex to)
         {
             reverseEdges.Remove(to);
+
+            IncrementChangeTicks();
         }
 
         public void RemoveExecutionEdge(PortIndex from, NodeIndex to)
         {
             executionEdges.Remove(from, to);
+
+            IncrementChangeTicks();
         }
 
         public bool TryGetOutputPortOf(PortIndex inputPort, out PortIndex outputPort)
@@ -485,6 +505,29 @@ namespace RealityFlow.NodeGraph
 
         public ImmutableList<NodeIndex> GetExecutionInputPortsOf(PortIndex outputPort)
             => executionEdges[outputPort];
+
+        public void ApplyJson(string json)
+        {
+            Graph fromJson = JsonUtility.FromJson<Graph>(json);
+
+            id = fromJson.id;
+            name = fromJson.name;
+            nodes = fromJson.nodes;
+            nodeTypes = fromJson.nodeTypes;
+            reverseEdges = fromJson.reverseEdges;
+            executionEdges = fromJson.executionEdges;
+            inputPorts = fromJson.inputPorts;
+            outputPorts = fromJson.outputPorts;
+            reverseInputPortEdges = fromJson.reverseInputPortEdges;
+            reverseOutputPortEdges = fromJson.reverseOutputPortEdges;
+            executionInputs = fromJson.executionInputs;
+            inputExecutionEdges = fromJson.inputExecutionEdges;
+            variadicPassthrough = fromJson.variadicPassthrough;
+            variadicOutput = fromJson.variadicOutput;
+            variables = fromJson.variables;
+
+            IncrementChangeTicks();
+        }
 
         public void OnBeforeSerialize() { }
 

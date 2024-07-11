@@ -22,12 +22,16 @@ public class CacheMeshData : MonoBehaviour
     private Rigidbody rb;
     private bool compErr = false;
     private BoxCollider boxCol;
-
+    
+    public void SetRfObject(RfObject rfObj)
+    {
+        this.rfObj = rfObj;
+    }
+    
     void Start()
     {
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
         lastPlayModeState = networkedPlayManager.playMode;
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
 
         cachedPosition = transform.localPosition;
         cachedScale = transform.localScale;

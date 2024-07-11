@@ -109,8 +109,8 @@ MonoBehaviour:
   - do not require any prefabs
   - do not require any references
   - all references should not be null
-  - 'Use the namespaces using UnityEngine; using System.Collections; using StarterAssets;
-    using Graph = RealityFlow.NodeGraph.Graph;  using RealityFlow.NodeGraph; '
+  - 'Use the namespaces using UnityEngine; using System.Collections; using Graph
+    = RealityFlow.NodeGraph.Graph;  using RealityFlow.NodeGraph; '
   - ONLY GENERATE CODE THAT MATCHES WHAT THE USER IS REQUESTING NOTHING ELSE
   - DO NOT USE COROUTINES
   - All code should be in a static Execute method

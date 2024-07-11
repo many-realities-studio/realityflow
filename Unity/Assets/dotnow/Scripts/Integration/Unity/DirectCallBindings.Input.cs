@@ -7,6 +7,7 @@ namespace UnityEngine
 {
     internal static partial class DirectCallBindings
     {
+      #if !ENABLE_UNITY_INPUT_SYSTEM
         [Preserve]
         [CLRMethodDirectCallBinding(typeof(Input), "GetKey", typeof(KeyCode))]
         public static void UnityEngine_Input_GetKey(StackData[] stack, int offset)
@@ -30,6 +31,7 @@ namespace UnityEngine
             stack[offset].value.Int32 = Input.GetKeyUp((KeyCode)stack[offset].value.Int32) ? 1 : 0;
             stack[offset].type = StackData.ObjectType.Int32;
         }
+#endif
     }
 }
 #endif

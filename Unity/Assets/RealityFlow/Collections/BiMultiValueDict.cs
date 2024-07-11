@@ -36,7 +36,7 @@ namespace RealityFlow.Collections
 
         public bool Remove(TKey key, TValue value)
         {
-            if (!forward.Remove(key, value))
+            if (forward.Remove(key, value) == false)
                 return false;
             backward.Remove(value, key);
             return true;

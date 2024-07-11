@@ -71,13 +71,14 @@ public class HandleSelector : MonoBehaviour
         if (HandleSpawner.Instance.mode == ManipulationMode.mObject)
             return;
 
-        //GetFirstRayCollision();
-
+    //GetFirstRayCollision();
+#if !ENABLE_INPUT_SYSTEM
         if (Input.GetKeyDown(KeyCode.L))
         {
             HandleSpawner.Instance.ReverseFaceHandlesDirection();
             xrayActive = !xrayActive;
         }
+#endif
     }
 
     private void SwitchHands(bool isLeftHandDominant)
