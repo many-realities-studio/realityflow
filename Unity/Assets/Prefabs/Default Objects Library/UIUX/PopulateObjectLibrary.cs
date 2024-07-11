@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,41 +22,26 @@ public class ModelData
 
 public class PopulateObjectLibrary : MonoBehaviour
 {
-    // This should be set to the Object button prefab
     public GameObject buttonPrefab;
-
-    // This should be set to the SpawnObjectAtRay component attached to one of the hands
     public RaycastLogger spawnScript;
-
-    // Spawn the object as networked
     [SerializeField] private NetworkSpawnManager networkSpawnManager;
-
-    // These lists should be populated with all of the objects that are expected to appear
-    // in the toolbox along with their icon prefabs
     public List<GameObject> objectPrefabs = new List<GameObject>();
     public List<GameObject> iconPrefabs = new List<GameObject>();
     public List<ModelData> modelCatalogue = new List<ModelData>();
-
-    // Reference to the Models button
     public GameObject modelsButton;
     public GameObject objectsButton;
     public Transform contentGrid;
-
-    // Reference to the RealityFlowClient
     private RealityFlowClient rfClient;
 
-    // Start is called before the first frame update
     void Awake()
     {
-        rfClient = RealityFlowClient.Find(this); // Find the RealityFlow client
+        rfClient = RealityFlowClient.Find(this);
         if (rfClient != null && rfClient.userDecoded != null && rfClient.userDecoded.ContainsKey("id"))
         {
             string userId = rfClient.userDecoded["id"];
             Debug.Log("User ID found: " + userId);
             GetUserName(userId);
-
-            // Get models data with actual user ID
-            GetModelsData(userId);
+            GetUserOwnedModels(userId);
         }
         else
         {
@@ -64,37 +50,8 @@ public class PopulateObjectLibrary : MonoBehaviour
         for (int i = 0; i < objectPrefabs.Count; i++)
             InstantiateButton(buttonPrefab, objectPrefabs[i], iconPrefabs[i], this.gameObject.transform);
 
-        // Set up listener for the Models button
         modelsButton.GetComponent<PressableButton>().OnClicked.AddListener(OnModelsButtonClicked);
         objectsButton.GetComponent<PressableButton>().OnClicked.AddListener(OnObjectsButtonClicked);
-    }
-
-    // Instantiate a button and set its prefab
-    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab,
-        GameObject iconPrefab, Transform parent)
-    {
-        // Instantiate the new button, set the text, and set the icon prefab
-        GameObject newButton = Instantiate(buttonPrefab, parent);
-        newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(objectPrefab.name);
-        newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
-
-        // Create a new Unity action and add it as a listener to the button's OnClicked event
-        UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
-        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
-    }
-
-    // Overloaded InstantiateButton method for ModelData
-    private void InstantiateButton(GameObject buttonPrefab, ModelData modelData,
-        GameObject iconPrefab, Transform parent)
-    {
-        // Instantiate the new button, set the text, and set the icon prefab
-        GameObject newButton = Instantiate(buttonPrefab, parent);
-        newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(modelData.name);
-        newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
-
-        // Create a new Unity action and add it as a listener to the button's OnClicked event
-        UnityAction<string> action = new UnityAction<string>(TriggerModelSpawn);
-        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(modelData.downloadURL));
     }
 
     private void ClearObjectGrid()
@@ -149,25 +106,29 @@ public class PopulateObjectLibrary : MonoBehaviour
 
     #region Populate with Objects
     void OnObjectsButtonClicked()
-    {
+    {   
         Debug.Log("Populating Buttons for Objects...");
-
         ClearObjectGrid();
-
         for (int i = 0; i < objectPrefabs.Count; i++)
         {
             InstantiateButton(buttonPrefab, objectPrefabs[i], iconPrefabs[i], this.gameObject.transform);
         }
     }
 
+    private void InstantiateButton(GameObject buttonPrefab, GameObject objectPrefab, GameObject iconPrefab, Transform parent)
+    {
+        GameObject newButton = Instantiate(buttonPrefab, parent);
+        newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(objectPrefab.name);
+        newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
+        UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
+    }
+
     void TriggerObjectSpawn(GameObject objectPrefab)
     {
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(spawnScript.GetVisualIndicatorPosition());
-
-        // Use the prefab's default rotation
         Quaternion defaultRotation = objectPrefab.transform.rotation;
-        // Spawn the object with the default rotation
         GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
         RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles });
 
@@ -188,23 +149,9 @@ public class PopulateObjectLibrary : MonoBehaviour
     #endregion
 
     #region Populate with Models
-
-    // Method called when the Models button is clicked
-    void OnModelsButtonClicked()
+    public void GetUserOwnedModels(string userId)
     {
-        Debug.Log("Populating Buttons for Models...");
-
-        ClearObjectGrid();
-
-        foreach (var modelData in modelCatalogue)
-        {
-            InstantiateButton(buttonPrefab, modelData, iconPrefabs[0], this.gameObject.transform);
-        }
-    }
-
-    public void GetModelsData(string userId)
-    {
-        Debug.Log("Starting GetModelsData for user ID: " + userId);
+        Debug.Log("Starting GetUserOwnedModels for user ID: " + userId);
 
         var getModelsRequest = new GraphQLRequest
         {
@@ -278,36 +225,53 @@ public class PopulateObjectLibrary : MonoBehaviour
         }
         catch (System.Exception ex)
         {
-            Debug.LogError("Exception in GetModelsData: " + ex.Message);
+            Debug.LogError("Exception in GetUserOwnedModels: " + ex.Message);
         }
     }
 
-    void TriggerModelSpawn(string modelUrl)
+    void OnModelsButtonClicked()
+    {   
+        Debug.Log("Populating Buttons for Models...");
+        ClearObjectGrid();
+        foreach (var modelData in modelCatalogue)
+        {
+            InstantiateButton(buttonPrefab, modelData, iconPrefabs[0], this.gameObject.transform);
+        }
+    }
+
+    private void InstantiateButton(GameObject buttonPrefab, ModelData modelData, GameObject iconPrefab, Transform parent)
     {
-        Debug.Log("TriggerModelSpawn with URL: " + modelUrl);
-        StartCoroutine(DownloadAndSpawnModel(modelUrl));
+        GameObject newButton = Instantiate(buttonPrefab, parent);
+        newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(modelData.name);
+        newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
+        UnityAction<string> action = new UnityAction<string>(TriggerModelSpawn);
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(modelData.downloadURL));
+    }
+
+    private void TriggerModelSpawn(string downloadUrl)
+    {
+        Debug.Log("TriggerModelSpawn with Download URL: " + downloadUrl);
+        StartCoroutine(DownloadAndSpawnModel(downloadUrl));
     }
 
     private IEnumerator DownloadAndSpawnModel(string url)
     {
+        // Download the model from the URL
         Debug.Log("Downloading model from URL: " + url);
-        UnityWebRequest webRequest = UnityWebRequest.Get(url);
 
-        // Wait for the response
-        yield return webRequest.SendWebRequest();
+        UnityWebRequest www = UnityWebRequest.Get(url);
+        yield return www.SendWebRequest();
 
-        // Check for errors
-        if (webRequest.result != UnityWebRequest.Result.Success)
+        if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError("Failed to download model. Error: " + webRequest.error);
+            Debug.LogError("Failed to download model. Error: " + www.error);
             yield break;
         }
 
-        // Get the data
-        byte[] data = webRequest.downloadHandler.data;
+        byte[] data = www.downloadHandler.data;
         Debug.Log("Successfully downloaded model. Size: " + data.Length + " bytes.");
 
-        // Parse and instantiate the model
+        // Load the model
         var gltf = new GltfImport();
         var successTask = gltf.LoadGltfBinary(data, null);
         yield return new WaitUntil(() => successTask.IsCompleted);
@@ -319,46 +283,30 @@ public class PopulateObjectLibrary : MonoBehaviour
         }
 
         Debug.Log("Successfully parsed the model.");
-
-        // Instantiate the model in the scene
         var sceneTask = gltf.InstantiateMainSceneAsync(transform);
         yield return sceneTask;
 
         if (sceneTask.Result)
         {
             Debug.Log("Model instantiated successfully.");
-            var instantiatedModel = transform.GetChild(transform.childCount - 1);
+            var instantiatedModel = transform.GetChild(transform.childCount - 1).gameObject;
+            instantiatedModel.transform.SetParent(null);
+            instantiatedModel.transform.position = spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0);
+            instantiatedModel.transform.localScale = Vector3.one;
 
-            // Detach the model from its parent to ensure it does not inherit the button's scale
-            instantiatedModel.SetParent(null);
+            Rigidbody rb = instantiatedModel.AddComponent<Rigidbody>();
+            MeshCollider meshCollider = instantiatedModel.AddComponent<MeshCollider>();
+            meshCollider.convex = true;
 
-            // Set the position to a specific location (e.g., the center of the level)
-            Vector3 spawnPosition = new Vector3(0, 0.25f, 0); // Example position
-            instantiatedModel.position = spawnPosition;
+            rb.mass = 1.0f;
+            rb.useGravity = true;
+            rb.isKinematic = false;
 
-            // Adjust the scale to ensure the model is reasonably sized
-            instantiatedModel.localScale = Vector3.one; // Reset scale to original size
+            /*RealityFlowAPI.MeshData meshData = ExtractMeshData(instantiatedModel);
+            string meshJson = JsonUtility.ToJson(meshData);
 
-            // Add Rigidbody component for physics
-            Rigidbody rb = instantiatedModel.gameObject.AddComponent<Rigidbody>();
-
-            // Add appropriate collider
-            Collider collider = instantiatedModel.gameObject.AddComponent<MeshCollider>();
-            ((MeshCollider)collider).convex = true;
-
-            // Optional: Configure Rigidbody properties
-            rb.mass = 1.0f; // Example: Set mass to 1
-            rb.useGravity = false; // Enable gravity
-            rb.isKinematic = false; // Allow physics interactions
-
-            // Add XRGrabInteractable component for XR interaction
-            // XRGrabInteractable grabInteractable = instantiatedModel.gameObject.AddComponent<XRGrabInteractable>();
-
-            // Optional: Configure XRGrabInteractable properties
-            // grabInteractable.movementType = XRBaseInteractable.MovementType.Kinematic; // Example: Set movement type to kinematic
-            // grabInteractable.throwOnDetach = true; // Allow throwing the object when released
-
-            Debug.Log("Rigidbody, Collider, and XRGrabInteractable added to the model.");
+            string projectId = rfClient.GetCurrentProjectId();
+            RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, new ModelData(), projectId, meshJson); // Pass your modelData here*/
         }
         else
         {

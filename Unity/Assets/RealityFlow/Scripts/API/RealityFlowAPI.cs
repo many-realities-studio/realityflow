@@ -1464,6 +1464,82 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    // SaveModelToDatabase
+    public void SaveModelToDatabase(GameObject model, ModelData modelData, string projectId, string meshJson)
+    {
+        TransformData transformData = new TransformData
+        {
+            position = model.transform.position,
+            rotation = model.transform.rotation,
+            scale = model.transform.localScale
+        };
+
+        RfObject rfObject = ConvertModelDataToRfObject(modelData, projectId, JsonUtility.ToJson(transformData), meshJson);
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+                mutation CreateObject($input: CreateObjectInput!) {
+                    createObject(input: $input) {
+                        id
+                    }
+                }",
+            OperationName = "CreateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectId = rfObject.projectId,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    type = rfObject.type,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            var graphQLResponse = client.SendQueryBlocking(createObject);
+            if (graphQLResponse["data"] != null)
+            {
+                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                rfObject.id = returnedId;
+                spawnedObjects[model] = rfObject;
+                spawnedObjectsById[returnedId] = model;
+                model.name = rfObject.id;
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+    }
+
+    public RfObject ConvertModelDataToRfObject(ModelData modelData, string projectId, string transformJson, string meshJson)
+    {
+        return new RfObject
+        {
+            id = modelData.id,
+            projectId = projectId,
+            name = modelData.name,
+            graphId = null,
+            type = "DownloadedModel",
+            transformJson = transformJson,
+            meshJson = meshJson,
+            originalPrefabName = modelData.name,
+            isTemplate = false,
+            isStatic = false,
+            isCollidable = true,
+            isGravityEnabled = true
+        };
+    }
+
     // --- Fetch/Populate Room---
     public void FetchAndPopulateObjects()
     {
