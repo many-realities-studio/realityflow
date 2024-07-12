@@ -130,9 +130,7 @@ namespace RealityFlow.NodeUI
                     fieldValue = def.DefaultValue;
                 }
                 if (editor is VariableEditor varEditor)
-                {
-                    varEditor.Type = view.Graph.Variables[(string)fieldValue.DynValue];
-                }
+                    varEditor.Type = def.VariableType;
 
                 editor.NodeValue = fieldValue;
                 editor.OnTick += value =>
