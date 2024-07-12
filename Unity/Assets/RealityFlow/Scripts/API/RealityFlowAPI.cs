@@ -355,8 +355,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
-            if (!isUndoing)
-                actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
+            //if (!isUndoing)
+            //actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
         }
         catch (Exception ex)
         {
