@@ -47,6 +47,7 @@ namespace RealityFlow.NodeUI
                 [NodeValueType.Float] = Resources.Load<GameObject>(basePath + "Float Editor"),
                 [NodeValueType.Vector2] = Resources.Load<GameObject>(basePath + "Vector2 Editor"),
                 [NodeValueType.Vector3] = Resources.Load<GameObject>(basePath + "Vector3 Editor"),
+                [NodeValueType.Quaternion] = Resources.Load<GameObject>(basePath + "Quaternion Editor"),
                 [NodeValueType.String] = Resources.Load<GameObject>(basePath + "String Editor"),
                 [NodeValueType.GameObject] = Resources.Load<GameObject>(basePath + "GameObject Editor"),
                 [NodeValueType.TemplateObject] = Resources.Load<GameObject>(basePath + "TemplateObject Editor"),
