@@ -9,6 +9,7 @@ using RealityFlow.NodeGraph;
 public class RealityFlowAPIEditor : Editor
 {
     private string objectId = "668ef98ca81147bb77ec5b51";
+    private float spacing = 20;
     private RealityFlow.Collections.Arena<RealityFlow.NodeGraph.Node>.Index testNodeIndex;
 
     GameObject objectToDespawn;
@@ -106,8 +107,12 @@ public class RealityFlowAPIEditor : Editor
         {
             CreateAndLinkLoopingProcedure(objectId);
         }
+        spacing = EditorGUILayout.FloatField("Spacing", spacing);
 
-
+        if (GUILayout.Button("Create Comprehensive Graph Procedure"))
+        {
+            CreateComprehensiveGraphProcedure(objectId, spacing);
+        }
 
     }
 
@@ -158,9 +163,10 @@ public class RealityFlowAPIEditor : Editor
         // Add a new FloatAdd node to the graph
         NodeIndex newFloatAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatAddDef);
         testNodeIndex = newFloatAddNode;
-        // Set the field values for the new node
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, newFloatAddNode, 0, new FloatValue(3.14f));
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, newFloatAddNode, 1, new FloatValue(1.59f));
+
+        // Set the input constant values for the new node
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, newFloatAddNode, 0, new FloatValue(3.14f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, newFloatAddNode, 1, new FloatValue(1.59f));
 
         Debug.Log($"Added new FloatAdd node to the graph: {newFloatAddNode}");
     }
@@ -199,12 +205,12 @@ public class RealityFlowAPIEditor : Editor
         NodeIndex floatAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatAddDef);
         NodeIndex floatSubtractNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatSubtractDef);
 
-        // Set the field values for the new nodes
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatAddNode, 0, new FloatValue(3.14f));
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatAddNode, 1, new FloatValue(1.59f));
+        // Set the input constant values for the new nodes
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 0, new FloatValue(3.14f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 1, new FloatValue(1.59f));
 
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatSubtractNode, 0, new FloatValue(2.71f));
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatSubtractNode, 1, new FloatValue(1.41f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatSubtractNode, 0, new FloatValue(2.71f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatSubtractNode, 1, new FloatValue(1.41f));
 
         // Create connections (edges) between the nodes
         PortIndex fromPort1 = new PortIndex(floatAddNode, 0); // Output of FloatAdd node
@@ -216,6 +222,7 @@ public class RealityFlowAPIEditor : Editor
         Debug.Log($"Added new FloatSubtract node to the graph: {floatSubtractNode}");
         Debug.Log($"Linked FloatAdd node to FloatSubtract node.");
     }
+
     private void RemoveTestNode(string objId)
     {
         // Find the object
@@ -285,7 +292,7 @@ public class RealityFlowAPIEditor : Editor
 
         // Assume we want to update the position of the node with index 1 for testing
         RealityFlow.Collections.Arena<RealityFlow.NodeGraph.Node>.Index nodeToUpdate = new RealityFlow.Collections.Arena<RealityFlow.NodeGraph.Node>.Index(1);
-        Vector2 newPosition = new Vector2(2.0f, 2.0f);
+        Vector2 newPosition = new Vector2(10.0f, 10.0f);
 
         // Update the position of the node
         RealityFlowAPI.Instance.SetNodePosition(graph, testNodeIndex, newPosition);
@@ -365,25 +372,26 @@ public class RealityFlowAPIEditor : Editor
         NodeIndex newFloatAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatAddDef);
 
         // Test setting different types of field values
-        SetNodeFieldValueSafe(graph, testNodeIndex, 0, new FloatValue(3.14f));
-        SetNodeFieldValueSafe(graph, testNodeIndex, 1, new FloatValue(1.59f));
-        SetNodeFieldValueSafe(graph, testNodeIndex, 2, new IntValue(42));
-        SetNodeFieldValueSafe(graph, testNodeIndex, 3, new BoolValue(true));
+        SetNodeInputConstantValueSafe(graph, newFloatAddNode, 0, new FloatValue(3.14f));
+        SetNodeInputConstantValueSafe(graph, newFloatAddNode, 1, new FloatValue(1.59f));
+        SetNodeInputConstantValueSafe(graph, newFloatAddNode, 2, new IntValue(42));
+        SetNodeInputConstantValueSafe(graph, newFloatAddNode, 3, new BoolValue(true));
 
         Debug.Log($"Set various field values for node {newFloatAddNode}.");
     }
 
-    private void SetNodeFieldValueSafe(Graph graph, NodeIndex nodeIndex, int fieldIndex, NodeValue value)
+    private void SetNodeInputConstantValueSafe(Graph graph, NodeIndex nodeIndex, int fieldIndex, NodeValue value)
     {
         try
         {
-            RealityFlowAPI.Instance.SetNodeFieldValue(graph, nodeIndex, fieldIndex, value);
+            RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, nodeIndex, fieldIndex, value);
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to set node field value: {e.Message}");
+            Debug.LogError($"Failed to set node input constant value: {e.Message}");
         }
     }
+
     private void GraphVariableManagement(string objId)
     {
         // Find the object
@@ -413,11 +421,12 @@ public class RealityFlowAPIEditor : Editor
 
         // Add, update, and remove variables in the graph
         RealityFlowAPI.Instance.AddVariableToGraph(graph, "testVariable", NodeValueType.Float);
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, new RealityFlow.Collections.Arena<RealityFlow.NodeGraph.Node>.Index(1), 0, new FloatValue(3.14f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, new RealityFlow.Collections.Arena<RealityFlow.NodeGraph.Node>.Index(1), 0, new FloatValue(3.14f));
         RealityFlowAPI.Instance.RemoveVariableFromGraph(graph, "testVariable");
 
         Debug.Log($"Managed variables in the graph.");
     }
+
     private void EdgeCycleDetection(string objId)
     {
         // Find the object
@@ -496,10 +505,10 @@ public class RealityFlowAPIEditor : Editor
         NodeIndex floatAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatAddDef);
         NodeIndex floatMultiplyNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatMultiplyDef);
 
-        // Set the field values for the new nodes
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatAddNode, 0, new FloatValue(2.0f));
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatAddNode, 1, new FloatValue(3.0f));
-        RealityFlowAPI.Instance.SetNodeFieldValue(graph, floatMultiplyNode, 1, new FloatValue(4.0f));
+        // Set the input constant values for the new nodes
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 0, new FloatValue(2.0f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 1, new FloatValue(3.0f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatMultiplyNode, 1, new FloatValue(4.0f));
 
         // Create connections (edges) between the nodes
         PortIndex addOutputPort = new PortIndex(floatAddNode, 0); // Output of FloatAdd node
@@ -509,6 +518,7 @@ public class RealityFlowAPIEditor : Editor
 
         Debug.Log($"Added and linked nodes for logical procedure in the graph.");
     }
+
 
     private void CreateAndLinkConditionalProcedure(string objId)
     {
@@ -549,9 +559,9 @@ public class RealityFlowAPIEditor : Editor
         NodeIndex thisObjectNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, thisObjectDef);
         NodeIndex vector3Node = RealityFlowAPI.Instance.AddNodeToGraph(graph, vector3Def);
 
-        // Set the field values for the new nodes
-        //RealityFlowAPI.Instance.SetNodeFieldValue(graph, greaterOrEqualNode, 0, new IntValue(5));
-        //RealityFlowAPI.Instance.SetNodeFieldValue(graph, greaterOrEqualNode, 1, new IntValue(10));
+        // Set the input constant values for the new nodes
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, greaterOrEqualNode, 0, new IntValue(5));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, greaterOrEqualNode, 1, new IntValue(10));
 
         // Create connections (edges) between the nodes
         PortIndex thisObjectOutput = new PortIndex(thisObjectNode, 0);
@@ -568,6 +578,7 @@ public class RealityFlowAPIEditor : Editor
 
         Debug.Log($"Added and linked nodes for conditional procedure in the graph.");
     }
+
 
     private void CreateAndLinkLoopingProcedure(string objId)
     {
@@ -608,9 +619,9 @@ public class RealityFlowAPIEditor : Editor
         NodeIndex setPositionNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, setPositionDef);
         NodeIndex vector3Node = RealityFlowAPI.Instance.AddNodeToGraph(graph, vector3Def);
 
-        // Set the field values for the new nodes
-        //RealityFlowAPI.Instance.SetNodeFieldValue(graph, intAddNode, 0, new IntValue(0));
-        //RealityFlowAPI.Instance.SetNodeFieldValue(graph, intAddNode, 1, new IntValue(1));
+        // Set the input constant values for the new nodes
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, intAddNode, 0, new IntValue(0));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, intAddNode, 1, new IntValue(1));
 
         // Create connections (edges) between the nodes
         PortIndex thisObjectOutput = new PortIndex(thisObjectNode, 0);
@@ -627,8 +638,113 @@ public class RealityFlowAPIEditor : Editor
         Debug.Log($"Added and linked nodes for looping procedure in the graph.");
     }
 
+    private void CreateComprehensiveGraphProcedure(string objId, float spacing)
+    {
+        // Find the object
+        GameObject obj = GameObject.Find(objId);
 
+        if (obj == null)
+        {
+            Debug.LogError($"Object with ID {objId} not found.");
+            return;
+        }
 
+        // Ensure the object has a VisualScript component
+        var visualScript = obj.GetComponent<VisualScript>();
+        if (visualScript == null)
+        {
+            Debug.LogError("VisualScript component not found on the object.");
+            return;
+        }
+
+        // Get the current graph
+        Graph graph = visualScript.graph;
+        if (graph == null)
+        {
+            Debug.LogError("Graph not found on the VisualScript component.");
+            return;
+        }
+
+        // Create new node definitions
+        NodeDefinition floatAddDef = RealityFlowAPI.Instance.NodeDefinitionDict["FloatAdd"];
+        NodeDefinition floatMultiplyDef = RealityFlowAPI.Instance.NodeDefinitionDict["FloatMultiply"];
+        NodeDefinition intGreaterOrEqualDef = RealityFlowAPI.Instance.NodeDefinitionDict["IntGreaterOrEqual"];
+        NodeDefinition setPositionDef = RealityFlowAPI.Instance.NodeDefinitionDict["SetPosition"];
+        NodeDefinition thisObjectDef = RealityFlowAPI.Instance.NodeDefinitionDict["ThisObject"];
+        NodeDefinition vector3Def = RealityFlowAPI.Instance.NodeDefinitionDict["Vector3 Right"];
+        NodeDefinition intAddDef = RealityFlowAPI.Instance.NodeDefinitionDict["IntAdd"];
+
+        // Define spacing
+        spacing = 100.0f;
+
+        // Position offset for spacing out the nodes in a rectangular grid pattern
+        Vector2[] positions = new Vector2[]
+        {
+        new Vector2(0, 0),
+        new Vector2(spacing, 0),
+        new Vector2(-spacing, 0),
+        new Vector2(0, spacing),
+        new Vector2(0, -spacing),
+        new Vector2(spacing, spacing),
+        new Vector2(-spacing, -spacing)
+        };
+
+        // Add new nodes to the graph and set their positions
+        NodeIndex floatAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatAddDef);
+        RealityFlowAPI.Instance.SetNodePosition(graph, floatAddNode, positions[0]);
+
+        NodeIndex floatMultiplyNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatMultiplyDef);
+        RealityFlowAPI.Instance.SetNodePosition(graph, floatMultiplyNode, positions[1]);
+
+        NodeIndex greaterOrEqualNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, intGreaterOrEqualDef);
+        RealityFlowAPI.Instance.SetNodePosition(graph, greaterOrEqualNode, positions[2]);
+
+        NodeIndex setPositionNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, setPositionDef);
+        RealityFlowAPI.Instance.SetNodePosition(graph, setPositionNode, positions[3]);
+
+        NodeIndex thisObjectNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, thisObjectDef);
+        RealityFlowAPI.Instance.SetNodePosition(graph, thisObjectNode, positions[4]);
+
+        NodeIndex vector3Node = RealityFlowAPI.Instance.AddNodeToGraph(graph, vector3Def);
+        RealityFlowAPI.Instance.SetNodePosition(graph, vector3Node, positions[5]);
+
+        NodeIndex intAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, intAddDef);
+        RealityFlowAPI.Instance.SetNodePosition(graph, intAddNode, positions[6]);
+
+        // Set the input constant values for the new nodes
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 0, new FloatValue(2.0f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 1, new FloatValue(3.0f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatMultiplyNode, 1, new FloatValue(4.0f));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, greaterOrEqualNode, 0, new IntValue(5));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, greaterOrEqualNode, 1, new IntValue(10));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, intAddNode, 0, new IntValue(0));
+        RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, intAddNode, 1, new IntValue(1));
+
+        // Create connections (edges) between the nodes
+        // Logical connections
+        PortIndex addOutputPort = new PortIndex(floatAddNode, 0); // Output of FloatAdd node
+        PortIndex multiplyInputPort = new PortIndex(floatMultiplyNode, 0); // First input of FloatMultiply node
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, addOutputPort, multiplyInputPort);
+
+        // Conditional connections
+        PortIndex thisObjectOutput = new PortIndex(thisObjectNode, 0);
+        PortIndex vector3Output = new PortIndex(vector3Node, 0);
+        PortIndex conditionOutput = new PortIndex(greaterOrEqualNode, 0);
+        PortIndex setPositionTarget = new PortIndex(setPositionNode, 0);
+        PortIndex setPositionValue = new PortIndex(setPositionNode, 1);
+        PortIndex conditionInput = new PortIndex(setPositionNode, 2); // Assuming the condition input is on index 2
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, thisObjectOutput, setPositionTarget);
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, vector3Output, setPositionValue);
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, conditionOutput, conditionInput);
+
+        // Looping connections
+        PortIndex intAddOutput = new PortIndex(intAddNode, 0);
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, thisObjectOutput, setPositionTarget);
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, vector3Output, setPositionValue);
+        RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, intAddOutput, setPositionValue);
+
+        Debug.Log($"Added and linked nodes for comprehensive procedure in the graph.");
+    }
 
 
 }

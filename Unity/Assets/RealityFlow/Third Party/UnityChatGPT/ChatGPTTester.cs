@@ -37,10 +37,10 @@ public class ChatGPTTester : MonoBehaviour
 
     private static readonly Dictionary<string, string> apiFunctionDescriptions = new Dictionary<string, string>
     {
-        { "SpawnObject", "Create an object: {0}" },
-        { "DespawnObject", "Remove the object: {0}" },
-        { "UpdateObjectTransform", "Move the object: {0}" },
-        { "AddNodeToGraph", "Add a node to the graph: {0}" },
+        { "SpawnObject", "Create an object(s): {0}" },
+        { "DespawnObject", "Remove the object(s): {0}" },
+        { "UpdateObjectTransform", "Move the object(s): {0}" },
+        { "AddNodeToGraph", "Add a node(s) to the graph: {0}" },
         // Add more mappings as needed
     };
 
@@ -50,6 +50,9 @@ public class ChatGPTTester : MonoBehaviour
 
     public void Execute()
     {
+        // Store original reminders list
+        var originalReminders = chatGPTQuestion.reminders.ToArray();
+
         LLMPromptToBePassed = $"{chatGPTQuestion.promptPrefixConstant} {UserWhisperInput.text}";
 
         ChatGPTProgress.Instance.StartProgress("Generating source code, please wait");
@@ -77,7 +80,7 @@ public class ChatGPTTester : MonoBehaviour
                 Debug.Log("Visual Indicator Location: " + indicatorPosition);
             }
 
-            AddOrUpdateReminder(reminderMessage);
+            AddTemporaryReminder(reminderMessage);
         }
 
         // Add reminder for selected object if it exists
@@ -93,15 +96,111 @@ public class ChatGPTTester : MonoBehaviour
                     string graphJson = JsonUtility.ToJson(visualScript.graph);
                     var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson}";
                     Debug.Log($"Selected object: {selectedObjectName}, Graph: {graphJson}");
-                    AddOrUpdateReminder(selectedObjectReminder);
+                    AddTemporaryReminder(selectedObjectReminder);
                 }
             }
         }
+        // Add specific reminder about graph manipulation
+        var graphManipulationReminder = "\n-------------------------------------------------------------------------\n\n\nWhen making a node or manipulating a graph, only do it like this. Do not deviate from how this file is set up at all. Don't try to create a new graph, don't try to use JSON, don't try to update the database. Do it like you see in this file, nodes should be organized rectangularly and use 100.0.0 spacing if the number of nodes being created is less than 10, if its more then 10 spacing shoud be used: \n\n\n\n" +
+                                        "private void CreateComprehensiveGraphProcedure(string objId, float spacing)\n" +
+                                        "{\n" +
+                                        "    // Find the object\n" +
+                                        "    GameObject obj = GameObject.Find(objId);\n" +
+                                        "    if (obj == null)\n" +
+                                        "    {\n" +
+                                        "        Debug.LogError($\"Object with ID {objId} not found.\");\n" +
+                                        "        return;\n" +
+                                        "    }\n" +
+                                        "    // Ensure the object has a VisualScript component\n" +
+                                        "    var visualScript = obj.GetComponent<VisualScript>();\n" +
+                                        "    if (visualScript == null)\n" +
+                                        "    {\n" +
+                                        "        Debug.LogError(\"VisualScript component not found on the object.\");\n" +
+                                        "        return;\n" +
+                                        "    }\n" +
+                                        "    // Get the current graph\n" +
+                                        "    Graph graph = visualScript.graph;\n" +
+                                        "    if (graph == null)\n" +
+                                        "    {\n" +
+                                        "        Debug.LogError(\"Graph not found on the VisualScript component.\");\n" +
+                                        "        return;\n" +
+                                        "    }\n" +
+                                        "    // Create new node definitions\n" +
+                                        "    NodeDefinition floatAddDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"FloatAdd\"];\n" +
+                                        "    NodeDefinition floatMultiplyDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"FloatMultiply\"];\n" +
+                                        "    NodeDefinition intGreaterOrEqualDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"IntGreaterOrEqual\"];\n" +
+                                        "    NodeDefinition setPositionDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"SetPosition\"];\n" +
+                                        "    NodeDefinition thisObjectDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"ThisObject\"];\n" +
+                                        "    NodeDefinition vector3Def = RealityFlowAPI.Instance.NodeDefinitionDict[\"Vector3 Right\"];\n" +
+                                        "    NodeDefinition intAddDef = RealityFlowAPI.Instance.NodeDefinitionDict[\"IntAdd\"];\n" +
+                                        "    // Define spacing\n" +
+                                        "    spacing = 100.0f;\n" +
+                                        "    // Position offset for spacing out the nodes in a rectangular grid pattern\n" +
+                                        "    Vector2[] positions = new Vector2[]\n" +
+                                        "    {\n" +
+                                        "        new Vector2(0, 0),\n" +
+                                        "        new Vector2(spacing, 0),\n" +
+                                        "        new Vector2(-spacing, 0),\n" +
+                                        "        new Vector2(0, spacing),\n" +
+                                        "        new Vector2(0, -spacing),\n" +
+                                        "        new Vector2(spacing, spacing),\n" +
+                                        "        new Vector2(-spacing, -spacing)\n" +
+                                        "    };\n" +
+                                        "    // Add new nodes to the graph and set their positions\n" +
+                                        "    NodeIndex floatAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatAddDef);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, floatAddNode, positions[0]);\n" +
+                                        "    NodeIndex floatMultiplyNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, floatMultiplyDef);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, floatMultiplyNode, positions[1]);\n" +
+                                        "    NodeIndex greaterOrEqualNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, intGreaterOrEqualDef);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, greaterOrEqualNode, positions[2]);\n" +
+                                        "    NodeIndex setPositionNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, setPositionDef);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, setPositionNode, positions[3]);\n" +
+                                        "    NodeIndex thisObjectNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, thisObjectDef);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, thisObjectNode, positions[4]);\n" +
+                                        "    NodeIndex vector3Node = RealityFlowAPI.Instance.AddNodeToGraph(graph, vector3Def);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, vector3Node, positions[5]);\n" +
+                                        "    NodeIndex intAddNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, intAddDef);\n" +
+                                        "    RealityFlowAPI.Instance.SetNodePosition(graph, intAddNode, positions[6]);\n" +
+                                        "    // Set the input constant values for the new nodes\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 0, new FloatValue(2.0f));\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatAddNode, 1, new FloatValue(3.0f));\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, floatMultiplyNode, 1, new FloatValue(4.0f));\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, greaterOrEqualNode, 0, new IntValue(5));\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, greaterOrEqualNode, 1, new IntValue(10));\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, intAddNode, 0, new IntValue(0));\n" +
+                                        "    RealityFlowAPI.Instance.SetNodeInputConstantValue(graph, intAddNode, 1, new IntValue(1));\n" +
+                                        "    // Create connections (edges) between the nodes\n" +
+                                        "    // Logical connections\n" +
+                                        "    PortIndex addOutputPort = new PortIndex(floatAddNode, 0); // Output of FloatAdd node\n" +
+                                        "    PortIndex multiplyInputPort = new PortIndex(floatMultiplyNode, 0); // First input of FloatMultiply node\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, addOutputPort, multiplyInputPort);\n" +
+                                        "    // Conditional connections\n" +
+                                        "    PortIndex thisObjectOutput = new PortIndex(thisObjectNode, 0);\n" +
+                                        "    PortIndex vector3Output = new PortIndex(vector3Node, 0);\n" +
+                                        "    PortIndex conditionOutput = new PortIndex(greaterOrEqualNode, 0);\n" +
+                                        "    PortIndex setPositionTarget = new PortIndex(setPositionNode, 0);\n" +
+                                        "    PortIndex setPositionValue = new PortIndex(setPositionNode, 1);\n" +
+                                        "    PortIndex conditionInput = new PortIndex(setPositionNode, 2); // Assuming the condition input is on index 2\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, thisObjectOutput, setPositionTarget);\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, vector3Output, setPositionValue);\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, conditionOutput, conditionInput);\n" +
+                                        "    // Looping connections\n" +
+                                        "    PortIndex intAddOutput = new PortIndex(intAddNode, 0);\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, thisObjectOutput, setPositionTarget);\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, vector3Output, setPositionValue);\n" +
+                                        "    RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, intAddOutput, setPositionValue);\n" +
+                                        "    Debug.Log($\"Added and linked nodes for comprehensive procedure in the graph.\");\n" +
+                                        "}";
+        AddTemporaryReminder(graphManipulationReminder);
 
+        // Add existing reminders only once
         if (chatGPTQuestion.reminders.Length > 0)
         {
             LLMPromptToBePassed += $", {string.Join(',', chatGPTQuestion.reminders)}";
             Debug.Log("The complete reminders are: " + LLMPromptToBePassed);
+
+            // Save the complete list of reminders to a file
+            File.WriteAllText(Path.Combine(Application.persistentDataPath, "LLMPromptToBePassed.txt"), LLMPromptToBePassed);
         }
 
         StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed, (response) =>
@@ -110,12 +209,12 @@ public class ChatGPTTester : MonoBehaviour
             ChatGPTProgress.Instance.StopProgress();
 
             WriteResponseToFile(ChatGPTMessage);
-            //Log the API calls in plain English
+            // Log the API calls in plain English
             Debug.Log("Logging message in plain English");
             LogApiCalls(ChatGPTMessage);
 
-            //If you want to see the code produced by ChatGPT uncomment out the line below
-            //Logger.Instance.LogInfo(ChatGPTMessage);
+            // If you want to see the code produced by ChatGPT uncomment out the line below
+            // Logger.Instance.LogInfo(ChatGPTMessage);
             if (RealityFlowAPI.Instance == null)
             {
                 Debug.LogError("RealityFlowAPI.Instance is null.");
@@ -137,8 +236,8 @@ public class ChatGPTTester : MonoBehaviour
             }
         }));
 
-        // Clear reminders after use
-        chatGPTQuestion.reminders = chatGPTQuestion.reminders.Where(r => !IsTemporaryReminder(r)).ToArray();
+        // Restore the original reminders list
+        chatGPTQuestion.reminders = originalReminders;
     }
 
     private string GetNodeDefinitionsJson()
@@ -153,27 +252,18 @@ public class ChatGPTTester : MonoBehaviour
         return nodeDefinitionsJson;
     }
 
-    private void AddOrUpdateReminder(string newReminder)
+    private void AddTemporaryReminder(string newReminder)
     {
         var remindersList = chatGPTQuestion.reminders.ToList();
-        var existingReminderIndex = remindersList.FindIndex(r => r.Contains(newReminder.Split(':')[0]));
-
-        if (existingReminderIndex != -1)
-        {
-            remindersList[existingReminderIndex] = newReminder;
-        }
-        else
-        {
-            remindersList.Add(newReminder);
-        }
-
+        remindersList.Add(newReminder);
         chatGPTQuestion.reminders = remindersList.ToArray();
     }
 
     private bool IsTemporaryReminder(string reminder)
     {
         // Identify temporary reminders based on specific keywords or patterns
-        return reminder.StartsWith("Only use the following prefabs") || reminder.StartsWith("Current spawned objects data");
+        return reminder.StartsWith("Only use the following prefabs") || reminder.StartsWith("Current spawned objects data") ||
+               reminder.StartsWith("Use the location");
     }
 
     private void LogApiCalls(string generatedCode)
