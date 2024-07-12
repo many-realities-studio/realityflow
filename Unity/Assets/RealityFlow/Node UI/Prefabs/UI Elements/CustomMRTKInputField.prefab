@@ -385,6 +385,7 @@ GameObject:
   - component: {fileID: 6851492935902919084}
   - component: {fileID: 5283861573692472279}
   - component: {fileID: 524533586625394616}
+  - component: {fileID: 5784192753166819799}
   m_Layer: 5
   m_Name: CustomMRTKInputField
   m_TagString: Untagged
@@ -737,7 +738,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 88.810005, y: 25.65, z: 26.38652}
+  m_Size: {x: 0, y: 0, z: 26.38652}
   m_Center: {x: 0, y: 0, z: 4.6067348}
 --- !u!114 &1479524107440150815
 MonoBehaviour:
@@ -1024,6 +1025,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5784192753166819799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479524107440150788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e3839959deb9244a3cd32d983f73cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PressableButton: {fileID: 1479524107440150812}
+  InputField: {fileID: 161218929157727460}
+  Keyboard: {fileID: 0}
 --- !u!1 &6530236690713695013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1653,6 +1669,7 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+  nonNativeKeyboard: {fileID: 0}
 --- !u!114 &5643983195917410745
 MonoBehaviour:
   m_ObjectHideFlags: 0
