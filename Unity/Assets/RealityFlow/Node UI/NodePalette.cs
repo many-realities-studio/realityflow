@@ -23,6 +23,7 @@ namespace RealityFlow.NodeUI
                 .NodeDefinitionDict
                 .Values
                 .Where(def => whitelist == null || whitelist.Contains(def.Name))
+                .OrderBy(def => def.Name)
                 .ToList();
 
             page.OnShow = (element, index) =>
@@ -34,6 +35,23 @@ namespace RealityFlow.NodeUI
                 button.definition = defs[index];
             };
             page.ItemCount = defs.Count;
+        }
+    }
+
+    internal class NewClass
+    {
+        public NewClass()
+        {
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is NewClass other;
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
         }
     }
 }

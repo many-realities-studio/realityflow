@@ -16,4 +16,12 @@ public class UndoRedoManager : MonoBehaviour
         // Invoke the OnUndoPerformed event to notify subscribers
         OnUndoPerformed?.Invoke();
     }
+    public void PerformRedo()
+    {
+        Debug.Log("Performing redo action...");
+        RealityFlowAPI.Instance.RedoLastAction();
+
+        // Invoke the OnRedoPerformed event to notify subscribers
+        OnRedoPerformed?.Invoke();
+    }
 }

@@ -13,7 +13,7 @@ using System;
 // is required if we want to load dynamically. I'm not sure what color is used for though, maybe the bounding boxes on meshes?
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 {
-    public NetworkId NetworkId {get; set;}
+    public NetworkId NetworkId { get; set; }
     public NetworkContext context;
     public bool owner;
     public bool isHeld;
@@ -41,7 +41,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // If our context is invalid, register this instance of myNetworkedObject with the scene.
         if (!context.Id.Valid)
         {
-            try 
+            try
             {
                 context = NetworkScene.Register(this);
                 Debug.Log(context.Scene.Id);
@@ -57,32 +57,35 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = false;
         isHeld = false;
 
-        if(gameObject.GetComponent<ObjectManipulator>() != null)
+        if (gameObject.GetComponent<ObjectManipulator>() != null)
         {
             manipulator = GetComponent<ObjectManipulator>();
-        } else
+        }
+        else
         {
             compErr = true;
         }
 
         // These should throw errors on failure (object doesn't have these components) TODO some other time:
-        if(gameObject.GetComponent<Rigidbody>() != null)
+        if (gameObject.GetComponent<Rigidbody>() != null)
         {
             rb = gameObject.GetComponent<Rigidbody>();
             rb.isKinematic = true;
-        } else
+        }
+        else
         {
             compErr = true;
         }
 
-        if(gameObject.GetComponent<BoxCollider>() != null)
+        if (gameObject.GetComponent<BoxCollider>() != null)
         {
             boxCol = gameObject.GetComponent<BoxCollider>();
-        } else
+        }
+        else
         {
             compErr = true;
         }
-        
+
         //color = obj.GetComponent<Renderer>().material.color;
     }
 
@@ -123,11 +126,23 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
             // TODO: 
-            
-        } else
+
+        }
+        else
         {
             rb.useGravity = false;
         }
+
+        Debug.Log("Started hold the action is now being logged to the ActionLogger");
+        // Log the transformation at the start of holding
+        RealityFlowAPI.Instance.actionLogger.LogAction(
+        nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+        rfObj.id,
+        transform.localPosition,
+        transform.localRotation,
+        transform.localScale
+        );
+
 
 
         context.SendJson(new Message()
@@ -141,7 +156,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             isKinematic = true//,
             //color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
-        }); 
+        });
     }
 
     // Set isHeld to false for all users when object is no longer currently being held
@@ -169,44 +184,48 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             rb.useGravity = false;
             rb.isKinematic = true;
-        } else
+        }
+        else
         {
             // If we are in play mode, we will want to have the object return to it's object property behaviors.
 
             // if we have are missing a component don't mess with the object's physics
-            if(!compErr)
+            if (!compErr)
             {
                 // Depending on the rf obj properties, behave appropraitely in play mode
                 // TODO: Move to it's own component (Like RFobject manager or something)
                 //       Include the playmode switch stuff
                 // if static, be still on play
-                if(rfObj.isStatic)
+                if (rfObj.isStatic)
                 {
                     rb.isKinematic = true;
                     rb.constraints = RigidbodyConstraints.FreezeAll;
-                } else
+                }
+                else
                 {
                     rb.isKinematic = false;
                 }
 
                 // if has gravity, apply in play mode
-                if(rfObj.isGravityEnabled)
+                if (rfObj.isGravityEnabled)
                 {
                     rb.useGravity = true;
-                } else
+                }
+                else
                 {
                     rb.useGravity = false;
                 }
 
                 // if the object is collidable
-                if(rfObj.isCollidable)
+                if (rfObj.isCollidable)
                 {
                     boxCol.enabled = true;
-                } else
+                }
+                else
                 {
                     boxCol.enabled = false;
                 }
-            } 
+            }
 
             //rb.useGravity = true;
             //rb.isKinematic = false;
