@@ -230,6 +230,16 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             //rb.useGravity = true;
             //rb.isKinematic = false;
         }
+
+        // Save the object's transform to the database
+        TransformData transformData = new TransformData()
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            scale = transform.localScale
+        };
+
+        // SaveObjectTransformToDatabase(rfObj.id, transformData);
     }
 
 
