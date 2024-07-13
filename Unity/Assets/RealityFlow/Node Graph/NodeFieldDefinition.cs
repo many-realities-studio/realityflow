@@ -18,5 +18,20 @@ namespace RealityFlow.NodeGraph
         [SerializeReference]
         [DiscUnion]
         public NodeValue DefaultValue;
+        /// <summary>
+        /// Only valid if DefaultType == NodeValueType.Variable
+        /// 
+        /// Represents the type of the variables this field can reference
+        /// </summary>
+        public NodeValueType VariableType;
+
+        public readonly string GetDescriptor()
+        {
+            return $@"  {{
+                    name: ""{Name}"",
+                    defaultType: ""{DefaultType}"",
+                    defaultValue: ""{DefaultValue}"",
+                }}";
+        }
     }
 }

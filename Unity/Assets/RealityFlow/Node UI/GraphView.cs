@@ -26,8 +26,9 @@ namespace RealityFlow.NodeUI
             {
                 graph = value;
                 EnableVariableButtons();
-                AddInitialVariables();
+                ResetVariables();
                 templateToggle.ForceSetToggled(currentObject.IsTemplate);
+                MarkDirty();
                 Render();
             }
         }
@@ -35,7 +36,8 @@ namespace RealityFlow.NodeUI
         public GameObject nodeUIPrefab;
         public GameObject edgeUIPrefab;
 
-        bool dirty;
+        int lastChangeTicks;
+        bool Dirty => graph.ChangeTicks != lastChangeTicks;
         VisualScript currentObject;
         public VisualScript CurrentObject { get => currentObject; set => currentObject = value; }
         string selectedVariable;
@@ -85,17 +87,17 @@ namespace RealityFlow.NodeUI
                 return;
             }
 
-            if (dirty)
+            if (Dirty)
             {
+                ResetVariables();
                 Render();
-                dirty = false;
+                MarkClean();
             }
         }
 
-        public void MarkDirty()
-        {
-            dirty = true;
-        }
+        public void MarkDirty() => graph.IncrementChangeTicks();
+
+        void MarkClean() => lastChangeTicks = graph.ChangeTicks;
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -419,14 +421,12 @@ namespace RealityFlow.NodeUI
                 Destroy(transform.gameObject);
         }
 
-        public void AddInitialVariables()
+        public void ResetVariables()
         {
             ClearVariableItems();
 
             foreach ((string name, NodeValueType type) in Graph.Variables)
                 AddVariableItem(name, type);
-
-            MarkDirty();
         }
 
         public void AddVariable()
