@@ -316,7 +316,10 @@ public class GizmoTransform : MonoBehaviour
     public void BakeRotation()
     {
         VertexPosition.BakeVerticesWithNetworking(GetAttachedObject().GetComponent<EditableMesh>());
-        GetAttachedObject().GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        if(GetAttachedObject().GetComponent<MeshFilter>() != null)
+        {
+            GetAttachedObject().GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        }
         /*GetAttachedObject().transform.rotation = Quaternion.identity;
         GetAttachedObject().transform.localScale = Vector3.one;*/
     }
