@@ -26,8 +26,9 @@ namespace RealityFlow.NodeUI
             {
                 graph = value;
                 EnableVariableButtons();
-                AddInitialVariables();
+                ResetVariables();
                 templateToggle.ForceSetToggled(currentObject.IsTemplate);
+                MarkDirty();
                 Render();
             }
         }
@@ -88,6 +89,7 @@ namespace RealityFlow.NodeUI
 
             if (Dirty)
             {
+                ResetVariables();
                 Render();
                 MarkClean();
             }
@@ -419,14 +421,12 @@ namespace RealityFlow.NodeUI
                 Destroy(transform.gameObject);
         }
 
-        public void AddInitialVariables()
+        public void ResetVariables()
         {
             ClearVariableItems();
 
             foreach ((string name, NodeValueType type) in Graph.Variables)
                 AddVariableItem(name, type);
-
-            MarkDirty();
         }
 
         public void AddVariable()

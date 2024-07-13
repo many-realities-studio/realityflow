@@ -52,7 +52,6 @@ public class RealityFlowAPIEditor : Editor
         if (GUILayout.Button("Undo Last Action"))
         {
             Debug.Log("Pressing Undo Last Action button");
-            // Assuming RealityFlowAPI has a method to handle the undo last action
             realityFlowAPI.UndoLastAction();
         }
         objectId = EditorGUILayout.TextField("Object ID", objectId);
@@ -114,6 +113,13 @@ public class RealityFlowAPIEditor : Editor
             CreateComprehensiveGraphProcedure(objectId, spacing);
         }
 
+
+        // Adding the Redo button
+        if (GUILayout.Button("Redo Last Action"))
+        {
+            Debug.Log("Pressing Redo Last Action button");
+            realityFlowAPI.RedoLastAction();
+        }
     }
 
     private void DespawnAllObjects(RealityFlowAPI realityFlowAPI)
