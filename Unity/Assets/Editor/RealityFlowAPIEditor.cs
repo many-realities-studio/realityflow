@@ -46,8 +46,14 @@ public class RealityFlowAPIEditor : Editor
         if (GUILayout.Button("Undo Last Action"))
         {
             Debug.Log("Pressing Undo Last Action button");
-            // Assuming RealityFlowAPI has a method to handle the undo last action
             realityFlowAPI.UndoLastAction();
+        }
+
+        // Adding the Redo button
+        if (GUILayout.Button("Redo Last Action"))
+        {
+            Debug.Log("Pressing Redo Last Action button");
+            realityFlowAPI.RedoLastAction();
         }
     }
 
