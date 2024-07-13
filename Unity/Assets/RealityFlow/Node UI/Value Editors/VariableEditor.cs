@@ -23,6 +23,8 @@ namespace RealityFlow.NodeUI
         Whiteboard whiteboard;
         readonly List<string> variables = new();
 
+        public NodeValueType Type { get; set; } = NodeValueType.Int;
+
         void OnEnable()
         {
             whiteboard = GetComponentInParent<Whiteboard>();
@@ -45,7 +47,7 @@ namespace RealityFlow.NodeUI
                 variables.Clear();
                 variables.AddRange(
                     whiteboard.TopLevelGraphView.Graph.Variables
-                    .Where(kv => kv.Value == NodeValueType.Int)
+                    .Where(kv => kv.Value == Type)
                     .Select(kv => kv.Key)
                 );
                 dropdown.ClearOptions();

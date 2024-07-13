@@ -256,7 +256,12 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// </summary>
         void Awake()
         {
+            Debug.Log("NonNativeKeyboard Awake called."); // Debug log
+
             Instance = this;
+            gameObject.SetActive(false);
+            DontDestroyOnLoad(gameObject); // Optional: If you want the keyboard to persist across scenes
+            Debug.Log("NonNativeKeyboard instance set.");
 
             m_StartingScale = transform.localScale;
             Bounds canvasBounds = RectTransformUtility.CalculateRelativeRectTransformBounds(transform);
@@ -264,26 +269,9 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             RectTransform rect = GetComponent<RectTransform>();
             m_ObjectBounds = new Vector3(canvasBounds.size.x * rect.localScale.x, canvasBounds.size.y * rect.localScale.y, canvasBounds.size.z * rect.localScale.z);
 
-            // Actually find microphone key in the keyboard
-            //var dictationButton = TransformExtensions.GetChildRecursive(gameObject.transform, "Dictation");
-            //if (dictationButton != null)
-            //{
-            //    var dictationIcon = dictationButton.Find("keyboard_closeIcon");
-            //    if (dictationIcon != null)
-            //    {
-            //        _recordImage = dictationIcon.GetComponentInChildren<Image>();
-            //        var material = new Material(_recordImage.material);
-            //        _defaultColor = material.color;
-            //        _recordImage.material = material;
-            //    }
-            //}
-
-            // Setting the keyboardType to an undefined TouchScreenKeyboardType,
-            // which prevents the MRTK keyboard from triggering the system keyboard itself.
-            InputField.keyboardType = (TouchScreenKeyboardType)(int.MaxValue);
-
             // Keep keyboard deactivated until needed
             gameObject.SetActive(false);
+            Debug.Log("NonNativeKeyboard Awake completed and deactivated.");
         }
 
 
@@ -940,6 +928,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             //}
             //SetMicrophoneDefault();
             OnClosed(this, EventArgs.Empty);
+            ClearTargetInputField();
             gameObject.SetActive(false);
         }
 
