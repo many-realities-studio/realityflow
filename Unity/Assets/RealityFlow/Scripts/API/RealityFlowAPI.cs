@@ -628,6 +628,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         Vector2 prevPosition = graph.GetNode(node).Position;
         graph.GetNode(node).Position = position;
+        graph.IncrementChangeTicks();
         Debug.Log($"Moved node {node} to {position}");
 
         string graphJson = JsonUtility.ToJson(graph);

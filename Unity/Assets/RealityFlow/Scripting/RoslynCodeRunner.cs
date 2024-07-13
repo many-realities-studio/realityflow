@@ -73,6 +73,7 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
         // Check if the compilation resulted in a valid assembly
         if (asm == null)
         {
+            Logger.Instance.LogError("There was an error completing this action try submiting your request again...");
             Debug.LogError("Failed to compile code.");
             yield break;
         }
