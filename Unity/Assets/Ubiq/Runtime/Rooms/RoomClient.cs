@@ -456,12 +456,7 @@ namespace Ubiq.Rooms
 
         private void Awake()
         {
-            //OnJoinedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Room " + room.Name));
-
             OnJoinedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Room " + room.Name));
-            //RoomClient roomClient = gameObject.GetComponent<RoomClient>();
-            //roomClient.OnJoinCreatedRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Created and Joined Room " + room.Name));
-            //OnJoinExistingRoom.AddListener((room) => Debug.Log("[ROOM CLIENT] Joined Existing Room " + room.Name));
 
             OnPeerUpdated.SetExisting(me);
         }
@@ -485,6 +480,7 @@ namespace Ubiq.Rooms
             {
                 case "Rejected":
                     {
+                        Debug.Log("Join request was rejected");
                         var args = JsonUtility.FromJson<RejectedArgs>(container.args);
                         OnJoinRejected.Invoke(new Rejection()
                         {
@@ -498,6 +494,7 @@ namespace Ubiq.Rooms
                     break;
                 case "SetRoom":
                     {
+                        Debug.Log("Received SetRoom message");
                         var args = JsonUtility.FromJson<SetRoomArgs>(container.args);
                         room.Set(args.room);
                         Me["ubiq.rooms.roomid"] = room.UUID; // Updates where this Peer thinks its a member of for the sake of other peers. Local Components should use the Room member.
@@ -609,7 +606,7 @@ namespace Ubiq.Rooms
         /// <param name="bool">Whether others should be able to browse for this room</param>
         public void Join(string name, bool publish)
         {
-            // Debug.Log("[ROOM CLIENT] Joining room with name: " + name);
+            Debug.Log("[ROOM CLIENT] Joining room with name: " + name);
             actions.Add(() =>
             {
                 SendToServerSync("Join", new JoinArgs()

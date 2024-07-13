@@ -558,30 +558,30 @@ public class RealityFlowClient : MonoBehaviour
         OnRoomsReceived?.Invoke(rooms);
     }
 
-public void CreateRoom()
-{
-    Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
-
-    // Check if a project is selected
-    if (string.IsNullOrEmpty(currentProjectId))
+    public void CreateRoom()
     {
-        Debug.LogError("No project selected");
-        return;
+        Debug.Log("Creating room for project: " + currentProjectId); // Log the project ID
+
+        // Check if a project is selected
+        if (string.IsNullOrEmpty(currentProjectId))
+        {
+            Debug.LogError("No project selected");
+            return;
+        }
+
+        // Hide Project and Login Menus, show Level Editor
+        projectManager.SetActive(false);
+
+        roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom); //!ON CREATE ROOM SHOULD TRIGGER!
+        Debug.Log("Listener added for OnJoinCreatedRoom.");
+
+        // Create a new room using the RoomClient
+        Debug.Log("Joining test-room");
+
+        roomClient.Join("", false); // Name: , Publish: false
+        Debug.Log("Join method called.");
+
     }
-
-    // Hide Project and Login Menus, show Level Editor
-    projectManager.SetActive(false);
-    Debug.Log("Loading Objects for Project ID: " + currentProjectId);
-
-    roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom); //!ON CREATE ROOM SHOULD TRIGGER!
-    Debug.Log("Listener added for OnJoinCreatedRoom.");
-
-    // Create a new room using the RoomClient
-    Debug.Log("Joining test-room");
-    roomClient.Join("test-room", false); // Name: Test-Room, Publish: false
-
-    RealityFlowAPI.Instance.FetchAndPopulateObjects();
-}
 
     public void OnJoinCreatedRoom(IRoom room)
     {
@@ -593,7 +593,8 @@ public void CreateRoom()
 
         levelEditor.SetActive(true);
 
-        
+        RealityFlowAPI.Instance.FetchAndPopulateObjects();
+
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
         {
@@ -649,6 +650,7 @@ public void CreateRoom()
 
 
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
+
         OnRoomCreated?.Invoke();
     }
 

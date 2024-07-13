@@ -20,6 +20,16 @@ public class ModelData
     public string thumbnailURL;
 }
 
+// Serializable class for Mesh data
+[Serializable]
+public class SerializableMeshData
+{
+    public Vector3[] vertices;
+    public int[] triangles;
+    public Vector3[] normals;
+    public Vector2[] uv;
+}
+
 public class PopulateObjectLibrary : MonoBehaviour
 {
     public GameObject buttonPrefab;
@@ -291,7 +301,7 @@ public class PopulateObjectLibrary : MonoBehaviour
         if (sceneTask.Result)
         {
             Debug.Log("Model instantiated successfully.");
-    
+        
             var instantiatedModel = transform.GetChild(transform.childCount - 1).gameObject;
 
             // Set the model's position and scale
@@ -309,16 +319,37 @@ public class PopulateObjectLibrary : MonoBehaviour
             rb.useGravity = true;
             rb.isKinematic = false;
 
-            // Use the
-           
+            // Extract mesh data and serialize it
+            Mesh mesh = meshCollider.sharedMesh;
+            SerializableMeshData serializableMeshData = new SerializableMeshData
+            {
+                vertices = mesh.vertices,
+                triangles = mesh.triangles,
+                normals = mesh.normals,
+                uv = mesh.uv
+            };
+            string meshJson = JsonUtility.ToJson(serializableMeshData);
 
+            // Use the RealityFlowAPI to save the model to the server
+            ModelData modelData = new ModelData
+            {
+                id = Guid.NewGuid().ToString(),  // Generate a unique ID for the model
+                name = instantiatedModel.name,
+                triangles = mesh.triangles.Length / 3,
+                downloadURL = url,  // Assuming the URL can be used for future downloads
+                thumbnailURL = ""   // Add logic to generate or fetch a thumbnail URL if needed
+            };
 
+            string projectId = "your_project_id";  // Replace with actual project ID
+
+            RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, modelData, projectId, meshJson);
+
+            Debug.Log("Model saved to the database successfully.");
         }
         else
         {
             Debug.LogError("Failed to instantiate the model.");
         }
     }
-
     #endregion
 }

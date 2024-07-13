@@ -1464,18 +1464,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    // SaveModelToDatabase
-    public void SaveModelToDatabase(GameObject model, ModelData modelData, string projectId, string meshJson)
+        // SaveModelToDatabase
+    public void SaveModelToDatabase(GameObject instantiatedModel, ModelData modelData, string projectId, string meshJson)
     {
-        TransformData transformData = new TransformData
-        {
-            position = model.transform.position,
-            rotation = model.transform.rotation,
-            scale = model.transform.localScale
-        };
-
-        RfObject rfObject = ConvertModelDataToRfObject(modelData, projectId, JsonUtility.ToJson(transformData), meshJson);
-
         var createObject = new GraphQLRequest
         {
             Query = @"
@@ -1483,44 +1474,49 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     createObject(input: $input) {
                         id
                     }
-                }",
+                }
+            ",
             OperationName = "CreateObject",
             Variables = new
             {
                 input = new
                 {
-                    projectId = rfObject.projectId,
-                    name = rfObject.name,
-                    graphId = rfObject.graphId,
-                    type = rfObject.type,
-                    meshJson = rfObject.meshJson,
-                    transformJson = rfObject.transformJson
+                    projectId = projectId,
+                    name = modelData.name,
+                    type = "Model",
+                    meshJson = meshJson,
+                    transformJson = JsonUtility.ToJson(new TransformData
+                    {
+                        position = instantiatedModel.transform.position,
+                        rotation = instantiatedModel.transform.rotation,
+                        scale = instantiatedModel.transform.localScale
+                    })
                 }
             }
         };
 
-        try
+        var response = client.SendQueryBlocking(createObject);
+        if (response["data"] != null)
         {
-            var graphQLResponse = client.SendQueryBlocking(createObject);
-            if (graphQLResponse["data"] != null)
-            {
-                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
-                rfObject.id = returnedId;
-                spawnedObjects[model] = rfObject;
-                spawnedObjectsById[returnedId] = model;
-                model.name = rfObject.id;
-            }
-            else
-            {
-                Debug.LogError("Failed to save object to the database.");
-            }
+            // Object saved successfully, retrieve the ID from the response
+            var objectId = response["data"]["createObject"]["id"].ToString();
+            modelData.id = objectId;
+            Debug.Log($"Model saved to database with ID: {objectId}");
         }
-        catch (Exception ex)
+        else
         {
-            Debug.LogException(ex);
+            Debug.LogError("Failed to save model to database.");
+            foreach (var error in response["errors"])
+            {
+                Debug.LogError($"GraphQL Error: {error["message"]}");
+                if (error["extensions"] != null)
+                {
+                    Debug.LogError($"Error Extensions: {error["extensions"]}");
+                }
+            }
         }
     }
-
+    
     public RfObject ConvertModelDataToRfObject(ModelData modelData, string projectId, string transformJson, string meshJson)
     {
         return new RfObject
