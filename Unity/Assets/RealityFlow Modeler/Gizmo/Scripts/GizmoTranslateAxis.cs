@@ -33,7 +33,7 @@ public class GizmoTranslateAxis : GizmoTransform
             EnableLineRenderer(this.transform.position, GetAxisDirection(), 100f); 
 
             lastUpdateRaySelect = true;
-            BeginMeshOperation();
+            //BeginMeshOperation();
         }
 
         else if (EndOfRaySelect())
@@ -41,7 +41,7 @@ public class GizmoTranslateAxis : GizmoTransform
             DisableLineRenderer();
 
             lastUpdateRaySelect = false;
-            EndMeshOperation();
+            //EndMeshOperation();
         }
 
         if (lastUpdateRaySelect)
@@ -58,6 +58,8 @@ public class GizmoTranslateAxis : GizmoTransform
 
             GetGizmoContainer().transform.position = newGizmoPosition;
             GetAttachedObject().transform.position = newGizmoPosition;
+
+            Debug.Log("The translate axis attached object... = " + GetAttachedObject());
         }
     }
 

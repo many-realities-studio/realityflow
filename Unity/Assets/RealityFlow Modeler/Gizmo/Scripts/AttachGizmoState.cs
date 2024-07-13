@@ -138,6 +138,7 @@ public class AttachGizmoState : MonoBehaviour
                 //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
                 attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             } else {
+                Debug.Log("ATTATCHING TO GIZMO FAILED?");
                 throw new ArgumentException("Cannot Attatch Gizmo because object is missing a required component");
             }
 
@@ -181,7 +182,9 @@ public class AttachGizmoState : MonoBehaviour
                 //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
                 attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             } else {
+                Debug.Log("TURN OFF GIZMO FAILED?");
                 throw new ArgumentException("Cannot Attatch Gizmo because object is missing a required component");
+                
             }
 
 
@@ -274,7 +277,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if this is the start of selection, otherwise, false</returns>
     bool StartOfRaySelect(GameObject target)
     {
-        return !lastUpdateRaySelect && target.GetComponent<MRTKBaseInteractable>().IsRaySelected;
+        return !lastUpdateRaySelect && target.GetComponent<MRTKBaseInteractable>().IsRaySelected && target.GetComponent<BoundsControl>() != null;
     }
 
     /// <summary>
@@ -284,7 +287,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if this is the end of selection, otherwise, false</returns>
     bool EndOfRaySelect(GameObject target)
     {
-        return lastUpdateRaySelect && !target.GetComponent<MRTKBaseInteractable>().IsRaySelected;
+        return lastUpdateRaySelect && !target.GetComponent<MRTKBaseInteractable>().IsRaySelected && target.GetComponent<BoundsControl>() != null;
     }
 
     /// <summary>
