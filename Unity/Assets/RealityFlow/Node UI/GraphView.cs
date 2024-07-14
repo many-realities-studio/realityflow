@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
@@ -70,6 +72,20 @@ namespace RealityFlow.NodeUI
         public PortIndex? selectedOutputEdgePort;
         public NodeIndex? selectedInputExecEdgePort;
         public PortIndex? selectedOutputExecEdgePort;
+
+        [NaughtyAttributes.Button]
+        void LayoutGraph()
+        {
+            static IEnumerator LayoutGraphCoroutine(GraphView view)
+            {
+                Task task = view.graph.LayoutNodes();
+                while (task.Status == TaskStatus.Running)
+                    yield return null;
+                view.MarkDirty();
+            }
+
+            StartCoroutine(LayoutGraphCoroutine(this));
+        }
 
         void Start()
         {

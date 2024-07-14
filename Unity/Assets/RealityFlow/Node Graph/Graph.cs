@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Dagre;
 using RealityFlow.Collections;
 using UnityEngine;
@@ -180,42 +181,53 @@ namespace RealityFlow.NodeGraph
             return index;
         }
 
-        public void LayoutNodes()
+        /// <summary>
+        /// Use the dagre layouting algorithm to layout the graph automatically.
+        /// 
+        /// Starts a task and returns it. The task will take a while to complete, so don't block on 
+        /// it.
+        /// </summary>
+        public Task LayoutNodes()
         {
-            DagreInputGraph inputGraph = new()
+            Task task = new(() =>
             {
-                VerticalLayout = false
-            };
-
-            Dictionary<NodeIndex, DagreInputNode> mapping = new();
-
-            foreach ((NodeIndex index, Node node) in nodes)
-            {
-                mapping.Add(index, inputGraph.AddNode(null, null, null));
-            }
-
-            foreach ((PortIndex from, PortIndex to) in Edges)
-            {
-                try
+                DagreInputGraph inputGraph = new()
                 {
-                    inputGraph.AddEdge(mapping[from.Node], mapping[to.Node]);
-                }
-                catch (DagreException) {}
-            }
+                    VerticalLayout = false
+                };
 
-            foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in ExecutionEdges)
-                foreach (NodeIndex to in tos)
+                Dictionary<NodeIndex, DagreInputNode> mapping = new();
+
+                foreach ((NodeIndex index, Node node) in nodes)
                 {
-                    inputGraph.AddEdge(mapping[from.Node], mapping[to]);
+                    mapping.Add(index, inputGraph.AddNode(null, null, null));
                 }
 
-            inputGraph.Layout();
+                foreach ((PortIndex from, PortIndex to) in Edges)
+                {
+                    try
+                    {
+                        inputGraph.AddEdge(mapping[from.Node], mapping[to.Node]);
+                    }
+                    catch (DagreException) { }
+                }
 
-            foreach ((NodeIndex index, Node node) in Nodes)
-            {
-                DagreInputNode inpNode = mapping[index];
-                node.Position = new(inpNode.X, inpNode.Y);
-            }
+                foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in ExecutionEdges)
+                    foreach (NodeIndex to in tos)
+                    {
+                        inputGraph.AddEdge(mapping[from.Node], mapping[to]);
+                    }
+
+                inputGraph.Layout();
+
+                foreach ((NodeIndex index, Node node) in Nodes)
+                {
+                    DagreInputNode inpNode = mapping[index];
+                    node.Position = new(inpNode.X, inpNode.Y);
+                }
+            });
+            task.Start();
+            return task;
         }
 
         /// <summary>
