@@ -74,7 +74,7 @@ namespace RealityFlow.NodeUI
         public PortIndex? selectedOutputExecEdgePort;
 
         [NaughtyAttributes.Button]
-        void LayoutGraph()
+        public void LayoutGraph()
         {
             static IEnumerator LayoutGraphCoroutine(GraphView view)
             {
@@ -82,6 +82,10 @@ namespace RealityFlow.NodeUI
                 while (task.IsCompleted == false)
                     yield return null;
                 view.MarkDirty();
+                RealityFlowAPI.Instance.SendGraphUpdateToDatabase(
+                    JsonUtility.ToJson(view.graph), 
+                    view.graph.Id
+                );
             }
 
             StartCoroutine(LayoutGraphCoroutine(this));

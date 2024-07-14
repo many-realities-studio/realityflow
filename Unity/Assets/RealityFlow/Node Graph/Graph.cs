@@ -186,6 +186,9 @@ namespace RealityFlow.NodeGraph
         /// 
         /// Starts a task and returns it. The task will take a while to complete, so don't block on 
         /// it.
+        /// 
+        /// This change will not be automatically persisted to the database! Make sure to update the
+        /// graph in the database yourself after this task finishes.
         /// </summary>
         public Task LayoutNodes()
         {
