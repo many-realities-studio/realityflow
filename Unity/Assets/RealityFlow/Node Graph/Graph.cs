@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Dagre;
 using RealityFlow.Collections;
 using UnityEngine;
 
@@ -177,6 +178,44 @@ namespace RealityFlow.NodeGraph
             MutableNodesOfType(definition.Name).Add(index);
             IncrementChangeTicks();
             return index;
+        }
+
+        public void LayoutNodes()
+        {
+            DagreInputGraph inputGraph = new()
+            {
+                VerticalLayout = false
+            };
+
+            Dictionary<NodeIndex, DagreInputNode> mapping = new();
+
+            foreach ((NodeIndex index, Node node) in nodes)
+            {
+                mapping.Add(index, inputGraph.AddNode(null, null, null));
+            }
+
+            foreach ((PortIndex from, PortIndex to) in Edges)
+            {
+                try
+                {
+                    inputGraph.AddEdge(mapping[from.Node], mapping[to.Node]);
+                }
+                catch (DagreException) {}
+            }
+
+            foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in ExecutionEdges)
+                foreach (NodeIndex to in tos)
+                {
+                    inputGraph.AddEdge(mapping[from.Node], mapping[to]);
+                }
+
+            inputGraph.Layout();
+
+            foreach ((NodeIndex index, Node node) in Nodes)
+            {
+                DagreInputNode inpNode = mapping[index];
+                node.Position = new(inpNode.X, inpNode.Y);
+            }
         }
 
         /// <summary>
