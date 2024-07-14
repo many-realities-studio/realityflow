@@ -225,6 +225,27 @@ namespace RealityFlow.NodeGraph
                     DagreInputNode inpNode = mapping[index];
                     node.Position = new(inpNode.X, inpNode.Y);
                 }
+
+                // Create a bounding box to re-center the graph
+                Rect boundingBox = new();
+                foreach ((NodeIndex index, Node node) in Nodes)
+                {
+                    if (node.Position.x < boundingBox.xMin)
+                        boundingBox.xMin = node.Position.x;
+                    if (node.Position.x > boundingBox.xMax)
+                        boundingBox.xMax = node.Position.x;
+                    if (node.Position.y < boundingBox.yMin)
+                        boundingBox.yMin = node.Position.y;
+                    if (node.Position.y > boundingBox.yMax)
+                        boundingBox.yMax = node.Position.y;
+                }
+
+                Vector2 offset = -boundingBox.center;
+
+                foreach ((NodeIndex index, Node node) in Nodes)
+                {
+                    node.Position += offset;
+                }
             });
             task.Start();
             return task;

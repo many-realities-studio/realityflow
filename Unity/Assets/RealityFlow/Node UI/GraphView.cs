@@ -79,7 +79,7 @@ namespace RealityFlow.NodeUI
             static IEnumerator LayoutGraphCoroutine(GraphView view)
             {
                 Task task = view.graph.LayoutNodes();
-                while (task.Status == TaskStatus.Running)
+                while (task.IsCompleted == false)
                     yield return null;
                 view.MarkDirty();
             }
