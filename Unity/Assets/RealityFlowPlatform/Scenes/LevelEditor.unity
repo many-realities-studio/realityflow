@@ -3563,6 +3563,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 161
       objectReference: {fileID: 0}
+    - target: {fileID: 6256583117870785841, guid: d6b701d19fbdb9d4586bfe1690958979,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6406086965157650251, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_IsActive
@@ -3587,6 +3592,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7401690213693505997, guid: d6b701d19fbdb9d4586bfe1690958979,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7584648563869503394, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
@@ -8363,7 +8373,7 @@ MonoBehaviour:
     type: 3}
   DiscoveryPanelDetail: {fileID: 325145418}
   RoomDescriptionPanel: {fileID: 377130204}
-  server: https://reality.gaim.ucf.edu/
+  server: http://localhost:4000/
 --- !u!114 &2142340402
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -157,7 +157,7 @@ public class ProjectsDisplay : MonoBehaviour
 
     private void GetActiveProjectsData()
     {
-        Debug.Log("--- Fetching Active Projects Data ---");
+        // Debug.Log("--- Fetching Active Projects Data ---");
         
         var activeProjectsQuery = new GraphQLRequest
         {
@@ -186,7 +186,7 @@ public class ProjectsDisplay : MonoBehaviour
 
         if (projectsData != null)
         {
-            Debug.Log($"Fetched {projectsData.Count} active projects.");
+            // Debug.Log($"Fetched {projectsData.Count} active projects.");
             DisplayActiveProjects(projectsData, activeProjectsPanel); // Pass the fetched data to the display method
         }
         else
@@ -239,13 +239,13 @@ public class ProjectsDisplay : MonoBehaviour
     // DisplayActive Projects
     public void DisplayActiveProjects(JArray projectsData, GameObject parentPanel)
     {
-        Debug.Log("--- Displaying Active Projects ---");
+        // Debug.Log("--- Displaying Active Projects ---");
         
         if (projectsData != null)
         {
             foreach (var project in projectsData)
             {
-                Debug.Log($"Processing project: {project["projectName"]}");
+                // Debug.Log($"Processing project: {project["projectName"]}");
                 // Instantiate a new ProjectUI prefab
                 GameObject projectUIInstance = Instantiate(projectPrefab, parentPanel.transform);
 
@@ -276,7 +276,7 @@ public class ProjectsDisplay : MonoBehaviour
 
                 // Set the project title
                 projectTitleText.text = project["projectName"].ToString();
-                Debug.Log($"Set project title to: {project["projectName"]}");
+                // Debug.Log($"Set project title to: {project["projectName"]}");
 
                 // Find and set up the join button
                 Button joinButton = projectUIInstance.GetComponent<Button>();
@@ -284,7 +284,7 @@ public class ProjectsDisplay : MonoBehaviour
                 {
                     string projectId = project["id"].ToString();
                     joinButton.onClick.AddListener(() => OpenProject(projectId));
-                    Debug.Log($"Set up join button for project: {project["projectName"]}");
+                    // Debug.Log($"Set up join button for project: {project["projectName"]}");
                 }
                 else
                 {
