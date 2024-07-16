@@ -324,7 +324,7 @@ public class RealityFlowClient : MonoBehaviour
         while (!task.isDone)
             Thread.Sleep(1);
         double end = Time.realtimeSinceStartupAsDouble;
-        Debug.Log($"Blocking query took {(end - start) * 1000}ms to complete");
+        // Debug.Log($"Blocking query took {(end - start) * 1000}ms to complete");
 
         return ProcessQueryResponse(request);
     }
