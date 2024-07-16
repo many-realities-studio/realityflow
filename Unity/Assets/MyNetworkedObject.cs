@@ -175,7 +175,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     }
 
     // Update method to be called within StartHold and EndHold
-    private void UpdateTransform()
+    public void UpdateTransform()
     {
         if (!owner && isHeld)
             this.gameObject.GetComponent<ObjectManipulator>().enabled = false;
@@ -202,6 +202,14 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                     isKinematic = true,
                     color = gameObject.GetComponent<Renderer>().material.color
                 });
+
+                // Update the object's transform in the database
+                RealityFlowAPI.Instance.UpdateObjectTransform(
+                    rfObj.id,
+                    transform.position,
+                    transform.rotation,
+                    transform.localScale
+                );
             }
         }
     }
