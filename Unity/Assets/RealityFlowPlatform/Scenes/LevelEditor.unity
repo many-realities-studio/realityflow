@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -8742,6 +8741,7 @@ MonoBehaviour:
   nearMenuReference: {fileID: 1448981244012354375}
   delteMenuReference: {fileID: 1203155907}
   isUndoing: 0
+  isRedoing: 0
   audioPlayer: {fileID: 3435842387280994128, guid: d30e801b3fe6a2641b8be993ee310556,
     type: 3}
   AudioClips:
@@ -9247,7 +9247,7 @@ MonoBehaviour:
     type: 3}
   DiscoveryPanelDetail: {fileID: 325145418}
   RoomDescriptionPanel: {fileID: 377130204}
-  server: http://localhost:4000/
+  server: https://reality.gaim.ucf.edu/
 --- !u!114 &2142340402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11122,7 +11122,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AttachTransform
       value: 
-      objectReference: {fileID: 684807928}
+      objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_AllowAnchorControl
@@ -11142,7 +11142,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RayOriginTransform
       value: 
-      objectReference: {fileID: 943692238}
+      objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_RaycastMask.m_Bits
