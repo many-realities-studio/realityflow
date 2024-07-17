@@ -166,6 +166,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb = GetComponent<Rigidbody>();
 
         isHeld = false;
+
+        RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
+
         context.SendJson(new Message()
         {
             position = transform.localPosition,
