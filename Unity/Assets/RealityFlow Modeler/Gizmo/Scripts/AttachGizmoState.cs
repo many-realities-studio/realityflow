@@ -7,6 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using TransformTypes;
 using Unity.XR.CoreUtils;
+using System;
 
 /// <summary>
 /// This class manages which object is the gizmo should attach to
@@ -21,9 +22,7 @@ public class AttachGizmoState : MonoBehaviour
     public GameObject rightHand;
     public GameObject sphere;
     public TransformType transformType;
-
     public MRTKRayInteractor interactor;
-
     public bool lookForTarget;
     public bool checkMeshRaySelection;
     bool lastUpdateRaySelect;
@@ -46,7 +45,7 @@ public class AttachGizmoState : MonoBehaviour
         checkMeshRaySelection = false;
         attachedGameObject = null;
         lookForTarget = false;
-        var rig = Object.FindFirstObjectByType<XROrigin>().gameObject;
+        var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
         if(rightHand == null) {
             rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
             // Debug.Log(rightHand);
@@ -83,6 +82,7 @@ public class AttachGizmoState : MonoBehaviour
 
         if (StartOfRaySelect(target))
         {
+            Debug.Log("ON ATTEMPTED RESELECTION, TRY TO DETATCH GIZMO");
             if (DoSwitchObjectSelect(target))
                 DetachGizmoFromObject();
 
@@ -125,9 +125,24 @@ public class AttachGizmoState : MonoBehaviour
 
         try
         {
-            attachedGameObject.GetComponent<MeshCollider>().enabled = false;
+            // If it's an object turn off its collider, if it's a mesh turn off its collider
+            // in the case of neither throw an error
+            if(attachedGameObject.GetComponent<BoxCollider>() != null && attachedGameObject.GetComponent<MyNetworkedObject>() != null)
+            {
+                attachedGameObject.GetComponent<BoxCollider>().enabled = false;
+                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
+
+            } else if (attachedGameObject.GetComponent<MeshCollider>() != null && attachedGameObject.GetComponent<NetworkedMesh>() != null)
+            {
+                attachedGameObject.GetComponent<MeshCollider>().enabled = false;
+                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
+                attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
+            } else {
+                Debug.Log("ATTATCHING TO GIZMO FAILED?");
+                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a required component");
+            }
+
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = true;
-            attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
             DeactivateFreeTransform(attachedGameObject);
         }
@@ -154,11 +169,27 @@ public class AttachGizmoState : MonoBehaviour
         //Debug.Log("Detach gizmo");
         try
         {
-            attachedGameObject.GetComponent<MeshCollider>().enabled = true;
-            //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = false;
+            // If it's an object turn off its collider, if it's a mesh turn off its collider
+            // in the case of neither throw an error
+            if(attachedGameObject.GetComponent<BoxCollider>() != null && attachedGameObject.GetComponent<MyNetworkedObject>() != null)
+            {
+                attachedGameObject.GetComponent<BoxCollider>().enabled = true;
+                attachedGameObject.GetComponent<MyNetworkedObject>().ControlSelection();
+
+            } else if (attachedGameObject.GetComponent<MeshCollider>() != null && attachedGameObject.GetComponent<NetworkedMesh>() != null)
+            {
+                attachedGameObject.GetComponent<MeshCollider>().enabled = true;
+                //attachedGameObject.GetComponent<NetworkedMesh>().isSelected = true;
+                attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
+            } else {
+                Debug.Log("TURN OFF GIZMO FAILED?");
+                throw new ArgumentException("Cannot Attatch Gizmo because object is missing a required component");
+                
+            }
+
+
             // Turn off the handles if all the gizmo tools are off
             attachedGameObject.GetComponent<BoundsControl>().HandlesActive = false;
-            attachedGameObject.GetComponent<NetworkedMesh>().ControlSelection();
             ActivateFreeTransform(attachedGameObject);
         }
         catch { Debug.Log("missing components"); }
@@ -167,6 +198,8 @@ public class AttachGizmoState : MonoBehaviour
 
         Destroy(gizmoContainerInst);       
     }
+
+    
 
     /// <summary>
     /// Sets the gizmo to active. This method was created to be used by Invoke().
@@ -182,6 +215,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>The game object if it meets the condition, otherwise, null</returns>
     private GameObject GetRayCollision()
     {
+        
         RaycastHit currentHitResult = new RaycastHit();
         interactor.TryGetCurrent3DRaycastHit(out currentHitResult);
 
@@ -189,8 +223,8 @@ public class AttachGizmoState : MonoBehaviour
             return null;
         if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>() == null)
             return null;
-        if (currentHitResult.transform.gameObject.GetComponent<EditableMesh>() == null)
-            return null;
+        //if (currentHitResult.transform.gameObject.GetComponent<EditableMesh>() == null)
+            //return null;
 
         return currentHitResult.transform.gameObject;
     }
@@ -243,7 +277,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if this is the start of selection, otherwise, false</returns>
     bool StartOfRaySelect(GameObject target)
     {
-        return !lastUpdateRaySelect && target.GetComponent<MRTKBaseInteractable>().IsRaySelected;
+        return !lastUpdateRaySelect && target.GetComponent<MRTKBaseInteractable>().IsRaySelected && target.GetComponent<BoundsControl>() != null;
     }
 
     /// <summary>
@@ -253,7 +287,7 @@ public class AttachGizmoState : MonoBehaviour
     /// <returns>True if this is the end of selection, otherwise, false</returns>
     bool EndOfRaySelect(GameObject target)
     {
-        return lastUpdateRaySelect && !target.GetComponent<MRTKBaseInteractable>().IsRaySelected;
+        return lastUpdateRaySelect && !target.GetComponent<MRTKBaseInteractable>().IsRaySelected && target.GetComponent<BoundsControl>() != null;
     }
 
     /// <summary>
