@@ -674,7 +674,7 @@ public class RealityFlowClient : MonoBehaviour
         var graphQL = SendQueryBlocking(updateExpiredTime);
         if (graphQL["data"] != null)
         {
-            Debug.Log("Room alive");
+            //Debug.Log("Room alive");
         }
         else
         {
@@ -708,6 +708,8 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
+
+        levelEditor.SetActive(true); 
 
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
     }

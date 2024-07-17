@@ -155,10 +155,11 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
 
-    private void GetActiveProjectsData()
+    public void GetActiveProjectsData()
     {
         // Debug.Log("--- Fetching Active Projects Data ---");
-        
+
+        // Updated Query Call
         var activeProjectsQuery = new GraphQLRequest
         {
             Query = @"
@@ -240,6 +241,7 @@ public class ProjectsDisplay : MonoBehaviour
     public void DisplayActiveProjects(JArray projectsData, GameObject parentPanel)
     {
         // Debug.Log("--- Displaying Active Projects ---");
+        ClearActiveProjects();
         
         if (projectsData != null)
         {
@@ -374,6 +376,14 @@ public class ProjectsDisplay : MonoBehaviour
                     child.GetComponent<Button>().onClick.AddListener(() => rfClient.JoinRoom(joinCode));
                 }
             }
+        }
+    }
+
+    private void ClearActiveProjects()
+    {
+        foreach (Transform child in activeProjectsPanel.transform)
+        {
+            Destroy(child.gameObject);
         }
     }
     #endregion

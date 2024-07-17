@@ -1763,30 +1763,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                     var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
                     // Deserialize the two dimensional array of integers from the json string and assign it to serializableMesh.faces
-
-                    // StringBuilder sb = new StringBuilder();
-                    // sb.Append("[");
-                    // for (int i = 0; i < smi.faces.Length; i++)
-                    // {
-                    //     sb.Append("[");
-                    //     for (int j = 0; j < smi.faces[i].Length; j++)
-                    //     {
-                    //         sb.Append(smi.faces[i][j]);
-                    //         if (j < smi.faces[i].Length - 1)
-                    //         {
-                    //             sb.Append(",");
-                    //         }
-                    //     }
-                    //     sb.Append("]");
-                    //     if (i < smi.faces.Length - 1)
-                    //     {
-                    //         sb.Append(",");
-                    //     }
-                    // }
-                    // sb.Append("]");
-
-                    // Reverse the above serialization for the faces property of the string contained in obj.meshJson and assign it to serializableMesh.faces
-                    //
                     obj.meshJson = obj.meshJson.Remove(obj.meshJson.Length - 1);
                     int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
                     int end = obj.meshJson.Length;
@@ -1798,6 +1774,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         // If the last character is a , remove it
                         faceArray[i] = faceArray[i].TrimEnd(',');
                         string[] face = faceArray[i].Split(',');
+                        
                         // Remove any "]" characters from the last element of the array
                         facesArray[i - 1] = new int[face.Length];
                         for (int j = 0; j < face.Length; j++)
