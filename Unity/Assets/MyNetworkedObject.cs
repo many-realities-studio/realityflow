@@ -25,11 +25,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     Color lastColor;
     // variables for entering and exiting playmode
     public NetworkedPlayManager networkedPlayManager;
-    private ObjectManipulator manipulator;
-    private Rigidbody rb;
-    private BoxCollider boxCol;
-    private bool lastPlayModeState;
-    private RfObject rfObj;
+    
     //bool lastGravity;
     private bool compErr = false;
 
@@ -77,12 +73,55 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         rb.isKinematic = false;
 
         UpdateTransform();
+
+        // If we are not in play mode, have no gravity and allow the object to move while held,
+        // similarly allow thw object to be moved in playmode without gravity on hold.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = false;
+
+            // This would also be a place to change to boxcolliders collider interaction masks so that
+            // the object can be placed within others to prevent it from colliding with UI.
+            // TODO: 
+
+        }
+        else
+        {
+            rb.useGravity = false;
+        }
+
+        Debug.Log("Started hold the action is now being logged to the ActionLogger");
+        // Log the transformation at the start of holding
+        RealityFlowAPI.Instance.actionLogger.LogAction(
+        nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+        rfObj.id,
+        transform.localPosition,
+        transform.localRotation,
+        transform.localScale
+        );
+
+
+
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            owner = false,
+            isHeld = true,
+            //isSelected = isSelected,
+            isKinematic = true//,
+            //color = gameObject.GetComponent<Renderer>().material.color
+            // gravity = obj.GetComponent<Rigidbody>().useGravity
+        });
     }
 
     // Set isHeld to false for all users when object is no longer currently being held
     public void EndHold()
     {
         isHeld = false;
+        rb.isKinematic = true;
 
         RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
 
@@ -98,93 +137,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             // gravity = obj.GetComponent<Rigidbody>().useGravity
         });
 
-        // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
-        // the rf obj for play mode.
-        if (!networkedPlayManager.playMode)
-        {
-            rb.useGravity = false;
-            rb.isKinematic = true;
-        }
-        else
-        {
-            // If we are in play mode, we will want to have the object return to it's object property behaviors.
-
-            // if we have are missing a component don't mess with the object's physics
-            if (!compErr)
-            {
-                // Depending on the rf obj properties, behave appropraitely in play mode
-                // TODO: Move to it's own component (Like RFobject manager or something)
-                //       Include the playmode switch stuff
-                // if static, be still on play
-                if (rfObj.isStatic)
-                {
-                    rb.isKinematic = true;
-                    rb.constraints = RigidbodyConstraints.FreezeAll;
-                }
-                else
-                {
-                    rb.isKinematic = false;
-                }
-
-                // if has gravity, apply in play mode
-                if (rfObj.isGravityEnabled)
-                {
-                    rb.useGravity = true;
-                }
-                else
-                {
-                    rb.useGravity = false;
-                }
-
-                // if the object is collidable
-                if (rfObj.isCollidable)
-                {
-                    boxCol.enabled = true;
-                }
-                else
-                {
-                    boxCol.enabled = false;
-                }
-            }
-
-            //rb.useGravity = true;
-            //rb.isKinematic = false;
-        }
-
-        // Save the object's transform to the database
-        TransformData transformData = new TransformData()
-        {
-            position = transform.position,
-            rotation = transform.rotation,
-            scale = transform.localScale
-        };
-
-        // SaveObjectTransformToDatabase(rfObj.id, transformData);
+        UpdateTransform();
     }
 
-
-    // Update is called once per frame
-    void Update()
+    // Update method to be called within StartHold and EndHold
+    public void UpdateTransform()
     {
-        /*
-        // If currently not the owner and the object is being held by someone, disable ObjectManipulator so it can be moved
-        if (!owner && isHeld)
-            this.gameObject.GetComponent<ObjectManipulator>().enabled = false;
-        else
-            this.gameObject.GetComponent<ObjectManipulator>().enabled = true;
-
-        // Update object positioning if the object is owned
-        // If you currently own the object, physics calculations are made on your device and transmitted to the rest for that object
-        if(owner)
+        if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != GetComponent<Renderer>().material.color)
         {
-            if(lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != obj.GetComponent<Renderer>().material.color)
-            {
-                lastPosition = transform.localPosition;
-                lastScale = transform.localScale;
-                lastRotation = transform.localRotation;
-                lastOwner = myObject.owner;
-                lastColor = obj.GetComponent<Renderer>().material.color;
-                // lastGravity = obj.GetComponent<Rigidbody>().useGravity;
+            lastPosition = transform.localPosition;
+            lastScale = transform.localScale;
+            lastRotation = transform.localRotation;
+            lastColor = GetComponent<Renderer>().material.color;
 
             context.SendJson(new Message()
             {
@@ -254,24 +218,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastRotation = transform.localRotation;
         lastOwner = owner;
         lastColor = GetComponent<Renderer>().material.color;
-    }
-
-    public void ControlSelection()
-    {
-        //Debug.Log("ControlSelection() was called");
-        // If the mesh is selected, then start the selection
-        if (gameObject.GetComponent<BoundsControl>().HandlesActive)
-        {
-            if (!owner && isSelected)
-            return;
-
-            //Debug.Log("This mesh is now selected");
-            owner = true;
-            // ownerName = selectTool.ownerName;
-            isSelected = true;
-            //boundsControl.HandlesActive = true;
-            //boundsVisuals.SetActive(true);
-        }
     }
 
     public void ControlSelection()
