@@ -575,7 +575,7 @@ public class RealityFlowClient : MonoBehaviour
         // Create a new room using the RoomClient
         roomClient.Join("User Created Room", false); // Name: , Publish: false
 
-
+        RealityFlowAPI.Instance.FetchAndPopulateObjects();
     }
 
     public void OnJoinCreatedRoom(IRoom room)
@@ -589,7 +589,7 @@ public class RealityFlowClient : MonoBehaviour
 
         levelEditor.SetActive(true);
 
-        RealityFlowAPI.Instance.FetchAndPopulateObjects();
+        //RealityFlowAPI.Instance.FetchAndPopulateObjects();
 
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
