@@ -17,17 +17,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public NetworkContext context;
     public bool owner;
     public bool isHeld;
-    private ObjectManipulator manipulator;
-    private Rigidbody rb;
-    private BoxCollider boxCol;
+    public bool isSelected;
     bool lastOwner;
     Vector3 lastPosition;
     Vector3 lastScale;
     Quaternion lastRotation;
     Color lastColor;
-
     // variables for entering and exiting playmode
     public NetworkedPlayManager networkedPlayManager;
+    private ObjectManipulator manipulator;
+    private Rigidbody rb;
+    private BoxCollider boxCol;
     private bool lastPlayModeState;
     private RfObject rfObj;
     //bool lastGravity;
@@ -89,6 +89,20 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         //color = obj.GetComponent<Renderer>().material.color;
     }
 
+    void Awake()
+    {
+        owner = false;
+        isHeld = false;
+        //isSelected = false;
+        // if(lastSize ! = 0.1f;
+        //boundsControl = gameObject.GetComponent<BoundsControl>();
+        //meshMaterial = gameObject.GetComponent<MeshRenderer>().material;
+        //boundsControl.HandlesActive = false;
+
+        if (NetworkId == null)
+            Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
+    }
+
     // Set object owner to whoever picks the object up, and set isHeld to true for every user in scene since object is being held
     public void StartHold()
     {
@@ -138,6 +152,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = false,
             isHeld = true,
+            //isSelected = isSelected,
             isKinematic = true//,
             //color = gameObject.GetComponent<Renderer>().material.color
             // gravity = obj.GetComponent<Rigidbody>().useGravity
@@ -151,6 +166,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb = GetComponent<Rigidbody>();
 
         isHeld = false;
+
+        RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
+
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -227,6 +245,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // SaveObjectTransformToDatabase(rfObj.id, transformData);
     }
 
+
     // Update is called once per frame
     void Update()
     {
@@ -267,6 +286,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         */
     }
 
+    
+
     public struct Message
     {
         public Vector3 position;
@@ -301,5 +322,23 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastOwner = owner;
         lastColor = gameObject.GetComponent<Renderer>().material.color;
         //lastGravity = obj.GetComponent<Rigidbody>().useGravity;
+    }
+
+    public void ControlSelection()
+    {
+        //Debug.Log("ControlSelection() was called");
+        // If the mesh is selected, then start the selection
+        if (gameObject.GetComponent<BoundsControl>().HandlesActive)
+        {
+            if (!owner && isSelected)
+            return;
+
+            //Debug.Log("This mesh is now selected");
+            owner = true;
+            // ownerName = selectTool.ownerName;
+            isSelected = true;
+            //boundsControl.HandlesActive = true;
+            //boundsVisuals.SetActive(true);
+        }
     }
 }

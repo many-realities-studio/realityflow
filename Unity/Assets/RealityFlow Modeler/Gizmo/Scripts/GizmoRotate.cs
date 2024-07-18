@@ -145,7 +145,8 @@ public class GizmoRotate : GizmoTranslateAxis
         currentOperation.AddOffsetAmount(GetAttachedObject().transform.localRotation * Quaternion.Inverse(startRot));
         try
         {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            // prefabs are not meshes like primitve bases
+            //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }
         catch { }
         currentOperation = null;
