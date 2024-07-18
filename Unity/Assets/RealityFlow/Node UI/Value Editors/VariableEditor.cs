@@ -45,12 +45,11 @@ namespace RealityFlow.NodeUI
             set
             {
                 variables.Clear();
-                if (whiteboard.TopLevelGraphView.Graph != null)
-                    variables.AddRange(
-                        whiteboard.TopLevelGraphView.Graph.Variables
-                        .Where(kv => kv.Value == Type)
-                        .Select(kv => kv.Key)
-                    );
+                variables.AddRange(
+                    whiteboard.TopLevelGraphView.Graph.Variables
+                    .Where(kv => kv.Value == Type)
+                    .Select(kv => kv.Key)
+                );
                 dropdown.ClearOptions();
                 dropdown.AddOptions(new[] { "None" }.ToList());
                 dropdown.AddOptions(variables);

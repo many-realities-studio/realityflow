@@ -15,7 +15,7 @@ namespace RealityFlow.NodeUI
         GameObject realityTools;
 
         static NetworkedPlayManager _playManager;
-        public static NetworkedPlayManager PlayManager
+        static NetworkedPlayManager PlayManager
         {
             get
             {
@@ -56,6 +56,12 @@ namespace RealityFlow.NodeUI
                 whiteboard.GetComponent<Whiteboard>().Init();
                 whiteboard.SetActive(false);
             }
+
+            GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
+            {
+                if (PlayManager != null && !PlayManager.playMode && RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(gameObject))
+                    ShowWhiteboard(gameObject);
+            });
         }
 
         void ShowWhiteboard(GameObject obj)
@@ -69,7 +75,7 @@ namespace RealityFlow.NodeUI
                 Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
                 return;
 
-            Whiteboard.Instance.SetAttachedObj(script);
+            Whiteboard.Instance.ShowForObject(script);
         }
     }
 }

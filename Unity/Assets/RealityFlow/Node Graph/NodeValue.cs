@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Text.Json.Serialization;
 using NaughtyAttributes;
 using TMPro;
 using UnityEngine;
@@ -166,7 +165,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         int value;
-        [JsonIgnore]
         public int Value => value;
 
         public IntValue()
@@ -189,7 +187,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         float value;
-        [JsonIgnore]
         public float Value => value;
 
         public FloatValue()
@@ -212,7 +209,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         string value;
-        [JsonIgnore]
         public string Value => value;
 
         public StringValue()
@@ -235,7 +231,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         bool value;
-        [JsonIgnore]
         public bool Value => value;
 
         public BoolValue()
@@ -258,7 +253,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         Vector2 value;
-        [JsonIgnore]
         public Vector2 Value => value;
 
         public Vector2Value()
@@ -281,7 +275,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         Vector3 value;
-        [JsonIgnore]
         public Vector3 Value => value;
 
         public Vector3Value()
@@ -304,7 +297,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         Quaternion value;
-        [JsonIgnore]
         public Quaternion Value => value;
 
         public QuaternionValue()
@@ -347,7 +339,6 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.GameObject;
 
-        [JsonIgnore]
         public GameObject Value
         {
             get
@@ -391,7 +382,6 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         string varName;
-        [JsonIgnore]
         public string VarName => varName;
 
         public VariableValue()

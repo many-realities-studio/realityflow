@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using RealityFlow.NodeGraph;
 using UnityEngine;
 
@@ -40,20 +39,14 @@ namespace RealityFlow.NodeUI
             RealityFlowAPI.Instance.OnLeaveRoom += () => gameObject.SetActive(false);
         }
 
-        public void Show()
+        public void ShowForObject(VisualScript obj)
         {
             if (DoNotShow)
                 return;
 
             gameObject.SetActive(true);
             // TODO: Probably use API for this later
-            Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up).normalized;
-            transform.position = Camera.main.transform.position + camForward;
-            transform.forward = camForward;
-        }
-
-        public void SetAttachedObj(VisualScript obj)
-        {
+            transform.position = obj.transform.position + Vector3.up * 1.0f;
             if (RealityFlowAPI.Instance.SpawnedObjects[obj.gameObject].graphId == null)
             {
                 obj.graph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
