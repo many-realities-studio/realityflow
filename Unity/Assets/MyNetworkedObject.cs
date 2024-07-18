@@ -90,6 +90,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void UpdateRfObject(RfObject rfObj)
     {
         this.rfObj = rfObj;
+        GetComponent<CacheObjectData>().rfObj = rfObj;
         context.SendJson(new Message()
         {
             rfObj = this.rfObj
@@ -114,7 +115,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         var m = message.FromJson<Message>();
         if(m.rfObj != null)
         {
+            Debug.Log("Received rfObject");
             rfObj = m.rfObj;
+            GetComponent<CacheObjectData>().rfObj = rfObj;
             RealityFlowAPI.Instance.RegisterPeerSpawnedObject(gameObject, rfObj);
             return;
         }
