@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
@@ -29,7 +26,8 @@ namespace RealityFlow.NodeUI
         public PortIndex port;
         [NonSerialized]
         IValueEditor editor;
-        public IValueEditor Editor => editor;
+        [NonSerialized]
+        TMP_Text nonEditorName;
 
         bool init;
 
@@ -44,13 +42,38 @@ namespace RealityFlow.NodeUI
             def = definition;
             this.port = port;
 
-            GameObject editorPrefab = NodeView.FieldPrefabs[def.Type];
-            editor = Instantiate(editorPrefab, editorParent).GetComponent<IValueEditor>();
-            editor.NodeValue = defaultValue;
-            editor.OnTick += value =>
+            if (view.Graph == null)
+                return;
+
+            // If the port is connected, just display a name.
+            if (view.Graph.ReverseEdges.ContainsKey(port))
             {
-                RealityFlowAPI.Instance.SetNodeInputConstantValue(view.Graph, port.Node, port.Port, value);
-            };
+                GameObject nonEditorObj = new("InputPortName");
+                GameObject editorPrefab = NodeView.FieldPrefabs[def.Type];
+                nonEditorObj.transform.SetParent(editorParent);
+                nonEditorObj.transform.localRotation = Quaternion.identity;
+                nonEditorObj.transform.localScale = editorPrefab.transform.localScale;
+                // this is just to set z position; x and y are controlled by layout
+                nonEditorObj.transform.localPosition = Vector3.zero;
+
+                nonEditorName = nonEditorObj.AddComponent<TextMeshProUGUI>();
+                TMP_Text editorPrefabName = editorPrefab.GetComponent<IValueEditor>().Name;
+                nonEditorName.font = editorPrefabName.font;
+                nonEditorName.fontSize = editorPrefabName.fontSize;
+                nonEditorName.alignment = editorPrefabName.alignment;
+                nonEditorName.color = editorPrefabName.color;
+            }
+            // Otherwise, display an editor for the input port's constant value.
+            else
+            {
+                GameObject editorPrefab = NodeView.FieldPrefabs[def.Type];
+                editor = Instantiate(editorPrefab, editorParent).GetComponent<IValueEditor>();
+                editor.NodeValue = defaultValue;
+                editor.OnTick += value =>
+                {
+                    RealityFlowAPI.Instance.SetNodeInputConstantValue(view.Graph, port.Node, port.Port, value);
+                };
+            }
 
             init = true;
 
@@ -61,7 +84,10 @@ namespace RealityFlow.NodeUI
         {
             Assert.IsTrue(init, "Must call Init() when creating input port views");
 
-            editor.Name.text = Definition.Name;
+            if (editor != null)
+                editor.Name.text = Definition.Name;
+            if (nonEditorName != null)
+                nonEditorName.text = Definition.Name;
         }
     }
 }

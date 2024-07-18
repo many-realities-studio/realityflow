@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 1220612881292142212}
   - component: {fileID: 3969154042671898735}
   - component: {fileID: 5954362475428783005}
+  - component: {fileID: -3939974325980926295}
   - component: {fileID: 5241023694219699609}
   - component: {fileID: 8721132859247098966}
   - component: {fileID: -2274518277862525055}
@@ -331,6 +332,18 @@ MonoBehaviour:
       - m_Target: {fileID: 2935166160665358904}
         m_TargetAssemblyTypeName: SelectToolManager, Assembly-CSharp
         m_MethodName: SelectMesh
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: -3939974325980926295}
+        m_TargetAssemblyTypeName: RealityFlowObjectEvents, Assembly-CSharp
+        m_MethodName: SendSelectedEvent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -739,6 +752,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b978d6336c8d69d4184e7dd01e72e9f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-3939974325980926295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524904045447331170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87e1d2cb41b7df94980a700fb5509a78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5241023694219699609
