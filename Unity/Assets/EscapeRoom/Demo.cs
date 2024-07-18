@@ -76,6 +76,9 @@ public class NetworkedObjectSpawner : MonoBehaviour
 
         if (spawnedObject != null)
         {
+            // Inherit the tag from the prefab
+            spawnedObject.tag = networkedObject.gameObject.tag;
+
             // Scale up the object in the next frame using the API method
             StartCoroutine(ScaleUpObject(spawnedObject, position, rotation, originalScale * scaleMultiplier));
 
@@ -98,8 +101,11 @@ public class NetworkedObjectSpawner : MonoBehaviour
                 }
             }
 
-            // Ensure Rigidbody stays kinematic
-            StartCoroutine(EnforceKinematic(spawnedObject));
+            // Ensure Rigidbody stays kinematic for "Teleport" tagged objects
+            if (spawnedObject.CompareTag("Teleport"))
+            {
+                StartCoroutine(EnforceKinematic(spawnedObject));
+            }
         }
 
         Debug.Log($"Spawned networked object: {networkedObject.gameObject.name} at position: {position}");

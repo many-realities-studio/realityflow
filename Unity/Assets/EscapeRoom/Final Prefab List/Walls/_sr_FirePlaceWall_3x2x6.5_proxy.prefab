@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 6708124714979433593}
   m_Layer: 0
   m_Name: _sr_FirePlaceWall_3x2x6.5_proxy
-  m_TagString: Walls
+  m_TagString: Teleport
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -445,6 +445,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   owner: 0
   isHeld: 0
+  isSelected: 0
   networkedPlayManager: {fileID: 0}
 --- !u!64 &6708124714979433593
 MeshCollider:
