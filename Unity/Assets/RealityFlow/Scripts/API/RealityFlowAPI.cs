@@ -1305,8 +1305,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                             // Update dictionary with the original prefab name
                             UpdateObjectToPrefabNameDictionary(returnedId, prefabName);
-
-
+                            spawnedObject.GetComponent<MyNetworkedObject>().UpdateRfObject(rfObject);
                             LogActionToServer("SpawnObject", new { rfObject });
 
                             // Update the name of the spawned object in the scene
@@ -1383,7 +1382,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedObject;
     }
     #endregion
-
+    public void RegisterPeerSpawnedObject(GameObject obj, RfObject rfObj)
+    {
+        if(spawnedObjectsById.ContainsKey(rfObj.id))
+        {
+            Debug.LogWarning("Object with ID " + rfObj.id + " already exists in the spawnedObjectsById dictionary.");
+            return;
+        }
+        spawnedObjects[obj] = rfObj;
+        spawnedObjectsById[rfObj.id] = obj;
+    }
     readonly HashSet<GameObject> nonPersistentObjects = new();
 
     public void InstantiateNonPersisted(GameObject obj, Vector3 position, Quaternion rotation)

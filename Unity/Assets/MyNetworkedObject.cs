@@ -16,6 +16,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     private ObjectManipulator manipulator;
     private Rigidbody rb;
     private BoxCollider boxCol;
+    public RfObject rfObj;
     bool lastOwner;
     Vector3 lastPosition;
     Vector3 lastScale;
@@ -24,6 +25,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {
+        Debug.Log("Starting networked object");
         context = NetworkScene.Register(this);
         
         owner = false;
@@ -33,6 +35,14 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
         boxCol = GetComponent<BoxCollider>();
+        RequestRfObject();
+    }
+
+    public void RequestRfObject()
+    {
+        Message msg = new Message();
+        msg.needsRfObject = true;
+        context.SendJson(msg);
     }
 
     // Set object owner to whoever picks the object up, and set isHeld to true for every user in scene since object is being held
@@ -77,8 +87,19 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    public void UpdateRfObject(RfObject rfObj)
+    {
+        this.rfObj = rfObj;
+        context.SendJson(new Message()
+        {
+            rfObj = this.rfObj
+        });
+    }
+
     public struct Message
     {
+        public bool needsRfObject;
+        public RfObject rfObj;
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
@@ -91,7 +112,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
-
+        if(m.rfObj != null)
+        {
+            rfObj = m.rfObj;
+            RealityFlowAPI.Instance.RegisterPeerSpawnedObject(gameObject, rfObj);
+            return;
+        }
+        if(m.needsRfObject && rfObj != null) {
+            context.SendJson(new Message()
+            {
+                rfObj = rfObj
+            });
+        }
         transform.localPosition = m.position;
         transform.localScale = m.scale;
         transform.localRotation = m.rotation;
