@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ubiq.Spawning;
+using RealityFlow.NodeGraph;
 
 public class NetworkedObjectSpawner : MonoBehaviour
 {
@@ -11,22 +13,28 @@ public class NetworkedObjectSpawner : MonoBehaviour
     {
         if (parentObject != null)
         {
-            List<MyNetworkedObject> networkedObjects = FindAllNetworkedObjects(parentObject);
-
-            foreach (MyNetworkedObject networkedObject in networkedObjects)
-            {
-                if (networkedObject.enabled)
-                {
-                    SpawnNetworkedObject(networkedObject);
-                }
-            }
-
-            Debug.Log("All enabled networked objects have been spawned.");
+            StartCoroutine(SpawnAllNetworkedObjectsCoroutine());
         }
         else
         {
             Debug.LogError("Parent Object is not set.");
         }
+    }
+
+    private IEnumerator SpawnAllNetworkedObjectsCoroutine()
+    {
+        List<MyNetworkedObject> networkedObjects = FindAllNetworkedObjects(parentObject);
+
+        foreach (MyNetworkedObject networkedObject in networkedObjects)
+        {
+            if (networkedObject.enabled)
+            {
+                SpawnNetworkedObject(networkedObject);
+                yield return null; // Wait for the next frame to continue
+            }
+        }
+
+        Debug.Log("All enabled networked objects have been spawned.");
     }
 
     private List<MyNetworkedObject> FindAllNetworkedObjects(GameObject parent)
@@ -79,12 +87,25 @@ public class NetworkedObjectSpawner : MonoBehaviour
                 meshCollider.enabled = false;
                 meshCollider.enabled = true; // Force recalculation
             }
+
+            // Check if the object has the "Walls" tag and set it as static
+            if (spawnedObject.CompareTag("Walls"))
+            {
+                VisualScript visualScript = spawnedObject.GetComponent<VisualScript>();
+                if (visualScript != null)
+                {
+                    RealityFlowAPI.Instance.SetStatic(visualScript, true);
+                }
+            }
+
+            // Ensure Rigidbody stays kinematic
+            StartCoroutine(EnforceKinematic(spawnedObject));
         }
 
         Debug.Log($"Spawned networked object: {networkedObject.gameObject.name} at position: {position}");
     }
 
-    private IEnumerator<WaitForEndOfFrame> ScaleUpObject(GameObject obj, Vector3 position, Quaternion rotation, Vector3 targetScale)
+    private IEnumerator ScaleUpObject(GameObject obj, Vector3 position, Quaternion rotation, Vector3 targetScale)
     {
         yield return new WaitForEndOfFrame(); // Wait for the end of the frame to ensure object is fully initialized
 
@@ -97,6 +118,28 @@ public class NetworkedObjectSpawner : MonoBehaviour
         {
             collider.enabled = false;
             collider.enabled = true;
+        }
+    }
+
+    private IEnumerator EnforceKinematic(GameObject obj)
+    {
+        Rigidbody rb = obj.GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            Debug.LogWarning("No Rigidbody found on the object.");
+            yield break;
+        }
+
+        rb.isKinematic = true; // Ensure it's kinematic initially
+
+        while (true)
+        {
+            if (!rb.isKinematic)
+            {
+                Debug.LogWarning("Rigidbody isKinematic property was modified. Resetting to kinematic.");
+                rb.isKinematic = true;
+            }
+            yield return new WaitForEndOfFrame(); // Check every frame
         }
     }
 }

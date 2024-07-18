@@ -9247,7 +9247,7 @@ MonoBehaviour:
     type: 3}
   DiscoveryPanelDetail: {fileID: 325145418}
   RoomDescriptionPanel: {fileID: 377130204}
-  server: http://localhost:4000/
+  server: https://reality.gaim.ucf.edu/
 --- !u!114 &2142340402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9261,7 +9261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   servers:
-  - {fileID: -7849211376014683480, guid: 1c91df7c43c1dbe4fb0fb303e71a2790, type: 2}
+  - {fileID: -7849211376014683480, guid: 86f501a9e79ad224ca784616b9c07cd1, type: 2}
   reconnectBehaviour: 0
 --- !u!114 &2142340403
 MonoBehaviour:
@@ -11122,7 +11122,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AttachTransform
       value: 
-      objectReference: {fileID: 684807928}
+      objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_AllowAnchorControl
@@ -11142,7 +11142,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RayOriginTransform
       value: 
-      objectReference: {fileID: 943692238}
+      objectReference: {fileID: 0}
     - target: {fileID: 173303173720431677, guid: 745359975b649aa4cbe3c0d5a0f5f66c,
         type: 3}
       propertyPath: m_RaycastMask.m_Bits

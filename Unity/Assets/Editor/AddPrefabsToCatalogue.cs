@@ -26,6 +26,11 @@ public class PrefabCatalogueEditor : EditorWindow
         {
             PopulateCatalogue();
         }
+
+        if (GUILayout.Button("Remove Empty Entries"))
+        {
+            RemoveEmptyEntries();
+        }
     }
 
     private void PopulateCatalogue()
@@ -55,5 +60,23 @@ public class PrefabCatalogueEditor : EditorWindow
         AssetDatabase.SaveAssets();
 
         Debug.Log("Catalogue populated with " + newPrefabs.Count + " new prefabs. Total prefabs in catalogue: " + catalogue.prefabs.Count);
+    }
+
+    private void RemoveEmptyEntries()
+    {
+        if (catalogue == null)
+        {
+            Debug.LogError("Prefab Catalogue not set.");
+            return;
+        }
+
+        int initialCount = catalogue.prefabs.Count;
+        catalogue.prefabs.RemoveAll(prefab => prefab == null);
+
+        EditorUtility.SetDirty(catalogue);
+        AssetDatabase.SaveAssets();
+
+        int removedCount = initialCount - catalogue.prefabs.Count;
+        Debug.Log("Removed " + removedCount + " empty entries. Total prefabs in catalogue: " + catalogue.prefabs.Count);
     }
 }
