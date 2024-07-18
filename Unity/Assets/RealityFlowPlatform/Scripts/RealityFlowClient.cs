@@ -53,7 +53,7 @@ public class RealityFlowClient : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log(" === RealityFlowClient Awake === ");
+        // Debug.Log(" === RealityFlowClient Awake === ");
 
         // Ensure only one instance
         if (transform.parent == null)
@@ -324,7 +324,7 @@ public class RealityFlowClient : MonoBehaviour
         while (!task.isDone)
             Thread.Sleep(1);
         double end = Time.realtimeSinceStartupAsDouble;
-        Debug.Log($"Blocking query took {(end - start) * 1000}ms to complete");
+        // Debug.Log($"Blocking query took {(end - start) * 1000}ms to complete");
 
         return ProcessQueryResponse(request);
     }
@@ -547,9 +547,7 @@ public class RealityFlowClient : MonoBehaviour
         JArray rooms = null;
         if (roomsData != null)
         {
-            // Debug.Log("Fetched rooms data: " + roomsData.ToString());
             rooms = (JArray)roomsData["getRoomsByProjectId"];
-            // Debug.Log("Rooms: " + rooms.ToString());
         }
         else
         {
@@ -573,27 +571,25 @@ public class RealityFlowClient : MonoBehaviour
         projectManager.SetActive(false);
 
         roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom); //!ON CREATE ROOM SHOULD TRIGGER!
-        Debug.Log("Listener added for OnJoinCreatedRoom.");
 
         // Create a new room using the RoomClient
-        Debug.Log("Joining test-room");
+        roomClient.Join("User Created Room", false); // Name: , Publish: false
 
-        roomClient.Join("", false); // Name: , Publish: false
-        Debug.Log("Join method called.");
-
+        RealityFlowAPI.Instance.FetchAndPopulateObjects();
     }
 
     public void OnJoinCreatedRoom(IRoom room)
     {
-        Debug.Log("Created Room: " + room.Name);// ON CREATE ROOM SHOULD TRIGGER!
+        Debug.Log("[CREATED ROOM]");
+        // Debug.Log("Created Room: " + room.Name);// ON CREATE ROOM SHOULD TRIGGER!
 
-        // Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
-        // Debug.Log(room.Name + " UUID: " + room.UUID);
-        // Debug.Log(room.Name + " Publish: " + room.Publish);
+        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
+        Debug.Log(room.Name + " UUID: " + room.UUID);
+        Debug.Log(room.Name + " Publish: " + room.Publish);
 
         levelEditor.SetActive(true);
 
-        RealityFlowAPI.Instance.FetchAndPopulateObjects();
+        //RealityFlowAPI.Instance.FetchAndPopulateObjects();
 
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
@@ -678,7 +674,7 @@ public class RealityFlowClient : MonoBehaviour
         var graphQL = SendQueryBlocking(updateExpiredTime);
         if (graphQL["data"] != null)
         {
-            Debug.Log("Room alive");
+            //Debug.Log("Room alive");
         }
         else
         {
@@ -689,7 +685,7 @@ public class RealityFlowClient : MonoBehaviour
     public void JoinRoom(string joinCode)
     {
         Debug.Log("Joining room for project: " + currentProjectId); // Log the project ID
-        Debug.Log("Joining room with join code: " + joinCode); // Log the join code
+        //Debug.Log("Joining room with join code: " + joinCode); // Log the join code
 
         // Check if a project is selected
         if (string.IsNullOrEmpty(currentProjectId))
@@ -701,17 +697,19 @@ public class RealityFlowClient : MonoBehaviour
 
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
 
-        Debug.Log("-RIGHT BEFORE EVENT CALL-");
         roomClient.Join(joinCode); // Join Room Based on Room Code
-        Debug.Log("-RIGHT AFTER EVENT CALL-");
+
     }
 
     private void OnJoinedExistingRoom(IRoom room)
     {
+        Debug.Log("[JOINED CREATED ROOM]");
         Debug.Log("Joined room: " + room.Name);
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
+
+        levelEditor.SetActive(true); 
 
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
     }
@@ -719,10 +717,11 @@ public class RealityFlowClient : MonoBehaviour
     public void LeaveRoom()
     {
         Debug.Log("=== LEAVING ROOM ==="); // Log the project ID
+
         roomClient.Join("", false);
 
         RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
-        // levelEditor.SetActive(false);
+
         projectManager.SetActive(true);
 
 
