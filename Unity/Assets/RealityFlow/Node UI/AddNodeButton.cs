@@ -18,6 +18,9 @@ namespace RealityFlow.NodeUI
 
         public void Add()
         {
+            if (view.Graph == null)
+                return;
+
             RealityFlowAPI.Instance.AddNodeToGraph(view.Graph, definition);
             view.MarkDirty();
         }

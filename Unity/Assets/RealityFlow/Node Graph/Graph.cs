@@ -39,6 +39,9 @@ namespace RealityFlow.NodeGraph
         [HideInInspector]
         BiDict<PortIndex, PortIndex> reverseEdges = new();
 
+        public ImmutableDictionary<PortIndex, PortIndex> ReverseEdges 
+            => reverseEdges.ToImmutableDictionary();
+
         public IEnumerable<KeyValuePair<PortIndex, PortIndex>> Edges =>
             reverseEdges.Select(kv => new KeyValuePair<PortIndex, PortIndex>(kv.Value, kv.Key));
 

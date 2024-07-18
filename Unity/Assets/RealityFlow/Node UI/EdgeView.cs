@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using Microsoft.MixedReality.Toolkit;
 using RealityFlow.NodeGraph;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
 
 namespace RealityFlow.NodeUI
 {
@@ -88,6 +85,8 @@ namespace RealityFlow.NodeUI
         public void Delete()
         {
             GraphView view = GetComponentInParent<GraphView>();
+            if (view.Graph == null)
+                return;
 
             if (toPort is int port)
             {
