@@ -16,7 +16,7 @@ public class CustomObjectManipulator : ObjectManipulator
         // Log the transformation when manipulation starts (object is grabbed)
         if (HostTransform != null)
         {
-            var rfObj = RealityFlowAPI.Instance.FindSpawnedObject(HostTransform.gameObject.name);
+            /*var rfObj = RealityFlowAPI.Instance.FindSpawnedObject(HostTransform.gameObject.name);
             Debug.Log("Entered on select should log " + rfObj.name);
             RealityFlowAPI.Instance.actionLogger.LogAction(
                             nameof(RealityFlowAPI.UpdateObjectTransform),

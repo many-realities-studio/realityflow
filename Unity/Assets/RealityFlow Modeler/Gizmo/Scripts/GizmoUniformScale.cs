@@ -25,6 +25,8 @@ public class GizmoUniformScale : GizmoTranslatePlane
         {
             InitRayGizmolData();
             originalMeshScale = GetAttachedObject().transform.localScale;
+            Debug.Log("The SCALE attached object... = " + GetAttachedObject());
+            
 
             planePoint = GetRayCastHit();
             originalPlaneNormal = Vector3.Normalize(GetPlaneNormal());

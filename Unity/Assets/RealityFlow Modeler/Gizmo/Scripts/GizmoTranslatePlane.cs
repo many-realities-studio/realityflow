@@ -45,6 +45,8 @@ public class GizmoTranslatePlane : GizmoTransform
 
             GetGizmoContainer().transform.position = newGizmoPosition;
             GetAttachedObject().transform.position = newGizmoPosition;
+
+            Debug.Log("The translate plane attached object... = " + GetAttachedObject());
         }
     }
 

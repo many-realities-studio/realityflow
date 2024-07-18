@@ -297,11 +297,13 @@ public class GizmoTransform : MonoBehaviour
         if (!gridTool.isActive)
             return position;
 
+        /* Editable mesh is not on the attatched object for prefabs...
         if (GetAttachedObject().GetComponent<EditableMesh>() == null)
             return position;
             
         if (GetAttachedObject().GetComponent<EditableMesh>().baseShape != ShapeType.Plane)
             return position;
+        */
 
         if (Mathf.Abs(position.y) == 0f)
             position.y += 0.05f;
@@ -314,7 +316,10 @@ public class GizmoTransform : MonoBehaviour
     public void BakeRotation()
     {
         VertexPosition.BakeVerticesWithNetworking(GetAttachedObject().GetComponent<EditableMesh>());
-        GetAttachedObject().GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        if(GetAttachedObject().GetComponent<MeshFilter>() != null)
+        {
+            GetAttachedObject().GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        }
         /*GetAttachedObject().transform.rotation = Quaternion.identity;
         GetAttachedObject().transform.localScale = Vector3.one;*/
     }

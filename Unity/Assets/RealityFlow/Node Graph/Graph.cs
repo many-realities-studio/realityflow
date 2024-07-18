@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
+using Dagre;
 using RealityFlow.Collections;
 using UnityEngine;
 
@@ -177,6 +179,79 @@ namespace RealityFlow.NodeGraph
             MutableNodesOfType(definition.Name).Add(index);
             IncrementChangeTicks();
             return index;
+        }
+
+        /// <summary>
+        /// Use the dagre layouting algorithm to layout the graph automatically.
+        /// 
+        /// Starts a task and returns it. The task will take a while to complete, so don't block on 
+        /// it.
+        /// 
+        /// This change will not be automatically persisted to the database! Make sure to update the
+        /// graph in the database yourself after this task finishes.
+        /// </summary>
+        public Task LayoutNodes()
+        {
+            Task task = new(() =>
+            {
+                DagreInputGraph inputGraph = new()
+                {
+                    VerticalLayout = false
+                };
+
+                Dictionary<NodeIndex, DagreInputNode> mapping = new();
+
+                foreach ((NodeIndex index, Node node) in nodes)
+                {
+                    mapping.Add(index, inputGraph.AddNode(null, null, null));
+                }
+
+                foreach ((PortIndex from, PortIndex to) in Edges)
+                {
+                    try
+                    {
+                        inputGraph.AddEdge(mapping[from.Node], mapping[to.Node]);
+                    }
+                    catch (DagreException) { }
+                }
+
+                foreach ((PortIndex from, ImmutableList<NodeIndex> tos) in ExecutionEdges)
+                    foreach (NodeIndex to in tos)
+                    {
+                        inputGraph.AddEdge(mapping[from.Node], mapping[to]);
+                    }
+
+                inputGraph.Layout();
+
+                foreach ((NodeIndex index, Node node) in Nodes)
+                {
+                    DagreInputNode inpNode = mapping[index];
+                    node.Position = new(inpNode.X, inpNode.Y);
+                }
+
+                // Create a bounding box to re-center the graph
+                Rect boundingBox = new();
+                foreach ((NodeIndex index, Node node) in Nodes)
+                {
+                    if (node.Position.x < boundingBox.xMin)
+                        boundingBox.xMin = node.Position.x;
+                    if (node.Position.x > boundingBox.xMax)
+                        boundingBox.xMax = node.Position.x;
+                    if (node.Position.y < boundingBox.yMin)
+                        boundingBox.yMin = node.Position.y;
+                    if (node.Position.y > boundingBox.yMax)
+                        boundingBox.yMax = node.Position.y;
+                }
+
+                Vector2 offset = -boundingBox.center;
+
+                foreach ((NodeIndex index, Node node) in Nodes)
+                {
+                    node.Position += offset;
+                }
+            });
+            task.Start();
+            return task;
         }
 
         /// <summary>
