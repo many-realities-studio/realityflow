@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -295,7 +296,7 @@ public class PrimitiveSpawner : MonoBehaviour
     /// <summary>
     /// Spawns mesh at target ray position. Reference to function stored in Spawn Manager.
     /// </summary>
-    public void SpawnMesh()
+    public async Task SpawnMesh()
     {
         if (!active)
             return;
@@ -306,7 +307,7 @@ public class PrimitiveSpawner : MonoBehaviour
             Debug.LogError("EditableMesh component not found on attached object.");
             return;
         }
-        spawnedMesh = RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
+        spawnedMesh = await RealityFlowAPI.Instance.SpawnPrimitive(attachedObject.transform.position, 
             Quaternion.identity, Vector3.one, 
             attachedObject.GetComponent<EditableMesh>());
         if(spawnedMesh != null) {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
 using System;
@@ -22,7 +23,7 @@ public class ObjectDelete : MonoBehaviour
         }
     }
 
-    public void DeleteObject(string objectId)
+    public async Task DeleteObject(string objectId)
     {
         var deleteObject = new GraphQLRequest
         {
@@ -43,7 +44,7 @@ public class ObjectDelete : MonoBehaviour
 
         try
         {
-            var graphQLResponse = realityFlowClient.SendQueryBlocking(deleteObject);
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(deleteObject);
             var data = graphQLResponse["data"];
             var errors = graphQLResponse["errors"];
             if (data != null)

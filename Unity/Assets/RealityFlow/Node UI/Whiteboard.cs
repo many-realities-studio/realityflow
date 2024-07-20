@@ -39,7 +39,7 @@ namespace RealityFlow.NodeUI
             RealityFlowAPI.Instance.OnLeaveRoom += () => gameObject.SetActive(false);
         }
 
-        public void ShowForObject(VisualScript obj)
+        public async Task ShowForObject(VisualScript obj)
         {
             if (DoNotShow)
                 return;
@@ -49,7 +49,7 @@ namespace RealityFlow.NodeUI
             transform.position = obj.transform.position + Vector3.up * 1.0f;
             if (RealityFlowAPI.Instance.SpawnedObjects[obj.gameObject].graphId == null)
             {
-                obj.graph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
+                obj.graph = await RealityFlowAPI.Instance.CreateNodeGraphAsync();
                 RealityFlowAPI.Instance.AssignGraph(obj.graph, obj.gameObject);
             }
             topLevelGraphView.CurrentObject = obj;

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Microsoft.MixedReality.Toolkit.Input;
@@ -152,10 +153,10 @@ public class RaycastLogger : MonoBehaviour
         return selectedObjectName;
     }
 
-    private void SpawnObjectAtHitLocation()
+    private async Task SpawnObjectAtHitLocation()
     {
         // Instantiate the object in the scene and over the network, then set its position to the hit position
-        GameObject currentObject = RealityFlowAPI.Instance.SpawnObject(selectedObjectName, visualIndicatorInstance.transform.position, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+        GameObject currentObject = await RealityFlowAPI.Instance.SpawnObject(selectedObjectName, visualIndicatorInstance.transform.position, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
 
         // Log the spawned object
         if (currentObject != null)

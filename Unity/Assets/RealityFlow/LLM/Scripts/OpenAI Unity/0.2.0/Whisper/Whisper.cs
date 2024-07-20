@@ -109,7 +109,6 @@ namespace Samples.Whisper
             {
                 Debug.LogError("MuteManager not found in the scene.");
             }
-
             //string apiKey = EnvConfigManager.Instance.OpenAIApiKey;
             if (!string.IsNullOrEmpty(apiKey))
             {
@@ -120,12 +119,12 @@ namespace Samples.Whisper
             {
                 Debug.LogError("OpenAI API key is not set. Please provide it through the environment variable or the input field.");
             }
-
+            
             if (flashingLight != null)
             {
                 flashingLight.SetActive(false); // Ensure the flashing light is initially off
             }
-
+            
             if (nearmenutoolbox != null)
             {
                 nearmenutoolbox.SetActive(false); // Ensure the nearmenutoolbox is initially off
@@ -135,12 +134,14 @@ namespace Samples.Whisper
             {
                 LLMWindow.SetActive(false); // Ensure the LLMWindow is initially off
             }
+            
         }
 
         private void InitializeOpenAI(string apiKey)
         {
             currentApiKey = apiKey;
             openai = new OpenAIApi(apiKey);
+            
             // Debug.Log("OpenAI API initialized with provided key.");
         }
 
@@ -164,8 +165,15 @@ namespace Samples.Whisper
             }
         }
 
+        // Unity WebGL does not support Microphone library.
+        #if !UNITY_WEBGL
         public void StartRecording()
         {
+            // Unity WebGL Does not support the Microphone library
+            #if UNITY_WEBGL
+            return;
+            #endif
+
             if (isRecording) return;
             isRecording = true;
             //recordButton.enabled = false;
@@ -193,6 +201,7 @@ namespace Samples.Whisper
 
         public async void EndRecording()
         {
+
             if (!isRecording) return;
             isRecording = false;
             // recordButton.enabled = true;
@@ -256,6 +265,15 @@ namespace Samples.Whisper
                 countdownCoroutine = StartCoroutine(StartCountdown(res.Text));
             }
         }
+        #else
+        public void StartRecording() {
+            Debug.Log("Trying to start recording on unsupported platform");
+        }
+        public async void EndRecording() {
+            Debug.Log("Trying to stop recording on unsupported platform");
+        }
+        #endif
+
 
         public async Task<string> TranscribeRecordingAsync(byte[] data)
         {

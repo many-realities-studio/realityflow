@@ -16,7 +16,11 @@ public class RealityFlowAPIEditor : Editor
 
         if (GUILayout.Button("Spawn Bear"))
         {
-            objectToDespawn = realityFlowAPI.SpawnObject("Bear", Vector3.zero, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+            realityFlowAPI.SpawnObject("Bear", Vector3.zero, Vector3.one,
+                    Quaternion.identity, RealityFlowAPI.SpawnScope.Room)
+                .ContinueWith(task => {
+                    objectToDespawn = task.Result;
+                });
         }
 
         if (GUILayout.Button("Despawn Bear"))

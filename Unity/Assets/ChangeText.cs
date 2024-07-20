@@ -61,6 +61,8 @@ public class ChangeTextOnButtonPress : MonoBehaviour
         }
     }
 
+    // Unity WebGL does not support Microphone library.
+    #if !UNITY_WEBGL
     private void OnButtonClicked(int index)
     {
         if (index >= 0 && index < TextArray.Length)
@@ -107,6 +109,20 @@ public class ChangeTextOnButtonPress : MonoBehaviour
             Debug.Log("Recording stopped and saved for button index: " + index);
         }
     }
+    #else
+    private void OnButtonClicked(int index)
+    {
+        Debug.Log("ChangeText library disabled on this platform.");
+    }
+    private void StartRecording(int index)
+    {
+        Debug.Log("Trying to start recording on unsupported platform.");
+    }
+    private void StopRecording(int index)
+    {
+        Debug.Log("Trying to stop recording on unsupported platform.");
+    }
+    #endif
 
     private void SaveRecording(AudioClip clip, string fileName, int index)
     {

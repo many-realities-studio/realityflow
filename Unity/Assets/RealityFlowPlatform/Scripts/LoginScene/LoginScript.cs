@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Threading.Tasks;
 
 // NOTE: OTPVerification is the updated version of this script. 
 public class LoginScript : MonoBehaviour
@@ -39,7 +40,7 @@ public class LoginScript : MonoBehaviour
     }
 
     // Function to submit the OTP
-    public void submitOTP()
+    public async Task submitOTP()
     {
         // Log the current text from the OTP input field for debugging purposes.
         Debug.Log(OTPInput.text);
@@ -59,7 +60,7 @@ public class LoginScript : MonoBehaviour
         };
 
         // Send the mutation request asynchronously and wait for the response.
-        var queryResult = rfClient.SendQueryBlocking(verifyOTP);
+        var queryResult = await rfClient.SendQueryAsync(verifyOTP);
         var data = queryResult["data"];
         var errors = queryResult["errors"];
         if (data != null && errors == null)  // Success in retrieving Data

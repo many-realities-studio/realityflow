@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
 
@@ -25,7 +26,7 @@ public class RetrieveModel : MonoBehaviour
         }
     }
 
-    private void GetUserName(string userId)
+    private async Task GetUserName(string userId)
     {
         var getUserRequest = new GraphQLRequest
         {
@@ -40,7 +41,7 @@ public class RetrieveModel : MonoBehaviour
 
         try
         {
-            var graphQLResponse = rfClient.SendQueryBlocking(getUserRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getUserRequest);
             var data = graphQLResponse["data"];
 
             if (data != null && data["getUserById"] != null)
@@ -67,7 +68,7 @@ public class RetrieveModel : MonoBehaviour
         }
     }
 
-    private void GetModelsData(string userId)
+    private async Task GetModelsData(string userId)
     {
         var getModelsRequest = new GraphQLRequest
         {
@@ -86,7 +87,7 @@ public class RetrieveModel : MonoBehaviour
 
         try
         {
-            var graphQLResponse = rfClient.SendQueryBlocking(getModelsRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getModelsRequest);
             var data = graphQLResponse["data"];
             if (data != null && data["getUserModelsForUnity"] != null)
             {

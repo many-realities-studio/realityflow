@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using Microsoft.MixedReality.Toolkit.UX;
@@ -41,16 +42,15 @@ public class PopulateObjectLibrary : MonoBehaviour
         newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
 
         // Create a new Unity action and add it as a listener to the buttons OnClicked event
-        UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
-        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(
-            objectPrefab
-        ));
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(
+            () => TriggerObjectSpawn(objectPrefab)
+        );
         //newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
     }
 
     // OnClicked event that triggers when the button is pressed
     // Sends the object prefab for the new buttons object to SpawnObjectAtRay when pressed
-    void TriggerObjectSpawn(GameObject objectPrefab)
+    async Task TriggerObjectSpawn(GameObject objectPrefab)
     {
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(spawnScript.GetVisualIndicatorPosition());
@@ -58,7 +58,7 @@ public class PopulateObjectLibrary : MonoBehaviour
         // Use the prefab's default rotation
         Quaternion defaultRotation = objectPrefab.transform.rotation;
         // Spawn the object with the default rotation
-        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
         RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles});
 
 
