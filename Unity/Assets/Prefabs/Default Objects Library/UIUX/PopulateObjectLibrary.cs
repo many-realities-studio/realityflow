@@ -49,7 +49,6 @@ public class PopulateObjectLibrary : MonoBehaviour
         if (rfClient != null && rfClient.userDecoded != null && rfClient.userDecoded.ContainsKey("id"))
         {
             string userId = rfClient.userDecoded["id"];
-            Debug.Log("User ID found: " + userId);
             GetUserName(userId);
             GetUserOwnedModels(userId);
         }
@@ -93,7 +92,6 @@ public class PopulateObjectLibrary : MonoBehaviour
             if (data != null && data["getUserById"] != null)
             {
                 string username = data["getUserById"]["username"].ToString();
-                Debug.Log("Username for user ID " + userId + ": " + username);
             }
             else
             {
@@ -138,10 +136,22 @@ public class PopulateObjectLibrary : MonoBehaviour
     {
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(spawnScript.GetVisualIndicatorPosition());
+
+        // Default rotation
         Quaternion defaultRotation = objectPrefab.transform.rotation;
+
+        Debug.Log("[POL]Spawning Prefab from Catalog: " + objectPrefab.name);
+
+        // Spawn the object
         GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+
+        Debug.Log("[POL]Object Spawned: " + spawnedObject.name);
+
+        // After Spawn Object, log the action to the server
         RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles });
 
+
+        // Add Rigidbody and MeshCollider
         if (spawnedObject.GetComponent<Rigidbody>() != null)
         {
             spawnedObject.GetComponent<Rigidbody>().useGravity = true;
@@ -161,7 +171,7 @@ public class PopulateObjectLibrary : MonoBehaviour
     #region Populate with Models
     public void GetUserOwnedModels(string userId)
     {
-        Debug.Log("Starting GetUserOwnedModels for user ID: " + userId);
+        //Debug.Log("Starting GetUserOwnedModels for user ID: " + userId);
 
         var getModelsRequest = new GraphQLRequest
         {
@@ -197,7 +207,7 @@ public class PopulateObjectLibrary : MonoBehaviour
 
                 if (models.Count > 0)
                 {
-                    Debug.Log("Models found for user ID: " + userId);
+                    // Debug.Log("Models found for user ID: " + userId);
 
                     modelCatalogue.Clear();
                     foreach (var model in models)

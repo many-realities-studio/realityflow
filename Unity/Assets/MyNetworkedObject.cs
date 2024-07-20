@@ -23,24 +23,40 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     Vector3 lastScale;
     Quaternion lastRotation;
     Color lastColor;
-    // variables for entering and exiting playmode
     public NetworkedPlayManager networkedPlayManager;
-    
-    //bool lastGravity;
     private bool compErr = false;
 
     void Start()
     {
         Debug.Log("Starting networked object");
+
+        // Register context
         context = NetworkScene.Register(this);
-        
+
+        // Initialize components
         owner = false;
         isHeld = false;
 
         manipulator = GetComponent<ObjectManipulator>();
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.isKinematic = true;
+        }
         boxCol = GetComponent<BoxCollider>();
+        if (boxCol == null)
+        {
+            boxCol = gameObject.AddComponent<BoxCollider>();
+        }
+        networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+
+        if (networkedPlayManager == null)
+        {
+            Debug.LogError("[MyNetworkedObject] NetworkedPlayManager not found in the scene");
+        }
+
         RequestRfObject();
     }
 
@@ -51,57 +67,40 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         context.SendJson(msg);
     }
 
-    void Awake()
-    {
-        owner = false;
-        isHeld = false;
-        //isSelected = false;
-        // if(lastSize ! = 0.1f;
-        //boundsControl = gameObject.GetComponent<BoundsControl>();
-        //meshMaterial = gameObject.GetComponent<MeshRenderer>().material;
-        //boundsControl.HandlesActive = false;
-
-        if (NetworkId == null)
-            Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
-    }
-
-    // Set object owner to whoever picks the object up, and set isHeld to true for every user in scene since object is being held
     public void StartHold()
     {
+        Debug.Log("StartHold called");
+
+        // Ensure all necessary components are available
+        if ( rb == null || networkedPlayManager == null || RealityFlowAPI.Instance == null)
+        {
+            Debug.LogError("StartHold failed due to missing components");
+            return;
+        }
+
         owner = true;
         isHeld = true;
         rb.isKinematic = false;
 
         UpdateTransform();
 
-        // If we are not in play mode, have no gravity and allow the object to move while held,
-        // similarly allow thw object to be moved in playmode without gravity on hold.
         if (!networkedPlayManager.playMode)
         {
             rb.useGravity = false;
             rb.isKinematic = false;
-
-            // This would also be a place to change to boxcolliders collider interaction masks so that
-            // the object can be placed within others to prevent it from colliding with UI.
-            // TODO: 
-
         }
         else
         {
             rb.useGravity = false;
         }
 
-        Debug.Log("Started hold the action is now being logged to the ActionLogger");
-        // Log the transformation at the start of holding
         RealityFlowAPI.Instance.actionLogger.LogAction(
-        nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-        rfObj.id,
-        transform.localPosition,
-        transform.localRotation,
-        transform.localScale
+            nameof(RealityFlowAPI.UpdateObjectTransform),
+            rfObj.id,
+            transform.localPosition,
+            transform.localRotation,
+            transform.localScale
         );
-
-
 
         context.SendJson(new Message()
         {
@@ -110,14 +109,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = false,
             isHeld = true,
-            //isSelected = isSelected,
-            isKinematic = true//,
-            //color = gameObject.GetComponent<Renderer>().material.color
-            // gravity = obj.GetComponent<Rigidbody>().useGravity
+            isKinematic = true,
+            isSelected = isSelected
         });
     }
 
-    // Set isHeld to false for all users when object is no longer currently being held
     public void EndHold()
     {
         isHeld = false;
@@ -132,48 +128,74 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = true,
             isHeld = false,
-            isKinematic = true//,
-            //color = gameObject.GetComponent<Renderer>().material.color
-            // gravity = obj.GetComponent<Rigidbody>().useGravity
+            isKinematic = true,
+            isSelected = isSelected
         });
 
         UpdateTransform();
     }
 
-    // Update method to be called within StartHold and EndHold
     public void UpdateTransform()
     {
-        if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != GetComponent<Renderer>().material.color)
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null)
         {
-            lastPosition = transform.localPosition;
-            lastScale = transform.localScale;
-            lastRotation = transform.localRotation;
-            lastColor = GetComponent<Renderer>().material.color;
-
-            context.SendJson(new Message()
+            if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != renderer.material.color)
             {
-                position = transform.localPosition,
-                scale = transform.localScale,
-                rotation = transform.localRotation,
-                owner = owner,
-                isHeld = isHeld,
-                isKinematic = rb.isKinematic,
-                color = GetComponent<Renderer>().material.color
-            });
+                lastPosition = transform.localPosition;
+                lastScale = transform.localScale;
+                lastRotation = transform.localRotation;
+                lastColor = renderer.material.color;
+
+                context.SendJson(new Message()
+                {
+                    position = transform.localPosition,
+                    scale = transform.localScale,
+                    rotation = transform.localRotation,
+                    owner = owner,
+                    isHeld = isHeld,
+                    isKinematic = rb.isKinematic,
+                    color = renderer.material.color,
+                    isSelected = isSelected
+                });
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[MyNetworkedObject] No Renderer component found on {gameObject.name}");
         }
     }
 
     public void UpdateRfObject(RfObject rfObj)
     {
+        StartCoroutine(UpdateRfObjectCoroutine(rfObj));
+    }
+
+    private IEnumerator UpdateRfObjectCoroutine(RfObject rfObj)
+    {
+        while (context.Scene == null || !context.Id.Valid)
+        {
+            Debug.LogWarning("[MyNetworkedObject] Waiting for NetworkContext to be initialized...");
+            yield return new WaitForSeconds(0.1f);
+        }
+
         this.rfObj = rfObj;
-        GetComponent<CacheObjectData>().rfObj = rfObj;
+
+        CacheObjectData cacheObjectData = GetComponent<CacheObjectData>();
+        if (cacheObjectData != null)
+        {
+            cacheObjectData.rfObj = rfObj;
+        }
+        else
+        {
+            Debug.LogError("[MyNetworkedObject] CacheObjectData component is missing.");
+        }
+
         context.SendJson(new Message()
         {
             rfObj = this.rfObj
         });
     }
-
-    
 
     public struct Message
     {
@@ -186,20 +208,29 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         public bool isHeld;
         public bool isKinematic;
         public Color color;
+        public bool isSelected;
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
-        if(m.rfObj != null)
+        if (m.rfObj != null)
         {
-            Debug.Log("Received rfObject");
             rfObj = m.rfObj;
-            GetComponent<CacheObjectData>().rfObj = rfObj;
+            CacheObjectData cacheObjectData = GetComponent<CacheObjectData>();
+            if (cacheObjectData != null)
+            {
+                cacheObjectData.rfObj = rfObj;
+            }
+            else
+            {
+                Debug.LogError("[MyNetworkedObject] CacheObjectData component is missing.");
+            }
             RealityFlowAPI.Instance.RegisterPeerSpawnedObject(gameObject, rfObj);
             return;
         }
-        if(m.needsRfObject && rfObj != null) {
+        if (m.needsRfObject && rfObj != null)
+        {
             context.SendJson(new Message()
             {
                 rfObj = rfObj
@@ -211,30 +242,56 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = m.owner;
         isHeld = m.isHeld;
         rb.isKinematic = m.isKinematic;
-        GetComponent<Renderer>().material.color = m.color;
+
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = m.color;
+        }
+        else
+        {
+            Debug.LogWarning($"[MyNetworkedObject] No Renderer component found on {gameObject.name}");
+        }
 
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
         lastOwner = owner;
-        lastColor = GetComponent<Renderer>().material.color;
+        lastColor = renderer != null ? renderer.material.color : Color.white;
     }
 
     public void ControlSelection()
     {
-        //Debug.Log("ControlSelection() was called");
-        // If the mesh is selected, then start the selection
-        if (gameObject.GetComponent<BoundsControl>().HandlesActive)
+        BoundsControl boundsControl = GetComponent<BoundsControl>();
+        if (boundsControl != null && boundsControl.HandlesActive)
         {
             if (!owner && isSelected)
-            return;
+                return;
 
-            //Debug.Log("This mesh is now selected");
             owner = true;
-            // ownerName = selectTool.ownerName;
             isSelected = true;
-            //boundsControl.HandlesActive = true;
-            //boundsVisuals.SetActive(true);
+            context.SendJson(new Message()
+            {
+                position = transform.localPosition,
+                scale = transform.localScale,
+                rotation = transform.localRotation,
+                owner = false,
+                isSelected = true,
+                isKinematic = rb.isKinematic
+            });
+        }
+        else
+        {
+            isSelected = false;
+            context.SendJson(new Message()
+            {
+                position = transform.localPosition,
+                scale = transform.localScale,
+                rotation = transform.localRotation,
+                owner = false,
+                isSelected = false,
+                isKinematic = rb.isKinematic
+            });
         }
     }
 }

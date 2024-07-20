@@ -573,23 +573,20 @@ public class RealityFlowClient : MonoBehaviour
         roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom); //!ON CREATE ROOM SHOULD TRIGGER!
 
         // Create a new room using the RoomClient
-        roomClient.Join("User Created Room", false); // Name: , Publish: false
+        roomClient.Join("NewRoom", false); // Name: , Publish: false
 
         RealityFlowAPI.Instance.FetchAndPopulateObjects();
     }
 
     public void OnJoinCreatedRoom(IRoom room)
     {
-        Debug.Log("[CREATED ROOM]");
-        // Debug.Log("Created Room: " + room.Name);// ON CREATE ROOM SHOULD TRIGGER!
-
+        /*
         Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
+        */
 
         levelEditor.SetActive(true);
-
-        //RealityFlowAPI.Instance.FetchAndPopulateObjects();
 
         // Create a new room using the GraphQL API
         var addRoom = new GraphQLRequest
@@ -633,7 +630,7 @@ public class RealityFlowClient : MonoBehaviour
         var graphQL = SendQueryBlocking(addRoom);
         if (graphQL["data"] != null)
         {
-            Debug.Log("Room created successfully");
+            Debug.Log("Created Room: " + room.Name + " successfully");// ON CREATE ROOM SHOULD TRIGGER!
             GetRoomsByProjectId(currentProjectId);
         }
         else
@@ -643,7 +640,6 @@ public class RealityFlowClient : MonoBehaviour
 
         // Run KeepRoomAlive every 30 seconds
         InvokeRepeating("KeepRoomAlive", 0, 30);
-
 
         roomClient.OnJoinedRoom.RemoveListener(OnJoinCreatedRoom);
 
