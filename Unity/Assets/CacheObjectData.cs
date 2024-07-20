@@ -18,7 +18,7 @@ public class CacheObjectData : MonoBehaviour
     private Quaternion cachedRotation;
 
     // Object with information containing collidable, grav, static
-    public RfObject rfObj;
+    private RfObject rfObj;
     private Rigidbody rb;
 
     private BoxCollider boxCol;
@@ -28,8 +28,9 @@ public class CacheObjectData : MonoBehaviour
 
     void Start()
     {
-        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+        Debug.Log(networkedPlayManager.gameObject);
         lastPlayModeState = networkedPlayManager.playMode;
 
         cachedPosition = transform.localPosition;
@@ -61,7 +62,7 @@ public class CacheObjectData : MonoBehaviour
         // gameObject.transform.parent.parent.parent.name == "Forest 1"
         
         // TODO: ?Because we are constantly checking if play mode is on or off, set the proper gravity/properties relating to the rf obj?
-        if (rfObj != null && lastPlayModeState != networkedPlayManager.playMode)
+        if (lastPlayModeState != networkedPlayManager.playMode)
         {
             lastPlayModeState = networkedPlayManager.playMode;
             // Cache values when Play mode is entered

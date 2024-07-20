@@ -8,7 +8,16 @@ using Org.BouncyCastle.Crypto.Modes;
 using Ubiq.Samples;
 using System.IO;
 using System.Text;
-
+using UnityEngine;
+using TMPro;
+using Microsoft.MixedReality.Toolkit.UX;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using Microsoft.MixedReality.Toolkit.UX;
+using Samples.Whisper;
+using Ubiq.Samples;
+using System.IO;
 public class ChangeTextOnButtonPress : MonoBehaviour
 {
     public StatefulInteractable[] PressableButtons; // Array of pressable buttons
