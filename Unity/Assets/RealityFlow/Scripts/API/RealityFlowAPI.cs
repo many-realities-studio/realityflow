@@ -1332,7 +1332,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 case SpawnScope.Room:
                     spawnManager.OnSpawned.AddListener(action);
-                    spawnManager.SpawnWithRoomScope(newObject);
+                    spawnManager.SpawnWithRoomScopeWithReturn(newObject);
                     Debug.Log("Spawned with Room Scope");
                     break;
                 case SpawnScope.Peer:
