@@ -454,16 +454,6 @@ public class RealityFlowClient : MonoBehaviour
             OperationName = "AddRoom",
             Variables = new
             {
-                input3 = new
-                {
-                    userId = userDecoded["id"],
-                    defaultProjectId = currentProjectId,
-                    newRoomId = room.UUID
-                },
-                input2 = new
-                {
-                    userId = userDecoded["id"]
-                },
                 input = new
                 {
                     projectId = currentProjectId,
