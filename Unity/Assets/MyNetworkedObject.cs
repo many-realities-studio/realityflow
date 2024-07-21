@@ -232,7 +232,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             {
                 Debug.LogError("[MyNetworkedObject] CacheObjectData component is missing.");
             }
-            RealityFlowAPI.Instance.RegisterPeerSpawnedObject(gameObject, rfObj);
+            // RealityFlowAPI.Instance.RegisterPeerSpawnedObject(gameObject, rfObj);
             return;
         }
         if (m.needsRfObject && rfObj != null)
