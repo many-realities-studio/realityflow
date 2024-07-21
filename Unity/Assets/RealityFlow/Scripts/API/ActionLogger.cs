@@ -19,7 +19,6 @@ public class ActionLogger : MonoBehaviour
 
         public virtual string GetDescription()
         {
-            // Customize descriptions based on function name and parameters
             switch (FunctionName)
             {
                 case "MoveObject":
@@ -56,11 +55,11 @@ public class ActionLogger : MonoBehaviour
 
     private bool isUndoing = false;
     private bool isRedoing = false;
-    private Stack<LoggedAction> actionStack = new Stack<LoggedAction>();
-    private Stack<LoggedAction> redoStack = new Stack<LoggedAction>();
+    public Stack<LoggedAction> actionStack = new Stack<LoggedAction>();
+    public Stack<LoggedAction> redoStack = new Stack<LoggedAction>();
     private CompoundAction currentCompoundAction;
 
-    private List<string> codeQueue = new List<string>(); // To hold generated code snippets
+    private List<string> codeQueue = new List<string>();
 
     public void LogAction(string functionName, params object[] parameters)
     {
@@ -76,7 +75,7 @@ public class ActionLogger : MonoBehaviour
         {
             actionStack.Push(action);
             Debug.Log($"Logged action: {functionName}");
-            redoStack.Clear(); // Clear redo stack when a new action is performed
+            redoStack.Clear();
         }
     }
 
@@ -96,7 +95,6 @@ public class ActionLogger : MonoBehaviour
         Debug.Log("Executed all logged code sequentially.");
     }
 
-
     public void ClearCodeQueue()
     {
         codeQueue.Clear();
@@ -109,9 +107,35 @@ public class ActionLogger : MonoBehaviour
         if (action != null)
         {
             Debug.Log($"Popped action: {action.FunctionName}");
+            if (isUndoing)
+            {
+                redoStack.Push(action);
+                Debug.Log($"Saved action to redo stack: {action.FunctionName}");
+            }
         }
         else
+        {
             Debug.Log("No actions in stack to pop");
+        }
+        return action;
+    }
+
+    public LoggedAction GetLastRedoAction()
+    {
+        var action = redoStack.Count > 0 ? redoStack.Pop() : null;
+        if (action != null)
+        {
+            Debug.Log($"Popped redo action: {action.FunctionName}");
+            if (isRedoing)
+            {
+                actionStack.Push(action);
+                Debug.Log($"Saved action back to action stack: {action.FunctionName}");
+            }
+        }
+        else
+        {
+            Debug.Log("No actions in redo stack to pop");
+        }
         return action;
     }
 

@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
@@ -26,8 +28,9 @@ namespace RealityFlow.NodeUI
             {
                 graph = value;
                 EnableVariableButtons();
-                AddInitialVariables();
+                ResetVariables();
                 templateToggle.ForceSetToggled(currentObject.IsTemplate);
+                MarkDirty();
                 Render();
             }
         }
@@ -70,6 +73,24 @@ namespace RealityFlow.NodeUI
         public NodeIndex? selectedInputExecEdgePort;
         public PortIndex? selectedOutputExecEdgePort;
 
+        [NaughtyAttributes.Button]
+        public void LayoutGraph()
+        {
+            static IEnumerator LayoutGraphCoroutine(GraphView view)
+            {
+                Task task = view.graph.LayoutNodes();
+                while (task.IsCompleted == false)
+                    yield return null;
+                view.MarkDirty();
+                RealityFlowAPI.Instance.SendGraphUpdateToDatabase(
+                    JsonUtility.ToJson(view.graph), 
+                    view.graph.Id
+                );
+            }
+
+            StartCoroutine(LayoutGraphCoroutine(this));
+        }
+
         void Start()
         {
             variableTypeDropdown.ClearOptions();
@@ -88,6 +109,7 @@ namespace RealityFlow.NodeUI
 
             if (Dirty)
             {
+                ResetVariables();
                 Render();
                 MarkClean();
             }
@@ -419,14 +441,12 @@ namespace RealityFlow.NodeUI
                 Destroy(transform.gameObject);
         }
 
-        public void AddInitialVariables()
+        public void ResetVariables()
         {
             ClearVariableItems();
 
             foreach ((string name, NodeValueType type) in Graph.Variables)
                 AddVariableItem(name, type);
-
-            MarkDirty();
         }
 
         public void AddVariable()

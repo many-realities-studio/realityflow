@@ -156,7 +156,7 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
 
-    public async Task GetActiveProjectsData()
+    public async void GetActiveProjectsData()
     {
         // Debug.Log("--- Fetching Active Projects Data ---");
 

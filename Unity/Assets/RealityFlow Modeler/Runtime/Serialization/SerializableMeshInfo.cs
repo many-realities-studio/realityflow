@@ -65,7 +65,7 @@ public class SerializableMeshInfo
             colorFlag = false;
         }
 
-        if (m.GetFloat("_Metallic") != 0)
+        /*if (m.GetFloat("_Metallic") != 0)
         {
             metalFlag = true;
             metalFactor = m.GetFloat("_Metallic");
@@ -84,7 +84,7 @@ public class SerializableMeshInfo
         else
         {
             glossFlag = false;
-        }
+        }*/
 
         Transform t = go.transform;
 
@@ -102,8 +102,6 @@ public class SerializableMeshInfo
             vertices[i * 3 + 2] = em.positions[i].z;
         }
 
-
-
         faces = new int[em.faces.Length][];
 
         for (int i = 0; i < em.faces.Length; i++)
@@ -117,12 +115,6 @@ public class SerializableMeshInfo
                 faces[i][j] = em.faces[i].indicies[j];
             }
         }
-
-        // Debug Log to show the Faces array.
-        // for (int i = 0; i < faces.Length; i++)
-        // {
-        //     Debug.Log("[SMI]Face " + i + ": " + faces[i][0] + " " + faces[i][1] + " " + faces[i][2]);
-        // }
 
         shapeID = getShapeID(em.baseShape);
     }

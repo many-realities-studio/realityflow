@@ -1441,6 +1441,20 @@ namespace RealityFlow.NodeUI
         // TODO: Make LateUpdate a coroutine instead. Allows us to control the update to only be when the field is active.
         protected virtual void LateUpdate()
         {
+            if (m_HideKeyboard) return;
+
+            if (m_HideKeyboard)
+            {
+                if (m_SoftKeyboard != null)
+                {
+                    if (m_SoftKeyboard.active)
+                    {
+                        m_SoftKeyboard.active = false;
+                        m_SoftKeyboard = null;
+                    }
+                }
+                return;
+            }
             // Only activate if we are not already activated.
             if (m_ShouldActivateNextUpdate)
             {
@@ -2116,6 +2130,8 @@ namespace RealityFlow.NodeUI
         /// Handle the specified event.
         /// </summary>
         private Event m_ProcessingEvent = new Event();
+        [SerializeField]
+        private bool m_HideKeyboard = true;
 
         public void ProcessEvent(Event e)
         {
@@ -4058,6 +4074,8 @@ namespace RealityFlow.NodeUI
 
         public void ActivateInputField()
         {
+            if (m_HideKeyboard) return;
+
             if (m_TextComponent == null || m_TextComponent.font == null || !IsActive() || !IsInteractable())
                 return;
 
@@ -4075,6 +4093,8 @@ namespace RealityFlow.NodeUI
 
         private void ActivateInputFieldInternal()
         {
+            if (m_HideKeyboard) return;
+
             if (EventSystem.current == null)
                 return;
 

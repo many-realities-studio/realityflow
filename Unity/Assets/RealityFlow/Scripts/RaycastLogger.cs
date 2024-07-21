@@ -75,7 +75,7 @@ public class RaycastLogger : MonoBehaviour
             Debug.Log($"Raycast hit object: {hitObject.name}");
 
             // Log the action in RealityFlowAPI
-            realityFlowAPI.actionLogger.LogAction(nameof(LogRaycastHitLocation), hitPosition, hitObject.name);
+            //realityFlowAPI.actionLogger.LogAction(nameof(LogRaycastHitLocation), hitPosition, hitObject.name);
 
             if (hitObject.CompareTag("Teleport"))
             {

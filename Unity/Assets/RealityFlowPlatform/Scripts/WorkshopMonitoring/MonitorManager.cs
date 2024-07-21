@@ -86,7 +86,7 @@ public class MonitorManager : MonoBehaviour
 
         ShowLabel(JoiningLabel);
 
-        var result = await rfClient.SendQueryAsync(new GraphQLRequest
+        var getUser = await rfClient.SendQueryAsync(new GraphQLRequest
         {
             OperationName = "GetUser",
             Query = @"query GetUser($id: String!) {
@@ -97,12 +97,30 @@ public class MonitorManager : MonoBehaviour
             Variables = new { id = userId }
         });
 
-        if (result["data"] == null || result["data"]["getUserById"] == null) {
+
+
+        if (getUser["data"] == null || getUser["data"]["getUserById"] == null) {
             OnJoinRejected(new Rejection() { reason = "Invalid user id" }) ;
             return;
         }
+
+        var getRoom = await rfClient.SendQueryAsync(new GraphQLRequest()
+        {
+            OperationName = "GetRoom",
+            Query = @"query GetRoom($id: String!) {
+                getRoom(id: $id) {
+                    udid
+                }
+            }",
+            Variables = new { id = getUser["data"]["getUserById"]["currentRoomId"]}
+        })  ;
+
+        if (getRoom["data"] == null || getRoom["data"]["getRoom"] == null) {
+            OnJoinRejected(new Rejection() { reason = "Invalid room id"});
+            return;
+        }
         
-        roomClient.Join((string)result["data"]["getUserById"]["currentRoomId"]);
+        roomClient.Join((string)getRoom["data"]["getRoom"]["udid"]);
         selectedUserId = userId;
     }
 }
