@@ -37,6 +37,9 @@ public class RFRayController : MonoBehaviour
 
     public void DisableMRTKRay()
     {
+        // If the lefthandray and righthandray interactor(s) are already active, set 
+        // that it was active on disable and disable. If the ray interactor isn't active,
+        // set that it was not active on disable.
         if(leftRayInteractor.activeInHierarchy)
         {
             leftControllerActiveOnDisable = true;
@@ -55,13 +58,17 @@ public class RFRayController : MonoBehaviour
             rightControllerActiveOnDisable = false;
         }
 
+        // Enable the XRI line visual because the MRTK ones are disabled.
         gameObject.GetComponent<XRInteractorLineVisual>().enabled = true;
         
     }
 
     public void EnableMRTKRay()
     {
+        // Disable the XRI line visual because the MRTK ones are endabled.
         gameObject.GetComponent<XRInteractorLineVisual>().enabled = false;
+        
+        // If the controllers were active when disable was set, enable it
         if(leftControllerActiveOnDisable)
         {
             leftRayInteractor.SetActive(true);
