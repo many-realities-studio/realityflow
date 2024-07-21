@@ -115,6 +115,7 @@ public class NetworkedPrefab : MonoBehaviour
     {
         // Parse the message
         var m = message.FromJson<Message>();
+        Debug.Log("[NETWORKED PREFAB]Received transform data. Position: " + m.position);
 
         // Use ther parsed message to update the object
         transform.localPosition = m.position;
@@ -142,8 +143,7 @@ public class NetworkedPrefab : MonoBehaviour
 
     public void SendTransformData()
     {
-        // Debug.Log("SendTransformData() was called");
-
+        Debug.Log("[NETWORKED PREFAB] SendTransformData called. Position: " + transform.localPosition);
         context.SendJson(new Message()
         {
             position = transform.localPosition,
