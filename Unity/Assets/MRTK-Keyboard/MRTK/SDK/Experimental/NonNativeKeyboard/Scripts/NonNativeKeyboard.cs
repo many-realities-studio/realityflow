@@ -406,6 +406,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             ActivateSpecificKeyboard(LayoutType.Alpha);
             OnPlacement(this, EventArgs.Empty);
             InputField.ActivateInputField();
+            InputField.text = string.Empty;
         }
 
         public void SetTargetInputField(Custom_MRTK_InputField userInputField)

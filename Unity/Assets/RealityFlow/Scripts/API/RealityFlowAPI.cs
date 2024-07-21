@@ -1384,7 +1384,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     #endregion
     public void RegisterPeerSpawnedObject(GameObject obj, RfObject rfObj)
     {
-        if(spawnedObjectsById.ContainsKey(rfObj.id))
+        if (spawnedObjectsById.ContainsKey(rfObj.id))
         {
             Debug.LogWarning("Object with ID " + rfObj.id + " already exists in the spawnedObjectsById dictionary.");
             return;
@@ -1499,7 +1499,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-        // SaveModelToDatabase
+    // SaveModelToDatabase
     public void SaveModelToDatabase(GameObject instantiatedModel, ModelData modelData, string projectId, string meshJson)
     {
         var createObject = new GraphQLRequest
@@ -1551,7 +1551,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
         }
     }
-    
+
     public RfObject ConvertModelDataToRfObject(ModelData modelData, string projectId, string transformJson, string meshJson)
     {
         return new RfObject
@@ -1782,7 +1782,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         // If the last character is a , remove it
                         faceArray[i] = faceArray[i].TrimEnd(',');
                         string[] face = faceArray[i].Split(',');
-                        
+
                         // Remove any "]" characters from the last element of the array
                         facesArray[i - 1] = new int[face.Length];
                         for (int j = 0; j < face.Length; j++)
