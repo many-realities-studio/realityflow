@@ -14,6 +14,7 @@ public class RFRayController : MonoBehaviour
     private GameObject rightRayInteractor;
     private bool leftControllerActiveOnDisable = true;
     private bool rightControllerActiveOnDisable = true;
+    private byte alternateEnableDisable = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -37,47 +38,57 @@ public class RFRayController : MonoBehaviour
 
     public void DisableMRTKRay()
     {
-        // If the lefthandray and righthandray interactor(s) are already active, set 
-        // that it was active on disable and disable. If the ray interactor isn't active,
-        // set that it was not active on disable.
-        if(leftRayInteractor.activeInHierarchy)
+        Debug.Log("MRTK RAYS DISABLED");
+        if(alternateEnableDisable == 0)
         {
-            leftControllerActiveOnDisable = true;
-            leftRayInteractor.SetActive(false);
-        } else
-        {
-            leftControllerActiveOnDisable = false;
-        }
-        
-        if(rightRayInteractor.activeInHierarchy)
-        {
-            rightControllerActiveOnDisable = true;
-            rightRayInteractor.SetActive(false);
-        } else
-        {
-            rightControllerActiveOnDisable = false;
-        }
+            // If the lefthandray and righthandray interactor(s) are already active, set 
+            // that it was active on disable and disable. If the ray interactor isn't active,
+            // set that it was not active on disable.
+            if(leftRayInteractor.activeInHierarchy)
+            {
+                leftControllerActiveOnDisable = true;
+                leftRayInteractor.SetActive(false);
+            } else
+            {
+                leftControllerActiveOnDisable = false;
+            }
+            
+            if(rightRayInteractor.activeInHierarchy)
+            {
+                rightControllerActiveOnDisable = true;
+                rightRayInteractor.SetActive(false);
+            } else
+            {
+                rightControllerActiveOnDisable = false;
+            }
 
-        // Enable the XRI line visual because the MRTK ones are disabled.
-        gameObject.GetComponent<XRInteractorLineVisual>().enabled = true;
+            // Enable the XRI line visual because the MRTK ones are disabled.
+            gameObject.GetComponent<XRInteractorLineVisual>().enabled = true;
+            alternateEnableDisable = 1;
+        }
         
     }
 
     public void EnableMRTKRay()
     {
-        // Disable the XRI line visual because the MRTK ones are endabled.
-        gameObject.GetComponent<XRInteractorLineVisual>().enabled = false;
-        
-        // If the controllers were active when disable was set, enable it
-        if(leftControllerActiveOnDisable)
+        Debug.Log("MRTK RAYS ENABLED");
+
+        if(alternateEnableDisable == 1)
         {
-            leftRayInteractor.SetActive(true);
+            // Disable the XRI line visual because the MRTK ones are endabled.
+            gameObject.GetComponent<XRInteractorLineVisual>().enabled = false;
+            
+            // If the controllers were active when disable was set, enable it
+            if(leftControllerActiveOnDisable)
+            {
+                leftRayInteractor.SetActive(true);
+            }
+            
+            if(rightControllerActiveOnDisable)
+            {
+                rightRayInteractor.SetActive(true);
+            }
+            alternateEnableDisable = 0;
         }
-        
-        if(rightControllerActiveOnDisable)
-        {
-            rightRayInteractor.SetActive(true);
-        }
-        
     }
 }
