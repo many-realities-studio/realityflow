@@ -23,7 +23,7 @@ public class WhiteboardIndicatorLine : MonoBehaviour
         else
             line.enabled = true;
 
-        positions[0] = transform.position;
+        positions[0] = transform.position + transform.forward * 0.1f;
         positions[1] = target.position;
         line.SetPositions(positions);
     }
