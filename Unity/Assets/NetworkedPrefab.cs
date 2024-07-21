@@ -30,11 +30,15 @@ public class NetworkedPrefab : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // -- Register the object with the NetworkScene
-        if (!context.Id.Valid)
-            context = NetworkScene.Register(this);
-        else
-            Debug.Log("ID is already valid");
+        // Ensure NetworkId is initialized
+        if (NetworkId == null || !NetworkId.Valid)
+        {
+            NetworkId = NetworkScene.GenerateUniqueId();
+        }
+
+        // Register the object with the NetworkScene
+        context = NetworkScene.Register(this, NetworkId);
+        Debug.Log("Network context registered with ID: " + NetworkId);
 
         // EraserTool Init
         eraser = FindObjectOfType<EraserTool>();
@@ -45,7 +49,6 @@ public class NetworkedPrefab : MonoBehaviour
             if (child.gameObject.name.Contains("BoundingBox"))
             {
                 boundsVisuals = child.gameObject;
-                //Debug.Log("boundsVisuals.name = " + boundsVisuals.name + " in the scene: " + gameObject.transform.parent.parent.parent.name);
 
                 // Find the immediate child game object of the bounding box that contains the instanced material
                 foreach (Transform child2 in boundsVisuals.transform)
@@ -53,16 +56,8 @@ public class NetworkedPrefab : MonoBehaviour
                     try
                     {
                         boundsMaterial = child2.gameObject.GetComponent<MeshRenderer>().material;
-                        // Debug.Log("child2.gameObject.name = " + child2.gameObject.name + " child2.gameObject.GetComponent<MeshRenderer>().material.HasProperty('Color') = "
-                        // + child2.gameObject.GetComponent<MeshRenderer>().material.HasProperty("_Color_"));
-
-                        // if (boundsMaterial.HasProperty("_Color_"))
-                        // {
-                        //     Debug.Log("The current color of bounds visuals for mesh: " + child2.gameObject.name + " in the scene: "
-                        //     + child2.gameObject.transform.parent.parent.parent.parent.parent.name + " is the color: " + boundsMaterial.GetColor("_Color_"));
-                        // }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Debug.Log(e + " Does " + child2.gameObject.name + " have the ThickerSqueezableBox material?");
                     }
