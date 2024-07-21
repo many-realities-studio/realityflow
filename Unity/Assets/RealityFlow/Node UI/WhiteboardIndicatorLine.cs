@@ -15,6 +15,14 @@ public class WhiteboardIndicatorLine : MonoBehaviour
     readonly Vector3[] positions = new Vector3[2];
     void Update()
     {
+        if (!target)
+        {
+            line.enabled = false;
+            return;
+        }
+        else
+            line.enabled = true;
+
         positions[0] = transform.position;
         positions[1] = target.position;
         line.SetPositions(positions);

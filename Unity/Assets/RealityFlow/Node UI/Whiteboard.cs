@@ -61,6 +61,10 @@ namespace RealityFlow.NodeUI
             }
             topLevelGraphView.CurrentObject = obj;
             topLevelGraphView.Graph = obj.graph;
+
+            WhiteboardIndicatorLine line = topLevelGraphView.GetComponent<WhiteboardIndicatorLine>();
+            if (line)
+                line.target = obj.transform;
         }
     }
 }
