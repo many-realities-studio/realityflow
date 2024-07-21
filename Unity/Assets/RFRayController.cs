@@ -15,6 +15,7 @@ public class RFRayController : MonoBehaviour
     private bool leftControllerActiveOnDisable = true;
     private bool rightControllerActiveOnDisable = true;
     private byte alternateEnableDisable = 0;
+    public static int bothEnabled = 0; // shared variable as both components may activate the methods and they need to coordinate
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +40,17 @@ public class RFRayController : MonoBehaviour
     public void DisableMRTKRay()
     {
         Debug.Log("MRTK RAYS DISABLED");
+
+        Debug.Log("Early: " + bothEnabled);
+
+        // This might break things in the future, but as this is a component on two separate objects, only when
+        // both rays are disabled should we assume that the state of them is already correct/set and return
+        //if(!leftRayInteractor.activeInHierarchy && !rightRayInteractor.activeInHierarchy)
+        //{
+        //    gameObject.GetComponent<XRInteractorLineVisual>().enabled = true;
+        //    return;
+        //}
+
         if(alternateEnableDisable == 0)
         {
             // If the lefthandray and righthandray interactor(s) are already active, set 
@@ -65,13 +77,23 @@ public class RFRayController : MonoBehaviour
             // Enable the XRI line visual because the MRTK ones are disabled.
             gameObject.GetComponent<XRInteractorLineVisual>().enabled = true;
             alternateEnableDisable = 1;
+            
         }
+
+        bothEnabled++;
+        Debug.Log(bothEnabled);
         
     }
 
     public void EnableMRTKRay()
     {
         Debug.Log("MRTK RAYS ENABLED");
+        //if(bothEnabled == 2)
+        //{
+        //    gameObject.GetComponent<XRInteractorLineVisual>().enabled = false;
+        //    bothEnabled--;
+        //    return;
+        //}
 
         if(alternateEnableDisable == 1)
         {
@@ -90,5 +112,7 @@ public class RFRayController : MonoBehaviour
             }
             alternateEnableDisable = 0;
         }
+
+        bothEnabled--;
     }
 }
