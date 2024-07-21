@@ -612,6 +612,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3756998697783098534}
   - component: {fileID: 697381901055328983}
+  - component: {fileID: 5550720480594614812}
   - component: {fileID: 7814976557292343990}
   - component: {fileID: 5111784879265449669}
   - component: {fileID: 3530045127439942206}
@@ -664,6 +665,48 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8493644, y: 0.8344948, z: 0.40937808}
   m_Center: {x: -0.08963307, y: -0.08275128, z: 0.23381121}
+--- !u!23 &5550720480594614812
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8419707733961395156}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7814976557292343990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,6 +762,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   owner: 0
   isHeld: 0
+  rfObj:
+    id: 
+    projectId: 
+    name: 
+    graphId: 
+    type: 
+    transformJson: 
+    meshJson: 
+    originalPrefabName: 
+    isTemplate: 0
+    isStatic: 0
+    isCollidable: 1
+    isGravityEnabled: 1
   isSelected: 0
   networkedPlayManager: {fileID: 0}
 --- !u!114 &3500631611427871088
@@ -734,6 +790,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPlayManager: {fileID: 0}
+  rfObj:
+    id: 
+    projectId: 
+    name: 
+    graphId: 
+    type: 
+    transformJson: 
+    meshJson: 
+    originalPrefabName: 
+    isTemplate: 0
+    isStatic: 0
+    isCollidable: 1
+    isGravityEnabled: 1
 --- !u!114 &1290213911508290375
 MonoBehaviour:
   m_ObjectHideFlags: 0

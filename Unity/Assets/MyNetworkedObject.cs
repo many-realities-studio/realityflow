@@ -59,6 +59,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         RequestRfObject();
     }
+    
+    // Update is called once per frame
+    void Update()
+    {
+        UpdateTransform();
+    }
 
     public void RequestRfObject()
     {

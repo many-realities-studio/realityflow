@@ -466,7 +466,7 @@ public class RealityFlowClient : MonoBehaviour
     #endregion
 
     #region Project Methods
-    public async Task CreateProject()
+    public async void CreateProject()
     {
         /* Create project input
         input CreateProjectInput{
