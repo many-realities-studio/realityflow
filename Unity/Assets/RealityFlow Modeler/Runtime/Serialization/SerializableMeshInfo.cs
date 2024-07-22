@@ -58,17 +58,16 @@ public class SerializableMeshInfo
             Debug.Log(m.color);
             colorFlag = true;
             colors = new float[4] { m.color.r, m.color.g, m.color.b, m.color.a };
-
         }
         else
         {
             colorFlag = false;
         }
 
-        if (m.GetFloat("_Metallic") != 0)
+        if (m.GetFloat("metallicFactor") != 0)
         {
             metalFlag = true;
-            metalFactor = m.GetFloat("_Metallic");
+            metalFactor = m.GetFloat("metallicFactor");
             Debug.Log("MetalFactor: " + metalFactor);
         }
         else
@@ -76,10 +75,10 @@ public class SerializableMeshInfo
             metalFlag = false;
         }
 
-        if (m.GetFloat("_Glossiness") != 0)
+        if (m.GetFloat("roughnessFactor") != 0)
         {
             glossFlag = true;
-            glossFactor = m.GetFloat("_Glossiness");
+            glossFactor = m.GetFloat("roughnessFactor");
         }
         else
         {
@@ -101,8 +100,6 @@ public class SerializableMeshInfo
             vertices[i * 3 + 1] = em.positions[i].y;
             vertices[i * 3 + 2] = em.positions[i].z;
         }
-
-
 
         faces = new int[em.faces.Length][];
 

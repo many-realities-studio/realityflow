@@ -91,7 +91,6 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             }
 
             GetComponent<NetworkedMesh>().SetLastSize(value.lastSize);
-            
         }
     }
 
