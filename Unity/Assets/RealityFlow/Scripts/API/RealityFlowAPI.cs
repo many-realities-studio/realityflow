@@ -941,7 +941,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
     {
          // Spawns Prefab through Ubiqs Network Spawn Manager
-        var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
+        var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScope(GetPrefabByName(prefabName));
 
         // Use spawnPostion to set the position of the spawned prefab
         spawnedPrefab.transform.position = spawnPosition; // This is the only thing effected

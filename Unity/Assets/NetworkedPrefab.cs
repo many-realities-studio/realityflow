@@ -1,12 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ubiq.Messaging;
-using Ubiq.Rooms;
-using Ubiq.Spawning;
-using TransformTypes;
-using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 
 public class NetworkedPrefab : MonoBehaviour
 {
@@ -18,6 +13,7 @@ public class NetworkedPrefab : MonoBehaviour
     void Start()
     {
         context = NetworkScene.Register(this);
+        Debug.Log("Registered with NetworkScene, Context ID: " + context.Id);
     }
 
     void Update()
@@ -27,6 +23,8 @@ public class NetworkedPrefab : MonoBehaviour
             lastPosition = transform.localPosition;
             lastScale = transform.localScale;
             lastRotation = transform.localRotation;
+
+            Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
             context.SendJson(new Message()
             {
@@ -40,6 +38,8 @@ public class NetworkedPrefab : MonoBehaviour
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
+        Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+
         transform.localPosition = m.position;
         transform.localScale = m.scale;
         transform.localRotation = m.rotation;
