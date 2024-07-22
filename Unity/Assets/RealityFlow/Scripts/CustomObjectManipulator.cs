@@ -11,7 +11,6 @@ public class CustomObjectManipulator : ObjectManipulator
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
-
         base.OnSelectEntered(args);
 
         // Log the transformation when manipulation starts (object is grabbed)

@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace RealityFlow.NodeUI
 {
@@ -20,8 +18,6 @@ namespace RealityFlow.NodeUI
         {
             get
             {
-                if (graph is null)
-                    Debug.LogError("Attempted to access Graph of GraphView before initialization");
                 return graph;
             }
             set
@@ -39,7 +35,14 @@ namespace RealityFlow.NodeUI
         public GameObject edgeUIPrefab;
 
         int lastChangeTicks;
-        bool Dirty => graph.ChangeTicks != lastChangeTicks;
+        bool Dirty {
+            get
+            {
+                if (graph == null)
+                    return false;
+                return graph.ChangeTicks != lastChangeTicks;
+            }
+        }
         VisualScript currentObject;
         public VisualScript CurrentObject { get => currentObject; set => currentObject = value; }
         string selectedVariable;
@@ -101,12 +104,6 @@ namespace RealityFlow.NodeUI
 
         void Update()
         {
-            if (currentObject == false)
-            {
-                Whiteboard.Instance.gameObject.SetActive(false);
-                return;
-            }
-
             if (Dirty)
             {
                 ResetVariables();
@@ -133,6 +130,9 @@ namespace RealityFlow.NodeUI
             nodeUis.Clear();
             dataEdgeUis.Clear();
             execEdgeUis.Clear();
+
+            if (graph == null)
+                return;
 
             foreach ((NodeIndex index, Node node) in graph.Nodes)
             {
