@@ -197,6 +197,11 @@ public class RealityFlowClient : MonoBehaviour
         string base64 = padded.Replace("_", "/").Replace("-", "+");
         return Convert.FromBase64String(base64);
     }
+
+    public void SetServer(string server)
+    {
+        this.server = server;
+    }
     
     #endregion
 
@@ -466,7 +471,7 @@ public class RealityFlowClient : MonoBehaviour
     #endregion
 
     #region Project Methods
-    public async Task CreateProject()
+    public async void CreateProject()
     {
         /* Create project input
         input CreateProjectInput{
@@ -505,7 +510,7 @@ public class RealityFlowClient : MonoBehaviour
                     details = "A new project",
                     thumbnailImg = "https://via.placeholder.com/150",
                     categories = new string[] { "Education" },
-                    isPublic = false,
+                    isPublic = true,
                     gallery = new string[] { "https://via.placeholder.com/150" },
                     publicUrl = "https://reality.gaim.ucf.edu/",
                     globalId = "New Project"
@@ -545,7 +550,8 @@ public class RealityFlowClient : MonoBehaviour
         }
 
         // Hide Project and Login Menus, show Level Editor
-        projectManager.SetActive(false);
+        if (projectManager)
+            projectManager.SetActive(false);
 
         roomClient.OnJoinedRoom.AddListener(OnJoinCreatedRoom); //!ON CREATE ROOM SHOULD TRIGGER!
         roomClient.Join("NewRoom", false);
@@ -586,8 +592,6 @@ public class RealityFlowClient : MonoBehaviour
             }
         };
         var graphQL = await SendQueryAsync(addRoom);
-        Debug.Log("<==@==> Query Result");
-        Debug.Log(graphQL);
         if (graphQL["data"] != null)
         {
             Debug.Log("Created Room: " + room.Name + " successfully");// ON CREATE ROOM SHOULD TRIGGER!
@@ -648,12 +652,17 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("No project selected");
             return;
         }
-        projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
+        Debug.Log("<==# Left comparison");
+
+        if (projectManager)
+            projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
+        Debug.Log("<==# Made project manager inactive");
 
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
 
+        Debug.Log("<==# Entered Join call");
         roomClient.Join(joinCode); // Join Room Based on Room Code
-
+        Debug.Log("<==# Left Join call");
     }
 
     private void OnJoinedExistingRoom(IRoom room)

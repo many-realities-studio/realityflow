@@ -23,8 +23,9 @@ public class MonitorManager : MonoBehaviour
     public GameObject JoiningFailedLabel;
     public TextMeshProUGUI JoiningFailedLabelReason;
 
-    
+    public ProjectsDisplay projectsDisplay;
     RealityFlowClient rfClient;
+
     GameObject LastLabel;
     
     string selectedUserId;
@@ -110,17 +111,22 @@ public class MonitorManager : MonoBehaviour
             Query = @"query GetRoom($id: String!) {
                 getRoom(id: $id) {
                     udid
+                    joinCode
+                    project {
+                        id
+                    }
                 }
             }",
             Variables = new { id = getUser["data"]["getUserById"]["currentRoomId"]}
-        })  ;
+        });
 
         if (getRoom["data"] == null || getRoom["data"]["getRoom"] == null) {
             OnJoinRejected(new Rejection() { reason = "Invalid room id"});
             return;
         }
-        
-        roomClient.Join((string)getRoom["data"]["getRoom"]["udid"]);
+
+        rfClient.SetCurrentProject((string)getRoom["data"]["getRoom"]["project"]["id"]);
+        rfClient.JoinRoom((string)getRoom["data"]["getRoom"]["joinCode"]);
         selectedUserId = userId;
     }
 }

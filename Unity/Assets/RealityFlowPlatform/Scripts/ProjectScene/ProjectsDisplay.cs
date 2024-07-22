@@ -25,7 +25,7 @@ public class ProjectsDisplay : MonoBehaviour
     public Button createRoomBtn;
     public Button refreshRoomsBtn;
 
-    // GraphQL client and access token variables
+    // References
     private RealityFlowClient rfClient;
 
     #region Initialization
