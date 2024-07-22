@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using Microsoft.MixedReality.Toolkit.UX;
@@ -49,7 +50,6 @@ public class PopulateObjectLibrary : MonoBehaviour
         if (rfClient != null && rfClient.userDecoded != null && rfClient.userDecoded.ContainsKey("id"))
         {
             string userId = rfClient.userDecoded["id"];
-            Debug.Log("User ID found: " + userId);
             GetUserName(userId);
             GetUserOwnedModels(userId);
         }
@@ -72,7 +72,7 @@ public class PopulateObjectLibrary : MonoBehaviour
         }
     }
 
-    private void GetUserName(string userId)
+    private async void GetUserName(string userId)
     {
         var getUserRequest = new GraphQLRequest
         {
@@ -87,13 +87,12 @@ public class PopulateObjectLibrary : MonoBehaviour
 
         try
         {
-            var graphQLResponse = rfClient.SendQueryBlocking(getUserRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getUserRequest);
             var data = graphQLResponse["data"];
 
             if (data != null && data["getUserById"] != null)
             {
                 string username = data["getUserById"]["username"].ToString();
-                Debug.Log("Username for user ID " + userId + ": " + username);
             }
             else
             {
@@ -130,18 +129,31 @@ public class PopulateObjectLibrary : MonoBehaviour
         GameObject newButton = Instantiate(buttonPrefab, parent);
         newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(objectPrefab.name);
         newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
-        UnityAction<GameObject> action = new UnityAction<GameObject>(TriggerObjectSpawn);
-        newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
+
+        // Create a new Unity action and add it as a listener to the buttons OnClicked event
+        newButton.GetComponent<PressableButton>().OnClicked.AddListener(
+            () => TriggerObjectSpawn(objectPrefab)
+        );
+        //newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(objectPrefab));
     }
 
-    void TriggerObjectSpawn(GameObject objectPrefab)
+    // OnClicked event that triggers when the button is pressed
+    // Sends the object prefab for the new buttons object to SpawnObjectAtRay when pressed
+    async void TriggerObjectSpawn(GameObject objectPrefab)
     {
         Debug.Log("TriggerObjectSpawn");
         Debug.Log(spawnScript.GetVisualIndicatorPosition());
-        Quaternion defaultRotation = objectPrefab.transform.rotation;
-        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
-        RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles });
 
+        // Default rotation
+        Quaternion defaultRotation = objectPrefab.transform.rotation;
+
+        // Spawn the object with the default rotation
+        //GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnPrefab(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles});
+        Debug.Log("[POL]Spawning Prefab from Catalog: " + objectPrefab.name);
+
+        // Add Rigidbody and MeshCollider
         if (spawnedObject.GetComponent<Rigidbody>() != null)
         {
             spawnedObject.GetComponent<Rigidbody>().useGravity = true;
@@ -159,9 +171,9 @@ public class PopulateObjectLibrary : MonoBehaviour
     #endregion
 
     #region Populate with Models
-    public void GetUserOwnedModels(string userId)
+    public async void GetUserOwnedModels(string userId)
     {
-        Debug.Log("Starting GetUserOwnedModels for user ID: " + userId);
+        //Debug.Log("Starting GetUserOwnedModels for user ID: " + userId);
 
         var getModelsRequest = new GraphQLRequest
         {
@@ -180,7 +192,7 @@ public class PopulateObjectLibrary : MonoBehaviour
 
         try
         {
-            var graphQLResponse = rfClient.SendQueryBlocking(getModelsRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getModelsRequest);
             Debug.Log("GraphQL response received: " + graphQLResponse);
 
             if (graphQLResponse == null)
@@ -197,7 +209,7 @@ public class PopulateObjectLibrary : MonoBehaviour
 
                 if (models.Count > 0)
                 {
-                    Debug.Log("Models found for user ID: " + userId);
+                    // Debug.Log("Models found for user ID: " + userId);
 
                     modelCatalogue.Clear();
                     foreach (var model in models)
@@ -342,7 +354,7 @@ public class PopulateObjectLibrary : MonoBehaviour
 
             string projectId = "your_project_id";  // Replace with actual project ID
 
-            RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, modelData, projectId, meshJson);
+            //RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, modelData, projectId, meshJson);
 
             Debug.Log("Model saved to the database successfully.");
         }
