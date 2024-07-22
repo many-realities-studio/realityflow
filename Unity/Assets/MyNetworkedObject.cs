@@ -117,22 +117,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
     }
 
-    void Update()
-    {
-        if (owner)
-        {
-            if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
-            {
-                lastPosition = transform.localPosition;
-                lastScale = transform.localScale;
-                lastRotation = transform.localRotation;
-                lastOwner = owner;
-
-                SendTransformData();
-            }
-        }
-    }
-
     public void SendTransformData()
     {
         // Debug.Log("SendTransformData() was called");
@@ -461,7 +445,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 scale = transform.localScale,
                 rotation = transform.localRotation,
                 owner = false,
-                isSelected = true,
+                //isSelected = true,
                 isKinematic = rb.isKinematic
             });
         }
@@ -474,7 +458,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 scale = transform.localScale,
                 rotation = transform.localRotation,
                 owner = false,
-                isSelected = false,
+                // isSelected = false,
                 isKinematic = rb.isKinematic
             });
         }

@@ -1708,7 +1708,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
         };
 
-        var response = await client.SendQueryAsync(createObject);
+        // var response = await client.SendQueryAsync(createObject);
         if (response["data"] != null)
         {
             // Object saved successfully, retrieve the ID from the response

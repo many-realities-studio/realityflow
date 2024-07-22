@@ -72,41 +72,41 @@ public class NetworkedObjectSpawner : MonoBehaviour
         Quaternion rotation = networkedObject.transform.rotation;
         Vector3 originalScale = networkedObject.transform.localScale;
 
-        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(networkedObject.gameObject.name, position, originalScale, rotation);
+        //GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(networkedObject.gameObject.name, position, originalScale, rotation);
 
-        if (spawnedObject != null)
-        {
-            // Inherit the tag from the prefab
-            spawnedObject.tag = networkedObject.gameObject.tag;
+        // if (spawnedObject != null)
+        // {
+        //     // Inherit the tag from the prefab
+        //     spawnedObject.tag = networkedObject.gameObject.tag;
 
-            // Scale up the object in the next frame using the API method
-            StartCoroutine(ScaleUpObject(spawnedObject, position, rotation, originalScale * scaleMultiplier));
+        //     // Scale up the object in the next frame using the API method
+        //     StartCoroutine(ScaleUpObject(spawnedObject, position, rotation, originalScale * scaleMultiplier));
 
-            // Ensure the collider is convex and update it
-            MeshCollider meshCollider = spawnedObject.GetComponent<MeshCollider>();
-            if (meshCollider != null)
-            {
-                meshCollider.convex = true; // Set the convex property to true
-                meshCollider.enabled = false;
-                meshCollider.enabled = true; // Force recalculation
-            }
+        //     // Ensure the collider is convex and update it
+        //     MeshCollider meshCollider = spawnedObject.GetComponent<MeshCollider>();
+        //     if (meshCollider != null)
+        //     {
+        //         meshCollider.convex = true; // Set the convex property to true
+        //         meshCollider.enabled = false;
+        //         meshCollider.enabled = true; // Force recalculation
+        //     }
 
-            // Check if the object has the "Walls" tag and set it as static
-            if (spawnedObject.CompareTag("Walls"))
-            {
-                VisualScript visualScript = spawnedObject.GetComponent<VisualScript>();
-                if (visualScript != null)
-                {
-                    RealityFlowAPI.Instance.SetStatic(visualScript, true);
-                }
-            }
+        //     // Check if the object has the "Walls" tag and set it as static
+        //     if (spawnedObject.CompareTag("Walls"))
+        //     {
+        //         VisualScript visualScript = spawnedObject.GetComponent<VisualScript>();
+        //         if (visualScript != null)
+        //         {
+        //             RealityFlowAPI.Instance.SetStatic(visualScript, true);
+        //         }
+        //     }
 
-            // Ensure Rigidbody stays kinematic for "Teleport" tagged objects
-            if (spawnedObject.CompareTag("Teleport"))
-            {
-                StartCoroutine(EnforceKinematic(spawnedObject));
-            }
-        }
+        //     // Ensure Rigidbody stays kinematic for "Teleport" tagged objects
+        //     if (spawnedObject.CompareTag("Teleport"))
+        //     {
+        //         StartCoroutine(EnforceKinematic(spawnedObject));
+        //     }
+        // }
 
         Debug.Log($"Spawned networked object: {networkedObject.gameObject.name} at position: {position}");
     }
