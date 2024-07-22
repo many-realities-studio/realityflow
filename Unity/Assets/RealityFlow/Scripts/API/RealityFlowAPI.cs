@@ -1051,9 +1051,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 Debug.Log("THE CURRENT OBJECT IS: " + spawnedPrefab);
 
-                // Update the object's RfObject component[?]
-                spawnedPrefab.GetComponent<MyNetworkedObject>().UpdateRfObject(rfObject);
-
                 LogActionToServer("SpawnObject", new { rfObject });
 
                 // Update the name of the spawned object in the scene
