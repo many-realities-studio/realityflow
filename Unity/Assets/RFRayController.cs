@@ -10,8 +10,11 @@ public class RFRayController : MonoBehaviour
 {
     private GameObject leftHand;
     private GameObject rightHand;
-    private GameObject leftRayInteractor;
-    private GameObject rightRayInteractor;
+    [SerializeField] private GameObject leftRayInteractor;
+    [SerializeField] private GameObject rightRayInteractor;
+
+    [SerializeField] private GameObject leftUIRayInteractor;
+    [SerializeField] private GameObject rightUIRayInteractor;
     private bool leftControllerActiveOnDisable = true;
     private bool rightControllerActiveOnDisable = true;
     private byte alternateEnableDisable = 0;
@@ -23,8 +26,11 @@ public class RFRayController : MonoBehaviour
         var rig = UnityEngine.Object.FindFirstObjectByType<XROrigin>().gameObject;
         leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
         rightHand = rig.transform.Find("Camera Offset/MRTK RightHand Controller").gameObject;
-        leftRayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>().gameObject;
-        rightRayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>().gameObject;
+        if(leftRayInteractor == null || rightRayInteractor == null)
+        {
+            leftRayInteractor = rightHand.GetComponentInChildren<MRTKRayInteractor>().gameObject;
+            rightRayInteractor = leftHand.GetComponentInChildren<MRTKRayInteractor>().gameObject;
+        }
 
         //Debug.Log("THIS IS FOR THE INTERACTORS:");
         //Debug.Log(leftRayInteractor);
@@ -101,12 +107,12 @@ public class RFRayController : MonoBehaviour
             gameObject.GetComponent<XRInteractorLineVisual>().enabled = false;
             
             // If the controllers were active when disable was set, enable it
-            if(leftControllerActiveOnDisable)
+            if(leftControllerActiveOnDisable) // && leftUIRayInteractor.GetComponent<XRInteractorLineVisual>().enabled == false
             {
                 leftRayInteractor.SetActive(true);
             }
             
-            if(rightControllerActiveOnDisable)
+            if(rightControllerActiveOnDisable) // && rightUIRayInteractor.GetComponent<XRInteractorLineVisual>().enabled == false
             {
                 rightRayInteractor.SetActive(true);
             }
