@@ -7,6 +7,7 @@ using Ubiq.Rooms;
 using Ubiq.Spawning;
 using TransformTypes;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
+using Org.BouncyCastle.Crypto.Engines;
 
 public enum CommandType
 {
@@ -40,6 +41,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Material meshMaterial;
     private Material boundsMaterial;
     private ObjectManipulator objectManipulator;
+    private Rigidbody rb;
     private EraserTool eraser;
 
     bool lastOwner;
@@ -72,6 +74,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         eraser = FindObjectOfType<EraserTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
+
+        
         // Find the child game object of this mesh that draws the bounds visuals
         foreach (Transform child in gameObject.transform)
         {
@@ -253,6 +257,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         owner = true;
         isHeld = true;
         // Debug.Log("StartHold() was called");
+
+        rb.constraints = RigidbodyConstraints.None;
+
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -304,6 +311,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             boundsColor = new Color(0.078f, 0.54f, 1f, 1f),
             objectManipulator = true
         });
+
+        rb.constraints = RigidbodyConstraints.FreezeAll;
     }
 
     /// <summary>

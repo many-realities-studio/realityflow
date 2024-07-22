@@ -41,6 +41,7 @@ public class CacheMeshData : MonoBehaviour
         if(gameObject.GetComponent<Rigidbody>() != null)
         {
             rb = gameObject.GetComponent<Rigidbody>();
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         } else
         {
             compErr = true;

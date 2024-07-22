@@ -86,6 +86,7 @@ public class CacheObjectData : MonoBehaviour
                         rb.constraints = RigidbodyConstraints.FreezeAll;
                     } else
                     {
+                        rb.constraints = RigidbodyConstraints.None;
                         rb.isKinematic = false;
                     }
 
