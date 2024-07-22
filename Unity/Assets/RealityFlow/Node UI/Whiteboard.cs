@@ -32,7 +32,7 @@ namespace RealityFlow.NodeUI
 
         public void Init()
         {
-            if (Instance)
+            if (Instance && Instance != this)
                 Destroy(gameObject);
             else
                 Instance = this;

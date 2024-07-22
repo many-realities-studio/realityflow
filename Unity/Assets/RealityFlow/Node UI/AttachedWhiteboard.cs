@@ -72,18 +72,13 @@ namespace RealityFlow.NodeUI
             }
         }
 
-        void ShowWhiteboard(GameObject obj)
+        void OnDisable()
         {
-            if (!Whiteboard.Instance)
-                return;
-
-            VisualScript script = obj.EnsureComponent<VisualScript>();
-
-            if (Whiteboard.Instance.gameObject.activeInHierarchy && 
-                Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
-                return;
-
-            Whiteboard.Instance.SetAttachedObj(script);
+            VisualScript script = this.EnsureComponent<VisualScript>();
+            if (Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
+            {
+                Whiteboard.Instance.TopLevelGraphView.Graph = null;
+            }
         }
     }
 }
