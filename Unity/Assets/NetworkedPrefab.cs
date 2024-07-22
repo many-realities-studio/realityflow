@@ -1,19 +1,34 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ubiq.Messaging;
+using Ubiq.Rooms;
+using Ubiq.Spawning;
+using TransformTypes;
+using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 
-public class NetworkedPrefab : MonoBehaviour
+public class NetworkedPrefab : MonoBehaviour, INetworkSpawnable
 {
-    NetworkContext context;
-    Vector3 lastPosition;
-    Vector3 lastScale;
-    Quaternion lastRotation;
+    // Ubiq ID and the Network Context
+    public NetworkId NetworkId { get; set; }
+    public NetworkContext context;
+
+    // For Tracking Transform Changes
+    private Vector3 lastPosition;
+    private Vector3 lastScale;
+    private Quaternion lastRotation;
+    public float lastSize = 0.1f;
 
     void Start()
     {
-        context = NetworkScene.Register(this);
-        Debug.Log("Registered with NetworkScene, Context ID: " + context.Id);
+        if (!context.Id.Valid)
+            context = NetworkScene.Register(this);
+        else
+            Debug.Log("ID is already valid");
+
+        Debug.Log("[NETPREFAB]Context ID: " + context.Id);
+
     }
 
     void Update()
