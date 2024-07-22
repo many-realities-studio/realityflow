@@ -1558,6 +1558,53 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return spawnedObject;
     }
+
+    private void SaveObjectToDatabase(RfObject rfObject)
+    {
+        if (client == null)
+        {
+            Debug.LogError("RealityFlowClient is not initialized.");
+            return;
+        }
+
+        var saveObject = new GraphQLRequest
+        {
+            Query = @"
+                mutation UpdateObject($input: UpdateObjectInput!) {
+                    updateObject(input: $input) {
+                        id
+                    }
+                }",
+            OperationName = "UpdateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson,
+                    isTemplate = rfObject.isTemplate,
+                    isStatic = rfObject.isStatic,
+                    isCollidable = rfObject.isCollidable,
+                    isGravityEnabled = rfObject.isGravityEnabled,
+                }
+            }
+        };
+
+        try
+        {
+            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
+            Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
+
+            // client.SendQueryFireAndForget(saveObject);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+    }
     #endregion
 
     public void RegisterPeerSpawnedObject(GameObject obj, RfObject rfObj)
@@ -1628,125 +1675,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Destroy(obj);
         }
         nonPersistentObjects.Clear();
-    }
-
-    private void SaveObjectToDatabase(RfObject rfObject)
-    {
-        if (client == null)
-        {
-            Debug.LogError("RealityFlowClient is not initialized.");
-            return;
-        }
-
-        var saveObject = new GraphQLRequest
-        {
-            Query = @"
-                mutation UpdateObject($input: UpdateObjectInput!) {
-                    updateObject(input: $input) {
-                        id
-                    }
-                }",
-            OperationName = "UpdateObject",
-            Variables = new
-            {
-                input = new
-                {
-                    id = rfObject.id,
-                    name = rfObject.name,
-                    graphId = rfObject.graphId,
-                    meshJson = rfObject.meshJson,
-                    transformJson = rfObject.transformJson,
-                    isTemplate = rfObject.isTemplate,
-                    isStatic = rfObject.isStatic,
-                    isCollidable = rfObject.isCollidable,
-                    isGravityEnabled = rfObject.isGravityEnabled,
-                }
-            }
-        };
-
-        try
-        {
-            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
-            Debug.Log("Request: " + JsonUtility.ToJson(saveObject));
-
-            client.SendQueryAsync(saveObject);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-        }
-    }
-
-    // SaveModelToDatabase
-    public void SaveModelToDatabase(GameObject instantiatedModel, ModelData modelData, string projectId, string meshJson)
-    {
-        var createObject = new GraphQLRequest
-        {
-            Query = @"
-                mutation CreateObject($input: CreateObjectInput!) {
-                    createObject(input: $input) {
-                        id
-                    }
-                }
-            ",
-            OperationName = "CreateObject",
-            Variables = new
-            {
-                input = new
-                {
-                    projectId = projectId,
-                    name = modelData.name,
-                    type = "Model",
-                    meshJson = meshJson,
-                    transformJson = JsonUtility.ToJson(new TransformData
-                    {
-                        position = instantiatedModel.transform.position,
-                        rotation = instantiatedModel.transform.rotation,
-                        scale = instantiatedModel.transform.localScale
-                    })
-                }
-            }
-        };
-
-        // var response = await client.SendQueryAsync(createObject);
-        if (response["data"] != null)
-        {
-            // Object saved successfully, retrieve the ID from the response
-            var objectId = response["data"]["createObject"]["id"].ToString();
-            modelData.id = objectId;
-            Debug.Log($"Model saved to database with ID: {objectId}");
-        }
-        else
-        {
-            Debug.LogError("Failed to save model to database.");
-            foreach (var error in response["errors"])
-            {
-                Debug.LogError($"GraphQL Error: {error["message"]}");
-                if (error["extensions"] != null)
-                {
-                    Debug.LogError($"Error Extensions: {error["extensions"]}");
-                }
-            }
-        }
-    }
-
-    public RfObject ConvertModelDataToRfObject(ModelData modelData, string projectId, string transformJson, string meshJson)
-    {
-        return new RfObject
-        {
-            id = modelData.id,
-            projectId = projectId,
-            name = modelData.name,
-            graphId = null,
-            type = "DownloadedModel",
-            transformJson = transformJson,
-            meshJson = meshJson,
-            originalPrefabName = modelData.name,
-            isTemplate = false,
-            isStatic = false,
-            isCollidable = true,
-            isGravityEnabled = true
-        };
     }
 
     // --- Fetch/Populate Room---

@@ -354,7 +354,7 @@ public class PopulateObjectLibrary : MonoBehaviour
 
             string projectId = "your_project_id";  // Replace with actual project ID
 
-            RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, modelData, projectId, meshJson);
+            //RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, modelData, projectId, meshJson);
 
             Debug.Log("Model saved to the database successfully.");
         }
