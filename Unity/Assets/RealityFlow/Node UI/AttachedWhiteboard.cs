@@ -47,6 +47,20 @@ namespace RealityFlow.NodeUI
                 Whiteboard.Instance.gameObject.SetActive(true);
         }
 
+        void Awake()
+        {
+            if (!GetComponent<VisualScript>())
+                gameObject.AddComponent<VisualScript>();
+
+            if (!GetComponent<RealityFlowObjectEvents>())
+            {
+                RealityFlowObjectEvents events = gameObject.AddComponent<RealityFlowObjectEvents>();
+
+                if (GetComponent<ObjectManipulator>() is ObjectManipulator manip)
+                    manip.firstSelectEntered.AddListener(_ => events.SendSelectedEvent());
+            }
+        }
+
         void Start()
         {
             realityTools = GameObject.Find("RealityFlow Editor");
