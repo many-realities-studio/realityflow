@@ -939,11 +939,12 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         public void Clear()
         {
             ResetKeyboardState();
-            if (InputField.caretPosition != 0)
+            if (InputField)
             {
-                InputField.MoveTextStart(false);
+                if (InputField.caretPosition != 0)
+                    InputField.MoveTextStart(false);
+                InputField.text = "";
             }
-            InputField.text = "";
             m_CaretPosition = InputField.caretPosition;
         }
 
