@@ -57,6 +57,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     //public bool sourceMesh = false;
     //private RoomClient roomClient;
 
+    public NetworkedPlayManager networkedPlayManager;
+    private bool lastPlayModeState;
+
     void Start()
     {
         // Debug.Log("Start is called");
@@ -75,7 +78,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
 
-        
+        networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+
         // Find the child game object of this mesh that draws the bounds visuals
         foreach (Transform child in gameObject.transform)
         {
@@ -254,11 +258,19 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
             return;
 
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
+        
         owner = true;
         isHeld = true;
         // Debug.Log("StartHold() was called");
 
-        rb.constraints = RigidbodyConstraints.None;
+         // If we are not in play mode, have no gravity and allow the object to move while held,
+        // similarly allow thw object to be moved in playmode without gravity on hold.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.constraints = RigidbodyConstraints.None;
+        }
 
         context.SendJson(new Message()
         {
@@ -312,7 +324,10 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             objectManipulator = true
         });
 
-        rb.constraints = RigidbodyConstraints.FreezeAll;
+        if (!networkedPlayManager.playMode)
+        {
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
     }
 
     /// <summary>
