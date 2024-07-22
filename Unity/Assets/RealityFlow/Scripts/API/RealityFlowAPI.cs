@@ -941,7 +941,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
     {
          // Spawns Prefab through Ubiqs Network Spawn Manager
-        var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScope(GetPrefabByName(prefabName));
+        var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
 
         // Use spawnPostion to set the position of the spawned prefab
         spawnedPrefab.transform.position = spawnPosition; // This is the only thing effected
@@ -995,12 +995,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Create a new RfObject to store the prefab data
         RfObject rfObject = new RfObject
         {
-            name = prefabName,
+            name = spawnedObject.name,
             type = "Prefab",
             graphId = null,
             transformJson = JsonUtility.ToJson(transformData),
-            meshJson = null,
-            projectId = client.GetCurrentProjectId()
+            meshJson = "{}",
+            projectId = client.GetCurrentProjectId(),
+            originalPrefabName = prefabName
         };
 
         // This is a GraphQL request to save the object to the database
