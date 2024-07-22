@@ -995,7 +995,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Create a new RfObject to store the prefab data
         RfObject rfObject = new RfObject
         {
-            name = spawnedObject.name,
+            name = prefabName,
             type = "Prefab",
             graphId = null,
             transformJson = JsonUtility.ToJson(transformData),
