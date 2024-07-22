@@ -623,7 +623,7 @@ public class RealityFlowClient : MonoBehaviour
                 input = new
                 {
                     projectId = currentProjectId,
-                    creatorId = userDecoded["id"],
+                    // creatorId = userDecoded["id"], seems to have been removed from schema
                     roomId = room.UUID,
                     joinCode = room.JoinCode,
                     isEditable = true
