@@ -16,6 +16,8 @@ namespace RealityFlow.NodeGraph
         string id;
         public string Id => id;
 
+        public void SetId(string id) => this.id = id;
+
         /// <summary>
         /// The name of this graph.
         /// </summary>

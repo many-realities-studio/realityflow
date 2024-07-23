@@ -89,8 +89,6 @@ public class EraserTool : MonoBehaviour
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
             Debug.Log("Delete attempted" + currentHitResult.collider.gameObject);
-            
-            Whiteboard.Instance.Init();
 
             RealityFlowAPI.Instance.LogActionToServer("Delete Object", new { deletedObj = currentHitResult.collider.gameObject.name});
 

@@ -1810,6 +1810,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
                     Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                    graphObj.SetId(graph.id);
                     spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
                 }
 
