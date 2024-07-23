@@ -28,7 +28,6 @@ public class CacheObjectData : MonoBehaviour
 
     void Start()
     {
-        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
         lastPlayModeState = networkedPlayManager.playMode;
 
@@ -53,6 +52,7 @@ public class CacheObjectData : MonoBehaviour
         {
             compErr = true;
         }
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
     }
 
     void Update()
@@ -61,7 +61,7 @@ public class CacheObjectData : MonoBehaviour
         // gameObject.transform.parent.parent.parent.name == "Forest 1"
         
         // TODO: ?Because we are constantly checking if play mode is on or off, set the proper gravity/properties relating to the rf obj?
-        if (rfObj != null && lastPlayModeState != networkedPlayManager.playMode)
+        if (lastPlayModeState != networkedPlayManager.playMode) // rfObj != null && 
         {
             lastPlayModeState = networkedPlayManager.playMode;
             // Cache values when Play mode is entered
@@ -116,7 +116,7 @@ public class CacheObjectData : MonoBehaviour
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
 
-                Debug.Log("there is a compErr: " + compErr);
+                //Debug.Log("there is a compErr: " + compErr);
 
                 // if we have are missing a component don't mess with the object's physics
                 if(!compErr)

@@ -254,8 +254,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 }
                 else
                 {
-                    rb.useGravity = true;
-                    //rb.useGravity = false;
+                    //rb.useGravity = true;
+                    rb.useGravity = false;
                 }
 
                 // if the object is collidable
