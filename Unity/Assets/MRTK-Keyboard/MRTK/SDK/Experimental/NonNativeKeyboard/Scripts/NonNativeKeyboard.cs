@@ -938,14 +938,37 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// </summary>
         public void Clear()
         {
-            ResetKeyboardState();
-            if (InputField.caretPosition != 0)
+            Debug.Log("NonNativeKeyboard Clear called.");
+
+            // Check if InputField is null
+            if (InputField == null)
             {
-                InputField.MoveTextStart(false);
+                Debug.LogWarning("InputField is null in Clear method.");
+                return;
             }
+
+            // Reset keyboard state
+            ResetKeyboardState();
+
+            // Check if caretPosition is accessible
+            try
+            {
+                if (InputField.caretPosition != 0)
+                {
+                    InputField.MoveTextStart(false);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Error accessing caretPosition: {ex.Message}");
+                return;
+            }
+
+            // Clear text and reset caret position
             InputField.text = "";
             m_CaretPosition = InputField.caretPosition;
         }
+
 
         #endregion
 

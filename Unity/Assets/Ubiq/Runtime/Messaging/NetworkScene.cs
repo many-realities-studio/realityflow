@@ -31,6 +31,9 @@ namespace Ubiq.Messaging
 
         public void SendJson<T>(T message)
         {
+            if (Scene == null)
+                Debug.LogError("Scene is null");
+            Debug.LogError(Scene);
             Scene.SendJson(Id, message);
         }
     }

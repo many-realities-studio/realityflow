@@ -46,8 +46,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Error Handling
     private bool compErr = false;
 
-    void Start()
-    {   
+    public void Initialize()
+    {
         // retrieve object from RealityFlowAPI
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
         // finds The Networked Play Manager
@@ -60,7 +60,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             Debug.Log("ID is already valid");
 
         Debug.Log("[NETOBJECT]Context ID: " + context.Id);
-    
+
         // Not Held or Owned on Start
         owner = false;
         isHeld = false;
@@ -104,17 +104,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void RequestRfObject()
     {
-         Message msg = new Message();
-         //msg.needsRfObject = true;
-         context.SendJson(msg);
+        Message msg = new Message();
+        //msg.needsRfObject = true;
+        context.SendJson(msg);
     }
 
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame
     void Update()
     {
-        if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
-        {   
+        if (context.Id.Valid && rfObj != null && lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
+        {
             // If the transform has changed, send the update
             lastPosition = transform.localPosition;
             lastScale = transform.localScale;
@@ -198,7 +198,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             });
         }
     }
-    
+
     public void StartHold()
     {
         if (!owner && isHeld)
@@ -211,12 +211,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         isHeld = true;
 
 
-        if (!networkedPlayManager.playMode)
+        if (networkedPlayManager && !networkedPlayManager.playMode)
         {
             rb.useGravity = false;
             rb.isKinematic = false;
         }
-        else
+        else if (networkedPlayManager)
         {
             rb.useGravity = true;
         }
@@ -337,7 +337,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     }
 
     #endregion
-    
+
     // THE MESSAGE STRUCTURE
     private struct Message
     {
