@@ -22,6 +22,7 @@ public class CacheMeshData : MonoBehaviour
     private Rigidbody rb;
     private bool compErr = false;
     private BoxCollider boxCol;
+    private MeshCollider meshCol;
     
     public void SetRfObject(RfObject rfObj)
     {
@@ -50,6 +51,14 @@ public class CacheMeshData : MonoBehaviour
         if(gameObject.GetComponent<BoxCollider>() != null)
         {
             boxCol = gameObject.GetComponent<BoxCollider>();
+        } else
+        {
+            compErr = true;
+        }
+
+        if(gameObject.GetComponent<MeshCollider>() != null)
+        {
+            meshCol = gameObject.GetComponent<MeshCollider>();
         } else
         {
             compErr = true;
@@ -101,9 +110,11 @@ public class CacheMeshData : MonoBehaviour
                     // if the object is collide enabled, keep that otherwise turn off the collider
                     if(rfObj.isCollidable)
                     {
+                        meshCol.enabled = true;
                         boxCol.enabled = true;
                     } else
                     {
+                        meshCol.enabled = false;
                         boxCol.enabled = false;
                     }
                 } 
