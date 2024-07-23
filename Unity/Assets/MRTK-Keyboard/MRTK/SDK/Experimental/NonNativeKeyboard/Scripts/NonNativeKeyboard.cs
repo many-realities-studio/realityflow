@@ -944,8 +944,8 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
                 if (InputField.caretPosition != 0)
                     InputField.MoveTextStart(false);
                 InputField.text = "";
+                m_CaretPosition = InputField.caretPosition;
             }
-            m_CaretPosition = InputField.caretPosition;
         }
 
         #endregion
