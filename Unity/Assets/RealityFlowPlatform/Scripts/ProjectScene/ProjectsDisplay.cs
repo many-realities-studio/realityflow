@@ -84,7 +84,7 @@ public class ProjectsDisplay : MonoBehaviour
     #endregion
 
     #region Display Projects
-    private void GetUserProjectsData()
+    private async void GetUserProjectsData()
     {
         // Check For Essential Components
         if (rfClient == null)
@@ -137,7 +137,7 @@ public class ProjectsDisplay : MonoBehaviour
             Variables = new { getUserByIdId = userId }
         };
 
-        var queryResult = rfClient.SendQueryBlocking(projectsQuery);
+        var queryResult = await rfClient.SendQueryAsync(projectsQuery);
         var data = queryResult["data"];
         if (data != null)
         {
@@ -155,7 +155,7 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
 
-    public void GetActiveProjectsData()
+    public async void GetActiveProjectsData()
     {
         // Debug.Log("--- Fetching Active Projects Data ---");
 
@@ -182,7 +182,7 @@ public class ProjectsDisplay : MonoBehaviour
             Variables = null
         };
 
-        var graphQL = rfClient.SendQueryBlocking(activeProjectsQuery);
+        var graphQL = await rfClient.SendQueryAsync(activeProjectsQuery);
         var projectsData = graphQL["data"]["getActiveProjects"] as JArray;
 
         if (projectsData != null)
@@ -300,7 +300,7 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
     
-    public void OpenProject(string id)
+    public async void OpenProject(string id)
     {
         rfClient.SetCurrentProject(id);
         projectDetailPanel.SetActive(true);
@@ -329,7 +329,7 @@ public class ProjectsDisplay : MonoBehaviour
             Variables = new { getProjectByIdId = id }
         };
 
-        var graphQL = rfClient.SendQueryBlocking(getProjectData);
+        var graphQL = await rfClient.SendQueryAsync(getProjectData);
         var projectdata = graphQL["data"];
         if (projectdata != null)
         {
