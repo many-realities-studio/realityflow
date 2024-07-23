@@ -47,14 +47,66 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     private bool compErr = false;
 
     void Start()
-    {
+    {   
+        // retrieve object from RealityFlowAPI
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        // finds The Networked Play Manager
+        networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+
+        // Initialize the Network Context
         if (!context.Id.Valid)
             context = NetworkScene.Register(this);
         else
             Debug.Log("ID is already valid");
 
         Debug.Log("[NETOBJECT]Context ID: " + context.Id);
+    
+        // Not Held or Owned on Start
+        owner = false;
+        isHeld = false;
 
+        // Get the Custom Object Manipulator
+        if (gameObject.GetComponent<CustomObjectManipulator>() != null)
+        {
+            manipulator = GetComponent<CustomObjectManipulator>();
+        }
+        else
+        {
+            // Send error?
+            compErr = true;
+        }
+
+        // Get the Rigidbody components
+        // These should throw errors on failure (object doesn't have these components) TODO some other time:
+        if (gameObject.GetComponent<Rigidbody>() != null)
+        {
+            rb = gameObject.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+        }
+        else
+        {
+            compErr = true;
+        }
+
+        // Get the Box Collider components
+        if (gameObject.GetComponent<BoxCollider>() != null)
+        {
+            boxCol = gameObject.GetComponent<BoxCollider>();
+        }
+        else
+        {
+            compErr = true;
+        }
+
+        RequestRfObject();
+        //color = obj.GetComponent<Renderer>().material.color;
+    }
+
+    public void RequestRfObject()
+    {
+         Message msg = new Message();
+         //msg.needsRfObject = true;
+         context.SendJson(msg);
     }
 
     // Update is called once per frame 
@@ -289,6 +341,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // THE MESSAGE STRUCTURE
     private struct Message
     {
+        // public bool needsRfObject;
+        // public RfObject rfObj;        
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
@@ -314,6 +368,4 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
     }
-
-
 }
