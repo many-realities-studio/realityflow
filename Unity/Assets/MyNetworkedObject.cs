@@ -364,12 +364,23 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         this.rfObj = rfObj;
         GetComponent<CacheObjectData>().rfObj = rfObj;
-        context.SendJson(new Message()
-        {
-            rfObj = this.rfObj
-        });
-    }
 
+        // Sometimes, such as when spawned from the mesh menu, this object will not have run Start()
+        // yet and end up failing to have a networkcontext; in this case yield until it can send the 
+        // message
+        IEnumerator SendRfObjUpdate()
+        {
+            while (!context.Scene)
+                yield return null;
+
+            context.SendJson(new Message()
+            {
+                rfObj = this.rfObj
+            });
+        }
+
+        StartCoroutine(SendRfObjUpdate());
+    }
 
     public struct Message
     {
