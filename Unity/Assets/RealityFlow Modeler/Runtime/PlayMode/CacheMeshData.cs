@@ -86,6 +86,7 @@ public class CacheMeshData : MonoBehaviour
                     } else
                     {
                         rb.isKinematic = false;
+                        rb.constraints = RigidbodyConstraints.None;
                     }
 
                     // if has gravity, apply in play mode
@@ -123,10 +124,10 @@ public class CacheMeshData : MonoBehaviour
                     // TODO: Move to it's own component (Like RFobject manager or something)
                     //       Include the playmode switch stuff
                     // if static, remove the added constraints
-                    if(rfObj.isStatic)
-                    {
-                        rb.constraints = RigidbodyConstraints.None;
-                    }
+                    //if(rfObj.isStatic)
+                    //{
+                    rb.constraints = RigidbodyConstraints.FreezeAll;
+                    //}
 
                     // all objects should float and be still
                     rb.useGravity = false;
