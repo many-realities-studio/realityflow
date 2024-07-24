@@ -40,6 +40,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Material meshMaterial;
     private Material boundsMaterial;
     private ObjectManipulator objectManipulator;
+    private Rigidbody rb;
     private EraserTool eraser;
 
     bool lastOwner;
@@ -54,6 +55,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     public string originalName = "";
     //public bool sourceMesh = false;
     //private RoomClient roomClient;
+
+    public NetworkedPlayManager networkedPlayManager;
+    private bool lastPlayModeState;
 
     void Start()
     {
@@ -72,6 +76,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         eraser = FindObjectOfType<EraserTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
+
+        networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+
         // Find the child game object of this mesh that draws the bounds visuals
         foreach (Transform child in gameObject.transform)
         {
@@ -274,9 +281,19 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
             return;
 
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
+        
         owner = true;
         isHeld = true;
         // Debug.Log("StartHold() was called");
+
+         // If we are not in play mode, have no gravity and allow the object to move while held,
+        // similarly allow thw object to be moved in playmode without gravity on hold.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.constraints = RigidbodyConstraints.None;
+        }
         context.SendJson(CreateHeldMessage(true));
     }
 
@@ -298,6 +315,12 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         
         RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
         context.SendJson(CreateHeldMessage(false));
+
+
+        if (!networkedPlayManager.playMode)
+        {
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
     }
 
     /// <summary>

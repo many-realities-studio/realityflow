@@ -71,6 +71,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             rb = gameObject.GetComponent<Rigidbody>();
             rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
@@ -166,6 +167,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.useGravity = false;
             rb.isKinematic = false;
 
+            rb.constraints = RigidbodyConstraints.None;
+
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
             // TODO: 
@@ -219,6 +222,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             rb.useGravity = false;
             rb.isKinematic = true;
+
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
@@ -249,8 +254,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 }
                 else
                 {
-                    rb.useGravity = true;
-                    //rb.useGravity = false;
+                    //rb.useGravity = true;
+                    rb.useGravity = false;
                 }
 
                 // if the object is collidable
