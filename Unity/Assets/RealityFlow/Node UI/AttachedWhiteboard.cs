@@ -71,14 +71,5 @@ namespace RealityFlow.NodeUI
                 whiteboard.SetActive(false);
             }
         }
-
-        void OnDisable()
-        {
-            VisualScript script = this.EnsureComponent<VisualScript>();
-            if (Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
-            {
-                Whiteboard.Instance.TopLevelGraphView.Graph = null;
-            }
-        }
     }
 }
