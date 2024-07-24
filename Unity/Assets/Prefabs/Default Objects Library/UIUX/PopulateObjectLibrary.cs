@@ -215,7 +215,7 @@ public class PopulateObjectLibrary : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogError("No models found for user ID: " + userId);
+                    Debug.Log("No models found for user ID: " + userId);
                 }
             }
             else
