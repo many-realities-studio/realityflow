@@ -1967,6 +1967,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
+
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -2652,7 +2653,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // Method to process incoming peer transform updates
-    public void ProcessPeerTransformUpdate(string propertyKey, string jsonMessage)
+    public void ProcessPeerTransformUpdate(string jsonMessage)
     {
         var transformMessage = JsonUtility.FromJson<TransformMessage>(jsonMessage);
         Debug.Log($"Received transform update: {transformMessage.ObjectName}, Pos: {transformMessage.Position}, Rot: {transformMessage.Rotation}, Scale: {transformMessage.Scale}");
@@ -2676,7 +2677,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             if (property.Key.StartsWith("transform."))
             {
-                ProcessPeerTransformUpdate(property.Key, property.Value);
+                ProcessPeerTransformUpdate(property.Value);
             }
         }
     }

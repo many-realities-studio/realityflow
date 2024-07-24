@@ -46,7 +46,7 @@ namespace RealityFlow.NodeUI
                 return;
 
             gameObject.SetActive(true);
-            // TODO: Probably use API for this later
+            // TODO: Probably use API for this later, when the whiteboard is networked so all clients see each whiteboard
             Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up).normalized;
             transform.position = Camera.main.transform.position + camForward;
             transform.forward = camForward;
