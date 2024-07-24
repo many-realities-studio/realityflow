@@ -16,6 +16,8 @@ namespace RealityFlow.NodeGraph
         string id;
         public string Id => id;
 
+        public void SetId(string id) => this.id = id;
+
         /// <summary>
         /// The name of this graph.
         /// </summary>
@@ -38,6 +40,9 @@ namespace RealityFlow.NodeGraph
         [SerializeField]
         [HideInInspector]
         BiDict<PortIndex, PortIndex> reverseEdges = new();
+
+        public ImmutableDictionary<PortIndex, PortIndex> ReverseEdges 
+            => reverseEdges.ToImmutableDictionary();
 
         public IEnumerable<KeyValuePair<PortIndex, PortIndex>> Edges =>
             reverseEdges.Select(kv => new KeyValuePair<PortIndex, PortIndex>(kv.Value, kv.Key));

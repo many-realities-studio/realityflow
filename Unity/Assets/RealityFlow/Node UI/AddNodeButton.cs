@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
@@ -18,6 +16,9 @@ namespace RealityFlow.NodeUI
 
         public void Add()
         {
+            if (view.Graph == null)
+                return;
+
             RealityFlowAPI.Instance.AddNodeToGraph(view.Graph, definition);
             view.MarkDirty();
         }

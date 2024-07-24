@@ -1,15 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace RealityFlow.NodeUI
 {
@@ -20,16 +19,17 @@ namespace RealityFlow.NodeUI
         {
             get
             {
-                if (graph is null)
-                    Debug.LogError("Attempted to access Graph of GraphView before initialization");
                 return graph;
             }
             set
             {
+                if (value is null)
+                    CurrentObject = null;
+
                 graph = value;
                 EnableVariableButtons();
                 ResetVariables();
-                templateToggle.ForceSetToggled(currentObject.IsTemplate);
+                SetOptions();
                 MarkDirty();
                 Render();
             }
@@ -39,7 +39,14 @@ namespace RealityFlow.NodeUI
         public GameObject edgeUIPrefab;
 
         int lastChangeTicks;
-        bool Dirty => graph.ChangeTicks != lastChangeTicks;
+        bool Dirty {
+            get
+            {
+                if (graph == null)
+                    return false;
+                return graph.ChangeTicks != lastChangeTicks;
+            }
+        }
         VisualScript currentObject;
         public VisualScript CurrentObject { get => currentObject; set => currentObject = value; }
         string selectedVariable;
@@ -76,6 +83,9 @@ namespace RealityFlow.NodeUI
         [NaughtyAttributes.Button]
         public void LayoutGraph()
         {
+            if (graph is null)
+                return;
+
             static IEnumerator LayoutGraphCoroutine(GraphView view)
             {
                 Task task = view.graph.LayoutNodes();
@@ -101,12 +111,6 @@ namespace RealityFlow.NodeUI
 
         void Update()
         {
-            if (currentObject == false)
-            {
-                Whiteboard.Instance.gameObject.SetActive(false);
-                return;
-            }
-
             if (Dirty)
             {
                 ResetVariables();
@@ -115,9 +119,14 @@ namespace RealityFlow.NodeUI
             }
         }
 
-        public void MarkDirty() => graph.IncrementChangeTicks();
+        public void MarkDirty() => graph?.IncrementChangeTicks();
 
-        void MarkClean() => lastChangeTicks = graph.ChangeTicks;
+        void MarkClean()
+        {
+            if (graph is null)
+                return;
+            lastChangeTicks = graph.ChangeTicks;
+        }
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -125,7 +134,7 @@ namespace RealityFlow.NodeUI
             SetPortsActive();
         }
 
-        public void Render()
+        public void ClearNodes()
         {
             foreach (Transform child in transform)
                 Destroy(child.gameObject);
@@ -133,6 +142,14 @@ namespace RealityFlow.NodeUI
             nodeUis.Clear();
             dataEdgeUis.Clear();
             execEdgeUis.Clear();
+        }
+
+        public void Render()
+        {
+            ClearNodes();
+
+            if (graph == null)
+                return;
 
             foreach ((NodeIndex index, Node node) in graph.Nodes)
             {
@@ -228,6 +245,9 @@ namespace RealityFlow.NodeUI
         /// </summary>
         void SetPortsActive()
         {
+            if (graph is null)
+                return;
+
             if (selectedInputEdgePort is PortIndex selectedInData && !graph.ContainsNode(selectedInData.Node))
                 selectedInputEdgePort = null;
             if (selectedOutputEdgePort is PortIndex selectedOutData && !graph.ContainsNode(selectedOutData.Node))
@@ -347,6 +367,9 @@ namespace RealityFlow.NodeUI
 
         public void DataEdgeConnected(PortIndex from, PortIndex to)
         {
+            if (graph is null)
+                return;
+
             RealityFlowAPI.Instance.AddDataEdgeToGraph(graph, from, to);
             ClearSelectedEdgeEnds();
             SetPortsActive();
@@ -355,6 +378,9 @@ namespace RealityFlow.NodeUI
 
         public void ExecEdgeConnected(PortIndex from, NodeIndex to)
         {
+            if (graph is null)
+                return;
+
             RealityFlowAPI.Instance.AddExecEdgeToGraph(graph, from, to);
             ClearSelectedEdgeEnds();
             SetPortsActive();
@@ -407,6 +433,12 @@ namespace RealityFlow.NodeUI
 
         void EnableVariableButtons()
         {
+            addVariableButton.enabled = false;
+            removeVariableButton.enabled = false;
+
+            if (graph is null)
+                return;
+
             addVariableButton.enabled =
                 !string.IsNullOrEmpty(variableNameField.text)
                 && !Graph.TryGetVariableType(variableNameField.text, out _);
@@ -418,11 +450,20 @@ namespace RealityFlow.NodeUI
 
         void SetOptions()
         {
+            if (!currentObject)
+            {
+                templateToggle.ForceSetToggled(false);
+                staticToggle.ForceSetToggled(false);
+                collidableToggle.ForceSetToggled(false);
+                gravityToggle.ForceSetToggled(false);
+                return;
+            }
+
             RfObject rfObj = RealityFlowAPI.Instance.SpawnedObjects[currentObject.gameObject];
-            templateToggle.ForceSetToggled(rfObj.isTemplate, false);
-            staticToggle.ForceSetToggled(rfObj.isStatic, false);
-            collidableToggle.ForceSetToggled(rfObj.isCollidable, false);
-            gravityToggle.ForceSetToggled(rfObj.isGravityEnabled, false);
+            templateToggle.ForceSetToggled(rfObj.isTemplate);
+            staticToggle.ForceSetToggled(rfObj.isStatic);
+            collidableToggle.ForceSetToggled(rfObj.isCollidable);
+            gravityToggle.ForceSetToggled(rfObj.isGravityEnabled);
         }
 
         void AddVariableItem(string name, NodeValueType type)
@@ -445,6 +486,9 @@ namespace RealityFlow.NodeUI
         {
             ClearVariableItems();
 
+            if (graph is null)
+                return;
+
             foreach ((string name, NodeValueType type) in Graph.Variables)
                 AddVariableItem(name, type);
         }
@@ -453,6 +497,9 @@ namespace RealityFlow.NodeUI
         {
             string name = variableNameField.text;
             if (string.IsNullOrEmpty(name))
+                return;
+
+            if (graph is null)
                 return;
 
             if (Graph.TryGetVariableType(name, out _))
@@ -476,6 +523,9 @@ namespace RealityFlow.NodeUI
                 if (trans.GetComponent<VariableItem>().varName == selectedVariable)
                     Destroy(trans.gameObject);
 
+            if (graph is null)
+                return;
+
             if (!Graph.TryGetVariableType(selectedVariable, out _))
                 return;
 
@@ -488,6 +538,9 @@ namespace RealityFlow.NodeUI
 
         public void AddGetVariableNode(string varName, NodeValueType type)
         {
+            if (graph is null)
+                return;
+
             string name = $"Get{type}Variable";
             NodeDefinition def = RealityFlowAPI.Instance.NodeDefinitionDict[name];
             NodeIndex node = RealityFlowAPI.Instance.AddNodeToGraph(Graph, def);
@@ -497,6 +550,9 @@ namespace RealityFlow.NodeUI
 
         public void AddSetVariableNode(string varName, NodeValueType type)
         {
+            if (graph is null)
+                return;
+
             string name = $"Set{type}Variable";
             NodeDefinition def = RealityFlowAPI.Instance.NodeDefinitionDict[name];
             NodeIndex node = RealityFlowAPI.Instance.AddNodeToGraph(Graph, def);

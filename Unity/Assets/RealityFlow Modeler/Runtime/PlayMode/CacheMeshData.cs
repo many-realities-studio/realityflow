@@ -22,6 +22,7 @@ public class CacheMeshData : MonoBehaviour
     private Rigidbody rb;
     private bool compErr = false;
     private BoxCollider boxCol;
+    private MeshCollider meshCol;
     
     public void SetRfObject(RfObject rfObj)
     {
@@ -41,6 +42,7 @@ public class CacheMeshData : MonoBehaviour
         if(gameObject.GetComponent<Rigidbody>() != null)
         {
             rb = gameObject.GetComponent<Rigidbody>();
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         } else
         {
             compErr = true;
@@ -49,6 +51,14 @@ public class CacheMeshData : MonoBehaviour
         if(gameObject.GetComponent<BoxCollider>() != null)
         {
             boxCol = gameObject.GetComponent<BoxCollider>();
+        } else
+        {
+            compErr = true;
+        }
+
+        if(gameObject.GetComponent<MeshCollider>() != null)
+        {
+            meshCol = gameObject.GetComponent<MeshCollider>();
         } else
         {
             compErr = true;
@@ -85,6 +95,7 @@ public class CacheMeshData : MonoBehaviour
                     } else
                     {
                         rb.isKinematic = false;
+                        rb.constraints = RigidbodyConstraints.None;
                     }
 
                     // if has gravity, apply in play mode
@@ -99,9 +110,11 @@ public class CacheMeshData : MonoBehaviour
                     // if the object is collide enabled, keep that otherwise turn off the collider
                     if(rfObj.isCollidable)
                     {
+                        meshCol.enabled = true;
                         boxCol.enabled = true;
                     } else
                     {
+                        meshCol.enabled = false;
                         boxCol.enabled = false;
                     }
                 } 
@@ -113,7 +126,7 @@ public class CacheMeshData : MonoBehaviour
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
 
-                Debug.Log("there is a compErr: " + compErr);
+                //Debug.Log("there is a compErr: " + compErr);
 
                 // if we have are missing a component don't mess with the object's physics
                 if(!compErr)
@@ -124,7 +137,11 @@ public class CacheMeshData : MonoBehaviour
                     // if static, remove the added constraints
                     if(rfObj.isStatic)
                     {
-                        rb.constraints = RigidbodyConstraints.None;
+                        //rb.constraints = RigidbodyConstraints.None;
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
+                    } else
+                    {
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
                     }
 
                     // all objects should float and be still

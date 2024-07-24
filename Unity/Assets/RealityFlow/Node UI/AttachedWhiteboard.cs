@@ -15,7 +15,7 @@ namespace RealityFlow.NodeUI
         GameObject realityTools;
 
         static NetworkedPlayManager _playManager;
-        static NetworkedPlayManager PlayManager
+        public static NetworkedPlayManager PlayManager
         {
             get
             {
@@ -47,6 +47,20 @@ namespace RealityFlow.NodeUI
                 Whiteboard.Instance.gameObject.SetActive(true);
         }
 
+        void Awake()
+        {
+            if (!GetComponent<VisualScript>())
+                gameObject.AddComponent<VisualScript>();
+
+            if (!GetComponent<RealityFlowObjectEvents>())
+            {
+                RealityFlowObjectEvents events = gameObject.AddComponent<RealityFlowObjectEvents>();
+
+                if (GetComponent<ObjectManipulator>() is ObjectManipulator manip)
+                    manip.firstSelectEntered.AddListener(_ => events.SendSelectedEvent());
+            }
+        }
+
         void Start()
         {
             realityTools = GameObject.Find("RealityFlow Editor");
@@ -56,26 +70,15 @@ namespace RealityFlow.NodeUI
                 whiteboard.GetComponent<Whiteboard>().Init();
                 whiteboard.SetActive(false);
             }
-
-            GetComponent<ObjectManipulator>().firstSelectEntered.AddListener(_ => 
-            {
-                if (PlayManager != null && !PlayManager.playMode && RealityFlowAPI.Instance.SpawnedObjects.ContainsKey(gameObject))
-                    ShowWhiteboard(gameObject);
-            });
         }
 
-        void ShowWhiteboard(GameObject obj)
+        void OnDisable()
         {
-            if (!Whiteboard.Instance)
-                return;
-
-            VisualScript script = obj.EnsureComponent<VisualScript>();
-
-            if (Whiteboard.Instance.gameObject.activeInHierarchy && 
-                Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
-                return;
-
-            Whiteboard.Instance.ShowForObject(script);
+            VisualScript script = this.EnsureComponent<VisualScript>();
+            if (Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
+            {
+                Whiteboard.Instance.TopLevelGraphView.Graph = null;
+            }
         }
     }
 }
