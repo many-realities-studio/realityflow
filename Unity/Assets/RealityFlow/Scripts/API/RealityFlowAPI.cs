@@ -165,6 +165,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 yield return null;
 
             NetworkedPlayManager.Instance.exitPlayMode.AddListener(ClearNonPersisted);
+            NetworkedPlayManager.Instance.exitPlayMode.AddListener(RespawnPersisted);
         }
 
         StartCoroutine(HookNetworkedPlayManager());
@@ -1428,6 +1429,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    /// <summary>
+    /// Non-persistently destroy an object. They will be restored on exiting play mode.
+    /// </summary>
     public void DestroyNonPersisted(GameObject obj)
     {
         bool nonPersistent = nonPersistentObjects.Contains(obj);
@@ -1450,6 +1454,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Destroy(obj);
         }
         nonPersistentObjects.Clear();
+    }
+
+    public void RespawnPersisted()
+    {
+        foreach (GameObject obj in spawnedObjects.Keys)
+            obj.SetActive(true);
     }
 
     private void SaveObjectToDatabase(RfObject rfObject)
