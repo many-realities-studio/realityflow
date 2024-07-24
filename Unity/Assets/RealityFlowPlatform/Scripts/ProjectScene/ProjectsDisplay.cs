@@ -157,7 +157,7 @@ public class ProjectsDisplay : MonoBehaviour
 
     public async void GetActiveProjectsData()
     {
-        // Debug.Log("--- Fetching Active Projects Data ---");
+        Debug.Log("--- Fetching Active Projects Data ---");
 
         // Updated Query Call
         var activeProjectsQuery = new GraphQLRequest
@@ -187,7 +187,7 @@ public class ProjectsDisplay : MonoBehaviour
 
         if (projectsData != null)
         {
-            // Debug.Log($"Fetched {projectsData.Count} active projects.");
+            Debug.Log($"Fetched {projectsData.Count} active projects.");
             DisplayActiveProjects(projectsData, activeProjectsPanel); // Pass the fetched data to the display method
         }
         else
