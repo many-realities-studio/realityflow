@@ -126,7 +126,7 @@ public class CacheMeshData : MonoBehaviour
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
 
-                Debug.Log("there is a compErr: " + compErr);
+                //Debug.Log("there is a compErr: " + compErr);
 
                 // if we have are missing a component don't mess with the object's physics
                 if(!compErr)
@@ -135,10 +135,14 @@ public class CacheMeshData : MonoBehaviour
                     // TODO: Move to it's own component (Like RFobject manager or something)
                     //       Include the playmode switch stuff
                     // if static, remove the added constraints
-                    //if(rfObj.isStatic)
-                    //{
-                    rb.constraints = RigidbodyConstraints.FreezeAll;
-                    //}
+                    if(rfObj.isStatic)
+                    {
+                        //rb.constraints = RigidbodyConstraints.None;
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
+                    } else
+                    {
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
+                    }
 
                     // all objects should float and be still
                     rb.useGravity = false;
