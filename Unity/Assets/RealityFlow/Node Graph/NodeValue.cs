@@ -19,6 +19,7 @@ namespace RealityFlow.NodeGraph
     {
         public abstract NodeValueType ValueType { get; }
 
+        [JsonIgnore]
         public abstract object DynValue { get; }
 
         protected virtual bool TryGetValue<T>(out T value)
@@ -181,6 +182,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Int;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -204,6 +206,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Float;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -227,6 +230,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.String;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -250,6 +254,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Bool;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -273,6 +278,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Vector2;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -296,6 +302,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Vector3;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -319,6 +326,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Quaternion;
 
+        [JsonIgnore]
         public override object DynValue => value;
     }
 
@@ -327,6 +335,7 @@ namespace RealityFlow.NodeGraph
     {
         [SerializeField]
         string realityflowId;
+        [JsonIgnore]
         public string RealityFlowId => realityflowId;
 
         public GameObjectValue()
@@ -373,6 +382,7 @@ namespace RealityFlow.NodeGraph
             return false;
         }
 
+        [JsonIgnore]
         public override object DynValue => Value;
     }
 
@@ -406,6 +416,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Variable;
 
+        [JsonIgnore]
         public override object DynValue => varName;
     }
 
@@ -437,6 +448,7 @@ namespace RealityFlow.NodeGraph
 
         public override NodeValueType ValueType => NodeValueType.Audio;
 
+        [JsonIgnore]
         public override object DynValue => clipName;
     }
 }
