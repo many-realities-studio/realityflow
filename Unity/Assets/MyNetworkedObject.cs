@@ -281,9 +281,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 gravity = rb.useGravity
             });
 
-            //rb.useGravity = true;
-            rb.isKinematic = false;
-            rb.useGravity = true;
         }
 
         RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
