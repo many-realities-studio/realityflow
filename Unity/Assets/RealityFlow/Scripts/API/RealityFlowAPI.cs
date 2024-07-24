@@ -1444,10 +1444,21 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Adding the Object Manipulator and associated components");
         var myNetworkedObject = spawnedPrefab.EnsureComponent<MyNetworkedObject>();
 
-        ObjectManipulator objManip = spawnedPrefab.EnsureComponent<CustomObjectManipulator>();
+        CustomObjectManipulator customObjectManipulator = spawnedPrefab.GetComponent<CustomObjectManipulator>();
+        if (customObjectManipulator != null)
+        {
+            DestroyImmediate(customObjectManipulator);
+            Debug.LogWarning("Destroyed Custom Object Manipulator to clear it for a fresh addition");
+            //This is to fix the issue of if an object already has a preset custom object manipulator and has the start hold and end hold events manually set it will log twice in the action logger
+        }
+
+        // Now ensure a new CustomObjectManipulator is added
+        CustomObjectManipulator objManip = spawnedPrefab.EnsureComponent<CustomObjectManipulator>();
 
         if (objManip != null)
         {
+            objManip.firstSelectEntered.RemoveAllListeners();
+            objManip.lastSelectExited.RemoveAllListeners();
             objManip.firstSelectEntered.AddListener((args) =>
             {
                 myNetworkedObject.StartHold();
@@ -1551,7 +1562,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
             //if (!isUndoing)
             // JORDAN PLEASE HELP!
-            actionLogger.LogAction(nameof(SpawnPrefab), spawnPosition, spawnRotation, scale, scale);
+            //actionLogger.LogAction(nameof(SpawnObject), prefabName, spawnPosition, spawnRotation, scale, scope);
+            actionLogger.LogAction(nameof(SpawnPrefab), spawnedPrefab.name, spawnPosition, spawnRotation, scale, scope);
         }
         catch (Exception ex)
         {
@@ -2597,7 +2609,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 break;
 
-            case nameof(SpawnObject):
+            case nameof(SpawnPrefab):
                 string objectId = action.Parameters[0] as string;
                 Debug.Log($"Parameter[0] type: {action.Parameters[0].GetType()}");
                 Debug.Log($"Parameter[1] type: {action.Parameters[1].GetType()}");
@@ -2613,7 +2625,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     Vector3 scale = (Vector3)action.Parameters[3];
                     SpawnScope scope = (SpawnScope)action.Parameters[4];
                     //originalPrefabName = GetOriginalPrefabName(objectId);
-                    SpawnObject(originalPrefabName, position, scale, rotation, scope);
+                    await SpawnPrefab(originalPrefabName, position, scale, rotation, scope);
                 }
                 else
                 {
@@ -2624,7 +2636,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     Vector3 scale = (Vector3)action.Parameters[3];
                     SpawnScope scope = (SpawnScope)action.Parameters[4]; // Ensure the scope is logged during the initial action and passed here.
                     string originalPrefabName = GetOriginalPrefabName(objectId);
-                    GameObject respawnedObject = await SpawnObject(originalPrefabName, position, scale, rotation, scope);
+                    GameObject respawnedObject = await SpawnPrefab(originalPrefabName, position, scale, rotation, scope);
                     if (respawnedObject != null)
                     {
                         respawnedObject.transform.localScale = scale;

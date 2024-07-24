@@ -899,10 +899,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2d86cf89641ced47ac32be57ea60542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastSize: 0.1
   owner: 0
   isHeld: 0
   isSelected: 0
   networkedPlayManager: {fileID: 0}
+  rfObj:
+    id: 
+    projectId: 
+    name: 
+    graphId: 
+    type: 
+    transformJson: 
+    meshJson: 
+    originalPrefabName: 
+    isTemplate: 0
+    isStatic: 0
+    isCollidable: 1
+    isGravityEnabled: 1
 --- !u!114 &1637210105674590932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -916,6 +930,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPlayManager: {fileID: 0}
+  rfObj:
+    id: 
+    projectId: 
+    name: 
+    graphId: 
+    type: 
+    transformJson: 
+    meshJson: 
+    originalPrefabName: 
+    isTemplate: 0
+    isStatic: 0
+    isCollidable: 1
+    isGravityEnabled: 1
 --- !u!114 &7610586032197603319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -985,34 +1012,10 @@ MonoBehaviour:
       m_Calls: []
   m_FirstSelectEntered:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 772951173893788515}
-        m_TargetAssemblyTypeName: MyNetworkedObject, Assembly-CSharp
-        m_MethodName: StartHold
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_LastSelectExited:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 772951173893788515}
-        m_TargetAssemblyTypeName: MyNetworkedObject, Assembly-CSharp
-        m_MethodName: EndHold
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
       m_Calls: []
