@@ -134,7 +134,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void UpdateRfObject(RfObject rfObj)
     {
-        StartCoroutine(UpdateRfObjectCoroutine(rfObj));
+        Update();
     }
 
     private IEnumerator UpdateRfObjectCoroutine(RfObject rfObj)
@@ -339,7 +339,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     #endregion
     
     // THE MESSAGE STRUCTURE
-    private struct Message
+    public struct Message
     {
         // public bool needsRfObject;
         // public RfObject rfObj;        

@@ -1394,6 +1394,28 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         spawnedPrefab.transform.rotation = spawnRotation; // Default
         spawnedPrefab.transform.localScale = scale;       // Default
 
+        // Ensure MyNetworkedObject component is present and update initial transform
+        var networkedObject = spawnedPrefab.GetComponent<MyNetworkedObject>();
+        if (networkedObject != null)
+        {
+            networkedObject.transform.position = spawnPosition;
+            networkedObject.transform.rotation = spawnRotation;
+            networkedObject.transform.localScale = scale;
+
+            // Send the initial transform data
+            networkedObject.context.SendJson(new MyNetworkedObject.Message
+            {
+                position = spawnPosition,
+                scale = scale,
+                rotation = spawnRotation
+            });
+        }
+        else
+        {
+            Debug.LogError("MyNetworkedObject component not found on spawned prefab.");
+        }
+
+
         // Add Rigidbody to the New Object
         if (spawnedPrefab.GetComponent<Rigidbody>() == null)
         {
