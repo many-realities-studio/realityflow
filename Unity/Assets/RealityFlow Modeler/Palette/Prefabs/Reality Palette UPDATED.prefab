@@ -3568,7 +3568,7 @@ GameObject:
   - component: {fileID: 4050044275204517031}
   - component: {fileID: 613585789998000213}
   - component: {fileID: 8239930582453352901}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: ColorsMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57824,6 +57824,8 @@ GameObject:
   - component: {fileID: 74194590725542909}
   - component: {fileID: 6476351955713728726}
   - component: {fileID: 5064402207238684043}
+  - component: {fileID: 7710247005088468385}
+  - component: {fileID: 2627920069899617644}
   m_Layer: 5
   m_Name: Reality Palette UPDATED
   m_TagString: Untagged
@@ -57903,7 +57905,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &1938891781405468430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58117,6 +58119,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkedPalette: {fileID: 7054702130059349806}
+--- !u!114 &7710247005088468385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3591269374014152013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &2627920069899617644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3591269374014152013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RaycastTriggerInteraction: 1
 --- !u!1 &3591269374045941317
 GameObject:
   m_ObjectHideFlags: 0
@@ -112162,6 +112200,7 @@ GameObject:
   - component: {fileID: 5538393564534218495}
   - component: {fileID: 5605719518048483740}
   - component: {fileID: 7767261146949259480}
+  - component: {fileID: 6372646324649154039}
   m_Layer: 6
   m_Name: SVPanel
   m_TagString: Untagged
@@ -112644,6 +112683,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!223 &6372646324649154039
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8166493520990643955}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1 &8249517633317236821
 GameObject:
   m_ObjectHideFlags: 0
