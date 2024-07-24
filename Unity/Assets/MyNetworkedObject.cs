@@ -164,7 +164,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // similarly allow thw object to be moved in playmode without gravity on hold.
         if (!networkedPlayManager.playMode)
         {
-            rb.useGravity = false;
+            //rb.useGravity = false;
             rb.isKinematic = false;
 
             rb.constraints = RigidbodyConstraints.None;
@@ -176,7 +176,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
         else
         {
-            rb.useGravity = true;
+            //rb.useGravity = true;
         }
 
         Debug.Log("Started hold the action is now being logged to the ActionLogger");
@@ -279,14 +279,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 gravity = rb.useGravity
             });
 
-            //rb.useGravity = true;
-            rb.isKinematic = false;
-            rb.useGravity = true;
         }
 
-        RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
+        //RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
 
-        UpdateTransform();
+        //UpdateTransform();
 
         // Save the object's transform to the database
         TransformData transformData = new TransformData()
