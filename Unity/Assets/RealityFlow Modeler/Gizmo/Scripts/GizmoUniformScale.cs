@@ -57,7 +57,9 @@ public class GizmoUniformScale : GizmoTranslatePlane
             Vector3 newGizmoPosition = originalGizmoPosition;
             Vector3 prevScale = GetAttachedObject().transform.localScale;
 
-            GetAttachedObject().transform.localScale = GetScaleInGrid(originalMeshScale * GetScaleFactor(newIntersection), prevScale); 
+            GetAttachedObject().transform.localScale = GetScaleInGrid(originalMeshScale * GetScaleFactor(newIntersection), prevScale);
+
+            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
         }
     }
 
