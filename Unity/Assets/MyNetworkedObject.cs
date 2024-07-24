@@ -49,7 +49,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     void Start()
     {   
         // retrieve object from RealityFlowAPI
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
