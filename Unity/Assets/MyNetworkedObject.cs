@@ -62,10 +62,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             Debug.Log("ID is already valid");
 
         Debug.Log("[NETOBJECT]Context ID: " + context.Id);
-    
-        // Not Held or Owned on Start
-        owner = false;
-        isHeld = false;
 
         // Get the Custom Object Manipulator
         if (gameObject.GetComponent<CustomObjectManipulator>() != null)
