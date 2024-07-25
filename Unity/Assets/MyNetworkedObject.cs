@@ -204,4 +204,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             isSelected = isSelected
         });
     }
+
+    internal void ControlSelection()
+    {
+        throw new NotImplementedException();
+    }
 }
