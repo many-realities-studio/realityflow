@@ -977,11 +977,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
          // Spawns Prefab through Ubiqs Network Spawn Manager
         var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
 
-        // Use spawnPostion to set the position of the spawned prefab
-        spawnedPrefab.transform.position = spawnPosition; // This is the only thing effected
-        spawnedPrefab.transform.rotation = spawnRotation; // Default
-        spawnedPrefab.transform.localScale = scale;       // Default
-
         // Add Rigidbody to the New Object
         if (spawnedPrefab.GetComponent<Rigidbody>() == null)
         {
@@ -1017,6 +1012,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             spawnedPrefab.AddComponent<AttachedWhiteboard>();
         }
+
+        // Call ManualUpdateRfObject on the spawned prefab
+        MyNetworkedObject networkedObject = spawnedPrefab.GetComponent<MyNetworkedObject>();
+        if (networkedObject != null)
+        {
+            networkedObject.ManualUpdateRfObject(spawnPosition, scale, spawnRotation);
+        }
+
+
+        // Add the object to the spawnedObjects dictionary
 
         // Set the prefabs transform data
         TransformData transformData = new TransformData
@@ -1171,7 +1176,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogException(ex);
         }
 
-        
+
         return spawnedPrefab;
     }
 

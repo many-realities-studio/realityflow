@@ -133,6 +133,23 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    // Manually Update the RfObject
+    public void ManualUpdateRfObject(Vector3 spawnPosition, Vector3 spawnScale, Quaternion spawnRotation)
+    {
+        // Update the transform
+        transform.localPosition = spawnPosition;
+        transform.localScale = spawnScale;
+        transform.localRotation = spawnRotation;
+
+        // send the update to the server
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation
+        });
+    }
+
     public void UpdateRfObject(RfObject rfObj)
     {
         Update();
