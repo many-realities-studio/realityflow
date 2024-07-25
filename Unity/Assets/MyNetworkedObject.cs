@@ -121,7 +121,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 lastRotation = transform.localRotation;
                 lastOwner = owner;
 
-                // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+                Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
                 // Send the transform data to the server
                 SendTransformData();
