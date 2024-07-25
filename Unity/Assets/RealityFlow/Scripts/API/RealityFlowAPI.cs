@@ -174,7 +174,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         NearMenuToolbox = nearMenuReference;
         DeleteMenu = delteMenuReference;
     }
+
     #region Object to PrefabName
+
     public void UpdateObjectToPrefabNameDictionary(string objectId, string prefabName)
     {
         if (!objectToPrefabName.ContainsKey(objectId))
@@ -182,6 +184,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             objectToPrefabName.Add(objectId, prefabName);
         }
     }
+
     public string GetOriginalPrefabName(string objectId)
     {
         if (objectToPrefabName.TryGetValue(objectId, out string prefabName))
@@ -190,7 +193,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
         return null;
     }
+
     #endregion
+
     public void LeaveRoom()
     {
         client.LeaveRoom();
@@ -240,6 +245,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.LogWarning($"Prefab named {name} not found in function GetPrefabByName.");
         return null;
     }
+
     void OutlineEffect(GameObject obj)
     {
         // Apply the outline effect (using material or component)
@@ -732,84 +738,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
     #endregion
 
-    #region Update and Spawn primitive
-    // // ---Spawn/Save Object---
-    public GameObject UpdatePrimitive(GameObject spawnedMesh)
-    {
-        Debug.Log("Updating primitive...");
-        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
-        TransformData transformData = new TransformData
-        {
-            position = spawnedMesh.transform.position,
-            rotation = spawnedMesh.transform.rotation,
-            scale = spawnedMesh.transform.localScale
-        };
+    #region Spawn and Update Primitive
 
-        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
-        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
-
-        RfObject rfObject = spawnedObjects[spawnedMesh];
-        rfObject.transformJson = JsonUtility.ToJson(transformData);
-        rfObject.meshJson = JsonUtility.ToJson(smi);
-        // Manually serialize faces into a json array of arrays
-        StringBuilder sb = new StringBuilder();
-        sb.Append("[");
-        for (int i = 0; i < smi.faces.Length; i++)
-        {
-            sb.Append("[");
-            for (int j = 0; j < smi.faces[i].Length; j++)
-            {
-                sb.Append(smi.faces[i][j]);
-                if (j < smi.faces[i].Length - 1)
-                {
-                    sb.Append(",");
-                }
-            }
-            sb.Append("]");
-            if (i < smi.faces.Length - 1)
-            {
-                sb.Append(",");
-            }
-        }
-        sb.Append("]");
-        Debug.Log(sb.ToString());
-        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
-
-        var createObject = new GraphQLRequest
-        {
-            Query = @"
-            mutation UpdateObject($input: UpdateObjectInput!) {
-                updateObject(input: $input) {
-                    id
-                }
-            }",
-            OperationName = "UpdateObject",
-            Variables = new
-            {
-                input = new
-                {
-                    id = rfObject.id,
-                    name = rfObject.name,
-                    graphId = rfObject.graphId,
-                    meshJson = rfObject.meshJson,
-                    transformJson = rfObject.transformJson
-                }
-            }
-        };
-
-        try
-        {
-            client.SendQueryAsync(createObject);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-        }
-
-        return spawnedMesh;
-    }
-
+    // Spawn a primitive object
     public async Task<GameObject> SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
         var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
@@ -952,6 +883,299 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         return spawnedMesh;
     }
+
+    // Update a primitive object
+    public GameObject UpdatePrimitive(GameObject spawnedMesh)
+    {
+        Debug.Log("Updating primitive...");
+
+        // Obtain the Special Mesh Data from primitive
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+
+        // Set the Primitive's transform Data
+        TransformData transformData = new TransformData
+        {
+            position = spawnedMesh.transform.position,
+            rotation = spawnedMesh.transform.rotation,
+            scale = spawnedMesh.transform.localScale
+        };
+
+        // Generate faces
+        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
+        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
+
+        RfObject rfObject = spawnedObjects[spawnedMesh];
+        rfObject.transformJson = JsonUtility.ToJson(transformData);
+        rfObject.meshJson = JsonUtility.ToJson(smi);
+         
+        // Manually serialize faces into a json array of arrays
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[");
+        for (int i = 0; i < smi.faces.Length; i++)
+        {
+            sb.Append("[");
+            for (int j = 0; j < smi.faces[i].Length; j++)
+            {
+                sb.Append(smi.faces[i][j]);
+                if (j < smi.faces[i].Length - 1)
+                {
+                    sb.Append(",");
+                }
+            }
+            sb.Append("]");
+            if (i < smi.faces.Length - 1)
+            {
+                sb.Append(",");
+            }
+        }
+        sb.Append("]");
+        Debug.Log(sb.ToString());
+        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
+        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation UpdateObject($input: UpdateObjectInput!) {
+                updateObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "UpdateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            client.SendQueryAsync(createObject);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+
+        return spawnedMesh;
+    }
+
+    #endregion
+
+    #region Spawn and Update Prefab
+
+    public async Task<GameObject> SpawnPrefab(string prefabName, Vector3 spawnPosition,
+        Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
+    {
+         // Spawns Prefab through Ubiqs Network Spawn Manager
+        var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
+
+        // Use spawnPostion to set the position of the spawned prefab
+        spawnedPrefab.transform.position = spawnPosition; // This is the only thing effected
+        spawnedPrefab.transform.rotation = spawnRotation; // Default
+        spawnedPrefab.transform.localScale = scale;       // Default
+
+        // Add Rigidbody to the New Object
+        if (spawnedPrefab.GetComponent<Rigidbody>() == null)
+        {
+            var rigidbody = spawnedPrefab.AddComponent<Rigidbody>();
+            rigidbody.useGravity = false;
+            rigidbody.isKinematic = true;
+        }
+
+        // Add BoxCollider based on bounds
+        if (spawnedPrefab.GetComponent<BoxCollider>() == null)
+        {
+            BoxCollider boxCollider = spawnedPrefab.AddComponent<BoxCollider>();
+            Renderer renderer = spawnedPrefab.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                boxCollider.center = renderer.bounds.center - spawnedPrefab.transform.position;
+                boxCollider.size = renderer.bounds.size;
+            }
+            else
+            {
+                // Handle case where mesh is on a child object
+                Renderer childRenderer = spawnedPrefab.GetComponentInChildren<Renderer>();
+                if (childRenderer != null)
+                {
+                    boxCollider.center = childRenderer.bounds.center - spawnedPrefab.transform.position;
+                    boxCollider.size = childRenderer.bounds.size;
+                }
+            }
+        }
+
+        // Add whiteboard attatch
+        if (spawnedPrefab.GetComponent<AttachedWhiteboard>() == null)
+        {
+            spawnedPrefab.AddComponent<AttachedWhiteboard>();
+        }
+
+        // Set the prefabs transform data
+        TransformData transformData = new TransformData
+        {
+            position = spawnPosition,
+            rotation = spawnRotation,
+            scale = scale
+        };
+
+        // Create a new RfObject to store the prefab data
+        RfObject rfObject = new RfObject
+        {
+            name = prefabName,
+            type = "Prefab",
+            graphId = null,
+            transformJson = JsonUtility.ToJson(transformData),
+            meshJson = "{}",
+            projectId = client.GetCurrentProjectId(),
+            originalPrefabName = prefabName
+        };
+
+        // This is a GraphQL request to save the object to the database
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+                mutation CreateObject($input: CreateObjectInput!) {
+                    createObject(input: $input) {
+                        id
+                    }
+                }",
+            OperationName = "CreateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    projectId = rfObject.projectId,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    type = rfObject.type,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
+            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
+            var graphQLResponse = await client.SendQueryAsync(createObject);
+            if (graphQLResponse["data"] != null)
+            {
+                Debug.Log("Prefab saved to the database successfully.");
+
+                // -- THIS IS IMPORTANT --
+                // Extract the ID from the response and assign it to the rfObject
+                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
+                rfObject.id = returnedId;
+
+                // Debug.Log($"Assigned ID from database: {rfObject.id}");
+                spawnedObjects[spawnedPrefab] = rfObject;
+                spawnedObjectsById[returnedId] = spawnedPrefab;
+
+                // Update dictionary with the original prefab name
+                UpdateObjectToPrefabNameDictionary(returnedId, prefabName);
+
+                Debug.Log("THE CURRENT OBJECT IS: " + spawnedPrefab);
+
+                LogActionToServer("SpawnObject", new { rfObject });
+
+                // Update the name of the spawned object in the scene
+                if (spawnedPrefab != null)
+                {
+                    spawnedPrefab.name = rfObject.id;
+                    Debug.Log($"Updated spawned object name to: {spawnedPrefab.name}");
+                }
+                else
+                {
+                    Debug.LogError("Could not find the spawned object to update its name.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to save object to the database.");
+                foreach (var error in graphQLResponse["errors"])
+                {
+                    Debug.LogError($"GraphQL Error: {error["message"]}");
+                    if (error["extensions"] != null)
+                    {
+                        Debug.LogError($"Error Extensions: {error["extensions"]}");
+                    }
+                }
+            }
+            //if (!isUndoing)
+                // JORDAN PLEASE HELP!
+                //actionLogger.LogAction(nameof(SpawnPrefab), spawnPosition, spawnRotation, scale, inputMesh, type);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+
+        return spawnedPrefab;
+    }
+
+
+    public GameObject UpdatePrefab (GameObject spawnedPrefab)
+    {   
+        Debug.Log("Updating primitive...");
+
+        // Set the Primitive's transform Data
+        TransformData transformData = new TransformData
+        {
+            position = spawnedPrefab.transform.position,
+            rotation = spawnedPrefab.transform.rotation,
+            scale = spawnedPrefab.transform.localScale
+        };
+
+        // Create a new RfObject to store the prefab data?
+        RfObject rfObject = spawnedObjects[spawnedPrefab];
+
+        rfObject.transformJson = JsonUtility.ToJson(transformData);
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation UpdateObject($input: UpdateObjectInput!) {
+                updateObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "UpdateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            client.SendQueryAsync(createObject);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+
+        
+        return spawnedPrefab;
+    }
+
+
     #endregion
 
     class Vector2Converter : JsonConverter
@@ -1383,157 +1607,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedObject;
     }
 
-    public async Task<GameObject> SpawnPrefab(string prefabName, Vector3 spawnPosition,
-        Vector3 scale = default, Quaternion spawnRotation = default, SpawnScope scope = SpawnScope.Room)
-    {
-         // Spawns Prefab through Ubiqs Network Spawn Manager
-        var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
-
-        // Use spawnPostion to set the position of the spawned prefab
-        spawnedPrefab.transform.position = spawnPosition; // This is the only thing effected
-        spawnedPrefab.transform.rotation = spawnRotation; // Default
-        spawnedPrefab.transform.localScale = scale;       // Default
-
-        // Add Rigidbody to the New Object
-        if (spawnedPrefab.GetComponent<Rigidbody>() == null)
-        {
-            var rigidbody = spawnedPrefab.AddComponent<Rigidbody>();
-            rigidbody.useGravity = false;
-            rigidbody.isKinematic = true;
-        }
-
-        // Add BoxCollider based on bounds
-        if (spawnedPrefab.GetComponent<BoxCollider>() == null)
-        {
-            BoxCollider boxCollider = spawnedPrefab.AddComponent<BoxCollider>();
-            Renderer renderer = spawnedPrefab.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                boxCollider.center = renderer.bounds.center - spawnedPrefab.transform.position;
-                boxCollider.size = renderer.bounds.size;
-            }
-            else
-            {
-                // Handle case where mesh is on a child object
-                Renderer childRenderer = spawnedPrefab.GetComponentInChildren<Renderer>();
-                if (childRenderer != null)
-                {
-                    boxCollider.center = childRenderer.bounds.center - spawnedPrefab.transform.position;
-                    boxCollider.size = childRenderer.bounds.size;
-                }
-            }
-        }
-
-        // Add whiteboard attatch
-        if (spawnedPrefab.GetComponent<AttachedWhiteboard>() == null)
-        {
-            spawnedPrefab.AddComponent<AttachedWhiteboard>();
-        }
-
-        // Set the prefabs transform data
-        TransformData transformData = new TransformData
-        {
-            position = spawnPosition,
-            rotation = spawnRotation,
-            scale = scale
-        };
-
-        // Create a new RfObject to store the prefab data
-        RfObject rfObject = new RfObject
-        {
-            name = prefabName,
-            type = "Prefab",
-            graphId = null,
-            transformJson = JsonUtility.ToJson(transformData),
-            meshJson = "{}",
-            projectId = client.GetCurrentProjectId(),
-            originalPrefabName = prefabName
-        };
-
-        // This is a GraphQL request to save the object to the database
-        var createObject = new GraphQLRequest
-        {
-            Query = @"
-                mutation CreateObject($input: CreateObjectInput!) {
-                    createObject(input: $input) {
-                        id
-                    }
-                }",
-            OperationName = "CreateObject",
-            Variables = new
-            {
-                input = new
-                {
-                    projectId = rfObject.projectId,
-                    name = rfObject.name,
-                    graphId = rfObject.graphId,
-                    type = rfObject.type,
-                    meshJson = rfObject.meshJson,
-                    transformJson = rfObject.transformJson
-                }
-            }
-        };
-
-        try
-        {
-            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
-            Debug.Log("Request: " + JsonUtility.ToJson(createObject));
-            var graphQLResponse = await client.SendQueryAsync(createObject);
-            if (graphQLResponse["data"] != null)
-            {
-                Debug.Log("Prefab saved to the database successfully.");
-
-                // -- THIS IS IMPORTANT --
-                // Extract the ID from the response and assign it to the rfObject
-                var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
-                rfObject.id = returnedId;
-
-                // Debug.Log($"Assigned ID from database: {rfObject.id}");
-                spawnedObjects[spawnedPrefab] = rfObject;
-                spawnedObjectsById[returnedId] = spawnedPrefab;
-
-                // Update dictionary with the original prefab name
-                UpdateObjectToPrefabNameDictionary(returnedId, prefabName);
-
-                Debug.Log("THE CURRENT OBJECT IS: " + spawnedPrefab);
-
-                LogActionToServer("SpawnObject", new { rfObject });
-
-                // Update the name of the spawned object in the scene
-                if (spawnedPrefab != null)
-                {
-                    spawnedPrefab.name = rfObject.id;
-                    Debug.Log($"Updated spawned object name to: {spawnedPrefab.name}");
-                }
-                else
-                {
-                    Debug.LogError("Could not find the spawned object to update its name.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to save object to the database.");
-                foreach (var error in graphQLResponse["errors"])
-                {
-                    Debug.LogError($"GraphQL Error: {error["message"]}");
-                    if (error["extensions"] != null)
-                    {
-                        Debug.LogError($"Error Extensions: {error["extensions"]}");
-                    }
-                }
-            }
-            //if (!isUndoing)
-                // JORDAN PLEASE HELP!
-                //actionLogger.LogAction(nameof(SpawnPrefab), spawnPosition, spawnRotation, scale, inputMesh, type);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-        }
-
-        return spawnedPrefab;
-    }
-
     #endregion
     public void RegisterPeerSpawnedObject(GameObject obj, RfObject rfObj)
     {
@@ -1545,6 +1618,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         spawnedObjects[obj] = rfObj;
         spawnedObjectsById[rfObj.id] = obj;
     }
+
     readonly HashSet<GameObject> nonPersistentObjects = new();
 
     public void InstantiateNonPersisted(GameObject obj, Vector3 position, Quaternion rotation)
@@ -2079,6 +2153,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
+        Debug.Log("Updating object transform for object: " + objectName);
+
         GameObject obj = FindSpawnedObject(objectName);
         if (obj != null)
         {
@@ -2109,6 +2185,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
+
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -2140,6 +2217,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         try
         {
             client.SendQueryAsync(saveObject);
+            Debug.Log("Object transform saved to the database successfully.");
         }
         catch (Exception ex)
         {

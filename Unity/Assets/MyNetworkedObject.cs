@@ -50,7 +50,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {   
         // retrieve object from RealityFlowAPI
         // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
-        
+
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
@@ -121,7 +121,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             lastScale = transform.localScale;
             lastRotation = transform.localRotation;
 
-            Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+            // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
             // Send the transform data to the server
             context.SendJson(new Message()
@@ -201,65 +201,79 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     }
     
     public void StartHold()
-    {
-        if (!owner && isHeld)
-            return;
+    {   
+        // Debug Saying that we are holding the object
+        Debug.Log("Start Holding Object");
 
+        // If the object is not owned, then we can't hold it
+        if (!owner)
+            return;
+        
+        // Get the rigid Body Component
         if (!rb)
             rb = GetComponent<Rigidbody>();
 
         owner = true;
         isHeld = true;
 
-
+        // Determines the behaivior of the object depending on play and edit mode
         if (!networkedPlayManager.playMode)
         {
             rb.useGravity = false;
-            rb.isKinematic = false;
+            rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.None;
         }
         else
         {
             rb.useGravity = true;
         }
 
-        RealityFlowAPI.Instance.actionLogger.LogAction(
-            nameof(RealityFlowAPI.UpdateObjectTransform),
+        Debug.Log($"Started hold for object {rfObj.id}.");
+
+        // Log the transformation at the start of holding
+        RealityFlowAPI.Instance?.actionLogger?.LogAction(
+            nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
             rfObj.id,
             transform.localPosition,
             transform.localRotation,
             transform.localScale
-        );
+        ); 
 
-        context.SendJson(new Message()
+        /*
+        // Send the updated state over the network
+        context?.SendJson(new Message()
         {
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            //owner = false,
-            //isHeld = true,
-            //isSelected = isSelected,
-            //isKinematic = true,//,
-            //color = gameObject.GetComponent<Renderer>().material.color
-            //gravity = rb.useGravity
-        });
+            owner = false,
+            isHeld = true,
+            isKinematic = rb.isKinematic,
+            gravity = rb.useGravity
+        });*/
+
     }
 
     public void EndHold()
     {
+        // Debug Saying that we are holding the object
+        Debug.Log("End Holding Object");
+
+        // Get the rigid Body Component
         if (!rb)
             rb = GetComponent<Rigidbody>();
 
         owner = false;
         isHeld = false;
 
-
-
-        // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
+                // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
         // the rf obj for play mode.
         if (!networkedPlayManager.playMode)
         {
             rb.useGravity = false;
             rb.isKinematic = true;
+
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
@@ -290,8 +304,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 }
                 else
                 {
-                    rb.useGravity = true;
-                    //rb.useGravity = false;
+                    //rb.useGravity = true;
+                    rb.useGravity = false;
                 }
 
                 // if the object is collidable
@@ -305,36 +319,13 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 }
             }
 
-            context.SendJson(new Message()
-            {
-                position = transform.localPosition,
-                scale = transform.localScale,
-                rotation = transform.localRotation,
-                // owner = false,
-                // isHeld = false,
-                // isKinematic = true,
-                // color = gameObject.GetComponent<Renderer>().material.color
-                // gravity = rb.useGravity
-            });
-
             //rb.useGravity = true;
             rb.isKinematic = false;
             rb.useGravity = true;
         }
+        
 
-        RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
-
-        // UpdateTransform();
-
-        // Save the object's transform to the database
-        TransformData transformData = new TransformData()
-        {
-            position = transform.position,
-            rotation = transform.rotation,
-            scale = transform.localScale
-        };
-
-        RealityFlowAPI.Instance.SaveObjectTransformToDatabase(rfObj.id, transformData);
+        RealityFlowAPI.Instance.UpdatePrefab(gameObject);
     }
 
     #endregion
@@ -358,7 +349,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
-        Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        
+        //Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
 
         transform.localPosition = m.position;
         transform.localScale = m.scale;
