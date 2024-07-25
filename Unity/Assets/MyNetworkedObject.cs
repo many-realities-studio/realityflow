@@ -50,11 +50,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         Debug.Log("[NETOBJECT] Context ID: " + context.Id);
 
-        // Only the owner should send the initial transform data
-        if (owner)
-        {
-            SendInitialTransformData();
-        }
+        // Initialization that might depend on other scripts or components being initialized
+        SendInitialTransformData();
     }
 
     void InitializeComponents()
@@ -155,7 +152,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    // ControlSelection method with a parameter
+    // Overloaded ControlSelection method to allow calling without parameters
+    public void ControlSelection()
+    {
+        ControlSelection(true);
+    }
+
     public void ControlSelection(bool select)
     {
         Debug.Log("[NETOBJECT] ControlSelection is called: " + select);
