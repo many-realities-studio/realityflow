@@ -109,6 +109,11 @@ namespace RealityFlow.NodeUI
             );
         }
 
+        void OnEnable()
+        {
+            MarkDirty();
+        }
+
         void Update()
         {
             if (Dirty)

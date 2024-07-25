@@ -214,8 +214,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = false;
         isHeld = false;
 
-
-
         // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
         // the rf obj for play mode.
         if (!networkedPlayManager.playMode)

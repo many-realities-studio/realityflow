@@ -30,7 +30,7 @@ public class GizmoTranslateAxis : GizmoTransform
         {
             InitRayGizmolData();
             InitLineData();
-            EnableLineRenderer(this.transform.position, GetAxisDirection(), 100f); 
+            EnableLineRenderer(transform.position, GetAxisDirection(), 100f); 
 
             lastUpdateRaySelect = true;
             //BeginMeshOperation();
@@ -58,6 +58,8 @@ public class GizmoTranslateAxis : GizmoTransform
 
             GetGizmoContainer().transform.position = newGizmoPosition;
             GetAttachedObject().transform.position = newGizmoPosition;
+
+            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
 
             Debug.Log("The translate axis attached object... = " + GetAttachedObject());
         }
@@ -114,7 +116,7 @@ public class GizmoTranslateAxis : GizmoTransform
         Vector3 cross_normal = Vector3.Normalize(Vector3.Cross(lineDirection, rayDirection));
         Vector3 rejection = pos_diff - Vector3.Project(pos_diff, rayDirection) - Vector3.Project(pos_diff, cross_normal);
 
-        float div = (Vector3.Dot(lineDirection, Vector3.Normalize(rejection)));
+        float div = Vector3.Dot(lineDirection, Vector3.Normalize(rejection));
 
         // don't divide by zero
         if (div == 0) return 

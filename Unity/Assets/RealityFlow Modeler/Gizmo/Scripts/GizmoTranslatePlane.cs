@@ -46,6 +46,8 @@ public class GizmoTranslatePlane : GizmoTransform
             GetGizmoContainer().transform.position = newGizmoPosition;
             GetAttachedObject().transform.position = newGizmoPosition;
 
+            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
+
             Debug.Log("The translate plane attached object... = " + GetAttachedObject());
         }
     }
