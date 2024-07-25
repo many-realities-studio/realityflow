@@ -113,40 +113,45 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame
     void Update()
-    {
-        if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
-        {   
-            // If the transform has changed, send the update
-            lastPosition = transform.localPosition;
-            lastScale = transform.localScale;
-            lastRotation = transform.localRotation;
+    {   
+        if (owner)
+        {
+            if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
+            {   
+                // If the transform has changed, send the update
+                lastPosition = transform.localPosition;
+                lastScale = transform.localScale;
+                lastRotation = transform.localRotation;
+                lastOwner = owner;
 
-            // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+                // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
-            // Send the transform data to the server
-            context.SendJson(new Message()
-            {
-                position = transform.localPosition,
-                scale = transform.localScale,
-                rotation = transform.localRotation
-            });
+                // Send the transform data to the server
+                SendTransformData();
+            }
         }
     }
 
-    // Manually Update the RfObject
-    public void ManualUpdateRfObject(Vector3 spawnPosition, Vector3 spawnScale, Quaternion spawnRotation)
+    public void SendTransformData()
     {
-        // Update the transform
-        transform.localPosition = spawnPosition;
-        transform.localScale = spawnScale;
-        transform.localRotation = spawnRotation;
+        // Debug.Log("SendTransformData() was called");
 
-        // send the update to the server
         context.SendJson(new Message()
         {
             position = transform.localPosition,
             scale = transform.localScale,
-            rotation = transform.localRotation
+            rotation = transform.localRotation,
+            owner = false,
+            isHeld = isHeld,
+            isSelected = isSelected,
+            // handlesActive = boundsControl.HandlesActive,
+            // boundsVisuals = boundsVisuals.activeInHierarchy,
+            // meshColor = meshMaterial.color,
+            // meshMetallic = meshMaterial.GetFloat("_Metallic"),
+            // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
+            // objectManipulator = wasBake
+            
         });
     }
 
@@ -350,16 +355,25 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // THE MESSAGE STRUCTURE
     public struct Message
     {
-        // public bool needsRfObject;
-        // public RfObject rfObj;        
+        // Object OwnerShip
+        public bool owner;
+        public bool isHeld;
+        public bool isSelected;
+        // Object Transform Data
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
-        // public bool owner;
-        // public bool isHeld;
-        // public bool isKinematic;
-        // public Color color;
-        // public bool gravity;
+        // Bounds and selection
+        public bool handlesActive;
+        public bool boundsVisuals;
+        //  public Color meshColor;
+        //  public float meshMetallic;
+        //  public float meshSmoothness;
+        //  public Color boundsColor;
+        //  public bool objectManipulator;
+        // RfObject Data
+        // public bool needsRfObject;
+        // public RfObject rfObj;        
     }
 
     // THE MESSAGE PROCESSOR
