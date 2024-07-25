@@ -255,18 +255,22 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             transform.localScale
         ); 
 
-        /*
-        // Send the updated state over the network
-        context?.SendJson(new Message()
+        context.SendJson(new Message()
         {
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
             owner = false,
             isHeld = true,
-            isKinematic = rb.isKinematic,
-            gravity = rb.useGravity
-        });*/
+            isSelected = isSelected,
+            // handlesActive = boundsControl.HandlesActive,
+            // boundsVisuals = boundsVisuals.activeInHierarchy,
+            // meshColor = meshMaterial.color,
+            // meshMetallic = meshMaterial.GetFloat("_Metallic"),
+            // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
+            // objectManipulator = wasBake     
+        });
 
     }
 
@@ -342,6 +346,22 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            owner = false,
+            isHeld = false,
+            isSelected = isSelected,
+            // handlesActive = boundsControl.HandlesActive,
+            // boundsVisuals = boundsVisuals.activeInHierarchy,
+            // meshColor = meshMaterial.color,
+            // meshMetallic = meshMaterial.GetFloat("_Metallic"),
+            // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
+            // objectManipulator = wasBake     
+        });
     }
 
     #endregion
