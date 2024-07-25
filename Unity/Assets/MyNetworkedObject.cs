@@ -98,17 +98,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             compErr = true;
         }
-
-        RequestRfObject();
-        //color = obj.GetComponent<Renderer>().material.color;
     }
 
-    public void RequestRfObject()
-    {
-         Message msg = new Message();
-         //msg.needsRfObject = true;
-         context.SendJson(msg);
-    }
 
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame
