@@ -47,7 +47,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     private bool compErr = false;
 
     void Start()
-    {   
+    {      
+        Debug.Log("[NETOBJECT]Start is called ");
         // retrieve object from RealityFlowAPI
         // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
 
@@ -113,8 +114,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // You want to update to send the transform data to the server every frame
     void Update()
     {   
-        if (owner)
-        {
+        //if (owner)
+        //{
             if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
             {   
                 // If the transform has changed, send the update
@@ -128,7 +129,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 // Send the transform data to the server
                 SendTransformData();
             }
-        }
+        //}
     }
 
     public void SendTransformData()
@@ -149,8 +150,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             // meshMetallic = meshMaterial.GetFloat("_Metallic"),
             // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
             // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-            // objectManipulator = wasBake
-            
+            // objectManipulator = wasBake     
         });
     }
 
@@ -201,9 +201,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                // owner = false,
-                // isSelected = true,
-                // isKinematic = rb.isKinematic
+                owner = false,
+                isHeld = isHeld,
+                isSelected = isSelected,
             });
         }
         else
@@ -214,9 +214,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                // owner = false,
-                // isSelected = false,
-                // isKinematic = rb.isKinematic
+                owner = false,
+                isHeld = isHeld,
+                isSelected = isSelected,
             });
         }
     }
@@ -345,7 +345,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.useGravity = true;
         }
         
-
+        //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
     }
 
@@ -363,8 +363,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         public Vector3 scale;
         public Quaternion rotation;
         // Bounds and selection
-        public bool handlesActive;
-        public bool boundsVisuals;
+        //public bool handlesActive;
+       // public bool boundsVisuals;
         //  public Color meshColor;
         //  public float meshMetallic;
         //  public float meshSmoothness;
