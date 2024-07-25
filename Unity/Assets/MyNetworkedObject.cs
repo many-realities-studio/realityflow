@@ -113,22 +113,22 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // If statemtn to check owner
         if (owner)
         {
-            Debug.Log("Owner is : " + owner);
+            if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
+            {   
+                // If the transform has changed, send the update
+                lastPosition = transform.localPosition;
+                lastScale = transform.localScale;
+                lastRotation = transform.localRotation;
+                lastOwner = owner;
+
+                // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+
+                // Send the transform data to the server
+                SendTransformData();
+            }
         }
 
-        if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
-        {   
-            // If the transform has changed, send the update
-            lastPosition = transform.localPosition;
-            lastScale = transform.localScale;
-            lastRotation = transform.localRotation;
-            lastOwner = owner;
 
-            // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
-
-            // Send the transform data to the server
-            SendTransformData();
-        }
     
     }
 
