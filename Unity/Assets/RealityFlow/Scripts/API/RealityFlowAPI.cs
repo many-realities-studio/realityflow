@@ -1530,7 +1530,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                             // Update dictionary with the original prefab name
                             UpdateObjectToPrefabNameDictionary(returnedId, prefabName);
-                            spawnedObject.GetComponent<MyNetworkedObject>().UpdateRfObject(rfObject);
+                            //spawnedObject.GetComponent<MyNetworkedObject>().UpdateRfObject(rfObject);
                             LogActionToServer("SpawnObject", new { rfObject });
 
                             // Update the name of the spawned object in the scene
