@@ -762,10 +762,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             return null;
         }
 
-        // Set the Primitive's transform Data
+        // Set the Primitive's transform
         spawnedMesh.transform.position = position;
         spawnedMesh.transform.rotation = rotation;
         spawnedMesh.transform.localScale = scale;
+        // Prepare the Primitive's transform data
         TransformData transformData = new TransformData
         {
             position = position,
@@ -977,6 +978,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
          // Spawns Prefab through Ubiqs Network Spawn Manager
         var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
 
+        // Set the Prefab's transform Data
+        spawnedPrefab.transform.position = spawnPosition;
+        spawnedPrefab.transform.rotation = spawnRotation;
+        spawnedPrefab.transform.localScale = scale;
+        // Prepare the Prefabs transform data
+        TransformData transformData = new TransformData
+        {
+            position = spawnPosition,
+            rotation = spawnRotation,
+            scale = scale
+        };
         // Add Rigidbody to the New Object
         if (spawnedPrefab.GetComponent<Rigidbody>() == null)
         {
@@ -1012,24 +1024,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             spawnedPrefab.AddComponent<AttachedWhiteboard>();
         }
-
-        // Call ManualUpdateRfObject on the spawned prefab
-        MyNetworkedObject networkedObject = spawnedPrefab.GetComponent<MyNetworkedObject>();
-        if (networkedObject != null)
-        {
-            networkedObject.ManualUpdateRfObject(spawnPosition, scale, spawnRotation);
-        }
-
-
-        // Add the object to the spawnedObjects dictionary
-
-        // Set the prefabs transform data
-        TransformData transformData = new TransformData
-        {
-            position = spawnPosition,
-            rotation = spawnRotation,
-            scale = scale
-        };
 
         // Create a new RfObject to store the prefab data
         RfObject rfObject = new RfObject
