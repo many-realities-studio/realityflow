@@ -405,10 +405,15 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         transform.localPosition = m.position;
         transform.localScale = m.scale;
         transform.localRotation = m.rotation;
+        owner = m.owner;
+
+        isHeld = m.isHeld;
+        isSelected = m.isSelected;
 
         // Update last known transform to avoid feedback loop
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
+        lastOwner = owner;
     }
 }
