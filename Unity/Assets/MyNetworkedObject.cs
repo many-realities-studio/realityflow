@@ -152,6 +152,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    // Overloaded ControlSelection method to allow calling without parameters
+    public void ControlSelection()
+    {
+        ControlSelection(true);
+    }
+
     public void ControlSelection(bool select)
     {
         Debug.Log("[NETOBJECT] ControlSelection is called: " + select);
