@@ -48,8 +48,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {      
-        Debug.Log("[NETOBJECT]Start is called ");
-        // retrieve object from RealityFlowAPI
         // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
 
         // finds The Networked Play Manager
@@ -99,10 +97,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
-        Debug.Log("[NETOBJECT]Awake is called");
         owner = false;
         isHeld = false;
         isSelected = false;
+
+        if (NetworkId == null)
+        {
+            Debug.Log("[AWAKE][NET-PREFAB]Networked Object " + gameObject.name + " Network ID is null");
+        }
+        else
+        {
+            Debug.Log("[AWAKE][NET-PREFAB]Context ID: " + context.Id);
+        }
     }
 
 
@@ -131,7 +137,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void SendTransformData()
     {
-        // Debug.Log("SendTransformData() was called");
+        Debug.Log("[SEND][NET-PREFAB]SendTransformData() was called");
 
         context.SendJson(new Message()
         {
@@ -392,12 +398,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // public RfObject rfObj;        
     }
 
-    // THE MESSAGE PROCESSOR
+    // THE MESSAGE PROCESSORa
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
         
-        //Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
 
         transform.localPosition = m.position;
         transform.localScale = m.scale;
