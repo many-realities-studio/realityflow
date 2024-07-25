@@ -46,10 +46,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
-        if (!context.Id.Valid)
-            context = NetworkScene.Register(this);
-        else
-            Debug.Log("ID is already valid");
+        context = NetworkScene.Register(this);
 
         Debug.Log("[NETOBJECT] Context ID: " + context.Id);
 
@@ -138,6 +135,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         var m = message.FromJson<Message>();
         Debug.Log("[NETOBJECT] ProcessMessage received: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
 
+        // Prevent ownership changes if already owned
         if (!owner)
         {
             transform.localPosition = m.position;
@@ -203,10 +201,5 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             isHeld = isHeld,
             isSelected = isSelected
         });
-    }
-
-    internal void ControlSelection()
-    {
-        throw new NotImplementedException();
     }
 }
