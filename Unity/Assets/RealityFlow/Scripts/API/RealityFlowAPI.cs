@@ -166,6 +166,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 yield return null;
 
             NetworkedPlayManager.Instance.exitPlayMode.AddListener(ClearNonPersisted);
+            NetworkedPlayManager.Instance.exitPlayMode.AddListener(RespawnPersisted);
         }
 
         StartCoroutine(HookNetworkedPlayManager());
@@ -1620,6 +1621,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    /// <summary>
+    /// Non-persistently destroy an object. They will be restored on exiting play mode.
+    /// </summary>
     public void DestroyNonPersisted(GameObject obj)
     {
         bool nonPersistent = nonPersistentObjects.Contains(obj);
@@ -1642,6 +1646,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Destroy(obj);
         }
         nonPersistentObjects.Clear();
+    }
+
+    public void RespawnPersisted()
+    {
+        foreach (GameObject obj in spawnedObjects.Keys)
+            obj.SetActive(true);
     }
 
     private void SaveObjectToDatabase(RfObject rfObject)
@@ -2002,6 +2012,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
                     Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                    graphObj.SetId(graph.id);
                     spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
                 }
                 var myNetworkedObject = spawnedObject.EnsureComponent<MyNetworkedObject>();
@@ -2121,13 +2132,24 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     #region UpdateObjectTransform (Move Object)
+    /// <summary>
+    /// Updates an object's transform over the network to what it is currently set to
+    /// </summary>
+    /// <param name="objectName"></param>
+    public void UpdateObjectTransform(string objectName)
+    {
+        GameObject obj = FindSpawnedObject(objectName);
+        obj.transform.GetPositionAndRotation(out Vector3 pos, out Quaternion rot);
+        Vector3 scale = obj.transform.localScale;
+        UpdateObjectTransform(objectName, pos, rot, scale);
+    }
+
     // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         GameObject obj = FindSpawnedObject(objectName);
         if (obj != null)
         {
-
             if (isUndoing)
                 actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdateObjectTransform), new object[] { objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale }));
 
@@ -2154,6 +2176,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning($"Object with name {objectName} not found.");
         }
     }
+
     public void SaveObjectTransformToDatabase(string objectId, TransformData transformData)
     {
         Debug.Log("Inside the save object transform to database function called from the update object transform function");
@@ -2839,7 +2862,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     // Method to process incoming peer transform updates
-    public void ProcessPeerTransformUpdate(string propertyKey, string jsonMessage)
+    public void ProcessPeerTransformUpdate(string jsonMessage)
     {
         var transformMessage = JsonUtility.FromJson<TransformMessage>(jsonMessage);
         Debug.Log($"Received transform update: {transformMessage.ObjectName}, Pos: {transformMessage.Position}, Rot: {transformMessage.Rotation}, Scale: {transformMessage.Scale}");
@@ -2863,7 +2886,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             if (property.Key.StartsWith("transform."))
             {
-                ProcessPeerTransformUpdate(property.Key, property.Value);
+                ProcessPeerTransformUpdate(property.Value);
             }
         }
     }

@@ -82,6 +82,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             rb = gameObject.GetComponent<Rigidbody>();
             rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
@@ -213,12 +214,19 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         if (networkedPlayManager && !networkedPlayManager.playMode)
         {
-            rb.useGravity = false;
+            //rb.useGravity = false;
             rb.isKinematic = false;
+
+            rb.constraints = RigidbodyConstraints.None;
+
+            // This would also be a place to change to boxcolliders collider interaction masks so that
+            // the object can be placed within others to prevent it from colliding with UI.
+            // TODO: 
+
         }
         else if (networkedPlayManager)
         {
-            rb.useGravity = true;
+            //rb.useGravity = true;
         }
 
         RealityFlowAPI.Instance.actionLogger.LogAction(
@@ -251,14 +259,14 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = false;
         isHeld = false;
 
-
-
         // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
         // the rf obj for play mode.
         if (!networkedPlayManager.playMode)
         {
             rb.useGravity = false;
             rb.isKinematic = true;
+
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
@@ -289,8 +297,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 }
                 else
                 {
-                    rb.useGravity = true;
-                    //rb.useGravity = false;
+                    //rb.useGravity = true;
+                    rb.useGravity = false;
                 }
 
                 // if the object is collidable
@@ -316,14 +324,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 // gravity = rb.useGravity
             });
 
-            //rb.useGravity = true;
-            rb.isKinematic = false;
-            rb.useGravity = true;
         }
 
-        RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
+        //RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
 
-        // UpdateTransform();
+        //UpdateTransform();
 
         // Save the object's transform to the database
         TransformData transformData = new TransformData()
@@ -343,29 +348,116 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         // public bool needsRfObject;
         // public RfObject rfObj;        
-        public Vector3 position;
-        public Vector3 scale;
-        public Quaternion rotation;
-        // public bool owner;
-        // public bool isHeld;
-        // public bool isKinematic;
-        // public Color color;
-        // public bool gravity;
-    }
+        if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
+        {
+            lastPosition = transform.localPosition;
+            lastScale = transform.localScale;
+            lastRotation = transform.localRotation;
+            //lastColor = GetComponent<Renderer>().material.color;
 
-    // THE MESSAGE PROCESSOR
-    public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
+            context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+                scale = transform.localScale,
+                rotation = transform.localRotation,
+                owner = owner,
+                isHeld = isHeld,
+                isKinematic = rb.isKinematic
+                //color = GetComponent<Renderer>().material.color
+            });
+        }
+}
+
+
+// Update is called once per frame
+//void Update()
+//{
+/*
+// If currently not the owner and the object is being held by someone, disable ObjectManipulator so it can be moved
+if (!owner && isHeld)
+    this.gameObject.GetComponent<ObjectManipulator>().enabled = false;
+else
+    this.gameObject.GetComponent<ObjectManipulator>().enabled = true;
+
+// Update object positioning if the object is owned
+// If you currently own the object, physics calculations are made on your device and transmitted to the rest for that object
+if(owner)
+{
+    if(lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation || lastColor != obj.GetComponent<Renderer>().material.color)
     {
-        var m = message.FromJson<Message>();
-        Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
-
-        transform.localPosition = m.position;
-        transform.localScale = m.scale;
-        transform.localRotation = m.rotation;
-
-        // Update last known transform to avoid feedback loop
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
+        lastOwner = myObject.owner;
+        lastColor = obj.GetComponent<Renderer>().material.color;
+        // lastGravity = obj.GetComponent<Rigidbody>().useGravity;
+
+        // Send position details to the rest of the users in the lobby
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            owner = false, 
+            isHeld = isHeld,
+            isKinematic = true,
+            color = obj.GetComponent<Renderer>().material.color
+            // gravity = obj.GetComponent<Rigidbody>().useGravity
+        });
     }
+}
+*/
+//}
+
+public void UpdateRfObject(RfObject rfObj)
+{
+    this.rfObj = rfObj;
+    GetComponent<CacheObjectData>().rfObj = rfObj;
+
+    // Sometimes, such as when spawned from the mesh menu, this object will not have run Start()
+    // yet and end up failing to have a networkcontext; in this case yield until it can send the 
+    // message
+    IEnumerator SendRfObjUpdate()
+    {
+        while (!context.Scene)
+            yield return null;
+
+        context.SendJson(new Message()
+        {
+            rfObj = this.rfObj
+        });
+    }
+
+    StartCoroutine(SendRfObjUpdate());
+}
+
+public struct Message
+{
+    public bool needsRfObject;
+    public RfObject rfObj;
+    public Vector3 position;
+    public Vector3 scale;
+    public Quaternion rotation;
+    // public bool owner;
+    // public bool isHeld;
+    // public bool isKinematic;
+    // public Color color;
+    // public bool gravity;
+}
+
+// THE MESSAGE PROCESSOR
+public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
+{
+    var m = message.FromJson<Message>();
+    Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+
+    transform.localPosition = m.position;
+    transform.localScale = m.scale;
+    transform.localRotation = m.rotation;
+
+    // Update last known transform to avoid feedback loop
+    lastPosition = transform.localPosition;
+    lastScale = transform.localScale;
+    lastRotation = transform.localRotation;
+}
 }

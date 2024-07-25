@@ -47,6 +47,20 @@ namespace RealityFlow.NodeUI
                 Whiteboard.Instance.gameObject.SetActive(true);
         }
 
+        void Awake()
+        {
+            if (!GetComponent<VisualScript>())
+                gameObject.AddComponent<VisualScript>();
+
+            if (!GetComponent<RealityFlowObjectEvents>())
+            {
+                RealityFlowObjectEvents events = gameObject.AddComponent<RealityFlowObjectEvents>();
+
+                if (GetComponent<ObjectManipulator>() is ObjectManipulator manip)
+                    manip.firstSelectEntered.AddListener(_ => events.SendSelectedEvent());
+            }
+        }
+
         void Start()
         {
             realityTools = GameObject.Find("RealityFlow Editor");
@@ -56,20 +70,6 @@ namespace RealityFlow.NodeUI
                 whiteboard.GetComponent<Whiteboard>().Init();
                 whiteboard.SetActive(false);
             }
-        }
-
-        void ShowWhiteboard(GameObject obj)
-        {
-            if (!Whiteboard.Instance)
-                return;
-
-            VisualScript script = obj.EnsureComponent<VisualScript>();
-
-            if (Whiteboard.Instance.gameObject.activeInHierarchy && 
-                Whiteboard.Instance.TopLevelGraphView.CurrentObject == script)
-                return;
-
-            Whiteboard.Instance.SetAttachedObj(script);
         }
     }
 }

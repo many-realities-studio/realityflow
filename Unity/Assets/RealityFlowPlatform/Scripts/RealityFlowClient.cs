@@ -40,20 +40,20 @@ public class RealityFlowClient : MonoBehaviour
     public event Action<JArray> OnRoomsReceived;
     public event Action<JObject> OnProjectUpdated;
     public event Action OnRoomCreated;
-    
+
     UnityAction<IRoom> OnJoinCreatedRoomAction;
     public Transform projectsPanel;
-    public GameObject projectUIPrefab; 
+    public GameObject projectUIPrefab;
     public GameObject DiscoveryPanelDetail;
     public GameObject RoomDescriptionPanel;
 
     private static RealityFlowClient rootRealityFlowClient;
 
-    #if REALITYFLOW_LIVE
+#if REALITYFLOW_LIVE
         public string server = @"https://reality.gaim.ucf.edu/";
-    #else
-        public string server = @"http://localhost:4000/";
-    #endif
+#else
+    public string server = @"http://localhost:4000/";
+#endif
 
     #region Behaviors
 
@@ -105,7 +105,8 @@ public class RealityFlowClient : MonoBehaviour
             return;
         }
 
-        if (projectManager != null && loginMenu != null) {
+        if (projectManager != null && loginMenu != null)
+        {
             LoginSuccess += (result) =>
             {
                 if (result)
@@ -176,7 +177,7 @@ public class RealityFlowClient : MonoBehaviour
         }
         return null;
     }
-    
+
     // Function to decode the JWT token
     public static Dictionary<string, string> DecodeJwt(string jwt)
     {
@@ -202,7 +203,7 @@ public class RealityFlowClient : MonoBehaviour
     {
         this.server = server;
     }
-    
+
     #endregion
 
     #region GraphQLMethods
@@ -287,7 +288,7 @@ public class RealityFlowClient : MonoBehaviour
         return request;
     }
 
-    private static JObject ProcessQueryResponse(UnityWebRequest request)
+    private static JObject ProcessQueryResponse(UnityWebRequest request, System.Diagnostics.StackTrace stacktrace)
     {
         // Handle response
         JObject response = null;
@@ -314,15 +315,15 @@ public class RealityFlowClient : MonoBehaviour
         {
             try
             {
-                // Debug.Log(request.downloadHandler.text);
                 response = JsonConvert.DeserializeObject<JObject>(
-                    request.downloadHandler.text // This is failing
+                    request.downloadHandler.text
                 );
             }
             catch (Exception e)
             {
                 Debug.Log(response);
                 Debug.LogException(e);
+                Debug.LogError($"Stacktrace: {stacktrace}");
                 return new JObject();
             }
         }
@@ -331,9 +332,10 @@ public class RealityFlowClient : MonoBehaviour
         if (response["errors"] != null)
         {
             Debug.LogError("GraphQL Errors");
+            Debug.LogError($"Stacktrace: {stacktrace}");
             foreach (JObject error in response["errors"])
             {
-                StringBuilder err = new(); 
+                StringBuilder err = new();
                 err.Append(error["message"].ToString() ?? "unknown error");
                 if (error["extensions"] is JObject exts)
                     err.Append($": {exts["code"]}");
@@ -344,16 +346,30 @@ public class RealityFlowClient : MonoBehaviour
         return response;
     }
 
-    
-    public void SendQueryCoroutine(GraphQLRequest payload, Action<UnityWebRequest> onComplete = null)
+    public JObject SendQueryBlocking(GraphQLRequest payload)
+    {
+        UnityWebRequest request = CreateWebRequest(payload);
+
+        // Send request
+        double start = Time.realtimeSinceStartupAsDouble;
+        UnityWebRequestAsyncOperation task = request.SendWebRequest();
+        while (!task.isDone)
+            Thread.Sleep(1);
+        double end = Time.realtimeSinceStartupAsDouble;
+        // Debug.Log($"Blocking query took {(end - start) * 1000}ms to complete");
+
+        return ProcessQueryResponse(request, new System.Diagnostics.StackTrace());
+    }
+
+    public void SendQueryFireAndForget(GraphQLRequest payload, Action<UnityWebRequest> onComplete = null)
     {
         UnityWebRequest request = CreateWebRequest(payload);
 
         // Send request
         UnityWebRequestAsyncOperation task = request.SendWebRequest();
         static IEnumerator WaitForRequestCompletion(
-            UnityWebRequestAsyncOperation task, 
-            UnityWebRequest request, 
+            UnityWebRequestAsyncOperation task,
+            UnityWebRequest request,
             Action<UnityWebRequest> onComplete,
             System.Diagnostics.StackTrace trace
         )
@@ -363,15 +379,15 @@ public class RealityFlowClient : MonoBehaviour
             double end = Time.realtimeSinceStartupAsDouble;
             Debug.Log($"Fire & Forget query took {(end - start) * 1000}ms to complete");
 
-            ProcessQueryResponse(request);
+            ProcessQueryResponse(request, trace);
 
             onComplete?.Invoke(request);
         }
 
         StartCoroutine(WaitForRequestCompletion(
-            task, 
-            request, 
-            onComplete, 
+            task,
+            request,
+            onComplete,
             new System.Diagnostics.StackTrace(true)
         ));
     }
@@ -383,8 +399,9 @@ public class RealityFlowClient : MonoBehaviour
     {
         if (projectManager)
             projectManager.SetActive(false);
-        
-        if (loginMenu) {
+
+        if (loginMenu)
+        {
             loginMenu.gameObject.SetActive(true);
             loginMenu.onOTPSubmitted += SubmitOTP;
         }
@@ -585,6 +602,7 @@ public class RealityFlowClient : MonoBehaviour
                 input = new
                 {
                     projectId = currentProjectId,
+                    // creatorId = userDecoded["id"], seems to have been removed from schema
                     roomId = room.UUID,
                     joinCode = room.JoinCode,
                     isEditable = true
@@ -640,7 +658,7 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("Failed to keep room alive");
         }
     }
-     
+
     public void JoinRoom(string joinCode)
     {
         Debug.Log("Joining room for project: " + currentProjectId); // Log the project ID
@@ -673,7 +691,7 @@ public class RealityFlowClient : MonoBehaviour
         Debug.Log(room.Name + " UUID: " + room.UUID);
         Debug.Log(room.Name + " Publish: " + room.Publish);
 
-        levelEditor.SetActive(true); 
+        levelEditor.SetActive(true);
 
         roomClient.OnJoinedRoom.RemoveListener(OnJoinedExistingRoom);
     }
