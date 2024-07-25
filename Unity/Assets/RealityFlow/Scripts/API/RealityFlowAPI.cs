@@ -1125,7 +1125,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public GameObject UpdatePrefab (GameObject spawnedPrefab)
     {   
-        Debug.Log("Updating primitive...");
+        Debug.Log("Updating Prefab...");
 
         // Set the Primitive's transform Data
         TransformData transformData = new TransformData
@@ -1170,7 +1170,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             Debug.LogException(ex);
         }
-
 
         return spawnedPrefab;
     }
