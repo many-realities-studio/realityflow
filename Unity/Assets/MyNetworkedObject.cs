@@ -152,6 +152,22 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    public void ControlSelection(bool select)
+    {
+        Debug.Log("[NETOBJECT] ControlSelection is called: " + select);
+
+        isSelected = select;
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            owner = owner,
+            isHeld = isHeld,
+            isSelected = isSelected
+        });
+    }
+
     public struct Message
     {
         public bool owner;
