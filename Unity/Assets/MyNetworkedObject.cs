@@ -114,8 +114,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // You want to update to send the transform data to the server every frame
     void Update()
     {   
-        //if (owner)
-        //{
+        if (owner)
+        {
             if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
             {   
                 // If the transform has changed, send the update
@@ -129,7 +129,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 // Send the transform data to the server
                 SendTransformData();
             }
-        //}
+        }
     }
 
     public void SendTransformData()
