@@ -1025,6 +1025,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             spawnedPrefab.AddComponent<AttachedWhiteboard>();
         }
 
+
         // Create a new RfObject to store the prefab data
         RfObject rfObject = new RfObject
         {
