@@ -95,8 +95,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             compErr = true;
         }
-
-        owner = true;
     }
 
     void Awake()
@@ -267,7 +265,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            owner = false,
+            owner = true,
             isHeld = true,
             isSelected = isSelected,
             // handlesActive = boundsControl.HandlesActive,
