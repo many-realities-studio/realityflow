@@ -95,6 +95,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             compErr = true;
         }
+
+        owner = true;
     }
 
     void Awake()
