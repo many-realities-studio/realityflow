@@ -100,6 +100,14 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    void Awake()
+    {
+        Debug.Log("[NETOBJECT]Awake is called");
+        owner = false;
+        isHeld = false;
+        isSelected = false;
+    }
+
 
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame

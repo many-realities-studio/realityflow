@@ -62,6 +62,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             context = NetworkScene.Register(this);
         else
             Debug.Log("ID is already valid");
+        
+        Debug.Log("[NETOBJECT]Context ID: " + context.Id);
 
         // Find the reference for the room client to track peers
         /*roomClient = NetworkScene.Find(this).GetComponent<RoomClient>();
