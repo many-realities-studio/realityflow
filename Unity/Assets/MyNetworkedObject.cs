@@ -59,7 +59,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         else
             Debug.Log("ID is already valid");
 
-        Debug.Log("[NETOBJECT]Context ID: " + context.Id);
+        Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
 
         // Get the Custom Object Manipulator
         if (gameObject.GetComponent<CustomObjectManipulator>() != null)
