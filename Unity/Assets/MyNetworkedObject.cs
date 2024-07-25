@@ -63,21 +63,19 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         Debug.Log("[NETOBJECT]Context ID: " + context.Id);
 
-        InitializeComponents();
-        SendInitialTransformData();
-    }
-
-    void InitializeComponents()
-    {
+        // Get the Custom Object Manipulator
         if (gameObject.GetComponent<CustomObjectManipulator>() != null)
         {
             manipulator = GetComponent<CustomObjectManipulator>();
         }
         else
         {
+            // Send error?
             compErr = true;
         }
 
+        // Get the Rigidbody components
+        // These should throw errors on failure (object doesn't have these components) TODO some other time:
         if (gameObject.GetComponent<Rigidbody>() != null)
         {
             rb = gameObject.GetComponent<Rigidbody>();
@@ -88,6 +86,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             compErr = true;
         }
 
+        // Get the Box Collider components
         if (gameObject.GetComponent<BoxCollider>() != null)
         {
             boxCol = gameObject.GetComponent<BoxCollider>();
@@ -98,19 +97,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    void SendInitialTransformData()
-    {
-        Debug.Log("[NETOBJECT]SendInitialTransformData is called");
-        context.SendJson(new Message()
-        {
-            position = transform.localPosition,
-            scale = transform.localScale,
-            rotation = transform.localRotation,
-            owner = owner,
-            isHeld = isHeld,
-            isSelected = isSelected
-        });
-    }
     void Awake()
     {
         Debug.Log("[NETOBJECT]Awake is called");
@@ -135,7 +121,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 lastRotation = transform.localRotation;
                 lastOwner = owner;
 
-                Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+                // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
                 // Send the transform data to the server
                 SendTransformData();
