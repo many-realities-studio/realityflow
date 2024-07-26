@@ -9,8 +9,12 @@ using UnityEngine;
 
 public class MonitorManager : MonoBehaviour
 {
-    [DllImport("__Internal")]
-    private static extern void Awake();
+    #if UNITY_WEBGL && !UNITY_EDITOR
+        [DllImport("__Internal")]
+        private static extern void Awake();
+    #else
+        private void Awake() {}
+    #endif
 
 
     public RoomClient roomClient;

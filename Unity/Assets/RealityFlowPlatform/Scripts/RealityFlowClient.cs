@@ -670,26 +670,22 @@ public class RealityFlowClient : MonoBehaviour
             Debug.LogError("No project selected");
             return;
         }
-        Debug.Log("<==# Left comparison");
 
         if (projectManager)
             projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
-        Debug.Log("<==# Made project manager inactive");
 
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
 
-        Debug.Log("<==# Entered Join call");
         roomClient.Join(joinCode); // Join Room Based on Room Code
-        Debug.Log("<==# Left Join call");
     }
 
     private void OnJoinedExistingRoom(IRoom room)
     {
-        Debug.Log("[JOINED CREATED ROOM]");
+        // Debug.Log("[JOINED CREATED ROOM]");
         Debug.Log("Joined room: " + room.Name);
-        Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
-        Debug.Log(room.Name + " UUID: " + room.UUID);
-        Debug.Log(room.Name + " Publish: " + room.Publish);
+        // Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
+        // Debug.Log(room.Name + " UUID: " + room.UUID);
+        // Debug.Log(room.Name + " Publish: " + room.Publish);
 
         levelEditor.SetActive(true);
 
