@@ -180,16 +180,15 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
 
         Debug.Log("Started hold the action is now being logged to the ActionLogger");
+
         // Log the transformation at the start of holding
         RealityFlowAPI.Instance.actionLogger.LogAction(
-        nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-        rfObj.id,
-        transform.localPosition,
-        transform.localRotation,
-        transform.localScale
+            nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+            rfObj.id,
+            transform.localPosition,
+            transform.localRotation,
+            transform.localScale
         );
-
-
 
         context.SendJson(new Message()
         {
@@ -285,15 +284,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         //UpdateTransform();
 
-        // Save the object's transform to the database
-        TransformData transformData = new TransformData()
+        if (!networkedPlayManager.playMode)
         {
-            position = transform.position,
-            rotation = transform.rotation,
-            scale = transform.localScale
-        };
+            // Save the object's transform to the database
+            TransformData transformData = new TransformData()
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                scale = transform.localScale
+            };
 
-        RealityFlowAPI.Instance.SaveObjectTransformToDatabase(rfObj.id, transformData);
+            RealityFlowAPI.Instance.SaveObjectTransformToDatabase(rfObj.id, transformData);
+        }
     }
 
     // Update method to be called within StartHold and EndHold
