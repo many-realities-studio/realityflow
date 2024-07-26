@@ -11718,13 +11718,38 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
         type: 3}
-      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2805978280264805539}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
         type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: VariableNameChanged
       objectReference: {fileID: 0}
     - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
         type: 3}
@@ -11743,8 +11768,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
         type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RealityFlow.NodeUI.GraphView, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: RealityFlow.NodeUI.GraphView, RealityFlow
+      objectReference: {fileID: 0}
+    - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
+        type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 161218929157727460, guid: effee1bea2528ca4496d47b15701ea70,
         type: 3}
