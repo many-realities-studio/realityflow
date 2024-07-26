@@ -51,7 +51,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         else
             Debug.Log("ID is already valid");
         
-        Debug.Log("[START][NET-MESH]Context ID: " + context.Id);
+        Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
 
         // Find the reference for the room client to track peers
         /*roomClient = NetworkScene.Find(this).GetComponent<RoomClient>();
@@ -137,11 +137,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         if (NetworkId == null)
         {
-            Debug.Log("[AWAKE][NET-MESH]Networked Object " + gameObject.name + " Network ID is null");
+            Debug.Log("[AWAKE][NET-PREFAB]Networked Object " + gameObject.name + " Network ID is null");
         }
         else
         {
-            Debug.Log("[AWAKE][NET-MESH]Context ID: " + context.Id);
+            Debug.Log("[AWAKE][NET-PREFAB]Context ID: " + context.Id);
         }
     }
 
@@ -366,7 +366,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void SendTransformData()
     {
-        Debug.Log("[SEND][NET-MESH]SendTransformData() was called");
+        Debug.Log("[SEND][NET-PREFAB]SendTransformData() was called");
 
         context.SendJson(new Message()
         {
