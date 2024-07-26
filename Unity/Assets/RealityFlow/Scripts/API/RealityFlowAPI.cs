@@ -812,7 +812,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public GameObject SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
-        var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
+        GameObject spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
         if (inputMesh == null)
         {
@@ -943,7 +943,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
             }
             if (!isUndoing)
-                actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+                actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type, spawnedMesh);
         }
         catch (Exception ex)
         {
@@ -2222,6 +2222,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 break;
 
+            case nameof(SpawnPrimitive):
+                GameObject obj = (GameObject)action.Parameters[5];
+                Debug.Log($"Undoing spawn primitive {obj}");
+
+                if (obj)
+                    DespawnObject(obj);
+                else
+                    Debug.Log("Undo failed; object to un-spawn was null");
+
+                break;
+
             case nameof(DespawnObject):
                 string objectId = action.Parameters[0] as string;
                 if (spawnedObjectsById.ContainsKey(objectId))
@@ -2262,7 +2273,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Quaternion oldRotation = (Quaternion)action.Parameters[2];
                 Vector3 oldScale = (Vector3)action.Parameters[3];
                 Debug.Log("Undoing the transform of object named " + objectName);
-                GameObject obj = FindSpawnedObject(objectName);
+                obj = FindSpawnedObject(objectName);
                 if (obj != null)
                 {
                     UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
@@ -2379,8 +2390,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 break;
 
                 // Add cases for other functions...
+
+            default:
+                Debug.LogError($"Attempted to undo unrecognized action {action.FunctionName}");
+                break;
         }
     }
+    
     #endregion
     #region Redo Functions
     public void RedoLastAction()
@@ -2641,7 +2657,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             // Log the current transform before making changes
             //There are checks to make sure that it does not undo a redo remove the !isRedoing check if you wish it to undo a redo, but this may result in an infinite loop of Undos and redos
             if (!isUndoing && !isRedoing)
-                actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            {
+                RfObject oldData = spawnedObjects[obj];
+                TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
+                actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, oldTransform.position, oldTransform.rotation, oldTransform.scale);
+            }
+                
             Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
             Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
 
