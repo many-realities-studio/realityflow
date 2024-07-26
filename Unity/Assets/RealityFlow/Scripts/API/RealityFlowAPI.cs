@@ -1934,13 +1934,24 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     #region UpdateObjectTransform (Move Object)
+    /// <summary>
+    /// Updates an object's transform over the network to what it is currently set to
+    /// </summary>
+    /// <param name="objectName"></param>
+    public void UpdateObjectTransform(string objectName)
+    {
+        GameObject obj = FindSpawnedObject(objectName);
+        obj.transform.GetPositionAndRotation(out Vector3 pos, out Quaternion rot);
+        Vector3 scale = obj.transform.localScale;
+        UpdateObjectTransform(objectName, pos, rot, scale);
+    }
+
     // Method to update the transform of a networked object
     public void UpdateObjectTransform(string objectName, Vector3 position, Quaternion rotation, Vector3 scale)
     {
         GameObject obj = FindSpawnedObject(objectName);
         if (obj != null)
         {
-
             if (isUndoing)
                 actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdateObjectTransform), new object[] { objectName, obj.transform.position, obj.transform.rotation, obj.transform.localScale }));
 

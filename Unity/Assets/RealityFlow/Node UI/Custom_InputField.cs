@@ -879,7 +879,17 @@ namespace RealityFlow.NodeUI
         /// Getters are public Setters are protected
         /// </summary>
 
-        protected int caretPositionInternal { get { return m_CaretPosition + compositionLength; } set { m_CaretPosition = value; ClampCaretPos(ref m_CaretPosition); } }
+        protected int caretPositionInternal
+        {
+            get
+            {
+                return m_CaretPosition + compositionLength;
+            }
+            set
+            {
+                m_CaretPosition = value; ClampCaretPos(ref m_CaretPosition);
+            }
+        }
         protected int stringPositionInternal { get { return m_StringPosition + compositionLength; } set { m_StringPosition = value; ClampStringPos(ref m_StringPosition); } }
 
         protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionLength; } set { m_CaretSelectPosition = value; ClampCaretPos(ref m_CaretSelectPosition); } }

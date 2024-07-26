@@ -52,6 +52,8 @@ public class GizmoRotate : GizmoTranslateAxis
         if (lastUpdateRaySelect)
         {
             GetAttachedObject().transform.eulerAngles = GetRotationInGrid(GetNewRotation(originalMeshRotate));
+
+            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
         }
     }
 

@@ -134,6 +134,7 @@ namespace RealityFlow.NodeUI
                     varEditor.Type = def.VariableType;
 
                 editor.NodeValue = fieldValue;
+                editor.Name.text = def.Name;
                 editor.OnTick += value =>
                 {
                     RealityFlowAPI.Instance.SetNodeFieldValue(view.Graph, Index, current, value);

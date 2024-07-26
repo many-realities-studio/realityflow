@@ -51,13 +51,13 @@ public class GizmoStretch : GizmoTranslateAxis
 
         if (lastUpdateRaySelect)
         {
-            Vector3 newMeshScale = originalMeshScale;
-
             if (!IsValidPosition()) return;
 
-            newMeshScale = GetStretchInGrid(GetNewMeshScale(originalMeshScale));
+            Vector3 newMeshScale = GetStretchInGrid(GetNewMeshScale(originalMeshScale));
 
             GetAttachedObject().transform.localScale = newMeshScale;
+
+            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
         }
 
         
