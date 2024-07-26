@@ -82,12 +82,12 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
             if (value.metalFlag)
             {
-                //material.SetFloat("metallicFactor", value.metalFactor);
+                material.SetFloat("metallicFactor", value.metalFactor);
             }
 
             if (value.glossFlag)
             {
-                //material.SetFloat("roughnessFactor", value.glossFactor);
+                material.SetFloat("roughnessFactor", value.glossFactor);
             }
 
             GetComponent<NetworkedMesh>().SetLastSize(value.lastSize);

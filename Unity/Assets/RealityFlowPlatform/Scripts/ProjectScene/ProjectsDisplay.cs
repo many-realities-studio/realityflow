@@ -187,7 +187,7 @@ public class ProjectsDisplay : MonoBehaviour
 
         if (projectsData != null)
         {
-            Debug.Log($"Fetched {projectsData.Count} active projects.");
+            // Debug.Log($"Fetched {projectsData.Count} active projects.");
             DisplayActiveProjects(projectsData, activeProjectsPanel); // Pass the fetched data to the display method
         }
         else

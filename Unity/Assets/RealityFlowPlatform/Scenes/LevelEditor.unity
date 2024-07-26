@@ -2870,7 +2870,7 @@ PrefabInstance:
     - target: {fileID: 443590255541243289, guid: 5a27ae1fd0b3cf44e9400a1e4eea9d72,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1266302786639067323, guid: 5a27ae1fd0b3cf44e9400a1e4eea9d72,
         type: 3}
@@ -3975,7 +3975,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_Target
       value: 
-      objectReference: {fileID: 1710923000}
+      objectReference: {fileID: 2142340401}
     - target: {fileID: 2892603326916741898, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_CallState
@@ -3984,12 +3984,12 @@ PrefabInstance:
     - target: {fileID: 2892603326916741898, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_MethodName
-      value: GetActiveProjectsData
+      value: DisplayActiveProjects
       objectReference: {fileID: 0}
     - target: {fileID: 2892603326916741898, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_TargetAssemblyTypeName
-      value: ProjectsDisplay, Assembly-CSharp
+      value: RealityFlowClient, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2892603326916741898, guid: d6b701d19fbdb9d4586bfe1690958979,
         type: 3}

@@ -46,11 +46,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Error Handling
     private bool compErr = false;
 
-    void Start()
+    public void Initialize()
     {
         // retrieve object from RealityFlowAPI
-        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
-
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
@@ -99,40 +98,21 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             compErr = true;
         }
+
+        RequestRfObject();
+        //color = obj.GetComponent<Renderer>().material.color;
     }
 
-    void Awake()
+    public void RequestRfObject()
     {
         Message msg = new Message();
         //msg.needsRfObject = true;
         context.SendJson(msg);
     }
 
-
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame
     void Update()
-    {
-        // If statemtn to check owner
-        if (owner)
-        {
-            if (lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
-            {
-                // If the transform has changed, send the update
-                lastPosition = transform.localPosition;
-                lastScale = transform.localScale;
-                lastRotation = transform.localRotation;
-                lastOwner = owner;
-
-                // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
-
-                // Send the transform data to the server
-                SendTransformData();
-            }
-        }
-    }
-
-    public void SendTransformData()
     {
         if (context.Id.Valid && rfObj != null && lastPosition != transform.localPosition || lastScale != transform.localScale || lastRotation != transform.localRotation)
         {
@@ -141,261 +121,230 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             lastScale = transform.localScale;
             lastRotation = transform.localRotation;
 
+            Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+
+            // Send the transform data to the server
             context.SendJson(new Message()
             {
                 position = transform.localPosition,
                 scale = transform.localScale,
-                rotation = transform.localRotation,
-                owner = false,
-                isHeld = isHeld,
-                isSelected = isSelected,
-                // handlesActive = boundsControl.HandlesActive,
-                // boundsVisuals = boundsVisuals.activeInHierarchy,
-                // meshColor = meshMaterial.color,
-                // meshMetallic = meshMaterial.GetFloat("_Metallic"),
-                // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-                // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-                // objectManipulator = wasBake     
+                rotation = transform.localRotation
             });
         }
+    }
 
-        public void UpdateRfObject(RfObject rfObj)
+    public void UpdateRfObject(RfObject rfObj)
+    {
+        StartCoroutine(UpdateRfObjectCoroutine(rfObj));
+    }
+
+    private IEnumerator UpdateRfObjectCoroutine(RfObject rfObj)
+    {
+        while (context.Scene == null || !context.Id.Valid)
         {
-            Update();
+            Debug.LogWarning("[MyNetworkedObject] Waiting for NetworkContext to be initialized...");
+            yield return new WaitForSeconds(0.1f);
         }
 
-        private IEnumerator UpdateRfObjectCoroutine(RfObject rfObj)
+        this.rfObj = rfObj;
+
+        CacheObjectData cacheObjectData = GetComponent<CacheObjectData>();
+        if (cacheObjectData != null)
         {
-            while (context.Scene == null || !context.Id.Valid)
-            {
-                Debug.LogWarning("[MyNetworkedObject] Waiting for NetworkContext to be initialized...");
-                yield return new WaitForSeconds(0.1f);
-            }
-
-            this.rfObj = rfObj;
-
-            CacheObjectData cacheObjectData = GetComponent<CacheObjectData>();
-            if (cacheObjectData != null)
-            {
-                cacheObjectData.rfObj = rfObj;
-            }
-            else
-            {
-                Debug.LogError("[MyNetworkedObject] CacheObjectData component is missing.");
-            }
-
-            // context.SendJson(new Message()
-            // {
-            //     rfObj = this.rfObj
-            // });
+            cacheObjectData.rfObj = rfObj;
+        }
+        else
+        {
+            Debug.LogError("[MyNetworkedObject] CacheObjectData component is missing.");
         }
 
-        #region Selection and Holding   
-        public void ControlSelection()
+        // context.SendJson(new Message()
+        // {
+        //     rfObj = this.rfObj
+        // });
+    }
+
+    #region Selection and Holding   
+    public void ControlSelection()
+    {
+        BoundsControl boundsControl = GetComponent<BoundsControl>();
+        if (boundsControl != null && boundsControl.HandlesActive)
         {
-            BoundsControl boundsControl = GetComponent<BoundsControl>();
-            if (boundsControl != null && boundsControl.HandlesActive)
-            {
-                if (!owner && isSelected)
-                    return;
-
-                owner = true;
-                isSelected = true;
-                context.SendJson(new Message()
-                {
-                    position = transform.localPosition,
-                    scale = transform.localScale,
-                    rotation = transform.localRotation,
-                    owner = false,
-                    isHeld = isHeld,
-                    isSelected = isSelected,
-                });
-            }
-            else
-            {
-                isSelected = false;
-                context.SendJson(new Message()
-                {
-                    position = transform.localPosition,
-                    scale = transform.localScale,
-                    rotation = transform.localRotation,
-                    owner = false,
-                    isHeld = isHeld,
-                    isSelected = isSelected,
-                });
-            }
-        }
-
-        public void StartHold()
-        {
-            // Debug Saying that we are holding the object
-            Debug.Log("Start Holding Object");
-
-            // If the object is not owned, then we can't hold it
-            if (!owner)
+            if (!owner && isSelected)
                 return;
 
-            // Get the rigid Body Component
-            if (!rb)
-                rb = GetComponent<Rigidbody>();
-
             owner = true;
-            isHeld = true;
-
-
-            if (networkedPlayManager && !networkedPlayManager.playMode)
+            isSelected = true;
+            context.SendJson(new Message()
             {
-                //rb.useGravity = false;
-                rb.isKinematic = false;
-
-                rb.constraints = RigidbodyConstraints.None;
-
-                // This would also be a place to change to boxcolliders collider interaction masks so that
-                // the object can be placed within others to prevent it from colliding with UI.
-                // TODO: 
-
-            }
-            else if (networkedPlayManager)
+                position = transform.localPosition,
+                scale = transform.localScale,
+                rotation = transform.localRotation,
+                // owner = false,
+                // isSelected = true,
+                // isKinematic = rb.isKinematic
+            });
+        }
+        else
+        {
+            isSelected = false;
+            context.SendJson(new Message()
             {
-                //rb.useGravity = true;
+                position = transform.localPosition,
+                scale = transform.localScale,
+                rotation = transform.localRotation,
+                // owner = false,
+                // isSelected = false,
+                // isKinematic = rb.isKinematic
+            });
+        }
+    }
+
+    public void StartHold()
+    {
+        if (!owner && isHeld)
+            return;
+
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
+
+        owner = true;
+        isHeld = true;
+
+
+        if (networkedPlayManager && !networkedPlayManager.playMode)
+        {
+            //rb.useGravity = false;
+            rb.isKinematic = false;
+
+            rb.constraints = RigidbodyConstraints.None;
+
+            // This would also be a place to change to boxcolliders collider interaction masks so that
+            // the object can be placed within others to prevent it from colliding with UI.
+            // TODO: 
+
+        }
+        else if (networkedPlayManager)
+        {
+            //rb.useGravity = true;
+        }
+
+        RealityFlowAPI.Instance.actionLogger.LogAction(
+            nameof(RealityFlowAPI.UpdateObjectTransform),
+            rfObj.id,
+            transform.localPosition,
+            transform.localRotation,
+            transform.localScale
+        );
+
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            //owner = false,
+            //isHeld = true,
+            //isSelected = isSelected,
+            //isKinematic = true,//,
+            //color = gameObject.GetComponent<Renderer>().material.color
+            //gravity = rb.useGravity
+        });
+    }
+
+    public void EndHold()
+    {
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
+
+        owner = false;
+        isHeld = false;
+
+        // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
+        // the rf obj for play mode.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
+        else
+        {
+            // If we are in play mode, we will want to have the object return to it's object property behaviors.
+
+            // if we have are missing a component don't mess with the object's physics
+            if (!compErr)
+            {
+                Debug.Log("WE DID NOT RUN INTO A COMP ERROR");
+                // Depending on the rf obj properties, behave appropraitely in play mode
+                // TODO: Move to it's own component (Like RFobject manager or something)
+                //       Include the playmode switch stuff
+                // if static, be still on play
+                if (rfObj.isStatic)
+                {
+                    rb.isKinematic = true;
+                    rb.constraints = RigidbodyConstraints.FreezeAll;
+                }
+                else
+                {
+                    rb.isKinematic = false;
+                }
+
+                // if has gravity, apply in play mode
+                if (rfObj.isGravityEnabled)
+                {
+                    rb.useGravity = true;
+                }
+                else
+                {
+                    //rb.useGravity = true;
+                    rb.useGravity = false;
+                }
+
+                // if the object is collidable
+                if (rfObj.isCollidable)
+                {
+                    boxCol.enabled = true;
+                }
+                else
+                {
+                    boxCol.enabled = false;
+                }
             }
-
-            Debug.Log($"Started hold for object {rfObj.id}.");
-
-            // Log the transformation at the start of holding
-            RealityFlowAPI.Instance?.actionLogger?.LogAction(
-                nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-                rfObj.id,
-                transform.localPosition,
-                transform.localRotation,
-                transform.localScale
-            );
 
             context.SendJson(new Message()
             {
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                owner = true,
-                isHeld = true,
-                isSelected = isSelected,
-                // handlesActive = boundsControl.HandlesActive,
-                // boundsVisuals = boundsVisuals.activeInHierarchy,
-                // meshColor = meshMaterial.color,
-                // meshMetallic = meshMaterial.GetFloat("_Metallic"),
-                // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-                // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-                // objectManipulator = wasBake     
+                // owner = false,
+                // isHeld = false,
+                // isKinematic = true,
+                // color = gameObject.GetComponent<Renderer>().material.color
+                // gravity = rb.useGravity
             });
 
         }
 
-        public void EndHold()
+        //RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
+
+        //UpdateTransform();
+
+        // Save the object's transform to the database
+        TransformData transformData = new TransformData()
         {
-            // Debug Saying that we are holding the object
-            Debug.Log("End Holding Object");
+            position = transform.position,
+            rotation = transform.rotation,
+            scale = transform.localScale
+        };
 
-            // Get the rigid Body Component
-            if (!rb)
-                rb = GetComponent<Rigidbody>();
-
-            owner = false;
-            isHeld = false;
-
-            // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
-            // the rf obj for play mode.
-            if (!networkedPlayManager.playMode)
-            {
-                rb.useGravity = false;
-                rb.isKinematic = true;
-
-                rb.constraints = RigidbodyConstraints.FreezeAll;
-            }
-            else
-            {
-                // If we are in play mode, we will want to have the object return to it's object property behaviors.
-
-                // if we have are missing a component don't mess with the object's physics
-                if (!compErr)
-                {
-                    Debug.Log("WE DID NOT RUN INTO A COMP ERROR");
-                    // Depending on the rf obj properties, behave appropraitely in play mode
-                    // TODO: Move to it's own component (Like RFobject manager or something)
-                    //       Include the playmode switch stuff
-                    // if static, be still on play
-                    if (rfObj.isStatic)
-                    {
-                        rb.isKinematic = true;
-                        rb.constraints = RigidbodyConstraints.FreezeAll;
-                    }
-                    else
-                    {
-                        rb.isKinematic = false;
-                    }
-
-                    // if has gravity, apply in play mode
-                    if (rfObj.isGravityEnabled)
-                    {
-                        rb.useGravity = true;
-                    }
-                    else
-                    {
-                        //rb.useGravity = true;
-                        rb.useGravity = false;
-                    }
-
-                    // if the object is collidable
-                    if (rfObj.isCollidable)
-                    {
-                        boxCol.enabled = true;
-                    }
-                    else
-                    {
-                        boxCol.enabled = false;
-                    }
-                }
-
-                context.SendJson(new Message()
-                {
-                    position = transform.localPosition,
-                    scale = transform.localScale,
-                    rotation = transform.localRotation,
-                    // owner = false,
-                    // isHeld = false,
-                    // isKinematic = true,
-                    // color = gameObject.GetComponent<Renderer>().material.color
-                    // gravity = rb.useGravity
-                });
-
-            }
-
-            //RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
-
-            //UpdateTransform();
-
-            // Save the object's transform to the database
-            TransformData transformData = new TransformData()
-            {
-                position = transform.localPosition,
-                scale = transform.localScale,
-                rotation = transform.localRotation,
-                owner = false,
-                isHeld = false,
-                isSelected = isSelected,
-                // handlesActive = boundsControl.HandlesActive,
-                // boundsVisuals = boundsVisuals.activeInHierarchy,
-                // meshColor = meshMaterial.color,
-                // meshMetallic = meshMaterial.GetFloat("_Metallic"),
-                // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-                // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-                // objectManipulator = wasBake     
-            });
-        }
+        RealityFlowAPI.Instance.SaveObjectTransformToDatabase(rfObj.id, transformData);
+    }
 
     #endregion
 
-        // THE MESSAGE STRUCTURE
-    public struct Message
+    // THE MESSAGE STRUCTURE
+    private struct Message
     {
         // public bool needsRfObject;
         // public RfObject rfObj;        
