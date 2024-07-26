@@ -1779,7 +1779,22 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     Debug.Log("Primitive Base");
 
-                    var serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
+                    SerializableMeshInfo serializableMesh;
+                    try 
+                    {
+                        serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
+                    }
+                    catch (ArgumentException)
+                    {
+                        // try to recover by adding a }. This might alleviate a difficult to track bug for now
+                        string newJson = obj.meshJson + "}";
+                        serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
+                        Debug.LogError("Recovered from failed SMI JSON parse by adding a } to the end");
+                    }
+                    finally 
+                    {
+                        Debug.LogError($"Failed to parse the following SMI JSON: {obj.meshJson}");
+                    }
                     // Deserialize the two dimensional array of integers from the json string and assign it to serializableMesh.faces
                     obj.meshJson = obj.meshJson.Remove(obj.meshJson.Length - 1);
                     int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
