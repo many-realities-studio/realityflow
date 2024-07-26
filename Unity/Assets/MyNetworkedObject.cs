@@ -62,6 +62,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
 
+         // Only set ownership if it is not already set
+        if (!owner)
+        {
+            owner = true;
+        }
         // Get the Custom Object Manipulator
         if (gameObject.GetComponent<CustomObjectManipulator>() != null)
         {
@@ -130,7 +135,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void SendTransformData()
     {
-        Debug.Log("[NET-PREFAB]SendTransformData() was called");
+        Debug.Log("[SEND][NET-PREFAB]SendTransformData() was called");
 
         context.SendJson(new Message()
         {
