@@ -59,9 +59,9 @@ namespace RealityFlow.NodeUI
                 nonEditorName = nonEditorObj.AddComponent<TextMeshProUGUI>();
                 TMP_Text editorPrefabName = editorPrefab.GetComponent<IValueEditor>().Name;
                 nonEditorName.font = editorPrefabName.font;
-                nonEditorName.fontSize = editorPrefabName.fontSize;
-                nonEditorName.alignment = editorPrefabName.alignment;
-                nonEditorName.color = editorPrefabName.color;
+                nonEditorName.fontSize = 8;
+                nonEditorName.alignment = TextAlignmentOptions.TopLeft;
+                nonEditorName.color = Color.white;
             }
             // Otherwise, display an editor for the input port's constant value.
             else
