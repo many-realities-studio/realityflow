@@ -1643,6 +1643,7 @@ GameObject:
   - component: {fileID: 5975439734854679334}
   - component: {fileID: 3039032870490081387}
   - component: {fileID: 7506911083283066035}
+  - component: {fileID: 1939898607967685639}
   m_Layer: 5
   m_Name: InputField (TMP)
   m_TagString: Untagged
@@ -1769,7 +1770,19 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5203476461243629985}
+        m_TargetAssemblyTypeName: RealityFlow.NodeUI.FloatEditor, Assembly-CSharp
+        m_MethodName: Tick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -1787,19 +1800,7 @@ MonoBehaviour:
       m_Calls: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5203476461243629985}
-        m_TargetAssemblyTypeName: RealityFlow.NodeUI.FloatEditor, RealityFlow
-        m_MethodName: Tick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnTouchScreenKeyboardStatusChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1818,6 +1819,7 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+  m_HideKeyboard: 1
 --- !u!114 &7506911083283066035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1844,3 +1846,17 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1939898607967685639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8255482010903712174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e3839959deb9244a3cd32d983f73cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PressableButton: {fileID: 5731522655890491327}
+  InputField: {fileID: 3039032870490081387}
