@@ -499,7 +499,7 @@ namespace Ubiq.Rooms
                         room.Set(args.room);
                         Me["ubiq.rooms.roomid"] = room.UUID; // Updates where this Peer thinks its a member of for the sake of other peers. Local Components should use the Room member.
                         OnJoinedRoom.Invoke(room);
-                        //OnRoomUpdated.Invoke(room);
+                        OnRoomUpdated.Invoke(room);
                     }
                     break;
                 case "Rooms":
