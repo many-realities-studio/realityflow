@@ -31,7 +31,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
-        Debug.Log("[NETOBJECT] Awake is called");
+        Debug.Log("[AWAKE][NET-PREFAB] Awake is called");
         owner = false;
         isHeld = false;
         isSelected = false;
@@ -42,16 +42,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {
-        Debug.Log("[NETOBJECT] Start is called");
-
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
         context = NetworkScene.Register(this);
 
-        Debug.Log("[NETOBJECT] Context ID: " + context.Id);
+        Debug.Log("[START][NET-PREFAB] Context ID: " + context.Id);
 
         // Initialization that might depend on other scripts or components being initialized
-        SendInitialTransformData();
+        if (owner)
+        {
+            SendInitialTransformData();
+        }
     }
 
     void InitializeComponents()
@@ -95,7 +96,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 lastScale = transform.localScale;
                 lastRotation = transform.localRotation;
 
-                Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+                Debug.Log("[NET-PREFAB]Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
                 SendTransformData();
             }
@@ -104,7 +105,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void SendTransformData()
     {
-        Debug.Log("[NETOBJECT] SendTransformData is called");
+        Debug.Log("[NET-PREFAB] SendTransformData is called");
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -118,7 +119,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void SendInitialTransformData()
     {
-        Debug.Log("[NETOBJECT] SendInitialTransformData is called");
+        Debug.Log("[NET-PREFAB] SendInitialTransformData is called");
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -133,7 +134,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
-        Debug.Log("[NETOBJECT] ProcessMessage received: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        Debug.Log("[NET-PREFAB] ProcessMessage received: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
 
         // Prevent ownership changes if already owned
         if (!owner)
@@ -160,7 +161,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void ControlSelection(bool select)
     {
-        Debug.Log("[NETOBJECT] ControlSelection is called: " + select);
+        Debug.Log("[NET-PREFAB] ControlSelection is called: " + select);
 
         isSelected = select;
         context.SendJson(new Message()
@@ -186,7 +187,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void StartHold()
     {
-        Debug.Log("[NETOBJECT] StartHold is called");
+        Debug.Log("[NET-PREFAB] StartHold is called");
 
         if (!owner)
         {
@@ -209,7 +210,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void EndHold()
     {
-        Debug.Log("[NETOBJECT] EndHold is called");
+        Debug.Log("[NET-PREFAB] EndHold is called");
 
         owner = false;
         isHeld = false;
