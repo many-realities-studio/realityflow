@@ -224,9 +224,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         Debug.Log("[START-HOLD][PREFAB]Started Holding Prefab");
         
         // Change the object's name to the rf object's name
-        if (gameObject.name != rfObj.name)
+        if (gameObject.name != rfObj.id)
         {
-            gameObject.name = rfObj.name;
+            gameObject.name = rfObj.id;
         }
 
         // The Moved Object needs to be the owner in order to send Updates
