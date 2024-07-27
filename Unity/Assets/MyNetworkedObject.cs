@@ -57,11 +57,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         // Initialize the Network Context
         if (!context.Id.Valid)
+        {
             context = NetworkScene.Register(this);
+            Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
+        }
         else
             Debug.Log("[START][NET-PREFAB]ID is already valid");
-
-        Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
 
 
         // Get the Custom Object Manipulator
@@ -97,23 +98,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             compErr = true;
         }
     }
-
-    void Awake()
-    {
-         // Initialize the Network Context
-        if (!context.Id.Valid)
-        {
-            Debug.Log("[AWAKE][PREFAB]Network Context ID is not valid");
-            context = NetworkScene.Register(this);
-        }
-        else
-            Debug.Log("[AWAKE][PREFAB]ID is already valid");
-
-        owner = false;
-        isHeld = false;
-        isSelected = false;
-    }
-
 
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame
@@ -176,9 +160,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
-
-        // sets the last owner to the current owner
-        lastOwner = owner;
 
         SendTransformData();
     }
