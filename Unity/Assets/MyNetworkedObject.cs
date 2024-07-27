@@ -52,8 +52,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {      
         // retrieve object from RealityFlowAPI
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
-        
         Debug.Log("[START][PREFAB]Object ID: " + rfObj.id);
+        rfObjID = rfObj.id;
         Debug.Log("[START][PREFAB]Object Name: " + rfObj.name);
 
         // finds The Networked Play Manager
@@ -141,6 +141,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation, 
+            rfObjID = rfObj.id,
         });
     }
 
