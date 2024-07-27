@@ -16,7 +16,7 @@ public class MeshManipulationModes : MonoBehaviour
 {
     public static event Action<ManipulationMode> OnManipulationModeChange;
 
-    /*private ManipulationTool manipulationTool;
+   /* private ManipulationTool manipulationTool;
 
     public void Awake()
     {

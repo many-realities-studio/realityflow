@@ -8,19 +8,18 @@ using UnityEngine;
 /// </summary>
 public class FaceHandle : Handle
 {
+    public int faceIndex;
 
     private MeshFilter meshFilter;
-    public int faceIndex;
-    public Mesh faceMesh; //{ get; private set; }
+    public Mesh faceMesh { get; private set; }
+
     public Vector3[] vpositions;
-   
-    //[SerializeField]
-    public int[] uniquePositionIndicies;
+
+    [SerializeField]
+    private int[] uniquePositionIndicies;
     public int[] indicies;
-    //private int[] sharedVertIndex;
+    private int[] sharedVertIndex;
 
-
-    // On awake, prepare mesh and mode for manipulaitng faces.
     public override void Awake()
     {
         base.Awake();
@@ -44,13 +43,11 @@ public class FaceHandle : Handle
         meshFilter = GetComponent<MeshFilter>();
         faceMesh.Clear();
         uniquePositionIndicies = uniqueIndicies.Distinct().ToArray();
-        Vector3[] pos = new Vector3[uniqueIndicies.Length];
-        //Vector3[] pos = new Vector3[uniquePositionIndicies.Length];
+        Vector3[] pos = new Vector3[uniquePositionIndicies.Length];
 
         for(int i = 0; i < uniquePositionIndicies.Length; i++)
         {
-            pos[i] = mesh.positions[uniquePositionIndicies[i]];
-            //pos[i] = Vector3.Scale(mesh.positions[uniquePositionIndicies[i]], mesh.gameObject.transform.localScale);
+            pos[i] = Vector3.Scale(mesh.positions[uniquePositionIndicies[i]], mesh.gameObject.transform.localScale);
         }
 
         vpositions = pos;
@@ -58,10 +55,10 @@ public class FaceHandle : Handle
 
         faceMesh.vertices = vpositions;
         faceMesh.triangles = indicies;
-        //faceMesh.RecalculateNormals(); 
+        faceMesh.RecalculateNormals(); 
         meshFilter.mesh = faceMesh;
 
-        //CacheSharedVertIndex();
+        CacheSharedVertIndex();
 
         MeshCollider collider = GetComponent<MeshCollider>();
         if (collider)
@@ -69,32 +66,10 @@ public class FaceHandle : Handle
             collider.sharedMesh = faceMesh;
         }
 
-        /*if(HandleSpawner.Instance.xrayActive)
-            ReverseFaceWindingOrder();*/
+        if(HandleSpawner.Instance.xrayActive)
+            ReverseFaceWindingOrder();
     }
 
-    public void UpdateFacePosition()
-    {
-        int[] index = uniquePositionIndicies;
-
-        for (int i = 0; i < index.Length; i++)
-        {
-            vpositions[i] = mesh.positions[index[i]];
-        }
-
-        faceMesh.vertices = vpositions;
-        faceMesh.triangles = indicies;
-
-        meshFilter.mesh = faceMesh;
-
-        MeshCollider collider = GetComponent<MeshCollider>();
-        if(collider)
-        {
-            collider.sharedMesh = faceMesh;
-        }
-    }
-
-    
     /// <summary>
     /// Reverse the winding order of the faces
     /// </summary>
@@ -112,8 +87,6 @@ public class FaceHandle : Handle
         }
     }
 
-    // store the current set of verticy positions
-    /*
     private void CacheSharedVertIndex()
     {
         sharedVertIndex = new int[uniquePositionIndicies.Length];
@@ -121,17 +94,15 @@ public class FaceHandle : Handle
         {
             sharedVertIndex[i] = mesh.sharedVertexLookup[uniquePositionIndicies[i]];
         }
-    }*/
+    }
 
-    // 
     public override void UpdateHandlePosition()
     {
         int[] index = uniquePositionIndicies;
 
         for (int i = 0; i < index.Length; i++)
         {
-            vpositions[i] = mesh.positions[index[i]];
-            //vpositions[i] = Vector3.Scale(mesh.positions[uniquePositionIndicies[i]], mesh.gameObject.transform.localScale);
+            vpositions[i] = Vector3.Scale(mesh.positions[uniquePositionIndicies[i]], mesh.gameObject.transform.localScale);
         }
 
         faceMesh.vertices = vpositions;
@@ -145,22 +116,14 @@ public class FaceHandle : Handle
             collider.sharedMesh = faceMesh;
         }
 
-        /*if(HandleSpawner.Instance.xrayActive)
+        if(HandleSpawner.Instance.xrayActive)
         {
             ReverseFaceWindingOrder();
-        }*/ 
+        }    
     }
 
     public override int[] GetSharedVertexIndicies()
     {
-        //return sharedVertIndex; 
-        int[] faceIndicies = mesh.faces[faceIndex].GetUniqueIndicies();
-
-        for(int i = 0; i < faceIndicies.Length; i++)
-        {
-            faceIndicies[i] = mesh.sharedVertexLookup[faceIndicies[i]];
-        }
-
-        return faceIndicies; 
+        return sharedVertIndex; 
     }
 }

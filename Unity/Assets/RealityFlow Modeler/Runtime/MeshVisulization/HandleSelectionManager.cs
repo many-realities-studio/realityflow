@@ -142,7 +142,6 @@ public class HandleSelectionManager : MonoBehaviour
 
         Vector3 center = CalculateCentroidPosition();
         selectionCentroid = mesh.transform.TransformPoint(center);
-        // UpdateManipulatorPosition();
     }
 
     private Vector3 CalculateCentroidPosition()
@@ -153,13 +152,6 @@ public class HandleSelectionManager : MonoBehaviour
             int index = mesh.sharedVertices[selectedIndices[i]].vertices[0];
             centroid += mesh.positions[index];
         }
-        
-        /*
-        for(int i = 0; i < selectedHandles.Count; i++)
-        {
-            FaceHandle fh = selectedHandles[i].GetComponent<FaceHandle>();
-        }
-        */
 
         return centroid / selectedIndices.Count;
     }
@@ -178,6 +170,5 @@ public class HandleSelectionManager : MonoBehaviour
 
     private void Update()
     {
-        
     }
 }

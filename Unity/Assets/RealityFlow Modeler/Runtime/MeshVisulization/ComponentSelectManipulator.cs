@@ -57,11 +57,11 @@ public class ComponentSelectManipulator : MonoBehaviour
         }
     }
 
-    private void UpdateHandlePosition()
+    /*private void UpdateHandlePosition()
     {
         EditableMesh mesh = selectionManager.mesh;
         mesh.GetComponent<MeshVisulization>().UpdateHandlePositions();
-    }
+    }*/
 
     private void TranslateSelection()
     {

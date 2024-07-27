@@ -35,8 +35,8 @@ public class Handle : MonoBehaviour
             Debug.LogError("SelectionManager not found");
         }
 
-        //if (!HandleSpawner.Instance.manipulationActive)
-        //    return;
+        if (!HandleSpawner.Instance.manipulationActive)
+            return;
 
         if (!isSelected)
         {
@@ -46,9 +46,8 @@ public class Handle : MonoBehaviour
 
         if(isSelected && !deselectOnRelease)
         {
-            //selectionManager.SelectHandle(this);
-            gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             selectionManager.SelectHandle(this);
+            gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             meshRenderer.material.color = selectionManager.OnSelectColor;
         }
     }
