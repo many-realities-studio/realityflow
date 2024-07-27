@@ -40,6 +40,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     private bool lastPlayModeState;
 
     // RealityFlow Object References and Components
+    public string rfObjID;
     public RfObject rfObj;
     private Rigidbody rb;
     private BoxCollider boxCol;
@@ -50,7 +51,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     void Start()
     {      
         // retrieve object from RealityFlowAPI
-        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        
+        Debug.Log("[START][PREFAB]Object ID: " + rfObj.id);
+        Debug.Log("[START][PREFAB]Object Name: " + rfObj.name);
 
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
@@ -171,6 +175,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
+            rfObjID = rfObj.id,
             // owner = false,
             // isHeld = isHeld,
             // isSelected = isSelected,
@@ -339,6 +344,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.isKinematic = false;
             rb.useGravity = true;
         }
+
+        // debug to show Id of object
+        Debug.Log($"Ended hold for object {rfObj.id}.");
         
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
@@ -373,6 +381,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
+        public string rfObjID;
         // Bounds and selection
         //public bool handlesActive;
        // public bool boundsVisuals;
@@ -393,7 +402,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         
         if (Time.frameCount % 300 == 0)
         {
-            Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+            Debug.Log("Received Message: ID" + m.rfObjID + ". Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
         }
 
         transform.localPosition = m.position;
@@ -403,5 +412,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
+
+        rfObjID = m.rfObjID;
     }
 }
