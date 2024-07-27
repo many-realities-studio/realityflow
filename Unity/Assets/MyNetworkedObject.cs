@@ -144,9 +144,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         rfObj = passedRfObj;
 
         // Change the object's name to the rf object's name
-        if (gameObject.name != rfObj.name)
+        if (gameObject.name != rfObj.id)
         {
-            gameObject.name = rfObj.name;
+            gameObject.name = rfObj.id;
         }
         
         // Set the owner of the object
