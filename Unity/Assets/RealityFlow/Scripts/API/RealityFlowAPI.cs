@@ -978,7 +978,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
          // Spawns Prefab through Ubiqs Network Spawn Manager
         var spawnedPrefab = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(GetPrefabByName(prefabName));
         
-        spawnedPrefab.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnPosition, scale, spawnRotation);
+        //spawnedPrefab.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnPosition, scale, spawnRotation);
 
         // Set the Prefab's transform Data
         spawnedPrefab.transform.position = spawnPosition;
@@ -2053,7 +2053,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.localScale = transformData.scale;
                 }
 
-                spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, transformData.position, transformData.scale, transformData.rotation);
+                //spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, transformData.position, transformData.scale, transformData.rotation);
                 
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 

@@ -59,7 +59,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         if (!context.Id.Valid)
             context = NetworkScene.Register(this);
         else
-            Debug.Log("ID is already valid");
+            Debug.Log("[START][NET-PREFAB]ID is already valid");
 
         Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
 
@@ -100,7 +100,15 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
-        Debug.Log("[NET-PREFAB]Awake is called");
+         // Initialize the Network Context
+        if (!context.Id.Valid)
+        {
+            Debug.Log("[AWAKE][PREFAB]Network Context ID is not valid");
+            context = NetworkScene.Register(this);
+        }
+        else
+            Debug.Log("[AWAKE][PREFAB]ID is already valid");
+
         owner = false;
         isHeld = false;
         isSelected = false;
@@ -122,7 +130,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 lastRotation = transform.localRotation;
                 lastOwner = owner;
 
-                // Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+                Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
 
                 // Send the transform data to the server
                 SendTransformData();
@@ -173,32 +181,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastOwner = owner;
 
         SendTransformData();
-    }
-
-    private IEnumerator UpdateRfObjectCoroutine(RfObject rfObj)
-    {
-        while (context.Scene == null || !context.Id.Valid)
-        {
-            Debug.LogWarning("[MyNetworkedObject] Waiting for NetworkContext to be initialized...");
-            yield return new WaitForSeconds(0.1f);
-        }
-
-        this.rfObj = rfObj;
-
-        CacheObjectData cacheObjectData = GetComponent<CacheObjectData>();
-        if (cacheObjectData != null)
-        {
-            cacheObjectData.rfObj = rfObj;
-        }
-        else
-        {
-            Debug.LogError("[MyNetworkedObject] CacheObjectData component is missing.");
-        }
-
-        // context.SendJson(new Message()
-        // {
-        //     rfObj = this.rfObj
-        // });
     }
 
     #region Selection and Holding   
