@@ -50,12 +50,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {      
-        // retrieve object from RealityFlowAPI
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
-        Debug.Log("[START][PREFAB]Object ID: " + rfObj.id);
-        rfObjID = rfObj.id;
-        Debug.Log("[START][PREFAB]Object Name: " + rfObj.name);
-
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
@@ -145,7 +139,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         });
     }
 
-    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation)
+    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation, string rfObjID)
     {
         Debug.Log("[NET-PREFAB]InitializePrefab() was called");
 

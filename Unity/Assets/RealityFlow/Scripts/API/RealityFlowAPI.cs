@@ -983,8 +983,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         spawnedPrefab.transform.rotation = spawnRotation;
         spawnedPrefab.transform.localScale = scale;
 
-        spawnedPrefab.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnPosition, scale, spawnRotation);
-
         // Prepare the Prefabs transform data
         TransformData transformData = new TransformData
         {
@@ -1079,6 +1077,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
                 rfObject.id = returnedId;
 
+                spawnedPrefab.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnPosition, scale, spawnRotation, rfObject.id);
                 // Debug.Log($"Assigned ID from database: {rfObject.id}");
                 spawnedObjects[spawnedPrefab] = rfObject;
                 spawnedObjectsById[returnedId] = spawnedPrefab;
@@ -2050,12 +2049,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.rotation = transformData.rotation;
                     spawnedObject.transform.localScale = transformData.scale;
                 }
-                spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, transformData.position, transformData.scale, transformData.rotation);
+                
 
                 // Set the name of the spawned object to its ID for unique identification
                 spawnedObject.name = obj.id;
 
-                
+                // Set ownership and Send Update Message through UBIQ's networkScene
+                spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnedObject.transform.position, spawnedObject.transform.localScale, spawnedObject.transform.rotation, spawnedObject.name);
+
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
                 spawnedObjects.Add(spawnedObject, obj);
