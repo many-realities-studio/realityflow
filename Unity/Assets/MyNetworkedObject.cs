@@ -130,19 +130,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             position = transform.localPosition,
             scale = transform.localScale,
-            rotation = transform.localRotation,
-            owner = false,
-            isHeld = isHeld,
-            isSelected = isSelected,
-            // handlesActive = boundsControl.HandlesActive,
-            // boundsVisuals = boundsVisuals.activeInHierarchy,
-            // meshColor = meshMaterial.color,
-            // meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-            // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-            // objectManipulator = wasBake     
+            rotation = transform.localRotation, 
         });
-        owner = false;
     }
 
     public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation)
@@ -151,7 +140,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         // Set the owner of the object
         owner = isOwner;
-
+        Debug.Log("[INIT-PREFAB][NET-PREFAB]OWNER IS: " + owner);
         // Set the transform of the object
         transform.localPosition = prefabPosition;
         transform.localScale = prefabScale;
@@ -162,17 +151,27 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
 
+        // Initialize the Network Context
+        if (!context.Id.Valid)
+        {
+            context = NetworkScene.Register(this);
+            Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
+        }
+        else
+            Debug.Log("[START][NET-PREFAB]ID is already valid");
+
         context.SendJson(new Message()
         {
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            owner = false,
-            isHeld = isHeld,
-            isSelected = isSelected,
+            // owner = false,
+            // isHeld = isHeld,
+            // isSelected = isSelected,
         });
 
-        owner = false;
+        Debug.Log("[INIT-PREFAB][NET-PREFAB]INIT MESSAGE SENT");
+        Debug.Log("[INIT-PREFAB][NET-PREFAB]OWNER IS: " + owner);
     }
 
     #region Selection and Holding   
@@ -191,9 +190,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                owner = false,
-                isHeld = isHeld,
-                isSelected = isSelected,
+                // owner = false,
+                // isHeld = isHeld,
+                // isSelected = isSelected,
             });
         }
         else
@@ -204,9 +203,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                owner = false,
-                isHeld = isHeld,
-                isSelected = isSelected,
+                // owner = false,
+                // isHeld = isHeld,
+                // isSelected = isSelected,
             });
         }
     }
@@ -255,9 +254,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            owner = true,
-            isHeld = true,
-            isSelected = isSelected,
+            // owner = true,
+            // isHeld = true,
+            // isSelected = isSelected,
             // handlesActive = boundsControl.HandlesActive,
             // boundsVisuals = boundsVisuals.activeInHierarchy,
             // meshColor = meshMaterial.color,
@@ -346,9 +345,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            owner = false,
-            isHeld = false,
-            isSelected = isSelected,
+            // owner = false,
+            // isHeld = false,
+            // isSelected = isSelected,
             // handlesActive = boundsControl.HandlesActive,
             // boundsVisuals = boundsVisuals.activeInHierarchy,
             // meshColor = meshMaterial.color,
@@ -365,9 +364,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public struct Message
     {
         // Object OwnerShip
-        public bool owner;
-        public bool isHeld;
-        public bool isSelected;
+        // public bool owner;
+        // public bool isHeld;
+        // public bool isSelected;
         // Object Transform Data
         public Vector3 position;
         public Vector3 scale;
@@ -395,15 +394,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         transform.localPosition = m.position;
         transform.localScale = m.scale;
         transform.localRotation = m.rotation;
-        owner = m.owner;
 
-        isHeld = m.isHeld;
-        isSelected = m.isSelected;
-
-        // Update last known transform to avoid feedback loop
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
-        lastOwner = owner;
     }
 }

@@ -2042,9 +2042,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
                 }
 
-                // Set the name of the spawned object to its ID for unique identification
-                spawnedObject.name = obj.id;
-
                 // Apply the transform properties
                 TransformData transformData = JsonUtility.FromJson<TransformData>(obj.transformJson);
                 if (transformData != null)
@@ -2053,8 +2050,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.rotation = transformData.rotation;
                     spawnedObject.transform.localScale = transformData.scale;
                 }
-
                 spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, transformData.position, transformData.scale, transformData.rotation);
+
+                // Set the name of the spawned object to its ID for unique identification
+                spawnedObject.name = obj.id;
+
                 
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
