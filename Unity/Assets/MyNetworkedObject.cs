@@ -105,7 +105,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {   
         // debug log to see if we are the owner 
         // delay it so it only logs every few seconds
-        if (Time.frameCount % 100 == 0)
+        if (Time.frameCount % 300 == 0)
         {
             Debug.Log("[UPDATE][NET-PREFAB]OWNER IS: " + owner);
         }
@@ -118,7 +118,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             lastRotation = transform.localRotation;
             lastOwner = owner;
 
-            if (Time.frameCount % 100 == 0)
+            if (Time.frameCount % 300 == 0)
             {
                 Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
             }
@@ -219,12 +219,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void StartHold()
     {   
         // Debug Saying that we are holding the object
-        Debug.Log("Start Holding Object");
+        Debug.Log("[START-HOLD][PREFAB]Start Holding Object");
 
-        // If the object is not owned, then we can't hold it
-        if (!owner)
-            return;
-        
         // Get the rigid Body Component
         if (!rb)
             rb = GetComponent<Rigidbody>();
@@ -395,7 +391,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         var m = message.FromJson<Message>();
         
-        Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        if (Time.frameCount % 300 == 0)
+        {
+            Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        }
 
         transform.localPosition = m.position;
         transform.localScale = m.scale;
