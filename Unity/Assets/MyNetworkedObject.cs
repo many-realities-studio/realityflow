@@ -49,9 +49,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {      
-        // retrieve object from RealityFlowAPI
-        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
-
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
@@ -116,7 +113,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             lastPosition = transform.localPosition;
             lastScale = transform.localScale;
             lastRotation = transform.localRotation;
-            lastOwner = owner;
 
             if (Time.frameCount % 300 == 0)
             {
@@ -137,6 +133,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation, 
+            rfObj = rfObj,
         });
     }
 
@@ -179,6 +176,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
+            rfObj = rfObj,
             // owner = false,
             // isHeld = isHeld,
             // isSelected = isSelected,
@@ -204,9 +202,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                // owner = false,
-                // isHeld = isHeld,
-                // isSelected = isSelected,
+                rfObj = rfObj
             });
         }
         else
@@ -217,9 +213,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 position = transform.localPosition,
                 scale = transform.localScale,
                 rotation = transform.localRotation,
-                // owner = false,
-                // isHeld = isHeld,
-                // isSelected = isSelected,
+                rfObj = rfObj,
             });
         }
     }
@@ -273,16 +267,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            // owner = true,
-            // isHeld = true,
-            // isSelected = isSelected,
-            // handlesActive = boundsControl.HandlesActive,
-            // boundsVisuals = boundsVisuals.activeInHierarchy,
-            // meshColor = meshMaterial.color,
-            // meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-            // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-            // objectManipulator = wasBake     
+            rfObj = rfObj,
         });
 
     }
@@ -362,16 +347,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            // owner = false,
-            // isHeld = false,
-            // isSelected = isSelected,
-            // handlesActive = boundsControl.HandlesActive,
-            // boundsVisuals = boundsVisuals.activeInHierarchy,
-            // meshColor = meshMaterial.color,
-            // meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            // meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-            // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
-            // objectManipulator = wasBake     
+            rfObj = rfObj,
         });
     }
 
@@ -380,25 +356,13 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // THE MESSAGE STRUCTURE
     public struct Message
     {
-        // Object OwnerShip
-        // public bool owner;
-        // public bool isHeld;
-        // public bool isSelected;
-        // Object Transform Data
+        // Transform Data
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
-        // Bounds and selection
-        //public bool handlesActive;
-       // public bool boundsVisuals;
-        //  public Color meshColor;
-        //  public float meshMetallic;
-        //  public float meshSmoothness;
-        //  public Color boundsColor;
-        //  public bool objectManipulator;
+
         // RfObject Data
-        // public bool needsRfObject;
-        // public RfObject rfObj;        
+        public RfObject rfObj;     
     }
 
     // THE MESSAGE PROCESSOR
@@ -418,5 +382,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
+
+        // Update the RealityFlow Object
+        rfObj = m.rfObj;
     }
 }
