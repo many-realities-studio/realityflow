@@ -139,7 +139,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            owner = owner,
+            owner = false,
             isHeld = isHeld,
             isSelected = isSelected,
             // handlesActive = boundsControl.HandlesActive,
