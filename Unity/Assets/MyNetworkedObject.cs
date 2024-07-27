@@ -135,7 +135,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation, 
-            rfObjID = rfObj.id,
+            //rfObjID = rfObj.id,
         });
     }
 
@@ -170,7 +170,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            rfObjID = rfObj.id,
+            //rfObjID = rfObj.id,
             // owner = false,
             // isHeld = isHeld,
             // isSelected = isSelected,
@@ -376,7 +376,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
-        public string rfObjID;
+        //public string rfObjID;
         // Bounds and selection
         //public bool handlesActive;
        // public bool boundsVisuals;
@@ -397,7 +397,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         
         if (Time.frameCount % 300 == 0)
         {
-            Debug.Log("Received Message: ID" + m.rfObjID + ". Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+            Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
         }
 
         transform.localPosition = m.position;
@@ -408,6 +408,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
 
-        rfObjID = m.rfObjID;
+        //rfObjID = m.rfObjID;
     }
 }
