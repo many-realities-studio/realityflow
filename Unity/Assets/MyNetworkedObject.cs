@@ -142,6 +142,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             // boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
             // objectManipulator = wasBake     
         });
+        owner = false;
     }
 
     public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation)
@@ -161,7 +162,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
 
-        SendTransformData();
+        context.SendJson(new Message()
+        {
+            position = transform.localPosition,
+            scale = transform.localScale,
+            rotation = transform.localRotation,
+            owner = false,
+            isHeld = isHeld,
+            isSelected = isSelected,
+        });
+
+        owner = false;
     }
 
     #region Selection and Holding   
