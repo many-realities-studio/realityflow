@@ -139,7 +139,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation, RfObject passedRfObj)
     {
-        Debug.Log("[NET-PREFAB]InitializePrefab() was called");
         // Set the RealityFlow Object
         rfObj = passedRfObj;
 
@@ -150,8 +149,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
         
         // Set the owner of the object
-        owner = isOwner;
+        owner = isOwner; // IsOwner should be true
         Debug.Log("[INIT-PREFAB][NET-PREFAB]OWNER IS: " + owner);
+
         // Set the transform of the object
         transform.localPosition = prefabPosition;
         transform.localScale = prefabScale;
@@ -177,7 +177,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             scale = transform.localScale,
             rotation = transform.localRotation,
             rfObj = rfObj,
-            // owner = false,
+            owner = false,
             // isHeld = isHeld,
             // isSelected = isSelected,
         });
@@ -230,7 +230,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
 
         // The Moved Object needs to be the owner in order to send Updates
-        owner = true;
+        owner = true; // Person who starts holding the object becomes owner
         isHeld = true;
 
 
@@ -268,6 +268,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             scale = transform.localScale,
             rotation = transform.localRotation,
             rfObj = rfObj,
+            owner = false,
         });
 
     }
@@ -276,6 +277,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         // Debug Saying that we are holding the object
         Debug.Log("[END-HOLD][PREFAB]Ended Holding Prefab");
+
+        // The Moved Object needs to be the owner in order to send Updates
+        owner = true; // Person who starts holding the object becomes owner
+        isHeld = false;
 
         // Get the rigid Body Component
         if (!rb)
@@ -342,12 +347,15 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
+
+        //Sends Ubiq Update
         context.SendJson(new Message()
         {
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
             rfObj = rfObj,
+            owner = false, //Set Others to Not Owner
         });
     }
 
@@ -356,13 +364,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // THE MESSAGE STRUCTURE
     public struct Message
     {
-        // Transform Data
-        public Vector3 position;
+        
+        public Vector3 position;      // Transform Data
         public Vector3 scale;
         public Quaternion rotation;
-
-        // RfObject Data
-        public RfObject rfObj;     
+        public RfObject rfObj;         // RfObject Data
+        public bool owner;             // Ownership Data
     }
 
     // THE MESSAGE PROCESSOR
@@ -385,5 +392,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         // Update the RealityFlow Object
         rfObj = m.rfObj;
+
+        //Update Ownership
+        owner = m.owner;
     }
 }
