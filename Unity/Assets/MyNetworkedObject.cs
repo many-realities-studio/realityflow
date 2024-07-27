@@ -416,7 +416,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         var m = message.FromJson<Message>();
         
-        //Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
 
         transform.localPosition = m.position;
         transform.localScale = m.scale;
