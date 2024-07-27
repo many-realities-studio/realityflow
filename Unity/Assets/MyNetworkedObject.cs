@@ -140,10 +140,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         });
     }
 
-    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation)
+    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation, RfObject passedRfObj)
     {
         Debug.Log("[NET-PREFAB]InitializePrefab() was called");
+        // Set the RealityFlow Object
+        rfObj = passedRfObj;
 
+        // Change the object's name to the rf object's name
+        if (gameObject.name != rfObj.name)
+        {
+            gameObject.name = rfObj.name;
+        }
+        
         // Set the owner of the object
         owner = isOwner;
         Debug.Log("[INIT-PREFAB][NET-PREFAB]OWNER IS: " + owner);
@@ -219,18 +227,23 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void StartHold()
     {   
         // Debug Saying that we are holding the object
-        Debug.Log("Start Holding Object");
-
-        // If the object is not owned, then we can't hold it
-        if (!owner)
-            return;
+        Debug.Log("[START-HOLD][PREFAB]Started Holding Prefab");
         
+        // Change the object's name to the rf object's name
+        if (gameObject.name != rfObj.name)
+        {
+            gameObject.name = rfObj.name;
+        }
+
+        // The Moved Object needs to be the owner in order to send Updates
+        owner = true;
+        isHeld = true;
+
+
         // Get the rigid Body Component
         if (!rb)
             rb = GetComponent<Rigidbody>();
 
-        owner = true;
-        isHeld = true;
 
         // Determines the behaivior of the object depending on play and edit mode
         if (!networkedPlayManager.playMode)
@@ -244,8 +257,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.useGravity = true;
         }
 
-        Debug.Log($"Started hold for object {rfObj.id}.");
-
         // Log the transformation at the start of holding
         RealityFlowAPI.Instance?.actionLogger?.LogAction(
             nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
@@ -254,6 +265,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             transform.localRotation,
             transform.localScale
         ); 
+        // debug for the rf obj id
+        Debug.Log("[START-HOLD][PREFAB]RF OBJECT ID: " + rfObj.id);
 
         context.SendJson(new Message()
         {
@@ -277,16 +290,14 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void EndHold()
     {
         // Debug Saying that we are holding the object
-        Debug.Log("End Holding Object");
+        Debug.Log("[END-HOLD][PREFAB]Ended Holding Prefab");
 
         // Get the rigid Body Component
         if (!rb)
             rb = GetComponent<Rigidbody>();
 
-        owner = false;
-        isHeld = false;
 
-                // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
+        // When we are not in play mode, have the object remain where you let it go, otherwise, follow what is the property of
         // the rf obj for play mode.
         if (!networkedPlayManager.playMode)
         {
