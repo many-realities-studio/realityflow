@@ -9,6 +9,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
+using UnityEngine.InputSystem.LowLevel;
 
 
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -62,11 +63,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         Debug.Log("[START][NET-PREFAB]Context ID: " + context.Id);
 
-         // Only set ownership if it is not already set
-        if (!owner)
-        {
-            owner = true;
-        }
+
         // Get the Custom Object Manipulator
         if (gameObject.GetComponent<CustomObjectManipulator>() != null)
         {
@@ -155,9 +152,27 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         });
     }
 
-    public void UpdateRfObject(RfObject rfObj)
+    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation)
     {
-        Update();
+        Debug.Log("[NET-PREFAB]InitializePrefab() was called");
+
+        // Set the owner of the object
+        owner = isOwner;
+
+        // Set the transform of the object
+        transform.localPosition = prefabPosition;
+        transform.localScale = prefabScale;
+        transform.localRotation = prefabRotation;
+
+        // Update the last known transform to avoid feedback loop
+        lastPosition = transform.localPosition;
+        lastScale = transform.localScale;
+        lastRotation = transform.localRotation;
+
+        // sets the last owner to the current owner
+        lastOwner = owner;
+
+        SendTransformData();
     }
 
     private IEnumerator UpdateRfObjectCoroutine(RfObject rfObj)
