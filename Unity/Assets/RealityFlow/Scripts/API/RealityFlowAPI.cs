@@ -1077,7 +1077,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 var returnedId = graphQLResponse["data"]["createObject"]["id"].ToString();
                 rfObject.id = returnedId;
 
-                spawnedPrefab.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnPosition, scale, spawnRotation, rfObject.id);
+                spawnedPrefab.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnPosition, scale, spawnRotation);
                 // Debug.Log($"Assigned ID from database: {rfObject.id}");
                 spawnedObjects[spawnedPrefab] = rfObject;
                 spawnedObjectsById[returnedId] = spawnedPrefab;
@@ -2055,7 +2055,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 spawnedObject.name = obj.id;
 
                 // Set ownership and Send Update Message through UBIQ's networkScene
-                spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnedObject.transform.position, spawnedObject.transform.localScale, spawnedObject.transform.rotation, spawnedObject.name);
+                spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnedObject.transform.position, spawnedObject.transform.localScale, spawnedObject.transform.rotation);
 
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 

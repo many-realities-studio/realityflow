@@ -40,7 +40,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     private bool lastPlayModeState;
 
     // RealityFlow Object References and Components
-    public string rfObjID;
     public RfObject rfObj;
     private Rigidbody rb;
     private BoxCollider boxCol;
@@ -50,6 +49,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {      
+        // retrieve object from RealityFlowAPI
+        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
@@ -135,11 +137,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation, 
-            //rfObjID = rfObj.id,
         });
     }
 
-    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation, string rfObjID)
+    public void InitializePrefab(bool isOwner, Vector3 prefabPosition, Vector3 prefabScale, Quaternion prefabRotation)
     {
         Debug.Log("[NET-PREFAB]InitializePrefab() was called");
 
@@ -170,7 +171,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
-            //rfObjID = rfObj.id,
             // owner = false,
             // isHeld = isHeld,
             // isSelected = isSelected,
@@ -219,8 +219,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void StartHold()
     {   
         // Debug Saying that we are holding the object
-        Debug.Log("[START-HOLD][PREFAB]Start Holding Object");
+        Debug.Log("Start Holding Object");
 
+        // If the object is not owned, then we can't hold it
+        if (!owner)
+            return;
+        
         // Get the rigid Body Component
         if (!rb)
             rb = GetComponent<Rigidbody>();
@@ -339,9 +343,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.isKinematic = false;
             rb.useGravity = true;
         }
-
-        // debug to show Id of object
-        Debug.Log($"Ended hold for object {rfObj.id}.");
         
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
@@ -376,7 +377,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         public Vector3 position;
         public Vector3 scale;
         public Quaternion rotation;
-        //public string rfObjID;
         // Bounds and selection
         //public bool handlesActive;
        // public bool boundsVisuals;
@@ -407,7 +407,5 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastPosition = transform.localPosition;
         lastScale = transform.localScale;
         lastRotation = transform.localRotation;
-
-        //rfObjID = m.rfObjID;
     }
 }
