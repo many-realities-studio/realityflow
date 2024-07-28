@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.MixedReality.Toolkit;
-using Microsoft.MixedReality.Toolkit.UX;
 using RealityFlow.NodeGraph;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace RealityFlow.NodeUI
 {
@@ -35,23 +31,6 @@ namespace RealityFlow.NodeUI
                 button.definition = defs[index];
             };
             page.ItemCount = defs.Count;
-        }
-    }
-
-    internal class NewClass
-    {
-        public NewClass()
-        {
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is NewClass other;
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
         }
     }
 }

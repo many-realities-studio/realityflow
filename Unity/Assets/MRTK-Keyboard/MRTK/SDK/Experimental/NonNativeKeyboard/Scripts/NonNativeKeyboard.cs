@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using RealityFlow.NodeUI;
+using System.Collections;
 
 
 namespace Microsoft.MixedReality.Toolkit.Experimental.UI
@@ -274,6 +275,12 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             Debug.Log("NonNativeKeyboard Awake completed and deactivated.");
         }
 
+        void Update()
+        {
+            // This is a hack because for some reason actually tracking the input field caused it
+            // to type backwards. It is unclear why.
+            InputField.caretPosition = m_CaretPosition;
+        }
 
         /// <summary>
         /// Set up Dictation, CanvasEX, and automatically select the TextInput object.
@@ -321,7 +328,24 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             CheckForCloseOnInactivityTimeExpired();
         }
 
-        private void UpdateCaretPosition(int newPos) => InputField.caretPosition = newPos;
+        // private void UpdateCaretPosition(int newPos) 
+        // {
+        //     InputField.selectionAnchorPosition = newPos;
+        //     InputField.selectionFocusPosition = newPos;
+        //     InputField.caretPosition = newPos;
+        // }
+
+        void UpdateCaretPosition(int caretIndex)
+        {
+            StartCoroutine(SetPosition());
+
+            IEnumerator SetPosition()
+            {
+
+                yield return new WaitForEndOfFrame();
+
+            }
+        }
 
         /// <summary>
         /// Called whenever the keyboard is disabled or deactivated.
@@ -406,7 +430,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             ActivateSpecificKeyboard(LayoutType.Alpha);
             OnPlacement(this, EventArgs.Empty);
             InputField.ActivateInputField();
-            InputField.text = string.Empty;
+            Clear();
         }
 
         public void SetTargetInputField(Custom_MRTK_InputField userInputField)
@@ -415,6 +439,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
             InputField = userInputField;
             if (InputField != null)
             {
+                m_CaretPosition = InputField.caretPosition;
                 InputField.onValueChanged.AddListener(DoTextUpdated);
             }
         }
@@ -649,7 +674,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
                 Shift(false);
             }
 
-            m_CaretPosition = InputField.caretPosition;
+            // m_CaretPosition = InputField.caretPosition;
 
             InputField.text = InputField.text.Insert(m_CaretPosition, value);
             m_CaretPosition += value.Length;
@@ -765,26 +790,26 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         public void Backspace()
         {
             // check if text is selected
-            if (InputField.selectionFocusPosition != InputField.caretPosition || InputField.selectionAnchorPosition != InputField.caretPosition)
-            {
-                if (InputField.selectionAnchorPosition > InputField.selectionFocusPosition) // right to left
-                {
-                    InputField.text = InputField.text.Substring(0, InputField.selectionFocusPosition) + InputField.text.Substring(InputField.selectionAnchorPosition);
-                    InputField.caretPosition = InputField.selectionFocusPosition;
-                }
-                else // left to right
-                {
-                    InputField.text = InputField.text.Substring(0, InputField.selectionAnchorPosition) + InputField.text.Substring(InputField.selectionFocusPosition);
-                    InputField.caretPosition = InputField.selectionAnchorPosition;
-                }
+            // if (InputField.selectionFocusPosition != InputField.caretPosition || InputField.selectionAnchorPosition != InputField.caretPosition)
+            // {
+            //     if (InputField.selectionAnchorPosition > InputField.selectionFocusPosition) // right to left
+            //     {
+            //         InputField.text = InputField.text.Substring(0, InputField.selectionFocusPosition) + InputField.text.Substring(InputField.selectionAnchorPosition);
+            //         InputField.caretPosition = InputField.selectionFocusPosition;
+            //     }
+            //     else // left to right
+            //     {
+            //         InputField.text = InputField.text.Substring(0, InputField.selectionAnchorPosition) + InputField.text.Substring(InputField.selectionFocusPosition);
+            //         InputField.caretPosition = InputField.selectionAnchorPosition;
+            //     }
 
-                m_CaretPosition = InputField.caretPosition;
-                InputField.selectionAnchorPosition = m_CaretPosition;
-                InputField.selectionFocusPosition = m_CaretPosition;
-            }
-            else
+            //     // m_CaretPosition = InputField.caretPosition;
+            //     InputField.selectionAnchorPosition = m_CaretPosition;
+            //     InputField.selectionFocusPosition = m_CaretPosition;
+            // }
+            // else
             {
-                m_CaretPosition = InputField.caretPosition;
+                // m_CaretPosition = InputField.caretPosition;
 
                 if (m_CaretPosition > 0)
                 {
@@ -817,24 +842,25 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// </summary>
         public void Enter()
         {
-            if (SubmitOnEnter)
-            {
-                // Send text entered event and close the keyboard
-                OnTextSubmitted?.Invoke(this, EventArgs.Empty);
+            //     if (SubmitOnEnter)
+            //     {
+            // Send text entered event and close the keyboard
+            OnTextSubmitted?.Invoke(this, EventArgs.Empty);
+            InputField.ReleaseSelection();
 
-                Close();
-            }
-            else
-            {
-                string enterString = "\n";
+            Close();
+            // }
+            // else
+            // {
+            //     string enterString = "\n";
 
-                m_CaretPosition = InputField.caretPosition;
+            //     m_CaretPosition = InputField.caretPosition;
 
-                InputField.text = InputField.text.Insert(m_CaretPosition, enterString);
-                m_CaretPosition += enterString.Length;
+            //     InputField.text = InputField.text.Insert(m_CaretPosition, enterString);
+            //     m_CaretPosition += enterString.Length;
 
-                UpdateCaretPosition(m_CaretPosition);
-            }
+            //     UpdateCaretPosition(m_CaretPosition);
+            // }
 
         }
 
@@ -868,7 +894,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// </summary>
         public void Space()
         {
-            m_CaretPosition = InputField.caretPosition;
+            // m_CaretPosition = InputField.caretPosition;
             InputField.text = InputField.text.Insert(m_CaretPosition++, " ");
 
             UpdateCaretPosition(m_CaretPosition);
@@ -881,7 +907,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         {
             string tabString = "\t";
 
-            m_CaretPosition = InputField.caretPosition;
+            // m_CaretPosition = InputField.caretPosition;
 
             InputField.text = InputField.text.Insert(m_CaretPosition, tabString);
             m_CaretPosition += tabString.Length;
@@ -894,7 +920,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// </summary>
         public void MoveCaretLeft()
         {
-            m_CaretPosition = InputField.caretPosition;
+            // m_CaretPosition = InputField.caretPosition;
 
             if (m_CaretPosition > 0)
             {
@@ -908,7 +934,7 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         /// </summary>
         public void MoveCaretRight()
         {
-            m_CaretPosition = InputField.caretPosition;
+            // m_CaretPosition = InputField.caretPosition;
 
             if (m_CaretPosition < InputField.text.Length)
             {
@@ -939,12 +965,14 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         public void Clear()
         {
             ResetKeyboardState();
-            if (InputField.caretPosition != 0)
+            if (InputField)
             {
+                // if (InputField.caretPosition != 0)
                 InputField.MoveTextStart(false);
+                InputField.text = "";
+                m_CaretPosition = 0;
+                // m_CaretPosition = InputField.caretPosition;
             }
-            InputField.text = "";
-            m_CaretPosition = InputField.caretPosition;
         }
 
         #endregion
@@ -1095,7 +1123,8 @@ namespace Microsoft.MixedReality.Toolkit.Experimental.UI
         {
             if (Time.time > _closingTime && CloseOnInactivity)
             {
-                Close();
+                // for some reason CloseOnInactivity is getting set to true. Just disabling this functionality now
+                // Close();
             }
         }
     }

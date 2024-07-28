@@ -79,6 +79,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             rb = gameObject.GetComponent<Rigidbody>();
             rb.isKinematic = true;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
@@ -242,13 +243,19 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // Determines the behaivior of the object depending on play and edit mode
         if (!networkedPlayManager.playMode)
         {
-            rb.useGravity = false;
-            rb.isKinematic = true;
+            //rb.useGravity = false;
+            rb.isKinematic = false;
+
             rb.constraints = RigidbodyConstraints.None;
+
+            // This would also be a place to change to boxcolliders collider interaction masks so that
+            // the object can be placed within others to prevent it from colliding with UI.
+            // TODO: 
+
         }
         else
         {
-            rb.useGravity = true;
+            //rb.useGravity = true;
         }
 
         // Log the transformation at the start of holding
@@ -327,6 +334,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 {
                     //rb.useGravity = true;
                     rb.useGravity = false;
+                    //rb.useGravity = true;
+                    rb.useGravity = false;
                 }
 
                 // if the object is collidable
@@ -339,6 +348,18 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                     boxCol.enabled = false;
                 }
             }
+
+            context.SendJson(new Message()
+            {
+                position = transform.localPosition,
+                scale = transform.localScale,
+                rotation = transform.localRotation,
+                owner = false,
+                isHeld = false,
+                isKinematic = true,//,
+                //color = gameObject.GetComponent<Renderer>().material.color
+                gravity = rb.useGravity
+            });
 
             //rb.useGravity = true;
             rb.isKinematic = false;

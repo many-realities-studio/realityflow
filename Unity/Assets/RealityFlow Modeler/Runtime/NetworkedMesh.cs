@@ -40,6 +40,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Material meshMaterial;
     private Material boundsMaterial;
     private ObjectManipulator objectManipulator;
+    private Rigidbody rb;
     private EraserTool eraser;
 
     bool lastOwner;
@@ -54,6 +55,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     public string originalName = "";
     //public bool sourceMesh = false;
     //private RoomClient roomClient;
+
+    public NetworkedPlayManager networkedPlayManager;
+    private bool lastPlayModeState;
 
     void Start()
     {
@@ -74,6 +78,9 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         eraser = FindObjectOfType<EraserTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
+
+        networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
+
         // Find the child game object of this mesh that draws the bounds visuals
         foreach (Transform child in gameObject.transform)
         {
@@ -207,6 +214,48 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         context.SendJson(msg);
     }
 
+    float GetMetallic()
+    {
+        if (meshMaterial.HasFloat("metallicFactor"))
+            return meshMaterial.GetFloat("metallicFactor");
+        else if (meshMaterial.HasFloat("_Metallic"))
+            return meshMaterial.GetFloat("_Metallic");
+
+        Debug.LogError($"Failed to get metallic for material {meshMaterial}");
+        return 0;
+    }
+
+    float GetGlossiness()
+    {
+        if (meshMaterial.HasFloat("roughnessFactor"))
+            return meshMaterial.GetFloat("roughnessFactor");
+        else if (meshMaterial.HasFloat("_Glossiness"))
+            return meshMaterial.GetFloat("_Glossiness");
+
+        Debug.LogError($"Failed to get glossiness for material {meshMaterial}");
+        return 0;
+    }
+
+    void SetMetallic(float metallic)
+    {
+        if (meshMaterial.HasFloat("metallicFactor"))
+            meshMaterial.SetFloat("metallicFactor", metallic);
+        else if (meshMaterial.HasFloat("_Metallic"))
+            meshMaterial.SetFloat("_Metallic", metallic);
+
+        Debug.LogError($"Failed to set metallic for material {meshMaterial}");
+    }
+
+    void SetGlossiness(float glossiness)
+    {
+        if (meshMaterial.HasFloat("roughnessFactor"))
+            meshMaterial.SetFloat("roughnessFactor", glossiness);
+        else if (meshMaterial.HasFloat("_Glossiness"))
+            meshMaterial.SetFloat("_Glossiness", glossiness);
+
+        Debug.LogError($"Failed to set glossiness for material {meshMaterial}");
+    }
+
     private void BroadcastCreateMesh()
     {
         if(isDuplicate && originalName != "")
@@ -224,8 +273,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             shapeType = em.baseShape,
 
             meshColor = meshMaterial.color,
-            meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            meshMetallic = GetMetallic(),
+            meshSmoothness = GetGlossiness(),
             boundsColor = new Color(0.078f, 0.54f, 1f, 1f),
             objectManipulator = true
         });
@@ -252,30 +301,49 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         Destroy(mesh.gameObject);
     }
 
-    public void StartHold()
+    Message CreateHeldMessage(bool held)
     {
-        if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
-            return;
+        Color boundsColor = held
+            ? new Color(1f, 0.21f, 0.078f, 1f)
+            : new Color(0.078f, 0.54f, 1f, 1f);
 
-        owner = true;
-        isHeld = true;
-        // Debug.Log("StartHold() was called");
-        context.SendJson(new Message()
+        return new Message()
         {
             position = transform.localPosition,
             scale = transform.localScale,
             rotation = transform.localRotation,
             owner = false,
-            isHeld = true,
+            isHeld = held,
             isSelected = isSelected,
             handlesActive = boundsControl.HandlesActive,
             boundsVisuals = boundsVisuals.activeInHierarchy,
             meshColor = meshMaterial.color,
-            meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-            boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
+            meshMetallic = GetMetallic(),
+            meshSmoothness = GetGlossiness(),
+            boundsColor = boundsColor,
             objectManipulator = false
-        });
+        };
+    }
+
+    public void StartHold()
+    {
+        if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive)
+            return;
+
+        if (!rb)
+            rb = GetComponent<Rigidbody>();
+        
+        owner = true;
+        isHeld = true;
+        // Debug.Log("StartHold() was called");
+
+         // If we are not in play mode, have no gravity and allow the object to move while held,
+        // similarly allow thw object to be moved in playmode without gravity on hold.
+        if (!networkedPlayManager.playMode)
+        {
+            rb.constraints = RigidbodyConstraints.None;
+        }
+        context.SendJson(CreateHeldMessage(true));
     }
 
     public void EndHold()
@@ -295,22 +363,13 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         // Debug.Log("Run the EndHold() networking messages");
         
         RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
-        context.SendJson(new Message()
+        context.SendJson(CreateHeldMessage(false));
+
+
+        if (!networkedPlayManager.playMode)
         {
-            position = transform.localPosition,
-            scale = transform.localScale,
-            rotation = transform.localRotation,
-            owner = false,
-            isHeld = false,
-            isSelected = isSelected,
-            handlesActive = boundsControl.HandlesActive,
-            boundsVisuals = boundsVisuals.activeInHierarchy,
-            meshColor = meshMaterial.color,
-            meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
-            boundsColor = new Color(0.078f, 0.54f, 1f, 1f),
-            objectManipulator = true
-        });
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
     }
 
     /// <summary>
@@ -343,8 +402,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 handlesActive = true,
                 boundsVisuals = true,
                 meshColor = meshMaterial.color,
-                meshMetallic = meshMaterial.GetFloat("_Metallic"),
-                meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+                meshMetallic = GetMetallic(),
+                meshSmoothness = GetGlossiness(),
                 boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
                 objectManipulator = false
             });
@@ -366,8 +425,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                 handlesActive = false,
                 boundsVisuals = false,
                 meshColor = meshMaterial.color,
-                meshMetallic = meshMaterial.GetFloat("_Metallic"),
-                meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+                meshMetallic = GetMetallic(),
+                meshSmoothness = GetGlossiness(),
                 boundsColor = new Color(0.078f, 0.54f, 1f, 1f),
                 objectManipulator = true
             });
@@ -389,8 +448,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             handlesActive = boundsControl.HandlesActive,
             boundsVisuals = boundsVisuals.activeInHierarchy,
             meshColor = meshMaterial.color,
-            meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            meshMetallic = GetMetallic(),
+            meshSmoothness = GetGlossiness(),
             boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
             objectManipulator = wasBake
             
@@ -409,8 +468,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             size = lastSize,
 
             meshColor = meshMaterial.color,
-            meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            meshMetallic = GetMetallic(),
+            meshSmoothness = GetGlossiness(),
             boundsColor = new Color(0.078f, 0.54f, 1f, 1f),
             objectManipulator = true
         });
@@ -474,8 +533,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             scale = transform.localScale,
             rotation = transform.localRotation,
             meshColor = meshMaterial.color,
-            meshMetallic = meshMaterial.GetFloat("_Metallic"),
-            meshSmoothness = meshMaterial.GetFloat("_Glossiness"),
+            meshMetallic = GetMetallic(),
+            meshSmoothness = GetGlossiness(),
             owner = false,
             isHeld = false,
             isSelected = isSelected,
@@ -580,8 +639,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         boundsControl.HandlesActive = m.handlesActive;
         boundsVisuals.SetActive(m.boundsVisuals);
         meshMaterial.SetColor("_Color", m.meshColor);
-        meshMaterial.SetFloat("_Metallic", m.meshMetallic);
-        meshMaterial.SetFloat("_Glossiness", m.meshSmoothness);
+        SetMetallic(m.meshMetallic);
+        SetGlossiness(m.meshSmoothness);
         boundsMaterial.SetColor("_Color_", m.boundsColor);
         objectManipulator.enabled = m.objectManipulator;
 
