@@ -1780,7 +1780,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     Debug.Log("Primitive Base");
 
                     SerializableMeshInfo serializableMesh;
-                    try 
+                    try
                     {
                         serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
                     }
@@ -1791,7 +1791,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
                         Debug.LogError("Recovered from failed SMI JSON parse by adding a } to the end");
                     }
-                    finally 
+                    finally
                     {
                         Debug.LogError($"Failed to parse the following SMI JSON: {obj.meshJson}");
                     }
@@ -1830,13 +1830,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     return;
                 }
 
-                spawnedObject.AddComponent<AttachedWhiteboard>();
-                if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
+                if (spawnedObject.GetComponent<ObjectManipulator>())
                 {
-                    Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
-                    Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
-                    graphObj.SetId(graph.id);
-                    spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
+                    spawnedObject.AddComponent<AttachedWhiteboard>();
+                    if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
+                    {
+                        Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
+                        Graph graphObj = JsonUtility.FromJson<Graph>(graph.graphJson);
+                        graphObj.SetId(graph.id);
+                        spawnedObject.EnsureComponent<VisualScript>().graph = graphObj;
+                    }
                 }
 
                 // Set the name of the spawned object to its ID for unique identification
