@@ -743,6 +743,20 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             rotation = rotation,
             scale = scale
         };
+
+        // Add whiteboard attatch
+        if (spawnedMesh.GetComponent<AttachedWhiteboard>() == null)
+        {
+            spawnedMesh.AddComponent<AttachedWhiteboard>();
+        }
+ 
+        if (spawnedMesh.GetComponent<RealityFlowObjectEvents>() == null)
+        {
+            spawnedMesh.AddComponent<RealityFlowObjectEvents>();
+        }
+
+
+
         // Generate faces
         spawnedMesh.GetComponent<EditableMesh>().LoadMeshData();
         SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
@@ -995,7 +1009,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             spawnedPrefab.AddComponent<AttachedWhiteboard>();
         }
-
+ 
         if (spawnedPrefab.GetComponent<RealityFlowObjectEvents>() == null)
         {
             spawnedPrefab.AddComponent<RealityFlowObjectEvents>();
