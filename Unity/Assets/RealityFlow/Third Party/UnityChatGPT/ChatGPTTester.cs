@@ -101,7 +101,7 @@ public class ChatGPTTester : MonoBehaviour
             }
         }
         // Add specific reminder about graph manipulation
-        var graphManipulationReminder = "\n-------------------------------------------------------------------------\n\n\nWhen making a node or manipulating a graph, only do it like this. Do not deviate from how this file is set up at all. Don't try to create a new graph, don't try to use JSON, don't try to update the database. Do it like you see in this file, nodes should be organized rectangularly and use 100.0.0 spacing if the number of nodes being created is less than 10, if its more then 10 spacing shoud be used: \n\n\n\n" +
+        var graphManipulationReminder = "\n-------------------------------------------------------------------------\n\n\n DO WHAT THE PROMPT SAYS, ignore the following message unless specifiied: When making a node or manipulating a graph, only do it like this. Do not deviate from how this file is set up at all. Don't try to create a new graph, don't try to use JSON, don't try to update the database. Do it like you see in this file, nodes should be organized rectangularly and use 100.0.0 spacing if the number of nodes being created is less than 10, if its more then 10 spacing shoud be used: \n\n\n\n" +
                                         "private void CreateComprehensiveGraphProcedure(string objId, float spacing)\n" +
                                         "{\n" +
                                         "    // Find the object\n" +
