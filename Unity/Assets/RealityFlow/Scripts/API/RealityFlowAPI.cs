@@ -1786,10 +1786,21 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                     catch (ArgumentException)
                     {
-                        // try to recover by adding a }. This might alleviate a difficult to track bug for now
-                        string newJson = obj.meshJson + "}";
-                        serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
-                        Debug.LogError("Recovered from failed SMI JSON parse by adding a } to the end");
+                        try
+                        {
+                            // try to recover by adding a }. This might alleviate a difficult to track bug for now
+                            string newJson = obj.meshJson + "}";
+                            serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
+                            Debug.LogError("Recovered from failed SMI JSON parse by adding a } to the end");
+                        }
+                        catch (ArgumentException)
+                        {
+                            // try to recover by adding a }. This might alleviate a difficult to track bug for now
+                            string newJson = obj.meshJson + "]}";
+                            serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
+                            Debug.LogError("Recovered from failed SMI JSON parse by adding a ]} to the end");
+                        } 
+                        
                     }
                     finally
                     {
