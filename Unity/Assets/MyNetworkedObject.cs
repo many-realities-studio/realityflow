@@ -355,10 +355,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 scale = transform.localScale,
                 rotation = transform.localRotation,
                 owner = false,
-                isHeld = false,
-                isKinematic = true,//,
+                //isHeld = false,
+                //isKinematic = true,//,
                 //color = gameObject.GetComponent<Renderer>().material.color
-                gravity = rb.useGravity
+                //gravity = rb.useGravity
             });
 
             //rb.useGravity = true;

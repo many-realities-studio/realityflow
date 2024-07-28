@@ -1976,9 +1976,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 // Set the name of the spawned object to its ID for unique identification
                 spawnedObject.name = obj.id;
 
-                // Set ownership and Send Update Message through UBIQ's networkScene
-                spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, spawnedObject.transform.position, spawnedObject.transform.localScale, spawnedObject.transform.rotation, obj);
-
+                if (obj.type == "Prefab")
+                {
+                    spawnedObject.GetComponent<MyNetworkedObject>().InitializePrefab(true, transformData.position, transformData.scale, transformData.rotation, obj);
+                }
+            
                 Debug.Log($"Spawned object with ID: {obj.id}, Name: {obj.name}");
 
                 spawnedObjects.Add(spawnedObject, obj);
@@ -2217,7 +2219,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private void RemoveObjectFromDatabase(string objectId, Action onSuccess)
+    private async void RemoveObjectFromDatabase(string objectId, Action onSuccess)
     {
         if (client == null)
         {
@@ -2244,18 +2246,35 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         try
         {
-            Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
-            Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
-            client.SendQueryCoroutine(deleteObject, request =>
-            {
-                if (request.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
-                    onSuccess();
-            });
-        }
-        catch (Exception ex)
+        Debug.Log("Sending GraphQL request to: " + client.server + "/graphql");
+        Debug.Log("Request: " + JsonUtility.ToJson(deleteObject));
+
+        var graphQLResponse = await client.SendQueryAsync(deleteObject);
+        var data = graphQLResponse["data"];
+        var errors = graphQLResponse["errors"];
+
+        if (data != null)
         {
-            Debug.LogException(ex);
+            Debug.Log("Object deleted from the database successfully.");
+            onSuccess();
         }
+        else
+        {
+            Debug.LogError("Failed to delete object from the database.");
+            foreach (var error in errors)
+            {
+                Debug.LogError($"GraphQL Error: {error["message"]}");
+                if (error["Extensions"] != null)
+                {
+                    Debug.LogError($"Error Extensions: {error["Extensions"]}");
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Debug.LogException(ex);
+    }
     }
     #endregion
     private bool IsRoomScoped(GameObject obj)
