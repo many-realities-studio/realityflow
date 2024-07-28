@@ -139,7 +139,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rotation = transform.localRotation,
             owner = false,
             isHeld = isHeld,
-            isKinematic = rb.isKinematic
+            isKinematic = rb ? rb.isKinematic : false,
             //color = GetComponent<Renderer>().material.color
             //gravity = rb.useGravity
         });
@@ -159,15 +159,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         owner = true;
         isHeld = true;
 
-
         // If we are not in play mode, have no gravity and allow the object to move while held,
         // similarly allow thw object to be moved in playmode without gravity on hold.
         if (!networkedPlayManager.playMode)
         {
-            //rb.useGravity = false;
-            rb.isKinematic = false;
+            if (rb)
+            {
+                //rb.useGravity = false;
+                rb.isKinematic = false;
 
-            rb.constraints = RigidbodyConstraints.None;
+                rb.constraints = RigidbodyConstraints.None;
+            }
 
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
@@ -180,16 +182,15 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
 
         Debug.Log("Started hold the action is now being logged to the ActionLogger");
+
         // Log the transformation at the start of holding
         RealityFlowAPI.Instance.actionLogger.LogAction(
-        nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-        rfObj.id,
-        transform.localPosition,
-        transform.localRotation,
-        transform.localScale
+            nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+            rfObj.id,
+            transform.localPosition,
+            transform.localRotation,
+            transform.localScale
         );
-
-
 
         context.SendJson(new Message()
         {
@@ -201,7 +202,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             //isSelected = isSelected,
             isKinematic = true,//,
             //color = gameObject.GetComponent<Renderer>().material.color
-            gravity = rb.useGravity
+            gravity = rb ? rb.useGravity : false,
         });
     }
 
@@ -218,10 +219,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // the rf obj for play mode.
         if (!networkedPlayManager.playMode)
         {
-            rb.useGravity = false;
-            rb.isKinematic = true;
-
-            rb.constraints = RigidbodyConstraints.FreezeAll;
+            if (rb)
+            {
+                rb.useGravity = false;
+                rb.isKinematic = true;
+                rb.constraints = RigidbodyConstraints.FreezeAll;
+            }
         }
         else
         {
@@ -235,25 +238,28 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 // TODO: Move to it's own component (Like RFobject manager or something)
                 //       Include the playmode switch stuff
                 // if static, be still on play
-                if (rfObj.isStatic)
+                if (rb)
                 {
-                    rb.isKinematic = true;
-                    rb.constraints = RigidbodyConstraints.FreezeAll;
-                }
-                else
-                {
-                    rb.isKinematic = false;
-                }
+                    if (rfObj.isStatic)
+                    {
+                        rb.isKinematic = true;
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
+                    }
+                    else
+                    {
+                        rb.isKinematic = false;
+                    }
 
-                // if has gravity, apply in play mode
-                if (rfObj.isGravityEnabled)
-                {
-                    rb.useGravity = true;
-                }
-                else
-                {
-                    //rb.useGravity = true;
-                    rb.useGravity = false;
+                    // if has gravity, apply in play mode
+                    if (rfObj.isGravityEnabled)
+                    {
+                        rb.useGravity = true;
+                    }
+                    else
+                    {
+                        //rb.useGravity = true;
+                        rb.useGravity = false;
+                    }
                 }
 
                 // if the object is collidable
@@ -276,24 +282,26 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 isHeld = false,
                 isKinematic = true,//,
                 //color = gameObject.GetComponent<Renderer>().material.color
-                gravity = rb.useGravity
+                gravity = rb ? rb.useGravity : false,
             });
-
         }
 
         //RealityFlowAPI.Instance.UpdateObjectTransform(rfObj.id, transform.localPosition, transform.localRotation, transform.localScale);
 
         //UpdateTransform();
 
-        // Save the object's transform to the database
-        TransformData transformData = new TransformData()
+        if (!networkedPlayManager.playMode)
         {
-            position = transform.position,
-            rotation = transform.rotation,
-            scale = transform.localScale
-        };
+            // Save the object's transform to the database
+            TransformData transformData = new TransformData()
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                scale = transform.localScale
+            };
 
-        RealityFlowAPI.Instance.SaveObjectTransformToDatabase(rfObj.id, transformData);
+            RealityFlowAPI.Instance.SaveObjectTransformToDatabase(rfObj.id, transformData);
+        }
     }
 
     // Update method to be called within StartHold and EndHold
@@ -313,7 +321,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 rotation = transform.localRotation,
                 owner = owner,
                 isHeld = isHeld,
-                isKinematic = rb.isKinematic
+                isKinematic = rb ? rb.isKinematic : false,
                 //color = GetComponent<Renderer>().material.color
             });
         }
@@ -363,7 +371,8 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void UpdateRfObject(RfObject rfObj)
     {
         this.rfObj = rfObj;
-        GetComponent<CacheObjectData>().rfObj = rfObj;
+        CacheObjectData cache = GetComponent<CacheObjectData>();
+        cache.rfObj = rfObj;
 
         // Sometimes, such as when spawned from the mesh menu, this object will not have run Start()
         // yet and end up failing to have a networkcontext; in this case yield until it can send the 
