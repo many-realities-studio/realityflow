@@ -148,7 +148,7 @@ public class PopulateObjectLibrary : MonoBehaviour
         Quaternion defaultRotation = objectPrefab.transform.rotation;
 
         // Spawn the object with the default rotation
-        //GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
+        // GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnObject(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
         GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnPrefab(objectPrefab.name, spawnScript.GetVisualIndicatorPosition() + new Vector3(0, 0.25f, 0), objectPrefab.transform.localScale, defaultRotation, RealityFlowAPI.SpawnScope.Room);
         RealityFlowAPI.Instance.LogActionToServer("Add Prefab" + spawnedObject.name.ToString(), new { prefabTransformPosition = spawnedObject.transform.localPosition, prefabTransformRotation = spawnedObject.transform.localRotation, prefabTransformScale = spawnedObject.transform.localEulerAngles});
         Debug.Log("[POL]Spawning Prefab from Catalog: " + objectPrefab.name);
@@ -266,7 +266,11 @@ public class PopulateObjectLibrary : MonoBehaviour
         GameObject newButton = Instantiate(buttonPrefab, parent);
         newButton.GetComponentInChildren<TextMeshProUGUI>().SetText(modelData.name);
         newButton.GetComponentInChildren<SetPrefabIcon>().prefab = iconPrefab;
-        UnityAction<string> action = new UnityAction<string>(TriggerModelSpawn);
+
+        // This connects the TriggerModelSpawn method to the button click event
+        UnityAction<string> action = new UnityAction<string>(TriggerModelSpawn); 
+
+        // Create a new Unity action and add it as a listener to the buttons OnClicked event
         newButton.GetComponent<PressableButton>().OnClicked.AddListener(() => action(modelData.downloadURL));
     }
 
@@ -351,8 +355,6 @@ public class PopulateObjectLibrary : MonoBehaviour
                 downloadURL = url,  // Assuming the URL can be used for future downloads
                 thumbnailURL = ""   // Add logic to generate or fetch a thumbnail URL if needed
             };
-
-            string projectId = "your_project_id";  // Replace with actual project ID
 
             //RealityFlowAPI.Instance.SaveModelToDatabase(instantiatedModel, modelData, projectId, meshJson);
 

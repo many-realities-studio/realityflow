@@ -19,7 +19,7 @@ public class ProjectsDisplay : MonoBehaviour
     public GameObject projectOwner;
 
     // Room UI elements
-    public Transform roomsContent;
+    public RectTransform roomsContent;
     public GameObject roomUI;
     public Button createRoomBtn;
     public Button refreshRoomsBtn;
@@ -357,11 +357,6 @@ public class ProjectsDisplay : MonoBehaviour
     #region Display Rooms
     private void DisplayRooms(JArray rooms)
     {
-        foreach (Transform child in roomsContent)
-        {
-            Destroy(child.gameObject);
-        }
-
         for (int i = 0; i < rooms.Count; i++)
         {
             var room = GameObject.Instantiate(roomUI, roomsContent, false);
