@@ -995,6 +995,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             spawnedPrefab.AddComponent<AttachedWhiteboard>();
         }
 
+        if (spawnedPrefab.GetComponent<RealityFlowObjectEvents>() == null)
+        {
+            spawnedPrefab.AddComponent<RealityFlowObjectEvents>();
+        }
+
 
         // Create a new RfObject to store the prefab data
         RfObject rfObject = new RfObject
@@ -1939,6 +1944,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
 
                 spawnedObject.AddComponent<AttachedWhiteboard>();
+                spawnedObject.AddComponent<RealityFlowObjectEvents>();
+
                 if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
                 {
                     Debug.Log($"Attaching graphdata `{graph.graphJson}` to object {spawnedObject}");
