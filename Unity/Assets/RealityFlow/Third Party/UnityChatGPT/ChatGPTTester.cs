@@ -268,6 +268,7 @@ public class ChatGPTTester : MonoBehaviour
 
     private void LogApiCalls(string generatedCode)
     {
+        bool matched = false;
         foreach (var entry in apiFunctionDescriptions)
         {
             if (generatedCode.Contains(entry.Key))
@@ -275,9 +276,15 @@ public class ChatGPTTester : MonoBehaviour
                 string objectName = ExtractObjectName(generatedCode, entry.Key);
                 string logMessage = string.Format(entry.Value, objectName);
                 Logger.Instance.LogInfo(logMessage);
+                matched = true;
             }
         }
+        if (!matched)
+        {
+            Logger.Instance.LogInfo("Added an action.");
+        }
     }
+
 
     private string ExtractObjectName(string code, string functionName)
     {
@@ -334,15 +341,23 @@ public class ChatGPTTester : MonoBehaviour
     private void WriteResponseToFile(string response)
     {
         Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
-        string path = Application.persistentDataPath + "/ChatGPTResponse.cs";
+        string localPath = Application.persistentDataPath + "/ChatGPTResponse.cs";
+        string externalPath = Path.Combine(Application.dataPath, "TestScript.cs");
+
         try
         {
-            File.WriteAllText(path, response);
-            Debug.Log("Response written to file: " + path);
+            // Write to local path
+            File.WriteAllText(localPath, response);
+            Debug.Log("Response written to file: " + localPath);
+
+            // Write to external path
+            File.WriteAllText(externalPath, response);
+            Debug.Log("Response written to file: " + externalPath);
         }
         catch (Exception e)
         {
             Debug.LogError("Failed to write response to file: " + e.Message);
         }
     }
+
 }
