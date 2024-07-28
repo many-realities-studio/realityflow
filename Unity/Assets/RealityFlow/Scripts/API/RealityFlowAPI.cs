@@ -1944,7 +1944,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
 
                 spawnedObject.AddComponent<AttachedWhiteboard>();
-                spawnedObject.AddComponent<RealityFlowObjectEvents>();
 
                 if (obj.graphId != null && graphData.TryGetValue(obj.graphId, out GraphData graph))
                 {
