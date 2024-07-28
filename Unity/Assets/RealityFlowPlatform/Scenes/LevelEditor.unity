@@ -3236,6 +3236,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3066899959337477420, guid: 4674852d403b2214ca01439e5720d554,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 796230937}
+    - targetCorrespondingSourceObject: {fileID: 3066899959337477420, guid: 4674852d403b2214ca01439e5720d554,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1530542513}
     - targetCorrespondingSourceObject: {fileID: 3066899959337477420, guid: 4674852d403b2214ca01439e5720d554,
         type: 3}
@@ -3270,7 +3274,7 @@ GameObject:
   - component: {fileID: 796230937}
   - component: {fileID: 796230936}
   m_Layer: 0
-  m_Name: TestScript
+  m_Name: GeneratedScriptTester
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3296,12 +3300,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 796230935}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 49.57116, y: -30.21893, z: 27.565947}
+  m_LocalRotation: {x: -0, y: -0, z: 2.7910115e-11, w: 1}
+  m_LocalPosition: {x: 51.96219, y: -32.078926, z: 27.046944}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 488727133}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &797195010 stripped
 RectTransform:
@@ -6821,6 +6825,11 @@ PrefabInstance:
       propertyPath: m_Value
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5643607349875261148, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5823835105142341189, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
       propertyPath: m_IsActive
@@ -6850,6 +6859,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 7332561249262014774, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7332561249632664139, guid: c04375d523a08224abfed4cfa9824ec5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7713547826859454349, guid: c04375d523a08224abfed4cfa9824ec5,
         type: 3}
@@ -12246,4 +12265,3 @@ SceneRoots:
   - {fileID: 2037515228}
   - {fileID: 51941857}
   - {fileID: 634966502}
-  - {fileID: 796230937}
