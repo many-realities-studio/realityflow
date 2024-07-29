@@ -9,28 +9,21 @@ using Samples.Whisper;
 using System.Linq;
 using System.Text;
 
-
 public class ChatGPTClient : Singleton<ChatGPTClient>
 {
     [SerializeField]
     private ChatGTPSettings chatGTPSettings;
     private Whisper whisper;
-    private string screenshotPath;
     private string logFilePath;
 
     private void Start()
     {
-        // Initialize the whisper reference
         whisper = FindObjectOfType<Whisper>();
         if (whisper == null)
         {
             Debug.LogError("Whisper instance not found in the scene.");
         }
 
-        // Set screenshot path
-        screenshotPath = Path.Combine(Application.persistentDataPath, "screenshot.png");
-
-        // Set log file path
         logFilePath = Path.Combine(Application.persistentDataPath, "ChatGPTLogs.txt");
     }
 
@@ -80,7 +73,6 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
             if (whisper != null)
             {
                 string apiKey = whisper.GetCurrentApiKey();
-                string organization = "";
                 if (!string.IsNullOrEmpty(apiKey))
                 {
                     request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
@@ -88,15 +80,6 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
                 else
                 {
                     Debug.LogError("API key is null or empty.");
-                }
-
-                if (!string.IsNullOrEmpty(organization))
-                {
-                    request.SetRequestHeader("OpenAI-Organization", organization);
-                }
-                else
-                {
-                    Debug.LogWarning("OpenAI-Organization is null or empty.");
                 }
             }
             else
@@ -151,36 +134,26 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
         logBuilder.AppendLine($"Response: {response.Choices[0].Message.content}");
         logBuilder.AppendLine("----------------------------------------------------");
 
-        // Append the log to the file
         File.AppendAllText(logFilePath, logBuilder.ToString());
     }
 
     private IEnumerator CaptureAndEncodeScreenshot()
     {
         yield return new WaitForEndOfFrame();
-        ScreenCapture.CaptureScreenshot(screenshotPath);
-        Debug.Log("Screenshot saved to: " + screenshotPath);
-        yield return new WaitUntil(() => File.Exists(screenshotPath));
+        Texture2D screenTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+        screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        screenTexture.Apply();
+
+        byte[] imageBytes = screenTexture.EncodeToJPG(20);
+        encodedScreenshot = Convert.ToBase64String(imageBytes);
+
+        Destroy(screenTexture);
     }
 
     private string EncodeScreenshotToBase64()
     {
-        byte[] imageBytes = File.ReadAllBytes(screenshotPath);
-        Texture2D texture = new Texture2D(2, 2);
-        texture.LoadImage(imageBytes);
-        Texture2D resizedTexture = ResizeTexture(texture, 128, 128);
-        byte[] resizedImageBytes = resizedTexture.EncodeToJPG(20);
-        return Convert.ToBase64String(resizedImageBytes);
+        return encodedScreenshot;
     }
 
-    private Texture2D ResizeTexture(Texture2D originalTexture, int targetWidth, int targetHeight)
-    {
-        RenderTexture rt = new RenderTexture(targetWidth, targetHeight, 24);
-        RenderTexture.active = rt;
-        Graphics.Blit(originalTexture, rt);
-        Texture2D resizedTexture = new Texture2D(targetWidth, targetHeight);
-        resizedTexture.ReadPixels(new Rect(0, 0, targetWidth, targetHeight), 0, 0);
-        resizedTexture.Apply();
-        return resizedTexture;
-    }
+    private string encodedScreenshot;
 }
