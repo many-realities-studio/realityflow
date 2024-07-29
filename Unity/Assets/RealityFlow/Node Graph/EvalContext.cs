@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using RealityFlow.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RealityFlow.NodeGraph
@@ -139,6 +140,8 @@ namespace RealityFlow.NodeGraph
                 return castValue;
             else if (typeof(T) == typeof(string) && value.ToString() is T tString)
                 return tString;
+            else if (typeof(T).IsReferenceType() && value == null)
+                return default;
             else
                 throw new GraphTypeMismatchException();
         }

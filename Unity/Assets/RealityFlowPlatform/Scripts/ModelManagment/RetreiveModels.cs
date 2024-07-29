@@ -25,7 +25,7 @@ public class RetrieveModel : MonoBehaviour
         }
     }
 
-    private void GetUserName(string userId)
+    private async void GetUserName(string userId)
     {
         var getUserRequest = new GraphQLRequest
         {
@@ -40,7 +40,7 @@ public class RetrieveModel : MonoBehaviour
 
         try
         {
-            var graphQLResponse = rfClient.SendQueryBlocking(getUserRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getUserRequest);
             var data = graphQLResponse["data"];
 
             if (data != null && data["getUserById"] != null)
@@ -67,7 +67,7 @@ public class RetrieveModel : MonoBehaviour
         }
     }
 
-    public void GetModelsData(string userId)
+    public async void GetModelsData(string userId)
     {
         var getModelsRequest = new GraphQLRequest
         {
@@ -86,7 +86,7 @@ public class RetrieveModel : MonoBehaviour
 
         try
         {
-            var graphQLResponse = rfClient.SendQueryBlocking(getModelsRequest);
+            var graphQLResponse = await rfClient.SendQueryAsync(getModelsRequest);
             var data = graphQLResponse["data"];
             if (data != null && data["getUserModelsForUnity"] != null)
             {

@@ -52,11 +52,11 @@ namespace RealityFlow.NodeUI
             transform.forward = camForward;
         }
 
-        public void SetAttachedObj(VisualScript obj)
+        public async void SetAttachedObj(VisualScript obj)
         {
             if (RealityFlowAPI.Instance.SpawnedObjects[obj.gameObject].graphId == null)
             {
-                obj.graph = RealityFlowAPI.Instance.CreateNodeGraphAsync();
+                obj.graph = await RealityFlowAPI.Instance.CreateNodeGraphAsync();
                 RealityFlowAPI.Instance.AssignGraph(obj.graph, obj.gameObject);
             }
             topLevelGraphView.CurrentObject = obj;

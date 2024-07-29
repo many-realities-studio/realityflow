@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using RealityFlow.Collections;
 using RealityFlow.NodeGraph;
 using RealityFlow.NodeUI;
@@ -78,6 +79,10 @@ namespace RealityFlow.NodeUI
 
         public void UpdateList()
         {
+            string current = dropdown.value > 0
+                ? dropdownIds[dropdown.value - 1]
+                : null;
+
             TextPrefab[] texts = FindObjectsOfType<TextPrefab>();
             (List<string> names, List<string> ids) =
                 (
@@ -93,6 +98,18 @@ namespace RealityFlow.NodeUI
 
             dropdownIds.Clear();
             dropdownIds.AddRange(ids);
+
+            int newIndex;
+            if (current is null)
+                newIndex = 0;
+            else
+            {
+                newIndex = ids.IndexOf(current) + 1;
+                if (newIndex == -1)
+                    newIndex = 0;
+            }
+
+            dropdown.SetValueWithoutNotify(newIndex);
         }
     }
 }

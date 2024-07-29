@@ -59,7 +59,7 @@ public class NetworkedObjectSpawner : MonoBehaviour
         }
     }
 
-    private void SpawnNetworkedObject(MyNetworkedObject networkedObject)
+    private async void SpawnNetworkedObject(MyNetworkedObject networkedObject)
     {
         if (RealityFlowAPI.Instance == null)
         {
@@ -72,7 +72,7 @@ public class NetworkedObjectSpawner : MonoBehaviour
         Quaternion rotation = networkedObject.transform.rotation;
         Vector3 originalScale = networkedObject.transform.localScale;
 
-        GameObject spawnedObject = RealityFlowAPI.Instance.SpawnObject(networkedObject.gameObject.name, position, originalScale, rotation);
+        GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnObject(networkedObject.gameObject.name, position, originalScale, rotation);
 
         if (spawnedObject != null)
         {

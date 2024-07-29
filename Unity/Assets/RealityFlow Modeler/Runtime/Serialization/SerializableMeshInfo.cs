@@ -5,13 +5,36 @@ using Ubiq.Spawning;
 using Ubiq.Messaging;
 using Newtonsoft.Json;
 using UnityEngine;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 
+[Serializable]
 public class SerializableMeshInfo
 {
 
     public float[] vertices;
 
-    public int[][] faces;
+    [Serializable]
+    public struct Face {
+        public int[] indices;
+
+        public Face(int[] indices)
+        {
+            this.indices = indices;
+        }
+
+        public readonly int this[int i]
+        {
+            get => indices[i];
+            set => indices[i] = value;
+        }
+
+        public static implicit operator int[](Face face) => face.indices;
+
+        public static implicit operator Face(int[] indices) => new(indices);
+    }
+
+    public Face[] faces;
 
     public int shapeID;
 
@@ -101,11 +124,9 @@ public class SerializableMeshInfo
             vertices[i * 3 + 2] = em.positions[i].z;
         }
 
-        faces = new int[em.faces.Length][];
-
+        faces = new Face[em.faces.Length];
         for (int i = 0; i < em.faces.Length; i++)
         {
-
             // faces[i] = em.faces[i].indicies;
             faces[i] = new int[em.faces[i].indicies.Length];
             for (int j = 0; j < em.faces[i].indicies.Length; j++)
