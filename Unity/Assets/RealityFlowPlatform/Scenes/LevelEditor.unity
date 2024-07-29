@@ -4556,8 +4556,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 729152569}
+  m_Children: []
   m_Father: {fileID: 1004891735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -7853,7 +7852,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 729152569}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.9999999, y: 1}
@@ -10073,7 +10072,7 @@ MonoBehaviour:
     type: 3}
   DiscoveryPanelDetail: {fileID: 325145418}
   RoomDescriptionPanel: {fileID: 377130204}
-  server: http://localhost:4000/
+  server: https://reality.gaim.ucf.edu/
 --- !u!114 &2142340402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12922,3 +12921,4 @@ SceneRoots:
   - {fileID: 2037515228}
   - {fileID: 51941857}
   - {fileID: 634966502}
+  - {fileID: 1510911641}
