@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 264905364295262773}
   - component: {fileID: 1167958887682932658}
   - component: {fileID: -2532674424673543189}
-  - component: {fileID: -7391600987763416907}
   - component: {fileID: 5187482911680691592}
   m_Layer: 0
   m_Name: Wall
@@ -455,6 +454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2d86cf89641ced47ac32be57ea60542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastSize: 0.1
   owner: 0
   isHeld: 0
   isSelected: 0
@@ -489,7 +489,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
@@ -590,32 +590,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &-7391600987763416907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6552777094840884397}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 207f43536db1e4420b3d240d31a5fe00, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  networkedPlayManager: {fileID: 0}
-  rfObj:
-    id: 
-    projectId: 
-    name: 
-    graphId: 
-    type: 
-    transformJson: 
-    meshJson: 
-    originalPrefabName: 
-    isTemplate: 0
-    isStatic: 0
-    isCollidable: 1
-    isGravityEnabled: 1
 --- !u!65 &5187482911680691592
 BoxCollider:
   m_ObjectHideFlags: 0

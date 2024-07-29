@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 2253084012651848733}
   - component: {fileID: 7481671207377693300}
   - component: {fileID: 792332533087121362}
-  - component: {fileID: 3525743733801575332}
   - component: {fileID: 1896781105675259843}
   - component: {fileID: -5508188530835070517}
   - component: {fileID: 1408376852829614066}
@@ -130,36 +129,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   autoConstraintSelection: 1
   selectedConstraints: []
---- !u!114 &3525743733801575332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7963664522839745951}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2d86cf89641ced47ac32be57ea60542, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lastSize: 0.1
-  owner: 0
-  isHeld: 0
-  isSelected: 0
-  networkedPlayManager: {fileID: 0}
-  rfObj:
-    id: 
-    projectId: 
-    name: 
-    graphId: 
-    type: 
-    transformJson: 
-    meshJson: 
-    originalPrefabName: 
-    isTemplate: 0
-    isStatic: 0
-    isCollidable: 1
-    isGravityEnabled: 1
 --- !u!64 &1896781105675259843
 MeshCollider:
   m_ObjectHideFlags: 0
