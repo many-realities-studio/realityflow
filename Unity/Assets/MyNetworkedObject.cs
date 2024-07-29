@@ -356,18 +356,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 }
             }
 
-            context.SendJson(new Message()
-            {
-                position = transform.localPosition,
-                scale = transform.localScale,
-                rotation = transform.localRotation,
-                owner = false,
-                //isHeld = false,
-                //isKinematic = true,//,
-                //color = gameObject.GetComponent<Renderer>().material.color
-                //gravity = rb.useGravity
-            });
-
             //rb.useGravity = true;
             rb.isKinematic = false;
             rb.useGravity = true;
@@ -385,6 +373,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rfObj = rfObj,
             owner = false, //Set Others to Not Owner
         });
+        }
     }
 
     #endregion
