@@ -361,10 +361,11 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         //Debug.Log("EndHold() was called");
         isHeld = false;
         // Debug.Log("Run the EndHold() networking messages");
-        
-        RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
-        context.SendJson(CreateHeldMessage(false));
 
+        if (!networkedPlayManager.playMode)
+            RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+
+        context.SendJson(CreateHeldMessage(false));
 
         if (!networkedPlayManager.playMode)
         {

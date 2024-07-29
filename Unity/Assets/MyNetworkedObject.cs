@@ -243,10 +243,13 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // Determines the behaivior of the object depending on play and edit mode
         if (!networkedPlayManager.playMode)
         {
-            //rb.useGravity = false;
-            rb.isKinematic = false;
+            if (rb)
+            {
+                //rb.useGravity = false;
+                rb.isKinematic = false;
 
-            rb.constraints = RigidbodyConstraints.None;
+                rb.constraints = RigidbodyConstraints.None;
+            }
 
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
@@ -258,16 +261,16 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             //rb.useGravity = true;
         }
 
+        Debug.Log("Started hold the action is now being logged to the ActionLogger");
+
         // Log the transformation at the start of holding
-        RealityFlowAPI.Instance?.actionLogger?.LogAction(
+        RealityFlowAPI.Instance.actionLogger.LogAction(
             nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
             rfObj.id,
             transform.localPosition,
             transform.localRotation,
             transform.localScale
-        ); 
-        // debug for the rf obj id
-        Debug.Log("[START-HOLD][PREFAB]RF OBJECT ID: " + rfObj.id);
+        );
 
         context.SendJson(new Message()
         {
@@ -298,10 +301,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         // the rf obj for play mode.
         if (!networkedPlayManager.playMode)
         {
-            rb.useGravity = false;
-            rb.isKinematic = true;
-
-            rb.constraints = RigidbodyConstraints.FreezeAll;
+            if (rb)
+            {
+                rb.useGravity = false;
+                rb.isKinematic = true;
+                rb.constraints = RigidbodyConstraints.FreezeAll;
+            }
         }
         else
         {
@@ -315,15 +320,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 // TODO: Move to it's own component (Like RFobject manager or something)
                 //       Include the playmode switch stuff
                 // if static, be still on play
-                if (rfObj.isStatic)
+                if (rb)
                 {
-                    rb.isKinematic = true;
-                    rb.constraints = RigidbodyConstraints.FreezeAll;
-                }
-                else
-                {
-                    rb.isKinematic = false;
-                }
+                    if (rfObj.isStatic)
+                    {
+                        rb.isKinematic = true;
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
+                    }
+                    else
+                    {
+                        rb.isKinematic = false;
+                    }
 
                 // if has gravity, apply in play mode
                 if (rfObj.isGravityEnabled)
