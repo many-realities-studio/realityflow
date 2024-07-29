@@ -345,7 +345,9 @@ namespace RealityFlow.NodeGraph
 
         public GameObjectValue(GameObject obj)
         {
-            if (RealityFlowAPI.Instance.SpawnedObjects.TryGetValue(obj, out RfObject rfObj))
+            if (obj == null)
+                realityflowId = null;
+            else if (RealityFlowAPI.Instance.SpawnedObjects.TryGetValue(obj, out RfObject rfObj))
                 realityflowId = rfObj.id;
             else
             {
@@ -423,11 +425,10 @@ namespace RealityFlow.NodeGraph
     [Serializable]
     public class TextValue : GameObjectValue
     {
-        [SerializeField]
-        string realityflowId;
-
         public TextValue(GameObject obj) : base(obj)
         {
+            if (obj == null)
+                return;
             if (!obj.GetComponent<TMP_Text>())
                 Debug.LogError("Created text value from non-text");
         }

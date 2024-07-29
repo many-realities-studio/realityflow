@@ -129,7 +129,7 @@ public class ObjectSpawn : MonoBehaviour
         return "{}";
     }
 
-    private void CreateObjectInDatabase(RfObject rfObject)
+    private async void CreateObjectInDatabase(RfObject rfObject)
     {
         if (realityFlowClient == null)
         {
@@ -164,7 +164,7 @@ public class ObjectSpawn : MonoBehaviour
             Debug.Log("Sending GraphQL request to: " + realityFlowClient.server + "/graphql");
             Debug.Log("Request: " + JsonUtility.ToJson(createObject));
 
-            var graphQLResponse = realityFlowClient.SendQueryBlocking(createObject);
+            var graphQLResponse = await realityFlowClient.SendQueryAsync(createObject);
             var data = graphQLResponse["data"];
             var errors = graphQLResponse["errors"];
             if (data != null)

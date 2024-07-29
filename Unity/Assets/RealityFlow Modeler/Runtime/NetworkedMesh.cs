@@ -66,6 +66,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             context = NetworkScene.Register(this);
         else
             Debug.Log("ID is already valid");
+        
+        Debug.Log("[START][NET-MESH]Context ID: " + context.Id);
 
         // Find the reference for the room client to track peers
         /*roomClient = NetworkScene.Find(this).GetComponent<RoomClient>();
@@ -142,8 +144,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     }
 
     void Awake()
-    {
-        // Debug.Log("Awake is called");
+    {  
         em = gameObject.GetComponent<EditableMesh>();
         owner = false;
         isHeld = false;
@@ -154,7 +155,13 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         //boundsControl.HandlesActive = false;
 
         if (NetworkId == null)
-            Debug.Log("Networked Object " + gameObject.name + " Network ID is null");
+        {
+            Debug.Log("[AWAKE][NET-MESH]Networked Object " + gameObject.name + " Network ID is null");
+        }
+        else
+        {
+            Debug.Log("[AWAKE][NET-MESH]Context ID: " + context.Id);
+        }
     }
 
     // Update is called once per frame
@@ -354,10 +361,11 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         //Debug.Log("EndHold() was called");
         isHeld = false;
         // Debug.Log("Run the EndHold() networking messages");
-        
-        RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
-        context.SendJson(CreateHeldMessage(false));
 
+        if (!networkedPlayManager.playMode)
+            RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+
+        context.SendJson(CreateHeldMessage(false));
 
         if (!networkedPlayManager.playMode)
         {
@@ -428,7 +436,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     public void SendTransformData()
     {
-        // Debug.Log("SendTransformData() was called");
+        Debug.Log("[SEND][NET-MESH]SendTransformData() was called");
 
         context.SendJson(new Message()
         {
