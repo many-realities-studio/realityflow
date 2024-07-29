@@ -331,7 +331,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                     {
                         rb.isKinematic = false;
                     }
-
+                }
                 // if has gravity, apply in play mode
                 if (rfObj.isGravityEnabled)
                 {
