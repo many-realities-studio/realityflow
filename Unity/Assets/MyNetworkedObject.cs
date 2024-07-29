@@ -373,7 +373,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rfObj = rfObj,
             owner = false, //Set Others to Not Owner
         });
-        }
     }
 
     #endregion
