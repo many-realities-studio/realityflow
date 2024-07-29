@@ -29,20 +29,20 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos
 
         private void LateUpdate()
         {
-            float distanceSqr = (localRespawnPosition - transform.localPosition).sqrMagnitude;
+            // float distanceSqr = (localRespawnPosition - transform.localPosition).sqrMagnitude;
 
-            if (distanceSqr > distanceThresholdSquared)
-            {
-                // Reset any velocity from falling or moving when respawning to original location
-                if (rigidBody != null)
-                {
-                    rigidBody.velocity = Vector3.zero;
-                    rigidBody.angularVelocity = Vector3.zero;
-                }
+            // if (distanceSqr > distanceThresholdSquared)
+            // {
+            //     // Reset any velocity from falling or moving when respawning to original location
+            //     if (rigidBody != null)
+            //     {
+            //         rigidBody.velocity = Vector3.zero;
+            //         rigidBody.angularVelocity = Vector3.zero;
+            //     }
 
-                transform.localPosition = localRespawnPosition;
-                transform.localRotation = localRespawnRotation;
-            }
+            //     transform.localPosition = localRespawnPosition;
+            //     transform.localRotation = localRespawnRotation;
+            // }
         }
     }
 }

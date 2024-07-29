@@ -19,12 +19,12 @@ public class ProjectsDisplay : MonoBehaviour
     public GameObject projectOwner;
 
     // Room UI elements
-    public Transform roomsContent;
+    public RectTransform roomsContent;
     public GameObject roomUI;
     public Button createRoomBtn;
     public Button refreshRoomsBtn;
 
-    // GraphQL client and access token variables
+    // References
     private RealityFlowClient rfClient;
 
     #region Initialization
@@ -84,7 +84,7 @@ public class ProjectsDisplay : MonoBehaviour
     #endregion
 
     #region Display Projects
-    private void GetUserProjectsData()
+    private async void GetUserProjectsData()
     {
         // Check For Essential Components
         if (rfClient == null)
@@ -137,7 +137,7 @@ public class ProjectsDisplay : MonoBehaviour
             Variables = new { getUserByIdId = userId }
         };
 
-        var queryResult = rfClient.SendQueryBlocking(projectsQuery);
+        var queryResult = await rfClient.SendQueryAsync(projectsQuery);
         var data = queryResult["data"];
         if (data != null)
         {
@@ -155,7 +155,7 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
 
-    public void GetActiveProjectsData()
+    public async void GetActiveProjectsData()
     {
         // Debug.Log("--- Fetching Active Projects Data ---");
 
@@ -182,12 +182,12 @@ public class ProjectsDisplay : MonoBehaviour
             Variables = null
         };
 
-        var graphQL = rfClient.SendQueryBlocking(activeProjectsQuery);
+        var graphQL = await rfClient.SendQueryAsync(activeProjectsQuery);
         var projectsData = graphQL["data"]["getActiveProjects"] as JArray;
 
         if (projectsData != null)
         {
-            // Debug.Log($"Fetched {projectsData.Count} active projects.");
+            Debug.Log($"Fetched {projectsData.Count} active projects.");
             DisplayActiveProjects(projectsData, activeProjectsPanel); // Pass the fetched data to the display method
         }
         else
@@ -300,7 +300,7 @@ public class ProjectsDisplay : MonoBehaviour
         }
     }
     
-    public void OpenProject(string id)
+    public async void OpenProject(string id)
     {
         rfClient.SetCurrentProject(id);
         projectDetailPanel.SetActive(true);
@@ -329,7 +329,7 @@ public class ProjectsDisplay : MonoBehaviour
             Variables = new { getProjectByIdId = id }
         };
 
-        var graphQL = rfClient.SendQueryBlocking(getProjectData);
+        var graphQL = await rfClient.SendQueryAsync(getProjectData);
         var projectdata = graphQL["data"];
         if (projectdata != null)
         {
@@ -357,11 +357,6 @@ public class ProjectsDisplay : MonoBehaviour
     #region Display Rooms
     private void DisplayRooms(JArray rooms)
     {
-        foreach (Transform child in roomsContent)
-        {
-            Destroy(child.gameObject);
-        }
-
         for (int i = 0; i < rooms.Count; i++)
         {
             var room = GameObject.Instantiate(roomUI, roomsContent, false);

@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Ubiq.Messaging;
@@ -87,7 +88,7 @@ public class ProjectContentManager : MonoBehaviour
         return sceneObjects.Find((IRealityFlowObject ro) => ro.transform == obj.transform);
     }
 
-    public void LoadObject(IRealityFlowObject em)
+    public async void LoadObject(IRealityFlowObject em)
     {
         // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MWM0ODAyNmU2ZjhjZjkzNWNkNTZlMCIsInVzZXJuYW1lIjoiSmFuZURvZSIsImVtYWlsIjoibmF0aGFuaWVsQHNoYXBlZGN2LmNvbSIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsImlhdCI6MTY4MzI0NDkzOCwiZXhwIjoxNjgzMzMxMzM4fQ.4m-yLOAfXW6qzK9hZyTScT2BseJQOp6IragpvCdwoqY";
         // graphQLC.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
@@ -107,7 +108,7 @@ public class ProjectContentManager : MonoBehaviour
             OperationName = "Query",
             Variables = new { getProjectByIdId = defaultProjectId }
         };
-        var queryResult = rfClient.SendQueryBlocking(getProjectObjects);
+        var queryResult = await rfClient.SendQueryAsync(getProjectObjects);
         var data = queryResult["data"];
         var errors = queryResult["errors"];
         Debug.Log("helloyes");
@@ -187,7 +188,7 @@ public class ProjectContentManager : MonoBehaviour
         // Calls an "AddObject route on the server"
     }
 
-    public void SaveObject(IRealityFlowObject em)
+    public async void SaveObject(IRealityFlowObject em)
     {
         //Send the Json file to the dataserver
 
@@ -210,7 +211,7 @@ public class ProjectContentManager : MonoBehaviour
             Variables = new { input = new { objectJson = em.smi, projectId = defaultProjectId } }
         };
 
-        var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
+        var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
         var queryData = queryResult["data"];
 
         if (queryData != null)
@@ -229,7 +230,7 @@ public class ProjectContentManager : MonoBehaviour
         em.uuid = (string)queryData["saveObject"]["id"];
     }
 
-    public void UpdateObject(GameObject go)
+    public async void UpdateObject(GameObject go)
     {
         if (editMode)
         {
@@ -254,11 +255,11 @@ public class ProjectContentManager : MonoBehaviour
                 Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid, objectJson = go } }
             };
 
-            var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
+            var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
         }
     }
 
-    public void RemoveObject(GameObject go)
+    public async void RemoveObject(GameObject go)
     {
         if (editMode) // And user has permission to edit
         {
@@ -282,7 +283,7 @@ public class ProjectContentManager : MonoBehaviour
                 Variables = new { input = new { objectId = go.GetComponent<EditableMesh>().uuid } }
             };
 
-            var queryResult = rfClient.SendQueryBlocking(getUserInfoRequest);
+            var queryResult = await rfClient.SendQueryAsync(getUserInfoRequest);
         }
     }
 
