@@ -4,6 +4,7 @@ using NaughtyAttributes;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace RealityFlow.NodeGraph
 {
@@ -363,7 +364,9 @@ namespace RealityFlow.NodeGraph
         {
             get
             {
-                if (RealityFlowAPI.Instance.SpawnedObjectsById.TryGetValue(realityflowId, out GameObject obj))
+                if (realityflowId == null)
+                    return null;
+                else if (RealityFlowAPI.Instance.SpawnedObjectsById.TryGetValue(realityflowId, out GameObject obj))
                     return obj;
                 else
                 {

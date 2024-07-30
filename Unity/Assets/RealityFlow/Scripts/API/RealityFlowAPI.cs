@@ -774,32 +774,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             originalPrefabName = em.baseShape.ToString(),
             baseShape = em.baseShape,
         };
-        // Manually serialize faces into a json array of arrays
-        StringBuilder sb = new StringBuilder();
         spawnedMesh.GetComponent<CacheMeshData>().SetRfObject(rfObject);
-        sb.Append("[");
-        for (int i = 0; i < smi.faces.Length; i++)
-        {
-            sb.Append("[");
-            for (int j = 0; j < smi.faces[i].Length; j++)
-            {
-                sb.Append(smi.faces[i][j]);
-                if (j < smi.faces[i].Length - 1)
-                {
-                    sb.Append(",");
-                }
-            }
-            sb.Append("]");
-            if (i < smi.faces.Length - 1)
-            {
-                sb.Append(",");
-            }
-        }
-        sb.Append("]");
-        // Debug.Log(sb.ToString());
-        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
-        // Debug.Log(rfObject);
 
         var createObject = new GraphQLRequest
         {
@@ -903,31 +878,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         RfObject rfObject = spawnedObjects[spawnedMesh];
         rfObject.transformJson = JsonUtility.ToJson(transformData);
         rfObject.meshJson = JsonUtility.ToJson(smi);
-
-        // Manually serialize faces into a json array of arrays
-        StringBuilder sb = new StringBuilder();
-        sb.Append("[");
-        for (int i = 0; i < smi.faces.Length; i++)
-        {
-            sb.Append("[");
-            for (int j = 0; j < smi.faces[i].Length; j++)
-            {
-                sb.Append(smi.faces[i][j]);
-                if (j < smi.faces[i].Length - 1)
-                {
-                    sb.Append(",");
-                }
-            }
-            sb.Append("]");
-            if (i < smi.faces.Length - 1)
-            {
-                sb.Append(",");
-            }
-        }
-        sb.Append("]");
-        Debug.Log(sb.ToString());
-        // Add sb.ToString() as the value of the faces property, adding it instead of replacing it.
-        rfObject.meshJson = rfObject.meshJson.Insert(rfObject.meshJson.Length - 1, $",\"faces\":{sb}");
 
         var createObject = new GraphQLRequest
         {
@@ -1960,56 +1910,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     Debug.Log("Primitive Base");
 
-                    SerializableMeshInfo serializableMesh;
-                    try
-                    {
-                        serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
-                    }
-                    catch (ArgumentException)
-                    {
-                        try
-                        {
-                            // try to recover by adding a }. This might alleviate a difficult to track bug for now
-                            string newJson = obj.meshJson + "}";
-                            serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
-                            Debug.LogError("Recovered from failed SMI JSON parse by adding a } to the end");
-                        }
-                        catch (ArgumentException)
-                        {
-                            // try to recover by adding a }. This might alleviate a difficult to track bug for now
-                            string newJson = obj.meshJson + "]}";
-                            serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(newJson);
-                            Debug.LogError("Recovered from failed SMI JSON parse by adding a ]} to the end");
-                        }
+                    SerializableMeshInfo serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
 
-                    }
-                    finally
-                    {
-                        Debug.LogError($"Failed to parse the following SMI JSON: {obj.meshJson}");
-                    }
-                    // Deserialize the two dimensional array of integers from the json string and assign it to serializableMesh.faces
-                    obj.meshJson = obj.meshJson.Remove(obj.meshJson.Length - 1);
-                    int start = obj.meshJson.LastIndexOf("\"faces\":") + 9;
-                    int end = obj.meshJson.Length;
-                    string faces = obj.meshJson.Substring(start, end - start - 1);
-                    string[] faceArray = faces.Split('[');
-                    int[][] facesArray = new int[faceArray.Length - 1][];
-                    for (int i = 1; i < faceArray.Length; i++)
-                    {
-                        // If the last character is a , remove it
-                        faceArray[i] = faceArray[i].TrimEnd(',');
-                        string[] face = faceArray[i].Split(',');
-
-                        // Remove any "]" characters from the last element of the array
-                        facesArray[i - 1] = new int[face.Length];
-                        for (int j = 0; j < face.Length; j++)
-                        {
-                            face[j] = face[j].Replace("]", "");
-                            facesArray[i - 1][j] = int.Parse(face[j]);
-                        }
-                    }
-                    serializableMesh.faces = facesArray;
-                    Debug.Log(serializableMesh.lastSize);
                     // Error can't deserialize here for some reason. Can check with team or investigate 
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
                     Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
