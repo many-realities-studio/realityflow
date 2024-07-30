@@ -89,9 +89,13 @@ public class CacheObjectData : MonoBehaviour
                     {
                         rb.isKinematic = true;
                         rb.constraints = RigidbodyConstraints.FreezeAll;
-                        if(GetComponent<CustomObjectManipulator>() != null)
+                        /*if(GetComponent<CustomObjectManipulator>() != null)
                         {
                             GetComponent<CustomObjectManipulator>().enabled = false;
+                        }*/
+                        if(GetComponent<BoundsControl>() != null)
+                        {
+                            GetComponent<BoundsControl>().ToggleHandlesOnClick = false;
                         } 
                     } else
                     {
@@ -141,9 +145,13 @@ public class CacheObjectData : MonoBehaviour
                     if(rfObj.isStatic)
                     {
                         rb.constraints = RigidbodyConstraints.None;
-                        if(GetComponent<CustomObjectManipulator>() != null)
+                        /*if(GetComponent<CustomObjectManipulator>() != null)
                         {
                             GetComponent<CustomObjectManipulator>().enabled = false;
+                        } */
+                        if(GetComponent<BoundsControl>() != null)
+                        {
+                            GetComponent<BoundsControl>().ToggleHandlesOnClick = false;
                         } 
                     }
 
