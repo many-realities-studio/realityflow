@@ -89,6 +89,10 @@ public class CacheObjectData : MonoBehaviour
                     {
                         rb.isKinematic = true;
                         rb.constraints = RigidbodyConstraints.FreezeAll;
+                        if(GetComponent<CustomObjectManipulator>() != null)
+                        {
+                            GetComponent<CustomObjectManipulator>().enabled = false;
+                        } 
                     } else
                     {
                         rb.constraints = RigidbodyConstraints.None;
@@ -137,6 +141,10 @@ public class CacheObjectData : MonoBehaviour
                     if(rfObj.isStatic)
                     {
                         rb.constraints = RigidbodyConstraints.None;
+                        if(GetComponent<CustomObjectManipulator>() != null)
+                        {
+                            GetComponent<CustomObjectManipulator>().enabled = false;
+                        } 
                     }
 
                     // all objects should float and be still
