@@ -181,6 +181,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // cycle through the spawnedObjects Catalogue
     public void CycleThroughObjects()
     {
+        Debug.Log("** Cycling through objects... **");
+
         foreach (var obj in spawnedObjects)
         {
             Debug.Log("Object: " + obj.Key);

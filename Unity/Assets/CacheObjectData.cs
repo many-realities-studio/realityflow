@@ -61,7 +61,7 @@ public class CacheObjectData : MonoBehaviour
         gameObject.name = objectName;
 
         // Debug log to find name of the gameObject
-        Debug.Log("Object Name: " + gameObject.name);
+        Debug.Log("[CACHE-OBJ]Object Name: " + gameObject.name);
 
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
 

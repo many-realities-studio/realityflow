@@ -103,10 +103,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {   
         // debug log to see if we are the owner 
         // delay it so it only logs every few seconds
-        if (Time.frameCount % 300 == 0)
-        {
-            Debug.Log("[UPDATE][NET-PREFAB]OWNER IS: " + owner);
-        }
+        // if (Time.frameCount % 300 == 0)
+        // {
+        //     Debug.Log("[UPDATE][NET-PREFAB]OWNER IS: " + owner);
+        // }
 
         if (owner)
         {
@@ -115,10 +115,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             lastScale = transform.localScale;
             lastRotation = transform.localRotation;
 
-            if (Time.frameCount % 300 == 0)
-            {
-                Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
-            }
+            // if (Time.frameCount % 300 == 0)
+            // {
+            //     Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+            // }
             
             // Send the transform data to the server
             SendTransformData();
@@ -393,10 +393,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         var m = message.FromJson<Message>();
         
-        if (Time.frameCount % 300 == 0)
-        {
-            Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
-        }
+        // if (Time.frameCount % 300 == 0)
+        // {
+        //     Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);
+        // }
 
         transform.localPosition = m.position;
         transform.localScale = m.scale;
