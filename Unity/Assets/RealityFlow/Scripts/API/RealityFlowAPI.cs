@@ -978,6 +978,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             originalPrefabName = prefabName
         };
 
+        //spawnedPrefab.GetComponent<CacheMeshData>().SetRfObject(rfObject);
+
         // This is a GraphQL request to save the object to the database
         var createObject = new GraphQLRequest
         {

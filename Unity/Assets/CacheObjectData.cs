@@ -26,6 +26,11 @@ public class CacheObjectData : MonoBehaviour
     // component errors
     private bool compErr = false;
 
+    /*public void SetRfObject(RfObject rfObj)
+    {
+        this.rfObj = rfObj;
+    }*/
+
     void Start()
     {
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
