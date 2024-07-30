@@ -56,8 +56,9 @@ public class CacheObjectData : MonoBehaviour
 
 
         // Remove "(Clone)" suffix from the object name if it exists
-        gameObject.name.Replace("(Clone)", "");
-
+        string objectName = gameObject.name.Replace("(Clone)", "");
+        gameObject.name = objectName;
+        
         // Debug log to find name of the gameObject
         Debug.Log("Object Name: " + gameObject.name);
 
