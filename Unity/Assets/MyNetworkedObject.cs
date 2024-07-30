@@ -10,6 +10,7 @@ using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using UnityEngine.InputSystem.LowLevel;
+using Unity.VisualScripting;
 
 
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -48,7 +49,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     private bool compErr = false;
 
     void Start()
-    {      
+    {
         // finds The Networked Play Manager
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
 
@@ -100,12 +101,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     // Update is called once per frame 
     // You want to update to send the transform data to the server every frame
     void Update()
-    {   
+    {
         // debug log to see if we are the owner 
         // delay it so it only logs every few seconds
         if (Time.frameCount % 300 == 0)
         {
-            Debug.Log("[UPDATE][NET-PREFAB]OWNER IS: " + owner);
+            //            Debug.Log("[UPDATE][NET-PREFAB]OWNER IS: " + owner);
         }
 
         if (owner)
@@ -119,10 +120,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             {
                 Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
             }
-            
+
             // Send the transform data to the server
             SendTransformData();
-        }   
+        }
     }
 
     public void SendTransformData()
@@ -133,7 +134,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             position = transform.localPosition,
             scale = transform.localScale,
-            rotation = transform.localRotation, 
+            rotation = transform.localRotation,
             rfObj = rfObj,
         });
     }
@@ -148,7 +149,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         {
             gameObject.name = rfObj.id;
         }
-        
+
         // Set the owner of the object
         owner = isOwner; // IsOwner should be true
         Debug.Log("[INIT-PREFAB][NET-PREFAB]OWNER IS: " + owner);
@@ -218,12 +219,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             });
         }
     }
-    
+
     public void StartHold()
-    {   
+    {
         // Debug Saying that we are holding the object
         Debug.Log("[START-HOLD][PREFAB]Started Holding Prefab");
-        
+
         // Change the object's name to the rf object's name
         if (gameObject.name != rfObj.id)
         {
@@ -268,15 +269,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         Debug.Log("Started hold the action is now being logged to the ActionLogger");
 
-        // Log the transformation at the start of holding
-        RealityFlowAPI.Instance.actionLogger.LogAction(
-            nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-            rfObj.id,
-            transform.localPosition,
-            transform.localRotation,
-            transform.localScale
-        );
-
+        if (!RealityFlowAPI.Instance.isUndoing)
+        {
+            // Log the transformation at the start of holding
+            RealityFlowAPI.Instance.actionLogger.LogAction(
+                nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+                rfObj.id,
+                transform.localPosition,
+                transform.localRotation,
+                transform.localScale
+            );
+        }
         context.SendJson(new Message()
         {
             position = transform.localPosition,
@@ -388,11 +391,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     }
 
     #endregion
-    
+
     // THE MESSAGE STRUCTURE
     public struct Message
     {
-        
+
         public Vector3 position;      // Transform Data
         public Vector3 scale;
         public Quaternion rotation;
@@ -404,7 +407,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
-        
+
         if (Time.frameCount % 300 == 0)
         {
             Debug.Log("Received Message: Position=" + m.position + ", Scale=" + m.scale + ", Rotation=" + m.rotation);

@@ -71,7 +71,7 @@ public class ChatGPTTester : MonoBehaviour
         if (prefabNames.Count > 0)
         {
             var reminderMessage = "\n-------------------------------------------------------------------------\n\n\nOnly use the following prefabs when spawning: " + string.Join(", ", prefabNames);
-            Debug.Log("Only use the following prefabs when generating code: " + string.Join(", ", prefabNames));
+            Debug.Log("Only use the following prefabs when generating code, also if the object in the prompt is not present in the prefab list choose the closest applicable one: " + string.Join(", ", prefabNames));
 
             Vector3 indicatorPosition = raycastLogger.GetVisualIndicatorPosition();
             if (indicatorPosition != Vector3.zero)
@@ -94,14 +94,15 @@ public class ChatGPTTester : MonoBehaviour
                 if (visualScript != null && visualScript.graph != null)
                 {
                     string graphJson = JsonUtility.ToJson(visualScript.graph);
-                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson}";
+                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED";
                     Debug.Log($"Selected object: {selectedObjectName}, Graph: {graphJson}");
                     AddTemporaryReminder(selectedObjectReminder);
                 }
             }
         }
         // Add specific reminder about graph manipulation
-        var graphManipulationReminder = "\n-------------------------------------------------------------------------\n\n\n DO WHAT THE PROMPT SAYS, ignore the following message unless specifiied: When making a node or manipulating a graph, only do it like this. Do not deviate from how this file is set up at all. Don't try to create a new graph, don't try to use JSON, don't try to update the database. Do it like you see in this file, nodes should be organized rectangularly and use 100.0.0 spacing if the number of nodes being created is less than 10, if its more then 10 spacing shoud be used: \n\n\n\n" +
+        var graphManipulationReminder = "\n-------------------------------------------------------------------------\n\n\n DO WHAT THE PROMPT SAYS, for example If it says to make a cube don't make nodes on the graph unless it says to. Ignore the following message unless specifiied: When making a node or manipulating a graph, only do it in the way you see here. Do not deviate from how this file is set up. Your responses should be structured very very similarly to this example. Don't try to create a new graph, don't try to use JSON, don't try to update the database, do only what the user says. Do it like you see in this file: \n\n\n\n" +
+                                        "Note this is just an example don't actually generate this, just something similar in line with the user prompt." +
                                         "private void CreateComprehensiveGraphProcedure(string objId, float spacing)\n" +
                                         "{\n" +
                                         "    // Find the object\n" +
