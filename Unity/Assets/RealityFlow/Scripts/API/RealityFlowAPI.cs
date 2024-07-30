@@ -1968,7 +1968,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // --- Fill SpawnObjects Catalogue ---
     // This method should help the synchronize other player who are not the host
 
-    public async Task FillSpawnObjectsCatalogue()
+    public async void FillSpawnObjectsCatalogue()
     {
         // Fetch the objects from the database
         List<RfObject> objectsInDatabase = await FetchObjectsByProjectId(client.GetCurrentProjectId());
@@ -2003,6 +2003,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ---Select/Edit---
     public GameObject FindSpawnedObject(string id)
     {
+        // Debug saying filling Catalogue or something
+        Debug.Log("[API]Filling SpawnObjects Catalogue...");
         // !I dont know what this method is used for but I wont delete it!
         if (spawnManager == null)
         {

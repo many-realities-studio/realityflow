@@ -673,7 +673,7 @@ public class RealityFlowClient : MonoBehaviour
             projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
 
 
-        _ = RealityFlowAPI.Instance.FillSpawnObjectsCatalogue();
+        RealityFlowAPI.Instance.FillSpawnObjectsCatalogue();
 
 
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
