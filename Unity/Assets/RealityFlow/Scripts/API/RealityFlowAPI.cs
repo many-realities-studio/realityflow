@@ -1971,22 +1971,22 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public async void FillSpawnObjectsCatalogue()
     {
         // Debug saying filling Catalogue or something
-        Debug.Log("[API]Filling SpawnObjects Catalogue...");
+        Debug.Log("[API] Filling SpawnObjects Catalogue...");
 
         // Fetch the objects from the database
         List<RfObject> objectsInDatabase = await FetchObjectsByProjectId(client.GetCurrentProjectId());
 
         if (objectsInDatabase == null)
         {
-            Debug.LogError("No objects fetched from the database.");
+            Debug.LogError("[API] No objects fetched from the database.");
             return;
         }
 
         // Iterate through the fetched objects and associate them with Unity GameObjects
         foreach (RfObject rfObject in objectsInDatabase)
         {
-            Debug.Log($"Filling Catalogue with object: {rfObject.name}");
-            Debug.Log($"Object ID: {rfObject.id}");
+            Debug.Log("[API] Filling Catalogue with object: " + rfObject.name );
+            //Debug.Log($"Object ID: {rfObject.id}");
 
             // Find the corresponding GameObject in the scene
             GameObject gameObject = GameObject.Find(rfObject.name);
