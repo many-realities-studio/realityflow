@@ -53,12 +53,13 @@ public class CacheObjectData : MonoBehaviour
             compErr = true;
         }
 
-
+        // Cycle through ojects in SpawnedObjects
+        RealityFlowAPI.Instance.CycleThroughObjects();
 
         // Remove "(Clone)" suffix from the object name if it exists
         string objectName = gameObject.name.Replace("(Clone)", "");
         gameObject.name = objectName;
-        
+
         // Debug log to find name of the gameObject
         Debug.Log("Object Name: " + gameObject.name);
 
