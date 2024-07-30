@@ -716,8 +716,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public async Task<GameObject> SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
 
-        var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
-        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        GameObject spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive); EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
         if (inputMesh == null)
         {
             // Based on the shape
@@ -844,7 +843,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
             if (!isUndoing)
             {
-                actionLogger.LogAction(nameof(SpawnPrimitive), spawnedMesh.name, position, rotation, scale, inputMesh, em.baseShape);
+                actionLogger.LogAction(nameof(SpawnPrimitive), spawnedMesh.name, position, rotation, scale, inputMesh, em.baseShape, spawnedMesh);
                 Debug.LogError("\n\n\n\nType is: " + em.baseShape);
             }
         }
@@ -2632,6 +2631,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     destroyed.SetActive(true);
 
                 break;
+            default:
+                Debug.LogError($"Attempted to undo unrecognized action {action.FunctionName}");
+                break;
 
                 // Add cases for other functions...
         }
@@ -2924,7 +2926,18 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             // Log the current transform before making changes
             //There are checks to make sure that it does not undo a redo remove the !isRedoing check if you wish it to undo a redo, but this may result in an infinite loop of Undos and redos
             if (!isUndoing)
-                actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+            {
+                RfObject oldData = spawnedObjects[obj];
+                if (oldData.type == "Primitive")
+                {
+                    TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
+                    actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, oldTransform.position, oldTransform.rotation, oldTransform.scale);
+                }
+                else
+                {
+                    actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+                }
+            }
             Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
             Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);
 

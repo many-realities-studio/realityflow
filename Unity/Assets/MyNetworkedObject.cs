@@ -10,6 +10,7 @@ using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using UnityEngine.InputSystem.LowLevel;
+using Unity.VisualScripting;
 
 
 public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -263,15 +264,17 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         Debug.Log("Started hold the action is now being logged to the ActionLogger");
 
-        // Log the transformation at the start of holding
-        RealityFlowAPI.Instance.actionLogger.LogAction(
-            nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-            rfObj.id,
-            transform.localPosition,
-            transform.localRotation,
-            transform.localScale
-        );
-
+        if (!RealityFlowAPI.Instance.isUndoing)
+        {
+            // Log the transformation at the start of holding
+            RealityFlowAPI.Instance.actionLogger.LogAction(
+                nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+                rfObj.id,
+                transform.localPosition,
+                transform.localRotation,
+                transform.localScale
+            );
+        }
         context.SendJson(new Message()
         {
             position = transform.localPosition,
