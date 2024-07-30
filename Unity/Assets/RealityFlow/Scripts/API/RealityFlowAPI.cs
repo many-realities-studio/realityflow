@@ -1930,12 +1930,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
             // Remove "(Clone)" suffix from the object name if it exists
             string objectName = obj.name.Replace("(Clone)", "");
+
+            //Setting RfObject fields to make undo and redo work
             obj.originalPrefabName = objectName;
 
             if (obj.type == "Primitive")
             {
                 obj.originalPrefabName = "PrimitiveBase";
                 obj.name = "PrimitiveBase";
+                obj.baseShape = obj.
+
             }
             // Find the prefab in the catalogue
 
