@@ -107,6 +107,10 @@ public class CacheObjectData : MonoBehaviour
                     {
                         boxCol.enabled = false;
                     }
+                }
+                if(GetComponent<BoundsControl>() != null)
+                {
+                    GetComponent<BoundsControl>().HandlesActive = false;
                 } 
             }
             // Revert values back to cached information upon leaving Play mode

@@ -309,6 +309,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 rb.constraints = RigidbodyConstraints.FreezeAll;
                 rb.excludeLayers = ~rb.excludeLayers;
             }
+
+            if(GetComponent<BoundsControl>() != null)
+            {
+                GetComponent<BoundsControl>().HandlesActive = false;
+            } 
         }
         else
         {
