@@ -412,7 +412,6 @@ namespace Ubiq.Spawning
                 tmpSpawnables[i].NetworkId = NetworkId.Create(networkId, (uint)(i + 1));
             }
 
-            go.name = go.name + j++; // RF change
             return go;
         }
 
