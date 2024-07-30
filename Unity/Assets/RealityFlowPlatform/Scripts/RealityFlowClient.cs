@@ -672,10 +672,6 @@ public class RealityFlowClient : MonoBehaviour
         if (projectManager)
             projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
 
-
-        RealityFlowAPI.Instance.FillSpawnObjectsCatalogue();
-
-
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
 
         roomClient.Join(joinCode); // Join Room Based on Room Code
@@ -688,6 +684,8 @@ public class RealityFlowClient : MonoBehaviour
         // Debug.Log(room.Name + " JoinCode: " + room.JoinCode);
         // Debug.Log(room.Name + " UUID: " + room.UUID);
         // Debug.Log(room.Name + " Publish: " + room.Publish);
+
+        RealityFlowAPI.Instance.FillSpawnObjectsCatalogue();
 
         levelEditor.SetActive(true); 
 

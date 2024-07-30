@@ -1992,7 +1992,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             GameObject gameObject = GameObject.Find(rfObject.name);
             if (gameObject == null)
             {
-                Debug.LogWarning($"GameObject with name {rfObject.name} not found in the scene.");
+                Debug.LogWarning("[API] Object not found in the scene: " + rfObject.name);
                 continue;
             }
 
