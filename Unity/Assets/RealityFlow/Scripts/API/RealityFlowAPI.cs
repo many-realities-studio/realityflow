@@ -1970,6 +1970,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public async void FillSpawnObjectsCatalogue()
     {
+        // Debug saying filling Catalogue or something
+        Debug.Log("[API]Filling SpawnObjects Catalogue...");
+
         // Fetch the objects from the database
         List<RfObject> objectsInDatabase = await FetchObjectsByProjectId(client.GetCurrentProjectId());
 
@@ -1982,6 +1985,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Iterate through the fetched objects and associate them with Unity GameObjects
         foreach (RfObject rfObject in objectsInDatabase)
         {
+            Debug.Log($"Filling Catalogue with object: {rfObject.name}");
+            Debug.Log($"Object ID: {rfObject.id}");
+
             // Find the corresponding GameObject in the scene
             GameObject gameObject = GameObject.Find(rfObject.name);
             if (gameObject == null)
@@ -2003,8 +2009,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     // ---Select/Edit---
     public GameObject FindSpawnedObject(string id)
     {
-        // Debug saying filling Catalogue or something
-        Debug.Log("[API]Filling SpawnObjects Catalogue...");
         // !I dont know what this method is used for but I wont delete it!
         if (spawnManager == null)
         {
