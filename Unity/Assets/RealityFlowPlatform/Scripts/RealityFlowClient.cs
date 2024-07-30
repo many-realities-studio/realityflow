@@ -672,6 +672,10 @@ public class RealityFlowClient : MonoBehaviour
         if (projectManager)
             projectManager.SetActive(false);  // MAYBE CHECK FOR SUCCESSFUL JOIN BEFORE HIDING
 
+
+        _ = RealityFlowAPI.Instance.FillSpawnObjectsCatalogue();
+
+
         roomClient.OnJoinedRoom.AddListener(OnJoinedExistingRoom);
 
         roomClient.Join(joinCode); // Join Room Based on Room Code

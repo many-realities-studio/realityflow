@@ -1965,6 +1965,40 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         Debug.Log("Room population complete.");
     }
 
+    // --- Fill SpawnObjects Catalogue ---
+    // This method should help the synchronize other player who are not the host
+
+    public async Task FillSpawnObjectsCatalogue()
+    {
+        // Fetch the objects from the database
+        List<RfObject> objectsInDatabase = await FetchObjectsByProjectId(client.GetCurrentProjectId());
+
+        if (objectsInDatabase == null)
+        {
+            Debug.LogError("No objects fetched from the database.");
+            return;
+        }
+
+        // Iterate through the fetched objects and associate them with Unity GameObjects
+        foreach (RfObject rfObject in objectsInDatabase)
+        {
+            // Find the corresponding GameObject in the scene
+            GameObject gameObject = GameObject.Find(rfObject.name);
+            if (gameObject == null)
+            {
+                Debug.LogWarning($"GameObject with name {rfObject.name} not found in the scene.");
+                continue;
+            }
+
+            // Add the association to the spawnedObjects dictionary
+            spawnedObjects[gameObject] = rfObject;
+            spawnedObjectsById[rfObject.id] = gameObject;
+
+            // Optionally, log the association
+            Debug.Log($"Associated GameObject {gameObject.name} with RfObject {rfObject.id}");
+        }
+    }
+
     #region FindSpawnedObject By ID
     // ---Select/Edit---
     public GameObject FindSpawnedObject(string id)
