@@ -1888,7 +1888,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 obj.originalPrefabName = "PrimitiveBase";
                 obj.name = "PrimitiveBase";
-                obj.baseShape = obj.
 
             }
             // Find the prefab in the catalogue
@@ -1916,6 +1915,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
                     Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
+                    if (obj.type == "Primitive")
+                    {
+                        obj.baseShape = spawnedObject.GetComponent<EditableMesh>().baseShape;
+                    }
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)
