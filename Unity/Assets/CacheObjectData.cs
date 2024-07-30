@@ -53,6 +53,18 @@ public class CacheObjectData : MonoBehaviour
             compErr = true;
         }
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+
+        // Debug log sahowing object Id and properties
+        if (rfObj != null)
+        {
+            Debug.Log("[CACHE-OBJ]Object Id: " + rfObj.id);
+            Debug.Log("[CACHE-OBJ]Object Name: " + rfObj.name);
+        }
+        else
+        {
+            Debug.Log("[CACHE-OBJ] NULL");
+        }
+        {}
     }
 
     void Update()
