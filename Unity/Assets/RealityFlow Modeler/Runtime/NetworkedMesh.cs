@@ -66,8 +66,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             context = NetworkScene.Register(this);
         else
             Debug.Log("ID is already valid");
-        
-        Debug.Log("[START][NET-MESH]Context ID: " + context.Id);
+
+        //        Debug.Log("[START][NET-MESH]Context ID: " + context.Id);
 
         // Find the reference for the room client to track peers
         /*roomClient = NetworkScene.Find(this).GetComponent<RoomClient>();
@@ -104,7 +104,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
                         //     + child2.gameObject.transform.parent.parent.parent.parent.parent.name + " is the color: " + boundsMaterial.GetColor("_Color_"));
                         // }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Debug.Log(e + " Does " + child2.gameObject.name + " have the ThickerSqueezableBox material?");
                     }
@@ -144,7 +144,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     }
 
     void Awake()
-    {  
+    {
         em = gameObject.GetComponent<EditableMesh>();
         owner = false;
         isHeld = false;
@@ -258,7 +258,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
     private void BroadcastCreateMesh()
     {
-        if(isDuplicate && originalName != "")
+        if (isDuplicate && originalName != "")
         {
             SendDuplicateToolData();
             return;
@@ -290,14 +290,14 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         {
             em.CreateMesh(mesh);
         }
-       /* PrimitiveData data = PrimitiveGenerator.CreatePrimitive(type);
+        /* PrimitiveData data = PrimitiveGenerator.CreatePrimitive(type);
 
-        if (em)
-        {
-            em.CreateMesh(data);
-        }
+         if (em)
+         {
+             em.CreateMesh(data);
+         }
 
-        boundsControl.enabled = true;*/
+         boundsControl.enabled = true;*/
         Destroy(mesh.gameObject);
     }
 
@@ -332,12 +332,12 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
         if (!rb)
             rb = GetComponent<Rigidbody>();
-        
+
         owner = true;
         isHeld = true;
         // Debug.Log("StartHold() was called");
 
-         // If we are not in play mode, have no gravity and allow the object to move while held,
+        // If we are not in play mode, have no gravity and allow the object to move while held,
         // similarly allow thw object to be moved in playmode without gravity on hold.
         if (!networkedPlayManager.playMode)
         {
@@ -353,7 +353,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
         }*/
 
-        if (isSelected 
+        if (isSelected
             || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive
             || eraser.isActive)
             return;
@@ -383,7 +383,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         if (gameObject.GetComponent<BoundsControl>().HandlesActive)
         {
             if (!owner && isSelected)
-            return;
+                return;
 
             //Debug.Log("This mesh is now selected");
             owner = true;
@@ -453,7 +453,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             meshSmoothness = GetGlossiness(),
             boundsColor = new Color(1f, 0.21f, 0.078f, 1f),
             objectManipulator = wasBake
-            
+
         });
 
         wasBake = false;
@@ -515,7 +515,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             em.BakeVertices();
         }*/
 
-        if(gameObject.GetComponent<BoundsControl>().HandlesActive)
+        if (gameObject.GetComponent<BoundsControl>().HandlesActive)
         {
             gameObject.GetComponent<BoundsControl>().RecomputeBounds();
         }
@@ -551,10 +551,10 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         GameObject go = GameObject.Find(originalName);
         //if (go != null)
         //{
-            EditableMesh copyFrom = go.GetComponent<EditableMesh>();
-            em.CreateMesh(copyFrom);
-            // em.RecalculateBoundsSafe();
-            em.GetComponent<BoundsControl>().RecomputeBounds();
+        EditableMesh copyFrom = go.GetComponent<EditableMesh>();
+        em.CreateMesh(copyFrom);
+        // em.RecalculateBoundsSafe();
+        em.GetComponent<BoundsControl>().RecomputeBounds();
         //}
     }
 
@@ -594,7 +594,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var m = message.FromJson<Message>();
-        if(m.needsData && !em.isEmpty)
+        if (m.needsData && !em.isEmpty)
         {
             // Debug.Log("We need data for the mesh from scene " + gameObject.transform.parent.parent.parent.name);
             StartHold();
@@ -602,14 +602,14 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        if(em.isEmpty && (m.shapeType != ShapeType.NoShape))
+        if (em.isEmpty && (m.shapeType != ShapeType.NoShape))
         {
             CreateMesh(m.shapeType);
             ResizeMesh(m.size);
             return;
         }
 
-        if(m.type == CommandType.Resize)
+        if (m.type == CommandType.Resize)
         {
             ResizeMesh(m.size);
             return;

@@ -34,6 +34,8 @@ using TMPro;
 using RealityFlow.Collections;
 using RealityFlow.Scripting;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Assertions.Must;
+
 // using UnityEditor.U2D; REMOVED FOR COMPILATION
 
 
@@ -713,6 +715,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public async Task<GameObject> SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
+
         var spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
         if (inputMesh == null)
@@ -767,7 +770,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             graphId = null,
             transformJson = JsonUtility.ToJson(transformData),
             meshJson = JsonUtility.ToJson(smi),
-            projectId = client.GetCurrentProjectId()
+            projectId = client.GetCurrentProjectId(),
+            originalPrefabName = em.baseShape.ToString(),
+            baseShape = em.baseShape,
         };
         // Manually serialize faces into a json array of arrays
         StringBuilder sb = new StringBuilder();
@@ -858,8 +863,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
+
+
+            Debug.LogError("Are we undoing right now?? " + isUndoing);
+
             if (!isUndoing)
-                actionLogger.LogAction(nameof(SpawnPrimitive), position, rotation, scale, inputMesh, type);
+            {
+                actionLogger.LogAction(nameof(SpawnPrimitive), spawnedMesh.name, position, rotation, scale, inputMesh, em.baseShape);
+                Debug.LogError("\n\n\n\nType is: " + em.baseShape);
+            }
         }
         catch (Exception ex)
         {
@@ -1102,6 +1114,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
+
+            Debug.LogError("Are we undoing right now?? " + isUndoing);
+
             if (!isUndoing)
                 actionLogger.LogAction(nameof(SpawnPrefab), spawnedPrefab.name, spawnPosition, spawnRotation, scale, scope);
 
@@ -1915,8 +1930,15 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
             // Remove "(Clone)" suffix from the object name if it exists
             string objectName = obj.name.Replace("(Clone)", "");
+            obj.originalPrefabName = objectName;
 
+            if (obj.type == "Primitive")
+            {
+                obj.originalPrefabName = "PrimitiveBase";
+                obj.name = "PrimitiveBase";
+            }
             // Find the prefab in the catalogue
+
             GameObject prefab = catalogue.prefabs.Find(p => p.name == objectName);
             if (prefab == null)
             {
@@ -2231,18 +2253,28 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     }
 
     //This function is primarily for peer scope
-    public void DespawnObject(GameObject objectToDespawn, SpawnScope scope = SpawnScope.Room)
+    public void DespawnPrimitive(GameObject objectToDespawn, SpawnScope scope = SpawnScope.Room)
     {
         if (objectToDespawn != null)
         {
+            // Will be used to store the current rfObject
+            RfObject obj = null;
             string objectId = objectToDespawn.name;
-            //Set the originalPrefabName to the object's name by default in case of peer scope
+            // Set the originalPrefabName to the object's name by default in case of peer scope
             string originalPrefabName = objectId;
             if (spawnedObjects.TryGetValue(objectToDespawn, out RfObject rfObject))
+            {
                 originalPrefabName = rfObject.originalPrefabName; // Ensure this field exists and is set correctly when spawning objects
+                obj = rfObject;
+            }
+            Debug.LogError("Are we undoing right now?? " + isUndoing);
 
+            // Log the action with all necessary details
             if (!isUndoing)
-                actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
+            {
+                actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, obj, scope);
+                Debug.LogError("ACTION ADDED!!!!");
+            }
 
             // Remove object from the database
             RemoveObjectFromDatabase(objectId, () =>
@@ -2263,6 +2295,56 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Object to despawn is null");
         }
     }
+
+    public void DespawnObject(GameObject objectToDespawn, SpawnScope scope = SpawnScope.Room)
+    {
+        if (objectToDespawn != null)
+        {
+            //Will be used to store the current rfObject
+            RfObject obj = null;
+            string objectId = objectToDespawn.name;
+            //Set the originalPrefabName to the object's name by default in case of peer scope
+            string originalPrefabName = objectId;
+
+            if (spawnedObjects.TryGetValue(objectToDespawn, out RfObject rfObject))
+            {
+                originalPrefabName = rfObject.originalPrefabName; // Ensure this field exists and is set correctly when spawning objects
+                obj = rfObject;
+            }
+
+            if (obj.type == "Primitive")
+            {
+                obj.originalPrefabName = "PrimitiveBase";
+                obj.name = "PrimitiveBase";
+                DespawnPrimitive(objectToDespawn, scope);
+                return;
+            }
+            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            if (!isUndoing)
+            {
+                actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
+                Debug.LogError("ACTION ADDED!!!!");
+            }
+            // Remove object from the database
+            RemoveObjectFromDatabase(objectId, () =>
+            {
+                // Remove the object from local dictionaries
+                spawnedObjects.Remove(objectToDespawn);
+                spawnedObjectsById.Remove(objectId);
+
+                // Only despawn the object if it was successfully removed from the database
+                spawnManager.Despawn(objectToDespawn);
+                Debug.Log("Despawned: " + objectToDespawn.name);
+            });
+
+            LogActionToServer("DespawnObject", new { rfObject, originalPrefabName });
+        }
+        else
+        {
+            Debug.LogError("Object to despawn is null");
+        }
+    }
+
 
     private async void RemoveObjectFromDatabase(string objectId, Action onSuccess)
     {
@@ -2432,16 +2514,71 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 break;
 
-            case nameof(DespawnObject):
+            case nameof(SpawnPrimitive):
+                string objectName = (string)action.Parameters[0];
+                spawnedObject = FindSpawnedObject(objectName);
+                if (spawnedObject != null)
+                {
+                    Debug.Log(objectName + " existed, despawning it now");
+                    DespawnPrimitive(spawnedObject);
+                }
+                break;
+
+            case nameof(DespawnPrimitive):
                 string objectId = action.Parameters[0] as string;
+                Vector3 position = (Vector3)action.Parameters[1];
+                Quaternion rotation = (Quaternion)action.Parameters[2];
+                Vector3 scale = (Vector3)action.Parameters[3];
+                RfObject rfObject = action.Parameters[4] as RfObject;
+                SpawnScope scope = (SpawnScope)action.Parameters[5];
+
                 if (spawnedObjectsById.ContainsKey(objectId))
                 {
-                    RfObject rfObject = spawnedObjects[spawnedObjectsById[objectId]];
+                    rfObject = spawnedObjects[spawnedObjectsById[objectId]];
                     string originalPrefabName = rfObject.originalPrefabName;
-                    Vector3 position = (Vector3)action.Parameters[1];
-                    Quaternion rotation = (Quaternion)action.Parameters[2];
-                    Vector3 scale = (Vector3)action.Parameters[3];
-                    SpawnScope scope = (SpawnScope)action.Parameters[4];
+                    //originalPrefabName = GetOriginalPrefabName(objectId);
+                    await SpawnPrefab(originalPrefabName, position, scale, rotation, scope);
+                }
+                else if (rfObject != null && rfObject.type == "Primitive")
+                {
+                    // Recreate the primitive using the stored rfObject
+                    GameObject respawnedObject = await SpawnPrimitive(position, rotation, scale, null, rfObject.baseShape);
+                    if (respawnedObject != null)
+                    {
+                        respawnedObject.transform.localScale = scale;
+                        respawnedObjects[objectId] = respawnedObject;
+                    }
+                }
+                else
+                {
+                    string objName = action.Parameters[0] as string;
+                    Debug.Log("Undoing the despawn of object named " + objName);
+                    position = (Vector3)action.Parameters[1];
+                    rotation = (Quaternion)action.Parameters[2];
+                    scale = (Vector3)action.Parameters[3];
+                    scope = (SpawnScope)action.Parameters[5]; // Ensure the scope is logged during the initial action and passed here.
+                    string originalPrefabName = GetOriginalPrefabName(objectId);
+                    Debug.Log("The original prefab name in undo despawn is: " + originalPrefabName);
+                    GameObject respawnedObject = await SpawnPrefab(objName, position, scale, rotation, scope);
+                    if (respawnedObject != null)
+                    {
+                        respawnedObject.transform.localScale = scale;
+                        respawnedObjects[objName] = respawnedObject;
+                    }
+                    //save the spawned object add it to a list of respawned objects that can then be searched by despawn redo
+                }
+                break;
+
+            case nameof(DespawnObject):
+                objectId = action.Parameters[0] as string;
+                if (spawnedObjectsById.ContainsKey(objectId))
+                {
+                    rfObject = spawnedObjects[spawnedObjectsById[objectId]];
+                    string originalPrefabName = rfObject.originalPrefabName;
+                    position = (Vector3)action.Parameters[1];
+                    rotation = (Quaternion)action.Parameters[2];
+                    scale = (Vector3)action.Parameters[3];
+                    scope = (SpawnScope)action.Parameters[4];
                     //originalPrefabName = GetOriginalPrefabName(objectId);
                     await SpawnPrefab(originalPrefabName, position, scale, rotation, scope);
                 }
@@ -2449,10 +2586,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     string objName = action.Parameters[0] as string;
                     Debug.Log("Undoing the despawn of object named " + objName);
-                    Vector3 position = (Vector3)action.Parameters[1];
-                    Quaternion rotation = (Quaternion)action.Parameters[2];
-                    Vector3 scale = (Vector3)action.Parameters[3];
-                    SpawnScope scope = (SpawnScope)action.Parameters[4]; // Ensure the scope is logged during the initial action and passed here.
+                    position = (Vector3)action.Parameters[1];
+                    rotation = (Quaternion)action.Parameters[2];
+                    scale = (Vector3)action.Parameters[3];
+                    scope = (SpawnScope)action.Parameters[4]; // Ensure the scope is logged during the initial action and passed here.
                     string originalPrefabName = GetOriginalPrefabName(objectId);
                     Debug.Log("The original prefab name in undo despawn is: " + originalPrefabName);
                     GameObject respawnedObject = await SpawnPrefab(objName, position, scale, rotation, scope);
@@ -2465,9 +2602,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 }
                 break;
-
             case nameof(UpdateObjectTransform):
-                string objectName = (string)action.Parameters[0];
+                objectName = (string)action.Parameters[0];
                 Vector3 oldPosition = (Vector3)action.Parameters[1];
                 Quaternion oldRotation = (Quaternion)action.Parameters[2];
                 Vector3 oldScale = (Vector3)action.Parameters[3];
@@ -2607,6 +2743,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.Log("No actions to redo.");
             return;
         }
+        Debug.LogError(lastRedoAction.ToString() + " This is the last redo action");
+
+
         isRedoing = true;
         if (lastRedoAction is ActionLogger.CompoundAction compoundAction)
         {
@@ -2643,6 +2782,31 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
                 break;
+            case nameof(DespawnPrimitive):
+                prefabName = (string)action.Parameters[0];
+                Debug.Log("The spawned object's name is " + prefabName);
+                spawnedObject = FindSpawnedObject(prefabName);
+                if (respawnedObjects.TryGetValue(prefabName, out spawnedObject))
+                {
+                    if (spawnedObject != null)
+                    {
+                        Debug.Log(prefabName + " existed, despawning it now");
+                        DespawnObject(spawnedObject);
+                        // Remove from respawned objects dictionary
+                        respawnedObjects.Remove(prefabName);
+                    }
+                }
+                break;
+
+            case nameof(SpawnPrimitive):
+                string objectName = (string)action.Parameters[0];
+                Vector3 position = (Vector3)action.Parameters[1];
+                Quaternion rotation = (Quaternion)action.Parameters[2];
+                Vector3 scale = (Vector3)action.Parameters[3];
+                EditableMesh inputMesh = action.Parameters[4] as EditableMesh;
+                ShapeType type = (ShapeType)action.Parameters[5];
+                await SpawnPrimitive(position, rotation, scale, inputMesh, type);
+                break;
 
             case nameof(SpawnPrefab):
                 string objectId = action.Parameters[0] as string;
@@ -2655,9 +2819,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     RfObject rfObject = spawnedObjects[spawnedObjectsById[objectId]];
                     string originalPrefabName = rfObject.originalPrefabName;
-                    Vector3 position = (Vector3)action.Parameters[1];
-                    Quaternion rotation = (Quaternion)action.Parameters[2];
-                    Vector3 scale = (Vector3)action.Parameters[3];
+                    position = (Vector3)action.Parameters[1];
+                    rotation = (Quaternion)action.Parameters[2];
+                    scale = (Vector3)action.Parameters[3];
                     SpawnScope scope = (SpawnScope)action.Parameters[4];
                     //originalPrefabName = GetOriginalPrefabName(objectId);
                     await SpawnPrefab(originalPrefabName, position, scale, rotation, scope);
@@ -2666,9 +2830,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     string objName = action.Parameters[0] as string;
                     Debug.Log("Redoing the despawn of object named " + objName);
-                    Vector3 position = (Vector3)action.Parameters[1];
-                    Quaternion rotation = (Quaternion)action.Parameters[2];
-                    Vector3 scale = (Vector3)action.Parameters[3];
+                    position = (Vector3)action.Parameters[1];
+                    rotation = (Quaternion)action.Parameters[2];
+                    scale = (Vector3)action.Parameters[3];
                     SpawnScope scope = (SpawnScope)action.Parameters[4]; // Ensure the scope is logged during the initial action and passed here.
                     string originalPrefabName = GetOriginalPrefabName(objectId);
                     GameObject respawnedObject = await SpawnPrefab(originalPrefabName, position, scale, rotation, scope);
@@ -2680,7 +2844,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 break;
 
             case nameof(UpdateObjectTransform):
-                string objectName = (string)action.Parameters[0];
+                objectName = (string)action.Parameters[0];
                 Vector3 oldPosition = (Vector3)action.Parameters[1];
                 Quaternion oldRotation = (Quaternion)action.Parameters[2];
                 Vector3 oldScale = (Vector3)action.Parameters[3];
@@ -2955,6 +3119,8 @@ public class RfObject
     public bool isStatic;
     public bool isCollidable = true;
     public bool isGravityEnabled = true;
+
+    public ShapeType baseShape;
 }
 
 [System.Serializable]
