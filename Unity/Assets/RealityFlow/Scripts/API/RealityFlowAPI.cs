@@ -333,7 +333,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     }
                 }
             }
-            //if (!isUndoing & !isRedoing)
+            //            //if(!isUndoing)
             //actionLogger.LogAction(nameof(CreateNodeGraphAsync), newGraph.Id);
         }
         catch (Exception ex)
@@ -489,7 +489,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding node {def.Name} to graph at index {index}");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(AddNodeToGraph), graph, def, index, prevJson, graphJson);
 
         LogActionToServer("AddNode", new { graphId = graph.Id, defName = def.Name, index });
@@ -512,7 +512,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Serialize the graph object to JSON
         string graphJson = JsonUtility.ToJson(graph);
         // Debug.Log($"Adding node {def} to graph at index {index}");
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(RemoveNodeFromGraph), graph, node, prevJson, graphJson);
 
         LogActionToServer("RemoveNode", new { graphId = graph.Id, node });
@@ -534,7 +534,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding edge {from}:{to} to graph");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(AddDataEdgeToGraph), graph, from, to, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -551,7 +551,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Deleting edge {from}:{to} to graph");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(RemoveDataEdgeFromGraph), graph, from, to, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -572,7 +572,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Adding exec edge {from}:{to} to graph");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(AddExecEdgeToGraph), graph, from, to, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -589,7 +589,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Removing exec edge {from}:{to} to graph");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(RemoveExecEdgeFromGraph), graph, from, to, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -613,7 +613,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Moving node {node} to {position}");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(SetNodePosition), graph, node, position, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -640,7 +640,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Setting node {node} field {field} to value {value}");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(SetNodeFieldValue), graph, node, field, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -667,7 +667,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         string graphJson = JsonUtility.ToJson(graph);
         Debug.Log($"Setting node {node} port {port} constant to {value}");
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(SetNodeInputConstantValue), graph, node, port, oldValue, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -681,7 +681,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         graph.AddVariable(name, type);
         string graphJson = JsonUtility.ToJson(graph);
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(AddVariableToGraph), graph, name, type, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -695,7 +695,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         graph.RemoveVariable(name);
         string graphJson = JsonUtility.ToJson(graph);
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(RemoveVariableFromGraph), graph, name, prevJson, graphJson);
 
         SendGraphUpdateToDatabase(graphJson, graph.Id);
@@ -842,7 +842,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
             Debug.LogError("Are we undoing right now?? " + isUndoing);
 
-            if (!isUndoing & !isRedoing)
+            if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(SpawnPrimitive), spawnedMesh.name, position, rotation, scale, inputMesh, em.baseShape);
                 Debug.LogError("\n\n\n\nType is: " + em.baseShape);
@@ -1067,7 +1067,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
             Debug.LogError("Are we undoing right now?? " + isUndoing);
 
-            if (!isUndoing & !isRedoing)
+            if (!isUndoing)
                 actionLogger.LogAction(nameof(SpawnPrefab), spawnedPrefab.name, spawnPosition, spawnRotation, scale, scope);
 
             // JORDAN PLEASE HELP!
@@ -1522,7 +1522,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                                 }
                             }
                         }
-                        if (!isUndoing & !isRedoing)
+                        if (!isUndoing)
                         {
                             Debug.Log("Object's name is " + spawnedObject.name);
                             actionLogger.LogAction(nameof(SpawnObject), spawnedObject.name, spawnPosition, spawnRotation, scale, scope);
@@ -1536,7 +1536,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 else
                 {
                     Debug.LogWarning("Could not find the spawned object in the scene or the object was spawned with peer scope.");
-                    if (!isUndoing & !isRedoing)
+                    if (!isUndoing)
                         actionLogger.LogAction(nameof(SpawnObject), prefabName, spawnPosition, spawnRotation, scale, scope);
                     return;
                 }
@@ -1612,7 +1612,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             nonPersistentObjects.Add(spawned);
             spawnedObjects.Add(spawned, objectDetails);
 
-            if (!isUndoing & !isRedoing)
+            if (!isUndoing)
                 actionLogger.LogAction(nameof(InstantiateNonPersisted), spawned);
         }
         catch (Exception e)
@@ -1635,7 +1635,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         else
             obj.SetActive(false);
 
-        if (!isUndoing & !isRedoing)
+        if (!isUndoing)
             actionLogger.LogAction(nameof(DestroyNonPersisted), obj, nonPersistent);
     }
 
@@ -2179,7 +2179,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             Debug.LogError("Are we undoing right now?? " + isUndoing);
 
             // Log the action with all necessary details
-            if (!isUndoing & !isRedoing)
+            if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, obj, scope);
                 Debug.LogError("ACTION ADDED!!!!");
@@ -2229,7 +2229,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 return;
             }
             Debug.LogError("Are we undoing right now?? " + isUndoing);
-            if (!isUndoing & !isRedoing)
+            if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
                 Debug.LogError("ACTION ADDED!!!!");
@@ -2923,7 +2923,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         {
             // Log the current transform before making changes
             //There are checks to make sure that it does not undo a redo remove the !isRedoing check if you wish it to undo a redo, but this may result in an infinite loop of Undos and redos
-            if (!isUndoing && !isRedoing)
+            if (!isUndoing)
                 actionLogger.LogAction(nameof(UpdateObjectTransform), obj.name, obj.transform.position, obj.transform.rotation, obj.transform.localScale);
             Debug.Log("The object's current location is: position: " + obj.transform.position + " Object rotation: " + obj.transform.rotation + " Object scale: " + obj.transform.localScale);
             Debug.Log("The object's desired location is: position: " + position + " Object rotation: " + rotation + " Object scale: " + scale);

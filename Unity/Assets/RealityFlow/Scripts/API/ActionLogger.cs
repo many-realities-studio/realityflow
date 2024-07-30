@@ -169,18 +169,6 @@ public class ActionLogger : MonoBehaviour
         isRedoing = false;
     }
 
-    public void ClearActionStack()
-    {
-        actionStack.Clear();
-        Debug.Log("Cleared action stack.");
-    }
-
-    public void ClearRedoStack()
-    {
-        redoStack.Clear();
-        Debug.Log("Cleared redo stack.");
-    }
-
     public void StartCompoundAction()
     {
         currentCompoundAction = new CompoundAction();
