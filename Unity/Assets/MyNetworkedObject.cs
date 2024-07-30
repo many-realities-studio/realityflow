@@ -259,6 +259,10 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
         else
         {
+            if(GetComponent<BoundsControl>() != null)
+            {
+                GetComponent<BoundsControl>().HandlesActive = false;
+            } 
             //rb.useGravity = true;
         }
 
@@ -310,10 +314,6 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 rb.excludeLayers = ~rb.excludeLayers;
             }
 
-            if(GetComponent<BoundsControl>() != null)
-            {
-                GetComponent<BoundsControl>().HandlesActive = false;
-            } 
         }
         else
         {
@@ -367,6 +367,11 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.isKinematic = false;
             rb.useGravity = true;
         }
+        
+        if(GetComponent<BoundsControl>() != null)
+        {
+            GetComponent<BoundsControl>().HandlesActive = false;
+        } 
         
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
