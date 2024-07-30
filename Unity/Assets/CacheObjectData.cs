@@ -52,6 +52,15 @@ public class CacheObjectData : MonoBehaviour
         {
             compErr = true;
         }
+
+
+
+        // Remove "(Clone)" suffix from the object name if it exists
+        gameObject.name.Replace("(Clone)", "");
+
+        // Debug log to find name of the gameObject
+        Debug.Log("Object Name: " + gameObject.name);
+
         rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
 
         // Debug log sahowing object Id and properties
