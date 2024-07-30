@@ -139,7 +139,7 @@ public class CacheObjectData : MonoBehaviour
                 }
 
                 
-
+                RealityFlowAPI.Instance.UpdatePrefab(gameObject);
                 // All meshes should be selectable after Play mode is exited
                 //gameObject.GetComponent<ObjectManipulator>().enabled = true;
             }
