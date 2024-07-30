@@ -74,7 +74,7 @@ public class ActionLogger : MonoBehaviour
         {
             actionStack.Push(action);
             Debug.Log($"Logged action: {functionName}");
-            redoStack.Clear();
+            //redoStack.Clear();
         }
     }
 
@@ -122,6 +122,7 @@ public class ActionLogger : MonoBehaviour
     public LoggedAction GetLastRedoAction()
     {
         var action = redoStack.Count > 0 ? redoStack.Pop() : null;
+        Debug.LogError("The current count of the redo stack is " + redoStack.Count);
         if (action != null)
         {
             Debug.Log($"Popped redo action: {action.FunctionName}");
@@ -166,18 +167,6 @@ public class ActionLogger : MonoBehaviour
     public void EndRedo()
     {
         isRedoing = false;
-    }
-
-    public void ClearActionStack()
-    {
-        actionStack.Clear();
-        Debug.Log("Cleared action stack.");
-    }
-
-    public void ClearRedoStack()
-    {
-        redoStack.Clear();
-        Debug.Log("Cleared redo stack.");
     }
 
     public void StartCompoundAction()
