@@ -18,6 +18,7 @@ public class CacheObjectData : MonoBehaviour
     private Quaternion cachedRotation;
 
     // Object with information containing collidable, grav, static
+    private GameObject myObject;
     public RfObject rfObj;
     private Rigidbody rb;
 
@@ -27,7 +28,8 @@ public class CacheObjectData : MonoBehaviour
     private bool compErr = false;
 
     void Start()
-    {
+    {   
+        myObject = this.gameObject;
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
         lastPlayModeState = networkedPlayManager.playMode;
 
@@ -37,33 +39,27 @@ public class CacheObjectData : MonoBehaviour
 
 
         // These should throw errors on failure (object doesn't have these components) TODO some other time:
-        if(gameObject.GetComponent<Rigidbody>() != null)
+        if(myObject.GetComponent<Rigidbody>() != null)
         {
-            rb = gameObject.GetComponent<Rigidbody>();
+            rb = myObject.GetComponent<Rigidbody>();
         } else
         {
             compErr = true;
         }
 
-        if(gameObject.GetComponent<BoxCollider>() != null)
+        if(myObject.GetComponent<BoxCollider>() != null)
         {
-            boxCol = gameObject.GetComponent<BoxCollider>();
+            boxCol = myObject.GetComponent<BoxCollider>();
         } else
         {
             compErr = true;
         }
-
-        // Cycle through ojects in SpawnedObjects
-        RealityFlowAPI.Instance.CycleThroughObjects();
-
-        // Remove "(Clone)" suffix from the object name if it exists
-        string objectName = gameObject.name.Replace("(Clone)", "");
-        gameObject.name = objectName;
 
         // Debug log to find name of the gameObject
-        Debug.Log("[CACHE-OBJ]Object Name: " + gameObject.name);
+        Debug.Log("[CACHE-OBJ]Object Name: " + myObject.name);
+        
 
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
+        rfObj = RealityFlowAPI.Instance.SpawnedObjects[myObject];
 
         // Debug log sahowing object Id and properties
         if (rfObj != null)
