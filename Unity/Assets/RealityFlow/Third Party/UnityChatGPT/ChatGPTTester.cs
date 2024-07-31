@@ -200,8 +200,10 @@ public class ChatGPTTester : MonoBehaviour
             LLMPromptToBePassed += $", {string.Join(',', chatGPTQuestion.reminders)}";
             Debug.Log("The complete reminders are: " + LLMPromptToBePassed);
 
+#if UNITY_EDITOR
             // Save the complete list of reminders to a file
             File.WriteAllText(Path.Combine(Application.persistentDataPath, "LLMPromptToBePassed.txt"), LLMPromptToBePassed);
+#endif
         }
 
         StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed, (response) =>
@@ -286,7 +288,6 @@ public class ChatGPTTester : MonoBehaviour
         }
     }
 
-
     private string ExtractObjectName(string code, string functionName)
     {
         int startIndex = code.IndexOf(functionName) + functionName.Length + 1;
@@ -347,6 +348,7 @@ public class ChatGPTTester : MonoBehaviour
 
         try
         {
+#if UNITY_EDITOR
             // Write to local path
             File.WriteAllText(localPath, response);
             Debug.Log("Response written to file: " + localPath);
@@ -354,11 +356,11 @@ public class ChatGPTTester : MonoBehaviour
             // Write to external path
             File.WriteAllText(externalPath, response);
             Debug.Log("Response written to file: " + externalPath);
+#endif
         }
         catch (Exception e)
         {
             Debug.LogError("Failed to write response to file: " + e.Message);
         }
     }
-
 }
