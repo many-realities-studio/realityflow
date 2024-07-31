@@ -19,7 +19,7 @@ public class CacheObjectData : MonoBehaviour
 
     // Object with information containing collidable, grav, static
     private GameObject myObject;
-    public RfObject rfObj;
+    // public RfObject rfObj;
     private Rigidbody rb;
 
     private BoxCollider boxCol;
@@ -56,22 +56,21 @@ public class CacheObjectData : MonoBehaviour
         }
 
         // Debug log to find name of the gameObject
-        Debug.Log("[CACHE-OBJ]Object Name: " + myObject.name);
-        RealityFlowAPI.Instance.CycleThroughObjects();
+        // string objectName = myObject.name.Replace("(Clone)", "");
 
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[myObject];
+        // myObject.name = objectName;
+
+        // Debug.Log("[CACHE-OBJ]Object Name: " + myObject.name);
+
+        // RealityFlowAPI.Instance.FillSpawnObjectsCatalogue();
+
+        // rfObj = RealityFlowAPI.Instance.SpawnedObjects[myObject];
 
         // Debug log sahowing object Id and properties
-        if (rfObj != null)
-        {
-            Debug.Log("[CACHE-OBJ]Object Id: " + rfObj.id);
-            Debug.Log("[CACHE-OBJ]Object Name: " + rfObj.name);
-        }
-        else
-        {
-            Debug.Log("[CACHE-OBJ] NULL");
-        }
-        {}
+        // if (rfObj != null)
+        // {
+        //     Debug.Log("[CACHE-OBJ]Object Id: " + rfObj.id);
+        //     Debug.Log("[CACHE-OBJ]Object Name: " + rfObj.name);
     }
 
     void Update()
@@ -90,7 +89,7 @@ public class CacheObjectData : MonoBehaviour
                 cachedScale = transform.localScale;
                 cachedRotation = transform.localRotation;
 
-                Debug.Log("These are my rfProperties, Static: " + rfObj.isStatic + " Collidable: " + rfObj.isCollidable + " GavityEnb: " + rfObj.isGravityEnabled);
+                //Debug.Log("These are my rfProperties, Static: " + rfObj.isStatic + " Collidable: " + rfObj.isCollidable + " GavityEnb: " + rfObj.isGravityEnabled);
 
                 // if we have are missing a component don't mess with the object's physics
                 if(!compErr)
@@ -99,33 +98,33 @@ public class CacheObjectData : MonoBehaviour
                     // TODO: Move to it's own component (Like RFobject manager or something)
                     //       Include the playmode switch stuff
                     // if static, be still on play
-                    if(rfObj.isStatic)
-                    {
-                        rb.isKinematic = true;
-                        rb.constraints = RigidbodyConstraints.FreezeAll;
-                    } else
-                    {
-                        rb.constraints = RigidbodyConstraints.None;
-                        rb.isKinematic = false;
-                    }
+                    // if(rfObj.isStatic)
+                    // {
+                    //     rb.isKinematic = true;
+                    //     rb.constraints = RigidbodyConstraints.FreezeAll;
+                    // } else
+                    // {
+                    //     rb.constraints = RigidbodyConstraints.None;
+                    //     rb.isKinematic = false;
+                    // }
 
-                    // if has gravity, apply in play mode
-                    if(rfObj.isGravityEnabled)
-                    {
-                        rb.useGravity = true;
-                    } else
-                    {
-                        rb.useGravity = false;
-                    }
+                    // // if has gravity, apply in play mode
+                    // if(rfObj.isGravityEnabled)
+                    // {
+                    //     rb.useGravity = true;
+                    // } else
+                    // {
+                    //     rb.useGravity = false;
+                    // }
 
-                    // if the object is collide enabled, keep that otherwise turn off the collider
-                    if(rfObj.isCollidable)
-                    {
-                        boxCol.enabled = true;
-                    } else
-                    {
-                        boxCol.enabled = false;
-                    }
+                    // // if the object is collide enabled, keep that otherwise turn off the collider
+                    // if(rfObj.isCollidable)
+                    // {
+                    //     boxCol.enabled = true;
+                    // } else
+                    // {
+                    //     boxCol.enabled = false;
+                    // }
                 } 
             }
             // Revert values back to cached information upon leaving Play mode
@@ -144,10 +143,10 @@ public class CacheObjectData : MonoBehaviour
                     // TODO: Move to it's own component (Like RFobject manager or something)
                     //       Include the playmode switch stuff
                     // if static, remove the added constraints
-                    if(rfObj.isStatic)
-                    {
-                        rb.constraints = RigidbodyConstraints.None;
-                    }
+                    // if(rfObj.isStatic)
+                    // {
+                    //     rb.constraints = RigidbodyConstraints.None;
+                    // }
 
                     // all objects should float and be still
                     rb.useGravity = false;
