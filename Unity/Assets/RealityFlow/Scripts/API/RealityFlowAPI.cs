@@ -179,17 +179,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     #region Object to PrefabName
 
     // cycle through the spawnedObjects Catalogue
-    public void CycleThroughObjects()
+    public RfObject GetRfObject(GameObject obj)
     {
-        Debug.Log("** Cycling through objects... **");
-
-        foreach (var obj in spawnedObjects)
+        if (spawnedObjects.TryGetValue(obj, out RfObject rfObject))
         {
-            Debug.Log("Object: " + obj.Key);
-            Debug.Log("Object: " + obj.Value.id);
-            Debug.Log("Object: " + obj.Value.name);
+            return rfObject;
         }
+        return null;
     }
+
+
 
     public void UpdateObjectToPrefabNameDictionary(string objectId, string prefabName)
     {
