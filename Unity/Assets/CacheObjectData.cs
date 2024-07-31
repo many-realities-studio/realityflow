@@ -26,10 +26,10 @@ public class CacheObjectData : MonoBehaviour
     // component errors
     private bool compErr = false;
 
-    /*public void SetRfObject(RfObject rfObj)
+    public void SetRfObject(RfObject rfObj)
     {
         this.rfObj = rfObj;
-    }*/
+    }
 
     void Start()
     {
@@ -39,7 +39,6 @@ public class CacheObjectData : MonoBehaviour
         cachedPosition = transform.localPosition;
         cachedScale = transform.localScale;
         cachedRotation = transform.localRotation;
-
 
         // These should throw errors on failure (object doesn't have these components) TODO some other time:
         if(gameObject.GetComponent<Rigidbody>() != null)
@@ -57,7 +56,6 @@ public class CacheObjectData : MonoBehaviour
         {
             compErr = true;
         }
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
     }
 
     void Update()

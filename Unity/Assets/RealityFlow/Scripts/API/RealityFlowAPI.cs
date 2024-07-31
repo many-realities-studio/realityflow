@@ -976,7 +976,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             spawnedPrefab.AddComponent<RealityFlowObjectEvents>();
         }
 
-
         // Create a new RfObject to store the prefab data
         RfObject rfObject = new RfObject
         {
@@ -989,7 +988,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             originalPrefabName = prefabName
         };
 
-        //spawnedPrefab.GetComponent<CacheMeshData>().SetRfObject(rfObject);
+        spawnedPrefab.GetComponent<CacheObjectData>().SetRfObject(rfObject);
 
         // This is a GraphQL request to save the object to the database
         var createObject = new GraphQLRequest
@@ -1733,7 +1732,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedObject.transform.localScale = transformData.scale;
                 }
 
-
                 // Set the name of the spawned object to its ID for unique identification
                 spawnedObject.name = obj.id;
 
@@ -1750,6 +1748,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 CacheMeshData meshData = spawnedObject.GetComponent<CacheMeshData>();
                 if (meshData)
                     meshData.SetRfObject(obj);
+
+                CacheObjectData objData = spawnedObject.GetComponent<CacheObjectData>();
+                if (objData)
+                    objData.SetRfObject(obj);
 
                 Debug.Log($"Added object with ID: {obj.id}, Name: {obj.name} to dictionary");
                 // Find the spawned object in the scene (assuming it's named the same as the prefab)
