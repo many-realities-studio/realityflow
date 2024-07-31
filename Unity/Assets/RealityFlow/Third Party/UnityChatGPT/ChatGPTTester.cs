@@ -102,7 +102,7 @@ public class ChatGPTTester : MonoBehaviour
         }
         // Add specific reminder about graph manipulation
         var graphManipulationReminder = "\n-------------------------------------------------------------------------\n\n\n DO WHAT THE PROMPT SAYS, for example If it says to make a cube don't make nodes on the graph unless it says to. Ignore the following message unless specified: When making a node or manipulating a graph, only do it in the way you see here. Do not deviate from how this file is set up. Your responses should be structured very similarly to this example. Don't try to create a new graph, don't try to use JSON, don't try to update the database, do only what the user says. Do it like you see in this file: \n\n\n\n" +
-                                "Note this is just an example don't actually generate this, just something similar in line with the user prompt." +
+                                "Note this is just an example don't actually generate this, just something similar in line with the user prompt.\n" +
                                 "private void CreateComprehensiveGraphProcedure(string objId, float spacing)\n" +
                                 "{\n" +
                                 "    // Find the object\n" +
@@ -233,7 +233,20 @@ public class ChatGPTTester : MonoBehaviour
                                 "\n" +
                                 "        Debug.Log(\"Impulse node added to the graph.\");\n" +
                                 "    }\n" +
-                                "}\n";
+                                "}\n" +
+                                "to spawn an object do it like this and structure the code exactly like this, of course replace the object name with the actual object from the prompt: using UnityEngine;\n" +
+                                "using System.Collections;\n" +
+                                "using Graph = RealityFlow.NodeGraph.Graph;\n" +
+                                "using RealityFlow.NodeGraph;\n" +
+                                "\n" +
+                                "public class SpawnCube\n" +
+                                "{\n" +
+                                "    public static void Execute()\n" +
+                                "    {\n" +
+                                "        Vector3 spawnPosition = new Vector3(-0.24f, -0.05f, 1.82f);\n" +
+                                "        RealityFlowAPI.Instance.SpawnObject(\"Cube\", spawnPosition, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);\n" +
+                                "    }\n" +
+                                "}";
         AddTemporaryReminder(graphManipulationReminder);
 
         // Add existing reminders only once
