@@ -25,9 +25,12 @@ MonoBehaviour:
   IsVariadicOutput: 0
   EvaluationMethod: 1
   EvalLookup: 
-  EvalCode: position = target.transform.position;
-  ExecutionInput: 0
-  ExecutionOutputs: []
+  EvalCode: 'position = target.transform.position;
+
+    then();'
+  ExecutionInput: 1
+  ExecutionOutputs:
+  - then
   references:
     version: 2
     RefIds: []

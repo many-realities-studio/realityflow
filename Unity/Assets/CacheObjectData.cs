@@ -26,6 +26,11 @@ public class CacheObjectData : MonoBehaviour
     // component errors
     private bool compErr = false;
 
+    public void SetRfObject(RfObject rfObj)
+    {
+        this.rfObj = rfObj;
+    }
+
     void Start()
     {
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
@@ -34,7 +39,6 @@ public class CacheObjectData : MonoBehaviour
         cachedPosition = transform.localPosition;
         cachedScale = transform.localScale;
         cachedRotation = transform.localRotation;
-
 
         // These should throw errors on failure (object doesn't have these components) TODO some other time:
         if(gameObject.GetComponent<Rigidbody>() != null)
@@ -52,7 +56,6 @@ public class CacheObjectData : MonoBehaviour
         {
             compErr = true;
         }
-        rfObj = RealityFlowAPI.Instance.SpawnedObjects[gameObject];
     }
 
     void Update()
@@ -84,6 +87,14 @@ public class CacheObjectData : MonoBehaviour
                     {
                         rb.isKinematic = true;
                         rb.constraints = RigidbodyConstraints.FreezeAll;
+                        /*if(GetComponent<CustomObjectManipulator>() != null)
+                        {
+                            GetComponent<CustomObjectManipulator>().enabled = false;
+                        }*/
+                        if(GetComponent<BoundsControl>() != null)
+                        {
+                            GetComponent<BoundsControl>().ToggleHandlesOnClick = false;
+                        } 
                     } else
                     {
                         rb.constraints = RigidbodyConstraints.None;
@@ -107,6 +118,10 @@ public class CacheObjectData : MonoBehaviour
                     {
                         boxCol.enabled = false;
                     }
+                }
+                if(GetComponent<BoundsControl>() != null)
+                {
+                    GetComponent<BoundsControl>().HandlesActive = false;
                 } 
             }
             // Revert values back to cached information upon leaving Play mode
@@ -128,6 +143,14 @@ public class CacheObjectData : MonoBehaviour
                     if(rfObj.isStatic)
                     {
                         rb.constraints = RigidbodyConstraints.None;
+                        /*if(GetComponent<CustomObjectManipulator>() != null)
+                        {
+                            GetComponent<CustomObjectManipulator>().enabled = false;
+                        } */
+                        if(GetComponent<BoundsControl>() != null)
+                        {
+                            GetComponent<BoundsControl>().ToggleHandlesOnClick = false;
+                        } 
                     }
 
                     // all objects should float and be still
@@ -138,8 +161,11 @@ public class CacheObjectData : MonoBehaviour
                     boxCol.enabled = true;
                 }
 
-                
-
+                if(GetComponent<BoundsControl>() != null)
+                {
+                    GetComponent<BoundsControl>().HandlesActive = false;
+                } 
+                RealityFlowAPI.Instance.UpdatePrefab(gameObject);
                 // All meshes should be selectable after Play mode is exited
                 //gameObject.GetComponent<ObjectManipulator>().enabled = true;
             }

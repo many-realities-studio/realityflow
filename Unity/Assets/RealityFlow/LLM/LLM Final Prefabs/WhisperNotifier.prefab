@@ -2135,8 +2135,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2847312451653348460}
   - {fileID: 5608697403646827936}
+  - {fileID: 2847312451653348460}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 7.485, z: 0}
 --- !u!114 &3895853455702012099
@@ -2883,6 +2883,7 @@ GameObject:
   - component: {fileID: 5834144580217099787}
   - component: {fileID: 3851656379788391745}
   - component: {fileID: 7089928275243483770}
+  - component: {fileID: 1409363787499239981}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -2973,6 +2974,25 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1409363787499239981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4752313547706729636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RaycastTriggerInteraction: 1
 --- !u!1 &5214388708432385580
 GameObject:
   m_ObjectHideFlags: 0
@@ -4628,7 +4648,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 3d95c01a73fe4904597e9631b4c6c9c1, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -7151,7 +7171,7 @@ PrefabInstance:
     - target: {fileID: 7374905010531200626, guid: 36b6a85a870fb3747bcbc0349f13146d,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7374905010531200626, guid: 36b6a85a870fb3747bcbc0349f13146d,
         type: 3}
@@ -7198,8 +7218,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36b6a85a870fb3747bcbc0349f13146d, type: 3}
---- !u!4 &2847312451653348460 stripped
-Transform:
+--- !u!224 &2847312451653348460 stripped
+RectTransform:
   m_CorrespondingSourceObject: {fileID: 7374905010531200626, guid: 36b6a85a870fb3747bcbc0349f13146d,
     type: 3}
   m_PrefabInstance: {fileID: 4745459881718170142}

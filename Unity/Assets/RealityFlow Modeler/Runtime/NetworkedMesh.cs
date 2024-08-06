@@ -341,6 +341,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         // similarly allow thw object to be moved in playmode without gravity on hold.
         if (!networkedPlayManager.playMode)
         {
+            rb.excludeLayers = ~rb.excludeLayers;
             rb.constraints = RigidbodyConstraints.None;
         }
         context.SendJson(CreateHeldMessage(true));
@@ -369,6 +370,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         if (!networkedPlayManager.playMode)
         {
             rb.constraints = RigidbodyConstraints.FreezeAll;
+            rb.excludeLayers = ~rb.excludeLayers;
         }
     }
 

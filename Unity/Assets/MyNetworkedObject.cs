@@ -249,16 +249,21 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 //rb.useGravity = false;
                 rb.isKinematic = false;
 
+                rb.excludeLayers = ~rb.excludeLayers;
                 rb.constraints = RigidbodyConstraints.None;
             }
 
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
             // TODO: 
-
+            
         }
         else
         {
+            if(GetComponent<BoundsControl>() != null)
+            {
+                GetComponent<BoundsControl>().HandlesActive = false;
+            } 
             //rb.useGravity = true;
         }
 
@@ -309,7 +314,9 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 rb.useGravity = false;
                 rb.isKinematic = true;
                 rb.constraints = RigidbodyConstraints.FreezeAll;
+                rb.excludeLayers = ~rb.excludeLayers;
             }
+
         }
         else
         {
@@ -363,7 +370,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.isKinematic = false;
             rb.useGravity = true;
         }
-
+        
+        if(GetComponent<BoundsControl>() != null)
+        {
+            GetComponent<BoundsControl>().HandlesActive = false;
+        } 
+        
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
 
