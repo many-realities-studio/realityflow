@@ -152,6 +152,8 @@ public class CacheMeshData : MonoBehaviour
                     boxCol.enabled = true;
                 }
 
+
+                RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
                 // All meshes should be selectable after Play mode is exited
                 //gameObject.GetComponent<ObjectManipulator>().enabled = true;
             }
