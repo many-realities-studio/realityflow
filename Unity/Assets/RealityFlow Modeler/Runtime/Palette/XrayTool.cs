@@ -7,28 +7,29 @@ using UnityEngine;
 /// </summary>
 public class XrayTool : MonoBehaviour
 {
-    HandleSpawner spawner;
+    //HandleSpawner spawner;
 
     public bool isActive;
 
     void Start()
     {
-        spawner = HandleSpawner.Instance;
+        //spawner = HandleSpawner.Instance;
     }
 
     private void EnterXrayMode()
     {
-        if (spawner == null)
+        /*if (spawner == null)
             spawner = HandleSpawner.Instance;
 
         if (NetworkedPalette.reference != null && NetworkedPalette.reference.owner)
         {
             spawner.EnterXrayMode();
-        }
+        }*/
     }
 
     private void ExitXrayMode()
     {
+        /*
         if (spawner == null)
             spawner = HandleSpawner.Instance;
 
@@ -36,6 +37,7 @@ public class XrayTool : MonoBehaviour
         {
             spawner.ExitXrayMode();
         }
+        */
     }
 
     public void Activate(int tool, bool status)

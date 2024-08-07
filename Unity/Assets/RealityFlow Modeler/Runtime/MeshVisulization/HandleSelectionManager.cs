@@ -18,9 +18,9 @@ public class HandleSelectionManager : MonoBehaviour
 
     private List<Handle> selectedHandles;
     public static List<int> selectedIndices;
-    public HandleSpawner handleSpawner { get; private set; }
+    public HandleSelector handleSelector { get; private set; }
     private GameObject spawnedManipulator;
-    public List<int> indicies => selectedIndices;
+    public List<int> indicies() { return selectedIndices; }
 
     public AttachGizmoState gizmoTool;
     private Vector3 selectionCentroid;
@@ -49,9 +49,9 @@ public class HandleSelectionManager : MonoBehaviour
         gizmoTool = tools.GetComponent<AttachGizmoState>();
 
         GameObject selectManager = GameObject.Find("Component Select Manager");
-        handleSpawner = selectManager.gameObject.GetComponent<HandleSpawner>();
+        handleSelector = selectManager.gameObject.GetComponent<HandleSelector>();
         
-        if(handleSpawner == null)
+        if(handleSelector == null)
         {
             Debug.Log("Handle selector not found");
         }
