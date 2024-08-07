@@ -241,7 +241,8 @@ public class MeshVisulization : MonoBehaviour
         for(int i = 0; i < handles.Length; i++)
         {
             eh = handles[i].GetComponent<EdgeHandle>();
-            eh.UpdateMeshTransform();
+            eh.UpdateHandlePosition();
+            //eh.UpdateMeshTransform();
         }
     }
 
@@ -250,7 +251,8 @@ public class MeshVisulization : MonoBehaviour
         for (int i = 0; i < handles.Length; i++)
         {
             FaceHandle fh = handles[i].GetComponent<FaceHandle>();
-            fh.UpdateFacePosition();
+            //fh.UpdateFacePosition();
+            fh.UpdateHandlePosition();
         }
     }
     #endregion

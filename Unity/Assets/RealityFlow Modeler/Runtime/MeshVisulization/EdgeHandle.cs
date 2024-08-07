@@ -33,7 +33,6 @@ public class EdgeHandle : Handle
 
     public void UpdateMeshTransform()
     {
-        Debug.LogError("MESH NO UPDATE");
         Vector3 pos1 = mesh.GetPositionFromSharedVertIndex(A);
         Vector3 pos2 = mesh.GetPositionFromSharedVertIndex(B);
 
