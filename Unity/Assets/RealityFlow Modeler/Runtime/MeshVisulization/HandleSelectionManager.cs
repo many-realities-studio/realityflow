@@ -5,6 +5,11 @@ using Ubiq.Rooms;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// HandleSelectionManager is the main controller for tracking the current state of handles.
+/// It serves as an access point for any other files that may select handles and keeps track of their
+/// changes.
+/// </summary>
 public class HandleSelectionManager : MonoBehaviour
 {
     public static HandleSelectionManager Instance { get; private set; }
@@ -63,9 +68,6 @@ public class HandleSelectionManager : MonoBehaviour
     }
 
     #region Selection
-    /// <summary>
-    /// Adds a handle to the list of selected handles and its corresponding indicies
-    /// </summary
     public void SelectHandle(Handle handle)
     {
         mesh = handle.mesh;
@@ -81,9 +83,6 @@ public class HandleSelectionManager : MonoBehaviour
         selectedIndices.AddRange(indicies);
     }
 
-    /// <summary>
-    /// Removes a handle from the list of selected handles if it's present
-    /// </summary>
     public void RemoveSelectedHandle(Handle handle)
     {
         try

@@ -11,7 +11,10 @@ public enum ManipulationMode
     face
 }
 
-
+/// <summary>
+/// This file provides the bridge between the palette and mesh manipulations through the use of an action. 
+/// The action currently is only used in MeshVisualization.cs to display the correct handles.
+/// </summary>
 public class MeshManipulationModes : MonoBehaviour
 {
     public static event Action<ManipulationMode> OnManipulationModeChange;
@@ -46,20 +49,12 @@ public class MeshManipulationModes : MonoBehaviour
 
     private void ChangeMode(ManipulationMode mode)
     {
-        // Only run this script if you are the owner of the palette
         if (NetworkedPalette.reference != null && NetworkedPalette.reference.owner)
         {
-            //Debug.Log(NetworkedPalette.reference.owner + NetworkedPalette.reference.ownerName);
+            // consider changing to HandleSelectionManager.Instance.ClearSelectedHandlesAndVertices();
             HandleSelectionManager handleSelectionManager = HandleSelectionManager.Instance;
             handleSelectionManager.ClearSelectedHandlesAndVertices();
             OnManipulationModeChange(mode);
-            //manipulationTool.SetManipulationMode(mode);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
