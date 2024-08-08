@@ -79,10 +79,13 @@ public class RaycastLogger : MonoBehaviour
 
             if (hitObject.CompareTag("Teleport"))
             {
+                // Adjust the position to ensure it stays above the floor
+                Vector3 adjustedPosition = new Vector3(hitPosition.x, hitPosition.y + 0.15f, hitPosition.z); // Slightly above the hit position
+
                 // Activate and move the visual indicator to the hit position
                 if (visualIndicatorInstance != null)
                 {
-                    visualIndicatorInstance.transform.position = hitPosition;
+                    visualIndicatorInstance.transform.position = adjustedPosition;
                     visualIndicatorInstance.SetActive(true);
                     Debug.Log("Visual indicator updated and activated.");
                 }
@@ -110,6 +113,7 @@ public class RaycastLogger : MonoBehaviour
             Debug.Log("Raycast did not hit any object.");
         }
     }
+
 
     private void ApplyGlowEffect(GameObject hitObject)
     {
@@ -143,7 +147,7 @@ public class RaycastLogger : MonoBehaviour
     {
         if (visualIndicatorInstance != null && visualIndicatorInstance.activeSelf)
         {
-            return visualIndicatorInstance.transform.position + new Vector3(0, 0.3f, 0); // Add 50 units to Y position
+            return visualIndicatorInstance.transform.position + new Vector3(0, 0.25f, 0);
         }
         return Vector3.zero;
     }
