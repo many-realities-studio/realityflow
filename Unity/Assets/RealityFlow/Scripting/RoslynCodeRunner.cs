@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using System.IO;
@@ -107,11 +108,20 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 
         // Invoke the static 'Execute' method asynchronously on the main thread
         bool methodInvocationCompleted = false;
-        UnityMainThreadDispatcher.RunOnMainThread(() =>
+        UnityMainThreadDispatcher.RunOnMainThread(async () =>
         {
             try
             {
-                method.Invoke(null, null);
+                // Check if the method returns a Task
+                if (method.ReturnType == typeof(Task) || (method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>)))
+                {
+                    // Await the async method
+                    await (Task)method.Invoke(null, null);
+                }
+                else
+                {
+                    method.Invoke(null, null);
+                }
                 LogScriptExecutionResult("Script executed successfully.");
             }
             catch (Exception e)
