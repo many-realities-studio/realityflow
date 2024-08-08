@@ -218,6 +218,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         client.LeaveRoom();
         OnLeaveRoom?.Invoke();
+        actionLogger.actionStack.Clear();
+        actionLogger.redoStack.Clear();
     }
 
     void OutlineEffect(GameObject obj)

@@ -121,6 +121,10 @@ public class RealityFlowAPIEditor : Editor
             Debug.Log("Pressing Redo Last Action button");
             realityFlowAPI.RedoLastAction();
         }
+        if (GUILayout.Button("Spawn Cube"))
+        {
+            SpawnCube();
+        }
     }
 
     private void DespawnAllObjects(RealityFlowAPI realityFlowAPI)
@@ -136,7 +140,21 @@ public class RealityFlowAPIEditor : Editor
             }
         }
     }
+    public async void SpawnCube()
+    {
+        Vector3 position = new Vector3(1.83f, 0.9f, 2.44f);
+        GameObject spawnedObject = await RealityFlowAPI.Instance.SpawnObject("Cube", position, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
 
+        if (spawnedObject != null)
+        {
+            spawnedObject.tag = "Spawned";
+            RealityFlowAPI.Instance.UpdateObjectTransform(spawnedObject.name, position, spawnedObject.transform.rotation, spawnedObject.transform.localScale);
+        }
+        else
+        {
+            Debug.LogError("Failed to spawn object.");
+        }
+    }
     private void AddTestNode(string objId)
     {
         // Find the object

@@ -15,6 +15,7 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     private ChatGTPSettings chatGTPSettings;
     private Whisper whisper;
     private string logFilePath;
+    private string encodedScreenshot;
 
     private void Start()
     {
@@ -30,91 +31,112 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     public IEnumerator Ask(string prompt, Action<ChatGPTResponse> callBack)
     {
         DateTime startTime = DateTime.Now;
+
         yield return StartCoroutine(CaptureAndEncodeScreenshot());
         DateTime screenshotCapturedTime = DateTime.Now;
 
         string base64Image = EncodeScreenshotToBase64();
         DateTime imageEncodedTime = DateTime.Now;
 
-        var url = chatGTPSettings.debug ? $"{chatGTPSettings.apiURL}?debug=true" : chatGTPSettings.apiURL;
+        string url = GetRequestUrl();
+        string requestBody = CreateRequestBody(prompt, base64Image);
 
+        using (UnityWebRequest request = CreateWebRequest(url, requestBody))
+        {
+            DateTime requestStartTime = DateTime.Now;
+            yield return request.SendWebRequest();
+            DateTime requestEndTime = DateTime.Now;
+
+            if (IsRequestSuccessful(request))
+            {
+                ProcessSuccessfulResponse(request, callBack, startTime, screenshotCapturedTime, imageEncodedTime, requestStartTime, requestEndTime);
+            }
+            else
+            {
+                Debug.LogError("Request error: " + request.error);
+            }
+        }
+    }
+
+    private string GetRequestUrl()
+    {
+        return chatGTPSettings.debug ? $"{chatGTPSettings.apiURL}?debug=true" : chatGTPSettings.apiURL;
+    }
+
+    private string CreateRequestBody(string prompt, string base64Image)
+    {
         var requestParams = new ChatGPTRequest
         {
             Model = chatGTPSettings.apiModel,
             Messages = new ChatGPTChatMessage[]
             {
-                new ChatGPTChatMessage
-                {
-                    role = "user",
-                    content = prompt
-                },
-                new ChatGPTChatMessage
-                {
-                    role = "user",
-                    content = "Here is an image for analysis, use it as context, however if you are unable to process it just process the prompt instead: data:image/png;base64," + base64Image
-                }
+                new ChatGPTChatMessage { role = "user", content = prompt },
+                new ChatGPTChatMessage { role = "user", content = "Here is an image for analysis, use it as context, however if you are unable to process it just process the prompt instead: data:image/png;base64," + base64Image }
             }
         };
 
-        string requestBody = JsonConvert.SerializeObject(requestParams);
-        Debug.Log("Request Payload: " + requestBody);
+        return JsonConvert.SerializeObject(requestParams);
+    }
 
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+    private UnityWebRequest CreateWebRequest(string url, string requestBody)
+    {
+        UnityWebRequest request = new UnityWebRequest(url, "POST")
         {
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(requestBody);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.disposeDownloadHandlerOnDispose = true;
-            request.disposeUploadHandlerOnDispose = true;
-            request.disposeCertificateHandlerOnDispose = true;
+            uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(requestBody)),
+            downloadHandler = new DownloadHandlerBuffer(),
+            disposeDownloadHandlerOnDispose = true,
+            disposeUploadHandlerOnDispose = true,
+            disposeCertificateHandlerOnDispose = true
+        };
 
-            request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("Content-Type", "application/json");
+        SetAuthorizationHeader(request);
 
-            if (whisper != null)
+        return request;
+    }
+
+    private void SetAuthorizationHeader(UnityWebRequest request)
+    {
+        if (whisper != null)
+        {
+            string apiKey = whisper.GetCurrentApiKey();
+            if (!string.IsNullOrEmpty(apiKey))
             {
-                string apiKey = whisper.GetCurrentApiKey();
-                if (!string.IsNullOrEmpty(apiKey))
-                {
-                    request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
-                }
-                else
-                {
-                    Debug.LogError("API key is null or empty.");
-                }
+                request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
             }
             else
             {
-                Debug.LogError("Whisper reference is null.");
-                yield break;
+                Debug.LogError("API key is null or empty.");
             }
+        }
+        else
+        {
+            Debug.LogError("Whisper reference is null.");
+        }
+    }
 
-            DateTime requestStartTime = DateTime.Now;
-            yield return request.SendWebRequest();
-            DateTime requestEndTime = DateTime.Now;
+    private bool IsRequestSuccessful(UnityWebRequest request)
+    {
+        return request.result != UnityWebRequest.Result.ConnectionError && request.result != UnityWebRequest.Result.DataProcessingError;
+    }
 
-            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.DataProcessingError)
-            {
-                Debug.LogError("Request error: " + request.error);
-            }
-            else
-            {
-                string responseInfo = request.downloadHandler.text;
-                Debug.Log("API Response: " + responseInfo);
+    private void ProcessSuccessfulResponse(UnityWebRequest request, Action<ChatGPTResponse> callBack, DateTime startTime, DateTime screenshotCapturedTime, DateTime imageEncodedTime, DateTime requestStartTime, DateTime requestEndTime)
+    {
+        string responseInfo = request.downloadHandler.text;
+        Debug.Log("API Response: " + responseInfo);
 
-                var response = JsonConvert.DeserializeObject<ChatGPTResponse>(responseInfo);
-                if (response != null && response.Choices != null && response.Choices.Any())
-                {
-                    response = response.CodeCleanUp();
-                    response.ResponseTotalTime = (requestEndTime - requestStartTime).TotalMilliseconds;
+        var response = JsonConvert.DeserializeObject<ChatGPTResponse>(responseInfo);
+        if (response != null && response.Choices != null && response.Choices.Any())
+        {
+            response = response.CodeCleanUp();
+            response.ResponseTotalTime = (requestEndTime - requestStartTime).TotalMilliseconds;
 
-                    LogDetails(startTime, screenshotCapturedTime, imageEncodedTime, requestStartTime, requestEndTime, response);
-                    callBack(response);
-                }
-                else
-                {
-                    Debug.LogError("No choices found in the response or response is null.");
-                }
-            }
+            LogDetails(startTime, screenshotCapturedTime, imageEncodedTime, requestStartTime, requestEndTime, response);
+            callBack(response);
+        }
+        else
+        {
+            Debug.LogError("No choices found in the response or response is null.");
         }
     }
 
@@ -140,6 +162,7 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     private IEnumerator CaptureAndEncodeScreenshot()
     {
         yield return new WaitForEndOfFrame();
+
         Texture2D screenTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
         screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
         screenTexture.Apply();
@@ -154,6 +177,4 @@ public class ChatGPTClient : Singleton<ChatGPTClient>
     {
         return encodedScreenshot;
     }
-
-    private string encodedScreenshot;
 }
