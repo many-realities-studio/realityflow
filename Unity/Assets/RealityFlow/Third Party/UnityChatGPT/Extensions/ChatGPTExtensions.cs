@@ -28,6 +28,14 @@ public static class ChatGPTExtensions
             return chatGPTResponse;
         }
 
+        // Determine if the content is JSON or C# code
+        if (messageContent.TrimStart().StartsWith("{") || messageContent.TrimStart().StartsWith("["))
+        {
+            // It's JSON, so no need to clean up C# code
+            Debug.Log("Detected JSON content, no C# cleanup needed.");
+            return chatGPTResponse;
+        }
+
         // Apply filters
         filters.ToList().ForEach(f =>
         {

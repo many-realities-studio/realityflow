@@ -9,6 +9,12 @@ using System.IO;
 using System.Collections;
 using Newtonsoft.Json;
 
+public class StructuredAction
+{
+    public string Action { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
+}
+
 public class ChatGPTTester : MonoBehaviour
 {
     [SerializeField]
@@ -147,20 +153,61 @@ public class ChatGPTTester : MonoBehaviour
             lastChatGPTResponseCache = response;
             ChatGPTProgress.Instance.StopProgress();
 
-            WriteResponseToFile(ChatGPTMessage);
+            // Log the received JSON response instead of executing it immediately
+            ProcessAndLogJsonResponse(ChatGPTMessage);
 
-            Debug.Log("Logging message in plain English");
-            LogApiCalls(ChatGPTMessage);
-
-            RealityFlowAPI.Instance?.actionLogger?.LogGeneratedCode(ChatGPTMessage);
-
-            if (immediateCompilation)
-            {
-                StartCoroutine(ExecuteLoggedActionsCoroutine());
-            }
+            chatGPTQuestion.reminders = originalReminders;
         }));
+    }
 
-        chatGPTQuestion.reminders = originalReminders;
+    private void ProcessAndLogJsonResponse(string jsonResponse)
+    {
+
+        Debug.LogError("The response is " + jsonResponse);
+        try
+        {
+            // Clean up the JSON response by removing markdown code block formatting
+            if (jsonResponse.Contains("```"))
+            {
+                int startIndex = jsonResponse.IndexOf('{');
+                int endIndex = jsonResponse.LastIndexOf('}');
+                jsonResponse = jsonResponse.Substring(startIndex, endIndex - startIndex + 1);
+            }
+
+            // Deserialize the cleaned JSON response into a StructuredAction object
+            var structuredResponse = JsonConvert.DeserializeObject<StructuredAction>(jsonResponse);
+
+            // Log the JSON action into the ActionLogger queue instead of executing it immediately
+            string structuredJson = JsonConvert.SerializeObject(structuredResponse);
+            RealityFlowAPI.Instance?.actionLogger?.LogJsonAction(structuredJson);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to process and log the response: {ex.Message}");
+        }
+    }
+
+
+    private void LogApiCall(string generatedCode)
+    {
+        bool matched = false;
+        foreach (var entry in apiFunctionDescriptions)
+        {
+            if (generatedCode.Contains(entry.Key))
+            {
+                string objectName = ExtractObjectName(generatedCode, entry.Key);
+                string logMessage = string.Format(entry.Value, objectName);
+                Logger.Instance.LogInfo(logMessage);
+                matched = true;
+            }
+        }
+        if (!matched)
+        {
+            Logger.Instance.LogInfo("Added an action.");
+        }
+
+        // Log the generated code with ActionLogger
+        RealityFlowAPI.Instance?.actionLogger?.LogGeneratedCode(generatedCode);
     }
 
     private string GetNodeDefinitionsJson()
@@ -235,7 +282,13 @@ public class ChatGPTTester : MonoBehaviour
             yield break;
         }
 
-        yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCodeCoroutine());
+        //yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCodeCoroutine());
+        yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteJsonActionsCoroutine());
+    }
+
+    public void ExecuteLoggedActions()
+    {
+        StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteJsonActionsCoroutine());
     }
 
     public void ProcessAndCompileResponse()
@@ -247,21 +300,30 @@ public class ChatGPTTester : MonoBehaviour
     {
         Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
         string localPath = Application.persistentDataPath + "/ChatGPTResponse.cs";
-        //string externalPath = Path.Combine(Application.dataPath, "TestScript.cs");
 
         try
         {
 #if UNITY_EDITOR
             File.WriteAllText(localPath, response);
             Debug.Log("Response written to file: " + localPath);
-
-            //File.WriteAllText(externalPath, response);
-            //Debug.Log("Response written to file: " + externalPath);
 #endif
         }
         catch (Exception e)
         {
             Debug.LogError("Failed to write response to file: " + e.Message);
+        }
+    }
+
+    private void ProcessAndExecuteResponse(string jsonResponse)
+    {
+        try
+        {
+            // Log the JSON action into the ActionLogger queue instead of executing it immediately
+            RealityFlowAPI.Instance?.actionLogger?.LogJsonAction(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to process and log the response: {ex.Message}");
         }
     }
 }

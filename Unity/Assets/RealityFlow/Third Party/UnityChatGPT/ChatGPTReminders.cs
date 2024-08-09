@@ -4,6 +4,145 @@ public static class Reminders
     //Use this script to add reminders that you want to pass to ChatGPT
     public static readonly string[] reminderTexts = new string[]
     {
+        //Object Spawn Reminder 
+        "The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'SpawnObject'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"prefabName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The name of the prefab to spawn.\"\n" +
+"        },\n" +
+"        \"spawnPosition\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        },\n" +
+"        \"scale\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        },\n" +
+"        \"spawnRotation\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" },\n" +
+"            \"w\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\", \"w\"]\n" +
+"        },\n" +
+"        \"scope\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The scope of the spawn, e.g., 'Room' or 'Peer'.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"prefabName\", \"spawnPosition\", \"scale\", \"spawnRotation\", \"scope\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+
+
+        //Reminder DespawnObject
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'DespawnObject'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectToDespawn\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The ID or name of the object to despawn.\"\n" +
+"        },\n" +
+"        \"scope\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The scope of the despawn, e.g., 'Room' or 'Peer'.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"objectToDespawn\", \"scope\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+
+
+//Reminder Update Object Transform
+
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'UpdateObjectTransform'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The name of the object to update.\"\n" +
+"        },\n" +
+"        \"position\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        },\n" +
+"        \"rotation\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" },\n" +
+"            \"w\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\", \"w\"]\n" +
+"        },\n" +
+"        \"scale\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"objectName\", \"position\", \"rotation\", \"scale\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+
         //Reminder 1
         "Only use the RealityFlow API which an example of which is referenced here:\n\n" +
         "# RealityFlowAPI Reference Sheet\n\n" +
@@ -359,18 +498,31 @@ public static class Reminders
         "        Debug.Log(\"Impulse node added to the graph.\");\n" +
         "    }\n" +
         "}\n" +
-        "to spawn an object do it like this and structure the code exactly like this, of course replace the object name with the actual object from the prompt: using UnityEngine;\n" +
-        "using System.Collections;\n" +
-        "using Graph = RealityFlow.NodeGraph.Graph;\n" +
-        "using RealityFlow.NodeGraph;\n" +
-        "\n" +
-        "public class SpawnCube\n" +
-        "{\n" +
-        "    public static void Execute()\n" +
-        "    {\n" +
-        "        Vector3 spawnPosition = new Vector3(-0.24f, -0.05f, 1.82f);\n" +
-        "        RealityFlowAPI.Instance.SpawnObject(\"Cube\", spawnPosition, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);\n" +
-        "    }\n" +
-        "}"
+        "Do not generate C# code. ONLY GENERATE JSON STRUCTURED IN THE SPECIFIED OUTPUT STRUCTURE FORMAT, to spawn an object do it like this and structure the code EXACTLY like this, of course replace the object name with the actual object from the prompt, so if it says spawn a key spawn a key: using UnityEngine;\n" +
+        @"
+        [
+            {
+                ""Action"": ""SpawnObject"",
+                ""Parameters"": {
+                    ""objectName"": ""Cube"",
+                    ""position"": {
+                        ""x"": -2.98,
+                        ""y"": 0.35,
+                        ""z"": -1.40
+                    },
+                    ""rotation"": {
+                        ""x"": 0,
+                        ""y"": 0,
+                        ""z"": 0,
+                        ""w"": 1
+                    },
+                    ""scale"": {
+                        ""x"": 1,
+                        ""y"": 1,
+                        ""z"": 1
+                    }
+                }
+            }
+        ]",
     };
 }
