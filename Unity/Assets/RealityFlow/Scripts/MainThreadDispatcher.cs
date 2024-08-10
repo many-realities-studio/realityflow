@@ -26,6 +26,11 @@ public class UnityMainThreadDispatcher : MonoBehaviour
         }
     }
 
+    public void Enqueue(IEnumerator action)
+    {
+        Enqueue(() => StartCoroutine(action));
+    }
+
     private static UnityMainThreadDispatcher _instance = null;
 
     public static bool Exists()

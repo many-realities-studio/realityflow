@@ -5,8 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using System.IO;
 
 public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
 {
@@ -31,6 +33,13 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
     private string resultInfo;
 
     private readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
+
+    private string logFilePath;
+
+    private void Start()
+    {
+        logFilePath = Path.Combine(Application.persistentDataPath, "ChatGPTLogs.txt");
+    }
 
     public IEnumerator RunCodeCoroutine(string updatedCode = null)
     {
@@ -73,7 +82,8 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
         // Check if the compilation resulted in a valid assembly
         if (asm == null)
         {
-            Logger.Instance.LogError("There was an error completing this action try submiting your request again...");
+            LogScriptExecutionResult("Failed to compile code.");
+            Logger.Instance.LogError("There was an error completing this action try submitting your request again...");
             Debug.LogError("Failed to compile code.");
             yield break;
         }
@@ -82,6 +92,7 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
         Type type = asm.GetTypes().Where(t => t.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public) != null).FirstOrDefault();
         if (type == null)
         {
+            LogScriptExecutionResult("No static Execute method found.");
             Debug.LogError("No static Execute method found.");
             yield break;
         }
@@ -90,21 +101,33 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
         MethodInfo method = type.GetMethod("Execute", BindingFlags.Static | BindingFlags.Public);
         if (method == null)
         {
+            LogScriptExecutionResult("Execute method not found.");
             Debug.LogError("Execute method not found.");
             yield break;
         }
 
         // Invoke the static 'Execute' method asynchronously on the main thread
         bool methodInvocationCompleted = false;
-        UnityMainThreadDispatcher.RunOnMainThread(() =>
+        UnityMainThreadDispatcher.RunOnMainThread(async () =>
         {
             try
             {
-                method.Invoke(null, null);
+                // Check if the method returns a Task
+                if (method.ReturnType == typeof(Task) || (method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>)))
+                {
+                    // Await the async method
+                    await (Task)method.Invoke(null, null);
+                }
+                else
+                {
+                    method.Invoke(null, null);
+                }
+                LogScriptExecutionResult("Script executed successfully.");
             }
             catch (Exception e)
             {
                 Debug.LogError("Error during script execution: " + e.Message);
+                LogScriptExecutionResult($"Error during script execution: {e.Message}");
             }
             methodInvocationCompleted = true;
         });
@@ -116,7 +139,9 @@ public class RoslynCodeRunner : Singleton<RoslynCodeRunner>
         }
     }
 
-
-
-
+    private void LogScriptExecutionResult(string message)
+    {
+        string logMessage = $"[{DateTime.Now}] Script Execution Result: {message}\n";
+        File.AppendAllText(logFilePath, logMessage);
+    }
 }

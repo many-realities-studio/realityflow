@@ -42,7 +42,8 @@ public class RaycastLogger : MonoBehaviour
         // Instantiate the visual indicator and disable it
         if (visualIndicatorPrefab != null)
         {
-            visualIndicatorInstance = Instantiate(visualIndicatorPrefab);
+            visualIndicatorInstance = visualIndicatorPrefab;
+            //visualIndicatorInstance = Instantiate(visualIndicatorPrefab);
             visualIndicatorInstance.SetActive(false);
         }
         else
@@ -78,10 +79,13 @@ public class RaycastLogger : MonoBehaviour
 
             if (hitObject.CompareTag("Teleport"))
             {
+                // Adjust the position to ensure it stays above the floor
+                Vector3 adjustedPosition = new Vector3(hitPosition.x, hitPosition.y + 0.15f, hitPosition.z); // Slightly above the hit position
+
                 // Activate and move the visual indicator to the hit position
                 if (visualIndicatorInstance != null)
                 {
-                    visualIndicatorInstance.transform.position = hitPosition;
+                    visualIndicatorInstance.transform.position = adjustedPosition;
                     visualIndicatorInstance.SetActive(true);
                     Debug.Log("Visual indicator updated and activated.");
                 }
@@ -109,6 +113,7 @@ public class RaycastLogger : MonoBehaviour
             Debug.Log("Raycast did not hit any object.");
         }
     }
+
 
     private void ApplyGlowEffect(GameObject hitObject)
     {
@@ -142,7 +147,7 @@ public class RaycastLogger : MonoBehaviour
     {
         if (visualIndicatorInstance != null && visualIndicatorInstance.activeSelf)
         {
-            return visualIndicatorInstance.transform.position;
+            return visualIndicatorInstance.transform.position + new Vector3(0, 0.25f, 0);
         }
         return Vector3.zero;
     }
@@ -155,12 +160,12 @@ public class RaycastLogger : MonoBehaviour
     private async void SpawnObjectAtHitLocation()
     {
         // Instantiate the object in the scene and over the network, then set its position to the hit position
-        GameObject currentObject = await RealityFlowAPI.Instance.SpawnObject(selectedObjectName, visualIndicatorInstance.transform.position, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
+        GameObject currentObject = await RealityFlowAPI.Instance.SpawnObject(selectedObjectName, GetVisualIndicatorPosition(), Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);
 
         // Log the spawned object
         if (currentObject != null)
         {
-            currentObject.transform.position = visualIndicatorInstance.transform.position;
+            currentObject.transform.position = GetVisualIndicatorPosition();
             Debug.Log("Spawned " + currentObject.name);
         }
         else
@@ -168,6 +173,7 @@ public class RaycastLogger : MonoBehaviour
             Debug.LogError("Failed to spawn object: " + selectedObjectName);
         }
     }
+
     // Function to cancel spawning of the current prefab
     public void CancelSpawn()
     {
