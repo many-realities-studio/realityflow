@@ -718,7 +718,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public async Task<GameObject> SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
 
-        GameObject spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive); EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        GameObject spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+
         if (inputMesh == null)
         {
             // Based on the shape
@@ -873,8 +875,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         };
 
         // Generate faces
-        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
-        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
+        PrimitiveRebuilder.RebuildMesh(em, spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
+        SerializableMeshInfo smi = em.smi;
 
         RfObject rfObject = spawnedObjects[spawnedMesh];
         rfObject.transformJson = JsonUtility.ToJson(transformData);

@@ -53,7 +53,10 @@ public class GizmoRotate : GizmoTranslateAxis
         {
             GetAttachedObject().transform.eulerAngles = GetRotationInGrid(GetNewRotation(originalMeshRotate));
 
-            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
+            if(GetAttachedObject().GetComponent<MyNetworkedObject>() != null)
+            {
+                RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
+            }
         }
     }
 
@@ -150,6 +153,7 @@ public class GizmoRotate : GizmoTranslateAxis
             if(GetAttachedObject().GetComponent<NetworkedMesh>())
             {
                 // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+                HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
             }
             // prefabs are not meshes like primitve bases
             //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);

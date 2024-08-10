@@ -57,7 +57,10 @@ public class GizmoStretch : GizmoTranslateAxis
 
             GetAttachedObject().transform.localScale = newMeshScale;
 
-            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
+            if(GetAttachedObject().GetComponent<MyNetworkedObject>() != null)
+            {
+                RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
+            }
         }
 
         
@@ -122,6 +125,7 @@ public class GizmoStretch : GizmoTranslateAxis
             if(GetAttachedObject().GetComponent<NetworkedMesh>())
             {
                 // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+                HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
             }
             //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }
