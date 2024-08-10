@@ -358,7 +358,7 @@ namespace Samples.Whisper
         {
             if (chatGPTTester != null)
             {
-                StartCoroutine(chatGPTTester.ExecuteLoggedActionsCoroutine());
+                StartCoroutine(chatGPTTester.ProcessAndExecuteResponses());
             }
         }
 

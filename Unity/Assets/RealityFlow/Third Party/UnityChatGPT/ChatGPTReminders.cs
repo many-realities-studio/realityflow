@@ -499,30 +499,131 @@ public static class Reminders
         "    }\n" +
         "}\n" +
         "Do not generate C# code. ONLY GENERATE JSON STRUCTURED IN THE SPECIFIED OUTPUT STRUCTURE FORMAT, to spawn an object do it like this and structure the code EXACTLY like this, of course replace the object name with the actual object from the prompt, so if it says spawn a key spawn a key: using UnityEngine;\n" +
+        "For referencing objects use the specified id given to do all manipulations. Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED",
+       @"
+[
+    {
+        ""Action"": ""SpawnObject"",
+        ""Parameters"": {
+            ""prefabName"": ""Cube"",
+            ""spawnPosition"": {
+                ""x"": -2.98,
+                ""y"": 0.35,
+                ""z"": -1.40
+            },
+            ""spawnRotation"": {
+                ""x"": 0,
+                ""y"": 0,
+                ""z"": 0,
+                ""w"": 1
+            },
+            ""scale"": {
+                ""x"": 1,
+                ""y"": 1,
+                ""z"": 1
+            }
+        }
+    }
+]"
+,
         @"
         [
             {
-                ""Action"": ""SpawnObject"",
+                ""Action"": ""DespawnObject"",
                 ""Parameters"": {
-                    ""objectName"": ""Cube"",
-                    ""position"": {
-                        ""x"": -2.98,
-                        ""y"": 0.35,
-                        ""z"": -1.40
-                    },
-                    ""rotation"": {
-                        ""x"": 0,
-                        ""y"": 0,
-                        ""z"": 0,
-                        ""w"": 1
-                    },
-                    ""scale"": {
-                        ""x"": 1,
-                        ""y"": 1,
-                        ""z"": 1
-                    }
+                    ""objectName"": ""Sphere""
                 }
             }
         ]",
+        @"
+[
+    {
+        ""Action"": ""UpdateObjectTransform"",
+        ""Parameters"": {
+            ""objectName"": ""Cylinder"",
+            ""position"": {
+                ""x"": 1.25,
+                ""y"": 0.75,
+                ""z"": -0.85
+            },
+            ""rotation"": {
+                ""x"": 0,
+                ""y"": 0.7071,
+                ""z"": 0,
+                ""w"": 0.7071
+            },
+            ""scale"": {
+                ""x"": 0.5,
+                ""y"": 2.0,
+                ""z"": 0.5
+            }
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""AddNodeToGraph"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeName"": ""StartNode""
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""RemoveNodeFromGraph"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeIndex"": 2
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""AddDataEdgeToGraph"",
+        ""Parameters"": {
+            ""graphId"": ""Graph123"",
+            ""fromNode"": 1,
+            ""fromPort"": 0,
+            ""toNode"": 3,
+            ""toPort"": 1
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""SetNodePosition"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeIndex"": 4,
+            ""position"": {
+                ""x"": 100,
+                ""y"": 150
+            }
+        }
+    }
+]"
+,
+@"
+[
+    {
+        ""Action"": ""SetNodeFieldValue"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeIndex"": 5,
+            ""fieldIndex"": 2,
+            ""value"": {
+                ""type"": ""String"",
+                ""data"": ""Hello World""
+            }
+        }
+    }
+]",
+
+
     };
 }
