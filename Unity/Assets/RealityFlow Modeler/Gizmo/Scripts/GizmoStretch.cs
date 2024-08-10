@@ -119,7 +119,11 @@ public class GizmoStretch : GizmoTranslateAxis
         currentOperation.AddOffsetAmount(newScale);
         try
         {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            if(GetAttachedObject().GetComponent<NetworkedMesh>())
+            {
+                // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+            }
+            //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }
         catch { }
         currentOperation = null;

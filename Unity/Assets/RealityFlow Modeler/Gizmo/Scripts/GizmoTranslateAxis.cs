@@ -179,7 +179,12 @@ public class GizmoTranslateAxis : GizmoTransform
         currentOperation.AddOffsetAmount(GetAttachedObject().transform.position - startPos);
         try
         {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            if(GetAttachedObject().GetComponent<NetworkedMesh>())
+            {
+                // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+            }
+
+            //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }
         catch {  }
         currentOperation = null;

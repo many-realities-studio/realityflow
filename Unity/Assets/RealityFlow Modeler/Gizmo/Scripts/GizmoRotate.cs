@@ -147,6 +147,10 @@ public class GizmoRotate : GizmoTranslateAxis
         currentOperation.AddOffsetAmount(GetAttachedObject().transform.localRotation * Quaternion.Inverse(startRot));
         try
         {
+            if(GetAttachedObject().GetComponent<NetworkedMesh>())
+            {
+                // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+            }
             // prefabs are not meshes like primitve bases
             //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }
