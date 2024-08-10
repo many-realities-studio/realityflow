@@ -149,65 +149,22 @@ public class ChatGPTTester : MonoBehaviour
     private IEnumerator SendRequestToChatGPT(string[] originalReminders)
     {
         yield return StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed, response =>
-        {
-            lastChatGPTResponseCache = response;
-            ChatGPTProgress.Instance.StopProgress();
+         {
+             lastChatGPTResponseCache = response;
+             ChatGPTProgress.Instance.StopProgress();
 
-            // Log the received JSON response instead of executing it immediately
-            ProcessAndLogJsonResponse(ChatGPTMessage);
+             WriteResponseToFile(ChatGPTMessage);
 
-            chatGPTQuestion.reminders = originalReminders;
-        }));
-    }
+             Debug.Log("Processing and executing the structured response...");
+             ProcessAndExecuteResponse(ChatGPTMessage);  // Process and execute JSON response
 
-    private void ProcessAndLogJsonResponse(string jsonResponse)
-    {
+             if (immediateCompilation)
+             {
+                 StartCoroutine(ExecuteLoggedActionsCoroutine());
+             }
+         }));
 
-        Debug.LogError("The response is " + jsonResponse);
-        try
-        {
-            // Clean up the JSON response by removing markdown code block formatting
-            if (jsonResponse.Contains("```"))
-            {
-                int startIndex = jsonResponse.IndexOf('{');
-                int endIndex = jsonResponse.LastIndexOf('}');
-                jsonResponse = jsonResponse.Substring(startIndex, endIndex - startIndex + 1);
-            }
-
-            // Deserialize the cleaned JSON response into a StructuredAction object
-            var structuredResponse = JsonConvert.DeserializeObject<StructuredAction>(jsonResponse);
-
-            // Log the JSON action into the ActionLogger queue instead of executing it immediately
-            string structuredJson = JsonConvert.SerializeObject(structuredResponse);
-            RealityFlowAPI.Instance?.actionLogger?.LogJsonAction(structuredJson);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to process and log the response: {ex.Message}");
-        }
-    }
-
-
-    private void LogApiCall(string generatedCode)
-    {
-        bool matched = false;
-        foreach (var entry in apiFunctionDescriptions)
-        {
-            if (generatedCode.Contains(entry.Key))
-            {
-                string objectName = ExtractObjectName(generatedCode, entry.Key);
-                string logMessage = string.Format(entry.Value, objectName);
-                Logger.Instance.LogInfo(logMessage);
-                matched = true;
-            }
-        }
-        if (!matched)
-        {
-            Logger.Instance.LogInfo("Added an action.");
-        }
-
-        // Log the generated code with ActionLogger
-        RealityFlowAPI.Instance?.actionLogger?.LogGeneratedCode(generatedCode);
+        chatGPTQuestion.reminders = originalReminders;
     }
 
     private string GetNodeDefinitionsJson()
@@ -282,13 +239,7 @@ public class ChatGPTTester : MonoBehaviour
             yield break;
         }
 
-        //yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCodeCoroutine());
-        yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteJsonActionsCoroutine());
-    }
-
-    public void ExecuteLoggedActions()
-    {
-        StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteJsonActionsCoroutine());
+        yield return StartCoroutine(RealityFlowAPI.Instance.actionLogger.ExecuteLoggedCodeCoroutine());
     }
 
     public void ProcessAndCompileResponse()
@@ -300,12 +251,16 @@ public class ChatGPTTester : MonoBehaviour
     {
         Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
         string localPath = Application.persistentDataPath + "/ChatGPTResponse.cs";
+        //string externalPath = Path.Combine(Application.dataPath, "TestScript.cs");
 
         try
         {
 #if UNITY_EDITOR
             File.WriteAllText(localPath, response);
             Debug.Log("Response written to file: " + localPath);
+
+            //File.WriteAllText(externalPath, response);
+            //Debug.Log("Response written to file: " + externalPath);
 #endif
         }
         catch (Exception e)
@@ -313,17 +268,53 @@ public class ChatGPTTester : MonoBehaviour
             Debug.LogError("Failed to write response to file: " + e.Message);
         }
     }
-
     private void ProcessAndExecuteResponse(string jsonResponse)
     {
         try
         {
-            // Log the JSON action into the ActionLogger queue instead of executing it immediately
-            RealityFlowAPI.Instance?.actionLogger?.LogJsonAction(jsonResponse);
+            // Clean up the JSON response by removing markdown code block formatting
+            if (jsonResponse.Contains("```"))
+            {
+                int startIndex = jsonResponse.IndexOf('{');
+                int endIndex = jsonResponse.LastIndexOf('}');
+                jsonResponse = jsonResponse.Substring(startIndex, endIndex - startIndex + 1);
+            }
+
+            // Deserialize the cleaned JSON response into a StructuredAction object
+            var structuredResponse = JsonConvert.DeserializeObject<StructuredAction>(jsonResponse);
+
+            // Process the single action
+            ExecuteAction(structuredResponse);
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Failed to process and log the response: {ex.Message}");
+            Debug.LogError($"Failed to process and execute the response: {ex.Message}");
         }
     }
+
+
+    private void ExecuteAction(StructuredAction action)
+    {
+        switch (action.Action)
+        {
+            case "SpawnObject":
+                // Change "objectName" to "prefabName" to match the key in the JSON response
+                string prefabName = action.Parameters["prefabName"].ToString();
+                var position = JsonConvert.DeserializeObject<Vector3>(action.Parameters["spawnPosition"].ToString());
+                var rotation = JsonConvert.DeserializeObject<Quaternion>(action.Parameters["spawnRotation"].ToString());
+                var scale = JsonConvert.DeserializeObject<Vector3>(action.Parameters["scale"].ToString());
+
+                // Use the correct prefabName and parameters
+                RealityFlowAPI.Instance.SpawnObject(prefabName, position, scale, rotation, RealityFlowAPI.SpawnScope.Room);
+                break;
+
+            // Add cases for other actions like DespawnObject, UpdateObjectTransform, etc.
+            default:
+                Debug.LogError($"Unsupported action: {action.Action}");
+                break;
+        }
+    }
+
+
+
 }
