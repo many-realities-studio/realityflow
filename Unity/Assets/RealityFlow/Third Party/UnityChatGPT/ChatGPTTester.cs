@@ -114,9 +114,11 @@ public class ChatGPTTester : MonoBehaviour
             if (selectedObject != null)
             {
                 var visualScript = selectedObject.GetComponent<RealityFlow.NodeGraph.VisualScript>();
-                if (visualScript != null && visualScript.graph != null)
+                if (visualScript != null)
                 {
-                    string graphJson = JsonUtility.ToJson(visualScript.graph);
+                    string graphJson = null;
+                    if (visualScript.graph != null)
+                        graphJson = JsonUtility.ToJson(visualScript.graph);
                     var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED";
                     Debug.Log($"Selected object: {selectedObjectName}, Graph: {graphJson}");
                     AddTemporaryReminder(selectedObjectReminder);
@@ -294,22 +296,26 @@ public class ChatGPTTester : MonoBehaviour
             // Clean up the JSON response by removing markdown code block formatting
             if (jsonResponse.Contains("```"))
             {
-                int startIndex = jsonResponse.IndexOf('{');
-                int endIndex = jsonResponse.LastIndexOf('}');
+                int startIndex = jsonResponse.IndexOf('['); // Change to '[' for list
+                int endIndex = jsonResponse.LastIndexOf(']');
                 jsonResponse = jsonResponse.Substring(startIndex, endIndex - startIndex + 1);
             }
 
-            // Deserialize the cleaned JSON response into a StructuredAction object
-            var structuredResponse = JsonConvert.DeserializeObject<StructuredAction>(jsonResponse);
+            // Deserialize the cleaned JSON response into a list of StructuredAction objects
+            var structuredResponses = JsonConvert.DeserializeObject<List<StructuredAction>>(jsonResponse);
 
-            // Process the single action
-            ExecuteAction(structuredResponse);
+            // Process each action in the list
+            foreach (var action in structuredResponses)
+            {
+                ExecuteAction(action);
+            }
         }
         catch (Exception ex)
         {
             Debug.LogError($"Failed to process and execute the response: {ex.Message}");
         }
     }
+
 
     private void ExecuteAction(StructuredAction action)
     {

@@ -73,7 +73,7 @@ public static class Reminders
 "    \"parameters\": {\n" +
 "      \"type\": \"object\",\n" +
 "      \"properties\": {\n" +
-"        \"objectToDespawn\": {\n" +
+"        \"objectName\": {\n" +
 "          \"type\": \"string\",\n" +
 "          \"description\": \"The ID or name of the object to despawn.\"\n" +
 "        },\n" +
@@ -88,7 +88,6 @@ public static class Reminders
 "  \"required\": [\"action\", \"parameters\"],\n" +
 "  \"additionalProperties\": false\n" +
 "}",
-
 
 //Reminder Update Object Transform
 
@@ -137,6 +136,64 @@ public static class Reminders
 "        }\n" +
 "      },\n" +
 "      \"required\": [\"objectName\", \"position\", \"rotation\", \"scale\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+// Reminder AddNodeToGraph
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'AddNodeToGraph'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectId\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The ID of the graph where the node will be added.\"\n" +
+"        },\n" +
+"        \"defName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The name of the node definition to be added.\"\n" +
+"        },\n" +
+"        \"index\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The index at which the node is added in the graph.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"graphId\", \"defName\", \"index\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+// Reminder RemoveNodeFromGraph
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'RemoveNodeFromGraph'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectId\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The ID of the graph from which the node will be removed.\"\n" +
+"        },\n" +
+"        \"node\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The index or identifier of the node to be removed.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"graphId\", \"node\"]\n" +
 "    }\n" +
 "  },\n" +
 "  \"required\": [\"action\", \"parameters\"],\n" +
@@ -499,7 +556,7 @@ public static class Reminders
         "    }\n" +
         "}\n" +
         "Do not generate C# code. ONLY GENERATE JSON STRUCTURED IN THE SPECIFIED OUTPUT STRUCTURE FORMAT, to spawn an object do it like this and structure the code EXACTLY like this, of course replace the object name with the actual object from the prompt, so if it says spawn a key spawn a key: using UnityEngine;\n" +
-        "For referencing objects use the specified id given to do all manipulations. Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED",
+        //"For referencing objects use the specified id given to do all manipulations. Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED",
        @"
 [
     {
