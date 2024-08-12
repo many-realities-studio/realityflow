@@ -383,6 +383,41 @@ public class ChatGPTTester : MonoBehaviour
                     Debug.Log($"{nodeName} node added to the graph.");
                 }
                 break;
+
+                //TODO: Make the LLM be able to delete Nodes this was never completed 
+                /*
+                case "RemoveNodeFromGraph":
+                    objectId = action.Parameters["objectId"].ToString();
+                    obj = GameObject.Find(objectId);
+
+                    if (obj == null)
+                    {
+                        Debug.LogError($"Object with ID {objectId} not found.");
+                        return;
+                    }
+
+                    visualScript = obj.GetComponent<VisualScript>();
+                    if (visualScript == null)
+                    {
+                        Debug.LogError("VisualScript component not found on the object.");
+                        return;
+                    }
+
+                    graph = visualScript.graph;
+                    if (graph == null)
+                    {
+                        Debug.LogError("Graph not found on the VisualScript component.");
+                        return;
+                    }
+
+                    nodeName = action.Parameters["nodeName"].ToString();
+                    nodeDef = RealityFlowAPI.Instance.NodeDefinitionDict[nodeName];
+
+                    //Node nodeToDelete = graph.GetNode(nodeName);
+
+                    //RealityFlowAPI.Instance.RemoveNodeFromGraph(graph, )                
+                    break;
+                    */
         }
     }
 

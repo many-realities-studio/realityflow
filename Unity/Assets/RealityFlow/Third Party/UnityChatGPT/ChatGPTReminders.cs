@@ -157,7 +157,7 @@ public static class Reminders
 "          \"type\": \"string\",\n" +
 "          \"description\": \"The ID of the graph where the node will be added.\"\n" +
 "        },\n" +
-"        \"defName\": {\n" +
+"        \"nodeName\": {\n" +
 "          \"type\": \"string\",\n" +
 "          \"description\": \"The name of the node definition to be added.\"\n" +
 "        },\n" +
