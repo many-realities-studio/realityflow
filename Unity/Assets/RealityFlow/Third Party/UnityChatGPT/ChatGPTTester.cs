@@ -69,6 +69,7 @@ public class ChatGPTTester : MonoBehaviour
         AddSelectedObjectToContext();
         AppendRemindersToPrompt();
 
+        //Logger.Instance.LogState("Processing your request....");
         StartCoroutine(SendRequestToChatGPT(originalReminders));
     }
 
@@ -177,6 +178,7 @@ public class ChatGPTTester : MonoBehaviour
          }));
 
         chatGPTQuestion.reminders = originalReminders;
+        LogApiCalls(ChatGPTMessage);
     }
 
     // New method to process the queue and execute responses
@@ -187,7 +189,9 @@ public class ChatGPTTester : MonoBehaviour
             string messageToProcess = chatGPTMessageQueue.Dequeue();
             Debug.Log("Processing message from queue.");
             ProcessAndExecuteResponse(messageToProcess);
-
+            Logger.Instance.LogInfo("All actions have been executed");
+            Logger.Instance.ClearAll();
+            Logger.Instance.AddHeader();
             // Yield to ensure other coroutines and Unity engine have time to process
             yield return null;
         }
@@ -228,7 +232,7 @@ public class ChatGPTTester : MonoBehaviour
         int startIndex = code.IndexOf(functionName) + functionName.Length + 1;
         if (startIndex < functionName.Length + 1)
         {
-            return "Unknown Object";
+            return "Object";
         }
 
         int endIndex = code.IndexOf(',', startIndex);
@@ -248,7 +252,7 @@ public class ChatGPTTester : MonoBehaviour
             }
             return parameter;
         }
-        return "Unknown Object";
+        return "Object";
     }
 
     public IEnumerator ExecuteLoggedActionsCoroutine()
