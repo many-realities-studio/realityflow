@@ -110,6 +110,7 @@ public class RaycastLogger : MonoBehaviour
         }
         else
         {
+            visualIndicatorInstance.SetActive(false);
             Debug.Log("Raycast did not hit any object.");
         }
     }

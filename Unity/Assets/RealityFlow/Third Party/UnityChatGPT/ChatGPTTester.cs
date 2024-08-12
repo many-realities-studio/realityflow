@@ -97,7 +97,7 @@ public class ChatGPTTester : MonoBehaviour
             Vector3 indicatorPosition = raycastLogger.GetVisualIndicatorPosition();
             if (indicatorPosition != Vector3.zero)
             {
-                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the location {indicatorPosition} as the position data when you spawn any and all objects. Also unless specified otherwise use this location as the updateobjecttransform position";
+                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the visualIndicator location {indicatorPosition} as the position data when you spawn any and all objects. Also unless specified otherwise use this location as the updateobjecttransform position";
                 Debug.LogError("Visual Indicator Location: " + indicatorPosition);
             }
 
@@ -114,12 +114,14 @@ public class ChatGPTTester : MonoBehaviour
             if (selectedObject != null)
             {
                 var visualScript = selectedObject.GetComponent<RealityFlow.NodeGraph.VisualScript>();
+                Vector3 objectPosition = selectedObject.transform.position;
+                string positionString = $"({objectPosition.x}, {objectPosition.y}, {objectPosition.z})";
                 if (visualScript != null)
                 {
                     string graphJson = null;
                     if (visualScript.graph != null)
                         graphJson = JsonUtility.ToJson(visualScript.graph);
-                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED";
+                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED also this is the object's current location: {positionString} don't move the object to its current location unless specified by visualIndicatorLocation ";
                     Debug.Log($"Selected object: {selectedObjectName}, Graph: {graphJson}");
                     AddTemporaryReminder(selectedObjectReminder);
                 }
