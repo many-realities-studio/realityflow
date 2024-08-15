@@ -378,7 +378,7 @@ public class AttachGizmoState : MonoBehaviour
     }
     public void EnableMeshRaySelection()
     {
-        if (!lookForTarget) return;
+        //if (!lookForTarget && attachedGameObject != null) return;
 
         GameObject farRay = GetActiveContollerFarRay();
 
@@ -389,7 +389,7 @@ public class AttachGizmoState : MonoBehaviour
 
     public void DisableMeshRaySelection()
     {
-        if (!lookForTarget) return;
+        //if (!lookForTarget) return;
 
         GameObject farRay = GetActiveContollerFarRay();
 
