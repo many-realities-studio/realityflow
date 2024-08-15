@@ -233,7 +233,7 @@ public class HandleSelector : MonoBehaviour
 
             if(em != null && em != selectedMesh)
             {
-                switchSelection();
+                //switchSelection();
             }
 
             if (selectedMesh != null)
