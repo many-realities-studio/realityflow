@@ -1658,6 +1658,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         Dictionary<string, GraphData> graphData = graphsInDatabase?.ToDictionary(graph => graph.id);
 
+        // For every object stored in the db for this room, put it in the room at the correct location:
         foreach (RfObject obj in objectsInDatabase)
         {
             if (obj == null)
@@ -1678,8 +1679,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 obj.name = "PrimitiveBase";
 
             }
-            // Find the prefab in the catalogue
 
+            // Find the prefab in the catalogue
             GameObject prefab = catalogue.prefabs.Find(p => p.name == objectName);
             if (prefab == null)
             {
@@ -1693,10 +1694,11 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
                 var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
-                if (spawnedObject.GetComponent<EditableMesh>() != null)
+                if (spawnedObject.GetComponent<EditableMesh>() != null) // when we are working with primitiveBases
                 {
                     Debug.Log("Primitive Base");
 
+                    // get smi from RfObj
                     SerializableMeshInfo serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
 
                     // Error can't deserialize here for some reason. Can check with team or investigate 
@@ -1707,6 +1709,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     {
                         obj.baseShape = spawnedObject.GetComponent<EditableMesh>().baseShape;
                     }
+
+                    spawnedObject.GetComponent<EditableMesh>().RefreshMesh();
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)

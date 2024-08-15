@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using RealityFlow.NodeUI;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -44,15 +45,22 @@ public class GizmoTranslatePlane : GizmoTransform
             newGizmoPosition -= GetPointInGrid(originalIntersection - newIntersection);
             newGizmoPosition = CheckForPlaneOffset(newGizmoPosition);
 
-            GetGizmoContainer().transform.position = newGizmoPosition;
-            GetAttachedObject().transform.position = newGizmoPosition;
+            GameObject attachedGO = GetAttachedObject();
 
-            if(GetAttachedObject().GetComponent<MyNetworkedObject>() != null)
+            GetGizmoContainer().transform.position = newGizmoPosition;
+            attachedGO.transform.position = newGizmoPosition;
+
+            if(attachedGO.GetComponent<MyNetworkedObject>() != null)
             {
-                RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
+                RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+            } else if (attachedGO.GetComponent<NetworkedMesh>() != null)
+            {
+                //attachedGO.GetComponent<EditableMesh>().RefreshMesh();
+                attachedGO.GetComponent<EditableMesh>().smi = new SerializableMeshInfo(attachedGO);
+                RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
             }
 
-            Debug.Log("The translate plane attached object... = " + GetAttachedObject());
+            Debug.Log("The translate plane attached object... = " + attachedGO);
         }
     }
 
