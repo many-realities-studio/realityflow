@@ -9,6 +9,7 @@ public class Handle : MonoBehaviour
     public EditableMesh mesh { get; set; }
 
     protected MeshRenderer meshRenderer;
+    Color defaultMat;
 
     public bool isSelected;
     private bool deselectOnRelease;
@@ -23,6 +24,8 @@ public class Handle : MonoBehaviour
 
         if (meshRenderer == null)
             meshRenderer = gameObject.GetComponent<MeshRenderer>();
+
+        defaultMat = meshRenderer.material.color;
     }
 
     public void OnHandleSelected()
@@ -58,7 +61,7 @@ public class Handle : MonoBehaviour
     {
         if(!isSelected)
         {
-            meshRenderer.material.color = selectionManager.defaultColor;
+            meshRenderer.material.color = defaultMat;
         }
     }
 
@@ -70,7 +73,7 @@ public class Handle : MonoBehaviour
             deselectOnRelease = false;
             gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             selectionManager.RemoveSelectedHandle(this);
-            meshRenderer.material.color = selectionManager.defaultColor;
+            meshRenderer.material.color = defaultMat;
         }
         else
         {
