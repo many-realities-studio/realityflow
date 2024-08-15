@@ -43,6 +43,11 @@ public class ComponentSelectManipulator : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public GameObject ReturnPairedObj()
+    {
+        return selectionManager.mesh.gameObject;
+    }
+
     /// <summary>
     /// Moves the manipulator to a set position without moving any of the components
     /// </summary>

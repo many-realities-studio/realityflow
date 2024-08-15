@@ -211,6 +211,17 @@ public class SerializableMeshInfo
         return mesh;
     }*/
 
+    public void printSMIPositions()
+    {
+        String vertexString = "vertex positions: \n";
+        //Debug.LogError("verticies: " + vertices + "\nfaces: " + faces);
+        for(int i = 0; i < vertices.Length; i+=3){
+             vertexString += "(" + vertices[i] + ", " + vertices[i+1] + ", " + vertices[i+2] + ")\n";
+        }
+
+        Debug.LogError(vertexString);
+    }
+
     public Vector3 GetPosition()
     {
         return new Vector3(positions[0], positions[1], positions[2]);

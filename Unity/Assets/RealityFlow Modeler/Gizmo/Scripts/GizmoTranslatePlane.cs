@@ -30,6 +30,34 @@ public class GizmoTranslatePlane : GizmoTransform
 
         else if (EndOfRaySelect())
         {
+            if(lastUpdateRaySelect)
+            {
+                GameObject attachedGO = GetAttachedObject();
+                GameObject manipulatedGO = null;
+
+                if(attachedGO.GetComponent<ComponentSelectManipulator>() != null)
+                {
+                    manipulatedGO = attachedGO.GetComponent<ComponentSelectManipulator>().ReturnPairedObj();
+                }
+
+                if(attachedGO.GetComponent<MyNetworkedObject>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+                }
+
+                if(attachedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+                }
+                
+                if (manipulatedGO != null && manipulatedGO.GetComponent<EditableMesh>() != null)
+                {
+                    //manipulatedGO.GetComponent<EditableMesh>().smi = new SerializableMeshInfo(manipulatedGO);
+                    //manipulatedGO.GetComponent<EditableMesh>().RefreshMesh();
+                    RealityFlowAPI.Instance.UpdatePrimitive(manipulatedGO);
+                }
+            }
+            
             lastUpdateRaySelect = false;
         }
 
@@ -50,17 +78,7 @@ public class GizmoTranslatePlane : GizmoTransform
             GetGizmoContainer().transform.position = newGizmoPosition;
             attachedGO.transform.position = newGizmoPosition;
 
-            if(attachedGO.GetComponent<MyNetworkedObject>() != null)
-            {
-                RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
-            } else if (attachedGO.GetComponent<NetworkedMesh>() != null)
-            {
-                //attachedGO.GetComponent<EditableMesh>().RefreshMesh();
-                attachedGO.GetComponent<EditableMesh>().smi = new SerializableMeshInfo(attachedGO);
-                RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
-            }
-
-            Debug.Log("The translate plane attached object... = " + attachedGO);
+            //Debug.Log("The translate plane attached object... = " + attachedGO);
         }
     }
 

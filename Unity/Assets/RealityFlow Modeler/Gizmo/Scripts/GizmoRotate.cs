@@ -46,17 +46,38 @@ public class GizmoRotate : GizmoTranslateAxis
             Destroy(tanSphere);
             BakeRotation();
 
+            if(lastUpdateRaySelect)
+            {
+                GameObject attachedGO = GetAttachedObject();
+                GameObject manipulatedGO = null;
+
+                if(attachedGO.GetComponent<ComponentSelectManipulator>() != null)
+                {
+                    manipulatedGO = attachedGO.GetComponent<ComponentSelectManipulator>().ReturnPairedObj();
+                }
+
+                if(attachedGO.GetComponent<MyNetworkedObject>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+                }
+
+                if(attachedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+                }
+                
+                if (manipulatedGO != null && manipulatedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(manipulatedGO);
+                }
+            }
+
             lastUpdateRaySelect = false;
         }
 
         if (lastUpdateRaySelect)
         {
             GetAttachedObject().transform.eulerAngles = GetRotationInGrid(GetNewRotation(originalMeshRotate));
-
-            if(GetAttachedObject().GetComponent<MyNetworkedObject>() != null)
-            {
-                RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
-            }
         }
     }
 

@@ -874,8 +874,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             scale = spawnedMesh.transform.localScale
         };
 
-        // Generate faces
-        PrimitiveRebuilder.RebuildMesh(em, spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
+        // Does PrimitiveRebuilder.RebuildMesh do anything necessary here?
+        //PrimitiveRebuilder.RebuildMesh(em, spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
         SerializableMeshInfo smi = em.smi;
 
         RfObject rfObject = spawnedObjects[spawnedMesh];
@@ -1701,8 +1701,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     // get smi from RfObj
                     SerializableMeshInfo serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
 
-                    // Error can't deserialize here for some reason. Can check with team or investigate 
+                    // Should deserialize correctly.
                     spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
+                    //spawnedObject.GetComponent<EditableMesh>().smi.printSMIPositions();
                     Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
                     if (obj.type == "Primitive")

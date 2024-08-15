@@ -104,6 +104,24 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
         baseShape = ShapeType.NoShape;
     }
 
+    /*public void printSMI()
+    {
+        Debug.LogError("positions: " + positions + "\nfaces: " +
+                        faces + "\nbaseShape: " + baseShape +
+                        "\nPos: " + transform.localPosition +
+                        "\nRot: " + transform.localRotation +
+                        "\nScale: " + transform.localScale);
+    }*/
+
+    /*public void updateFromSMI()
+    {
+        positions = smi.vertices;
+        faces = smi.faces;
+        //transform.localPosition = smi.
+        //transform.localRotation +
+        //transform.localScale);
+    }*/
+
     public void CreateMesh(EditableMesh otherMesh)
     {
         if(otherMesh != null) {
