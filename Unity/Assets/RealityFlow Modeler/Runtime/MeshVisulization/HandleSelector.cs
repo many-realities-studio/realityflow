@@ -231,9 +231,9 @@ public class HandleSelector : MonoBehaviour
 
             EditableMesh selectedMesh = currentHitResult.transform.gameObject.GetComponent<EditableMesh>();
 
-            if(em != null && em != selectedMesh)
+            if(em != null && selectedMesh != null && em != selectedMesh)
             {
-                //switchSelection();
+                switchSelection();
             }
 
             if (selectedMesh != null)
