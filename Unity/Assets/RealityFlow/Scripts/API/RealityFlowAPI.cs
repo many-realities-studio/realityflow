@@ -866,6 +866,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Obtain the Special Mesh Data from primitive
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
 
+        //em.FinalizeMesh();
+
         // Set the Primitive's transform Data
         TransformData transformData = new TransformData
         {

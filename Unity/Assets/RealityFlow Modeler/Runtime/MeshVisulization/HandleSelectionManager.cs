@@ -45,7 +45,7 @@ public class HandleSelectionManager : MonoBehaviour
         selectedHandles = new List<Handle>();
         selectedIndices = new List<int>();
 
-        GameObject tools = GameObject.Find("RealityFlow Editor");
+        GameObject tools = GameObject.Find("Gizmo Manager");
         gizmoTool = tools.GetComponent<AttachGizmoState>();
 
         GameObject selectManager = GameObject.Find("Component Select Manager");

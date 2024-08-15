@@ -54,6 +54,15 @@ public class MeshManipulationModes : MonoBehaviour
             // consider changing to HandleSelectionManager.Instance.ClearSelectedHandlesAndVertices();
             HandleSelectionManager handleSelectionManager = HandleSelectionManager.Instance;
             handleSelectionManager.ClearSelectedHandlesAndVertices();
+            
+            if(mode != ManipulationMode.mObject)
+            {
+                handleSelectionManager.gizmoTool.isActive = true;
+            } else
+            {
+                handleSelectionManager.gizmoTool.isActive = false;
+            }
+
             OnManipulationModeChange(mode);
         }
     }
