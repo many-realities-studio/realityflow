@@ -78,6 +78,19 @@ public class HandleSelector : MonoBehaviour
         }
     }
 
+    private void switchSelection()
+    {
+        InvalidateHandleCache();
+
+        if(em != null)
+        {
+            em.gameObject.GetComponent<MeshCollider>().enabled = true;
+            em.gameObject.GetComponent<BoundsControl>().HandlesActive = false;
+            em.gameObject.GetComponent<NetworkedMesh>().ControlSelection();
+            em = null;
+        }
+    }
+
     private void SpawnHandles()
     {
         if(em == null)
@@ -215,7 +228,14 @@ public class HandleSelector : MonoBehaviour
         MRTKBaseInteractable interactable = currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>();
         if (interactable != null && interactable.isSelected)
         {
+
             EditableMesh selectedMesh = currentHitResult.transform.gameObject.GetComponent<EditableMesh>();
+
+            if(em != null && em != selectedMesh)
+            {
+                switchSelection();
+            }
+
             if (selectedMesh != null)
             {
                 Debug.Log("adding mesh " + selectedMesh.gameObject.name + " to visualization");
