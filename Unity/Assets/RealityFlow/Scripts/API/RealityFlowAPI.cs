@@ -866,6 +866,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Obtain the Special Mesh Data from primitive
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
 
+         // Add BoxCollider based on bounds
+        if (spawnedMesh.GetComponent<BoxCollider>() != null)
+        {
+            BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
+            boxCollider.center = em.mesh.bounds.center;
+            boxCollider.size = em.mesh.bounds.size;
+        }
         //em.FinalizeMesh();
 
         // Set the Primitive's transform Data
