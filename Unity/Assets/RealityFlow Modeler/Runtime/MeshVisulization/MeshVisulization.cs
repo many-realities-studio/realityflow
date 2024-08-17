@@ -308,8 +308,8 @@ public class MeshVisulization : MonoBehaviour
     {
         Material mat = gameObject.GetComponent<MeshRenderer>().material;
 
-        currentMetallicValue = mat.GetFloat("_Metallic");
-        currentGlossyValue = mat.GetFloat("_Glossiness");
+        currentMetallicValue = mat.GetFloat("metallicFactor");
+        currentGlossyValue = mat.GetFloat("roughnessFactor");
     }
 
     public void SetMeshMaterialOpaque()
@@ -324,8 +324,8 @@ public class MeshVisulization : MonoBehaviour
         mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
         mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
         mat.SetInt("_ZWrite", 1);
-        mat.SetFloat("_Metallic", currentMetallicValue);
-        mat.SetFloat("_Glossiness", currentGlossyValue);
+        mat.SetFloat("metallicFactor", currentMetallicValue);
+        mat.SetFloat("roughnessFactor", currentGlossyValue);
         mat.DisableKeyword("_ALPHATEST_ON");
         mat.DisableKeyword("_ALPHABLEND_ON");
         mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
@@ -346,7 +346,9 @@ public class MeshVisulization : MonoBehaviour
         mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
         mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
         mat.SetInt("_ZWrite", 0);
-        mat.SetFloat("_Metallic", 0);
+        mat.SetFloat("metallicFactor", 0);
+        
+        // not sure the shader supports the below calls
         mat.DisableKeyword("_ALPHATEST_ON");
         mat.DisableKeyword("_ALPHABLEND_ON");
         mat.EnableKeyword("_ALPHAPREMULTIPLY_ON");

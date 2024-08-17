@@ -122,18 +122,21 @@ public class ColorTool : MonoBehaviour
         if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
+            GameObject hitObj = currentHitResult.collider.gameObject;
             if (colorToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetColor("baseColorFactor", currentColor);
+                hitObj.GetComponent<Renderer>().material.SetColor("baseColorFactor", currentColor);
             }
             if (metallicToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("metallicFactor", currentMetallicValue);
+                hitObj.GetComponent<Renderer>().material.SetFloat("metallicFactor", currentMetallicValue);
             }
             if (smoothnessToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("roughnessFactor", currentSmoothnessValue);
+                hitObj.GetComponent<Renderer>().material.SetFloat("roughnessFactor", currentSmoothnessValue);
             }
+
+             RealityFlowAPI.Instance.UpdatePrimitive(hitObj);
         }
     }
 
