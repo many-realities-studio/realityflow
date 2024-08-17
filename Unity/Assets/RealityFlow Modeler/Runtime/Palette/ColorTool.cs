@@ -113,6 +113,9 @@ public class ColorTool : MonoBehaviour
         }
     }
 
+    // This method is very dependent on the shader itself. Methods like SetColor look for the correct value to
+    // change by locating the property on the shader by it's name. To see the name, inspect the shader file
+    // in unity and scoll to the bottom. Change the string to the property name and it should work.
     private void UpdateMeshTexture()
     {
         // Update the game object depending on the tool and if it is a user created mesh and not selected by anyone else
@@ -121,15 +124,15 @@ public class ColorTool : MonoBehaviour
         {
             if (colorToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetColor("_Color", currentColor);
+                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetColor("baseColorFactor", currentColor);
             }
             if (metallicToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("_Metallic", currentMetallicValue);
+                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("metallicFactor", currentMetallicValue);
             }
             if (smoothnessToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("_Glossiness", currentSmoothnessValue);
+                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("roughnessFactor", currentSmoothnessValue);
             }
         }
     }
