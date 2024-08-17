@@ -364,14 +364,14 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         // Debug.Log("Run the EndHold() networking messages");
 
         if (!networkedPlayManager.playMode)
-            RealityFlowAPI.Instance.UpdateObjectTransform(gameObject.name);
-        context.SendJson(CreateHeldMessage(false));
-
-        if (!networkedPlayManager.playMode)
         {
             rb.constraints = RigidbodyConstraints.FreezeAll;
             rb.excludeLayers = ~rb.excludeLayers;
         }
+
+        if (!networkedPlayManager.playMode)
+            RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+        context.SendJson(CreateHeldMessage(false));
     }
 
     /// <summary>

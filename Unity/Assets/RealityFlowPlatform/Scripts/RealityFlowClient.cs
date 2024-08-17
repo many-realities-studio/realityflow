@@ -699,8 +699,6 @@ public class RealityFlowClient : MonoBehaviour
         RealityFlowAPI.Instance.DespawnAllObjectsInBothDictionarys();
 
         projectManager.SetActive(true);
-
-
     }
 
     public void SetCurrentProject(string projectId)
