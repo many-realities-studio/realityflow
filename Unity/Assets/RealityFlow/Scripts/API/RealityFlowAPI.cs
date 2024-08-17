@@ -866,12 +866,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Obtain the Special Mesh Data from primitive
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
 
-         // Add BoxCollider based on bounds
+        // Add BoxCollider based on bounds
         if (spawnedMesh.GetComponent<BoxCollider>() != null)
         {
             BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
             boxCollider.center = em.mesh.bounds.center;
             boxCollider.size = em.mesh.bounds.size;
+            boxCollider.enabled = false;
         }
         //em.FinalizeMesh();
 
@@ -1711,16 +1712,26 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     SerializableMeshInfo serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
 
                     // Should deserialize correctly.
-                    spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
+                    EditableMesh em = spawnedObject.GetComponent<EditableMesh>();
+                    em.smi = serializableMesh;
                     //spawnedObject.GetComponent<EditableMesh>().smi.printSMIPositions();
-                    Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
+                    Debug.Log(em.baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
                     if (obj.type == "Primitive")
                     {
-                        obj.baseShape = spawnedObject.GetComponent<EditableMesh>().baseShape;
+                        obj.baseShape = em.baseShape;
                     }
 
-                    spawnedObject.GetComponent<EditableMesh>().RefreshMesh();
+                    em.RefreshMesh();
+
+                    // Add BoxCollider based on bounds
+                    if (spawnedObject.GetComponent<BoxCollider>() != null)
+                    {
+                        BoxCollider boxCollider = spawnedObject.GetComponent<BoxCollider>();
+                        boxCollider.center = em.mesh.bounds.center;
+                        boxCollider.size = em.mesh.bounds.size;
+                        boxCollider.enabled = false;
+                    }
                 }
                 Debug.Log("Spawned object with room scope");
                 if (spawnedObject == null)

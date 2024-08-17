@@ -156,8 +156,9 @@ public class CacheMeshData : MonoBehaviour
                     rb.useGravity = false;
                     rb.isKinematic = true;
 
-                    // the object needs to be selectable
-                    boxCol.enabled = true;
+                    // the object needs to be selectable (mesh colidder covers this)
+                    meshCol.enabled = true;
+                    boxCol.enabled = false;
                 }
 
 
