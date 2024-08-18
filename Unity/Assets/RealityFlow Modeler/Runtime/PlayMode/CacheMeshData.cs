@@ -162,8 +162,8 @@ public class CacheMeshData : MonoBehaviour
                 }
 
 
-                //RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
-                RealityFlowAPI.Instance.UpdateObjectTransform(gameObject.name);
+                RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+                //RealityFlowAPI.Instance.UpdateObjectTransform(gameObject.name);
                 // All meshes should be selectable after Play mode is exited
                 //gameObject.GetComponent<ObjectManipulator>().enabled = true;
             }

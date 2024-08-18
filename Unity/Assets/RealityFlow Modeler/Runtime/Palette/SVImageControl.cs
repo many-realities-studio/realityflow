@@ -112,6 +112,8 @@ public class SVImageControl : MonoBehaviour
 
         xNorm = x / rectTransform.sizeDelta.x;
         yNorm = y / rectTransform.sizeDelta.y;
+
+        SetColor();
     }
 
     public void SetColor()

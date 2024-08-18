@@ -354,9 +354,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
         }*/
 
-        if (isSelected
-            || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive
-            || eraser.isActive)
+        if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive || eraser.isActive)
             return;
 
         //Debug.Log("EndHold() was called");
