@@ -25,7 +25,13 @@ public class Logger : Singleton<Logger>
         }
         debugAreaText.text = string.Empty;
         ClearLines();
-        string message = "RealityFlow actions list";
+        string message = "RealityFlow action list. Your actions will appear here:";
+        debugAreaText.text += $"<size=150%><color=\"green\"> {message}</color></size>\n";
+    }
+
+    public void AddHeader()
+    {
+        string message = "RealityFlow action list. Your actions will appear here:";
         debugAreaText.text += $"<size=150%><color=\"green\"> {message}</color></size>\n";
     }
 
@@ -60,6 +66,11 @@ public class Logger : Singleton<Logger>
         ClearLines();
         debugAreaText.text += $"<color=\"yellow\">{message}</color>\n";
     }
+    public void LogState(string message)
+    {
+        ClearLines();
+        debugAreaText.text += $"<color=\"green\">{message}</color>\n";
+    }
 
     private void ClearLines()
     {
@@ -68,5 +79,10 @@ public class Logger : Singleton<Logger>
             debugAreaText.text = string.Empty;
             actionCount = 0; // Reset action counter when clearing
         }
+    }
+    public void ClearAll()
+    {
+        debugAreaText.text = string.Empty;
+        actionCount = 0; // Reset the action counter
     }
 }

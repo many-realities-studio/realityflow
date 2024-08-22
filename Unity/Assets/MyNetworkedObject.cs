@@ -118,7 +118,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
 
             if (Time.frameCount % 300 == 0)
             {
-                Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
+                //Debug.Log("Sending Update: Position=" + lastPosition + ", Scale=" + lastScale + ", Rotation=" + lastRotation);
             }
 
             // Send the transform data to the server
@@ -256,14 +256,14 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
             // TODO: 
-            
+
         }
         else
         {
-            if(GetComponent<BoundsControl>() != null)
+            if (GetComponent<BoundsControl>() != null)
             {
                 GetComponent<BoundsControl>().HandlesActive = false;
-            } 
+            }
             //rb.useGravity = true;
         }
 
@@ -370,12 +370,12 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.isKinematic = false;
             rb.useGravity = true;
         }
-        
-        if(GetComponent<BoundsControl>() != null)
+
+        if (GetComponent<BoundsControl>() != null)
         {
             GetComponent<BoundsControl>().HandlesActive = false;
-        } 
-        
+        }
+
         //Updates the object's transform
         RealityFlowAPI.Instance.UpdatePrefab(gameObject);
 
