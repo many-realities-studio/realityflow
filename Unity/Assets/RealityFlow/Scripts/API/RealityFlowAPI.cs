@@ -1997,7 +1997,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             // Log the action with all necessary details
             if (!isUndoing)
             {
-                actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, obj, scope);
+                actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, objectToDespawn.GetComponent<EditableMesh>().smi, obj, scope);
                 //Debug.LogError("ACTION ADDED!!!!");
             }
 
@@ -2255,8 +2255,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Vector3 position = (Vector3)action.Parameters[1];
                 Quaternion rotation = (Quaternion)action.Parameters[2];
                 Vector3 scale = (Vector3)action.Parameters[3];
-                RfObject rfObject = action.Parameters[4] as RfObject;
-                SpawnScope scope = (SpawnScope)action.Parameters[5];
+                SerializableMeshInfo smi = action.Parameters[4] as SerializableMeshInfo;
+                RfObject rfObject = action.Parameters[5] as RfObject;
+                SpawnScope scope = (SpawnScope)action.Parameters[6];
 
                 if (spawnedObjectsById.ContainsKey(objectId))
                 {
@@ -2269,27 +2270,56 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     // Recreate the primitive using the stored rfObject
                     GameObject respawnedObject = await SpawnPrimitive(position, rotation, scale, null, rfObject.baseShape);
+                    EditableMesh reEM = respawnedObject.GetComponent<EditableMesh>();
                     if (respawnedObject != null)
                     {
                         respawnedObject.transform.localScale = scale;
                         respawnedObjects[objectId] = respawnedObject;
+                        reEM.smi = smi;
+                        //if (obj.type == "Primitive")
+                        //{
+                        //    respawnedObject.baseShape = em.baseShape;
+                        //}
+                        reEM.RefreshMesh();
+
+                        // Add BoxCollider based on bounds
+                        if (respawnedObject.GetComponent<BoxCollider>() != null)
+                        {
+                            BoxCollider boxCollider = respawnedObject.GetComponent<BoxCollider>();
+                            boxCollider.center = reEM.mesh.bounds.center;
+                            boxCollider.size = reEM.mesh.bounds.size;
+                            boxCollider.enabled = false;
+                        }
                     }
                 }
                 else
                 {
                     string objName = action.Parameters[0] as string;
                     Debug.Log("Undoing the despawn of object named " + objName);
-                    position = (Vector3)action.Parameters[1];
-                    rotation = (Quaternion)action.Parameters[2];
-                    scale = (Vector3)action.Parameters[3];
                     scope = (SpawnScope)action.Parameters[5]; // Ensure the scope is logged during the initial action and passed here.
                     string originalPrefabName = GetOriginalPrefabName(objectId);
                     Debug.Log("The original prefab name in undo despawn is: " + originalPrefabName);
                     GameObject respawnedObject = await SpawnObject(objName, position, scale, rotation, scope);
+                    EditableMesh reEM = respawnedObject.GetComponent<EditableMesh>();
                     if (respawnedObject != null)
                     {
                         respawnedObject.transform.localScale = scale;
                         respawnedObjects[objName] = respawnedObject;
+                        reEM.smi = smi;
+                        //if (obj.type == "Primitive")
+                        //{
+                        //    respawnedObject.baseShape = em.baseShape;
+                        //}
+                        reEM.RefreshMesh();
+
+                        // Add BoxCollider based on bounds
+                        if (respawnedObject.GetComponent<BoxCollider>() != null)
+                        {
+                            BoxCollider boxCollider = respawnedObject.GetComponent<BoxCollider>();
+                            boxCollider.center = reEM.mesh.bounds.center;
+                            boxCollider.size = reEM.mesh.bounds.size;
+                            boxCollider.enabled = false;
+                        }
                     }
                     //save the spawned object add it to a list of respawned objects that can then be searched by despawn redo
                 }
