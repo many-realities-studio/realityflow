@@ -843,12 +843,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
 
 
-            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            //Debug.LogError("Are we undoing right now?? " + isUndoing);
 
             if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(SpawnPrimitive), spawnedMesh.name, position, rotation, scale, inputMesh, em.baseShape, spawnedMesh);
-                Debug.LogError("\n\n\n\nType is: " + em.baseShape);
+                //Debug.LogError("Type is: " + em.baseShape);
             }
         }
         catch (Exception ex)
@@ -1992,13 +1992,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 originalPrefabName = rfObject.originalPrefabName; // Ensure this field exists and is set correctly when spawning objects
                 obj = rfObject;
             }
-            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            //Debug.LogError("Are we undoing right now?? " + isUndoing);
 
             // Log the action with all necessary details
             if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, obj, scope);
-                Debug.LogError("ACTION ADDED!!!!");
+                //Debug.LogError("ACTION ADDED!!!!");
             }
 
             // Remove object from the database
@@ -2044,11 +2044,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 DespawnPrimitive(objectToDespawn, scope);
                 return;
             }
-            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            //Debug.LogError("Are we undoing right now?? " + isUndoing);
+            
             if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
-                Debug.LogError("ACTION ADDED!!!!");
+                //Debug.LogError("ACTION ADDED!!!!");
             }
             // Remove object from the database
             RemoveObjectFromDatabase(objectId, () =>
