@@ -344,6 +344,18 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             rb.excludeLayers = ~rb.excludeLayers;
             rb.constraints = RigidbodyConstraints.None;
         }
+        if (!RealityFlowAPI.Instance.isUndoing)
+        {
+            // Log the transformation at the start of holding
+            RealityFlowAPI.Instance.actionLogger.LogAction(
+                nameof(RealityFlowAPI.UpdatePrimitive), // Action name to match the API
+                gameObject.name,
+                transform.localPosition,
+                transform.localRotation,
+                transform.localScale, 
+                gameObject.GetComponent<EditableMesh>().smi
+                );
+        }
         context.SendJson(CreateHeldMessage(true));
     }
 
