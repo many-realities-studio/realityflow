@@ -863,16 +863,23 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         Debug.Log("Updating primitive...");
 
-        //if (isUndoing)
-        //    actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitive), new object[] { spawnedMesh.name, spawnedMesh.transform.position, spawnedMesh.transform.rotation, spawnedMesh.transform.localScale, spawnedMesh.GetComponent<EditableMesh>().smi }));
+        
 
 
         GameObject curMesh = FindSpawnedObject(spawnedMesh.name);
+        //if (isUndoing)
+        //{
+        //    actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitive), new object[] { spawnedMesh.name, curMesh.transform.position, curMesh.transform.rotation, curMesh.transform.localScale, curMesh.GetComponent<EditableMesh>().smi }));
+
+        //    Debug.LogError("Undo is being logged with Pos: " + spawnedMesh.transform.position + ", Rot: " + spawnedMesh.transform.rotation + ", SCL: " + spawnedMesh.transform.localScale);
+        //}
+            
         if (!isUndoing && curMesh != null)
         {
             RfObject oldData = spawnedObjects[spawnedMesh];
             TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
             SerializableMeshInfo oldSMI = JsonUtility.FromJson<SerializableMeshInfo>(oldData.meshJson);
+            
             actionLogger.LogAction(nameof(UpdatePrimitive), spawnedMesh.name, oldTransform.position, oldTransform.rotation, oldTransform.scale, oldSMI);
             //Debug.LogError("Type is: " + em.baseShape);
         }
@@ -2385,6 +2392,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 GameObject spawnedMesh = FindSpawnedObject(objectName);
 
                 Debug.Log("Undoing the transform of object named " + spawnedMesh);
+                actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitive), new object[] { spawnedMesh.name, spawnedMesh.transform.position, spawnedMesh.transform.rotation, spawnedMesh.transform.localScale, spawnedMesh.GetComponent<EditableMesh>().smi }));
                 //GameObject obj = FindSpawnedObject(objectName);
                 if (spawnedMesh != null)
                 {
@@ -2669,12 +2677,16 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 
                 GameObject spawnedMesh = FindSpawnedObject(objectName);
 
-                Debug.Log("Undoing the transform of object named " + spawnedMesh);
+                //Debug.LogError("Undoing the transform of object named " + spawnedMesh);
                 //GameObject obj = FindSpawnedObject(objectName);
                 if (spawnedMesh != null)
                 {
                     
                     EditableMesh reEM = spawnedMesh.GetComponent<EditableMesh>();
+                    //Debug.LogError("CurPos: " + spawnedMesh.transform.localPosition + ", oldPos: " +  oldPosition);
+                    //Debug.LogError("CurPos: " + spawnedMesh.transform.localRotation + ", oldPos: " +  oldRotation);
+                    //Debug.LogError("CurPos: " + spawnedMesh.transform.localScale + ", oldPos: " +  oldScale);
+
                     spawnedMesh.transform.localPosition = oldPosition;
                     spawnedMesh.transform.localRotation = oldRotation;
                     spawnedMesh.transform.localScale = oldScale;
@@ -2698,6 +2710,23 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 else
                 {
                     Debug.LogError($"Object named {spawnedMesh} not found during undo transform.");
+                }
+                break;
+
+            case nameof(UpdateObjectTransform):
+                objectName = (string)action.Parameters[0];
+                oldPosition = (Vector3)action.Parameters[1];
+                oldRotation = (Quaternion)action.Parameters[2];
+                oldScale = (Vector3)action.Parameters[3];
+                Debug.Log("Undoing the transform of object named " + objectName);
+                GameObject obj = FindSpawnedObject(objectName);
+                if (obj != null)
+                {
+                    UpdateObjectTransform(objectName, oldPosition, oldRotation, oldScale);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {objectName} not found during undo transform.");
                 }
                 break;
 
