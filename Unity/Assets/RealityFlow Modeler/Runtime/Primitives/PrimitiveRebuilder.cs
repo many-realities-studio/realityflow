@@ -51,7 +51,9 @@ public static class PrimitiveRebuilder
 
     private static void UpdateMesh(EditableMesh target, EditableMesh newMesh)
     {
+        newMesh.mesh = target.mesh;
         target.CreateMesh(newMesh);
+        //target.RefreshMesh();
         Object.Destroy(newMesh.gameObject);
 
         // Adjust bounds visuals to the finalized size

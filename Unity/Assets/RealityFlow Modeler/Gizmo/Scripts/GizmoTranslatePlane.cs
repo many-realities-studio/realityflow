@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using RealityFlow.NodeUI;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -9,7 +11,11 @@ using UnityEngine;
 /// </summary>
 public class GizmoTranslatePlane : GizmoTransform
 {
+    
     public Vector3 originalIntersection;
+
+    //private ComponentTranslation currentOperation;
+    //private Vector3 startPos;
 
     void Update()
     {
@@ -24,10 +30,42 @@ public class GizmoTranslatePlane : GizmoTransform
             );
 
             lastUpdateRaySelect = true;
+            //BeginMeshOperation();
         }
 
         else if (EndOfRaySelect())
         {
+            //EndMeshOperation();
+            BakeRotation();
+            
+            if(lastUpdateRaySelect)
+            {
+                GameObject attachedGO = GetAttachedObject();
+                GameObject manipulatedGO = null;
+
+                if(attachedGO.GetComponent<ComponentSelectManipulator>() != null)
+                {
+                    manipulatedGO = attachedGO.GetComponent<ComponentSelectManipulator>().ReturnPairedObj();
+                }
+
+                if(attachedGO.GetComponent<MyNetworkedObject>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+                }
+
+                if(attachedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+                }
+                
+                if (manipulatedGO != null && manipulatedGO.GetComponent<EditableMesh>() != null)
+                {
+                    //manipulatedGO.GetComponent<EditableMesh>().smi = new SerializableMeshInfo(manipulatedGO);
+                    //manipulatedGO.GetComponent<EditableMesh>().RefreshMesh();
+                    RealityFlowAPI.Instance.UpdatePrimitive(manipulatedGO);
+                }
+            }
+            
             lastUpdateRaySelect = false;
         }
 
@@ -43,12 +81,12 @@ public class GizmoTranslatePlane : GizmoTransform
             newGizmoPosition -= GetPointInGrid(originalIntersection - newIntersection);
             newGizmoPosition = CheckForPlaneOffset(newGizmoPosition);
 
+            GameObject attachedGO = GetAttachedObject();
+
             GetGizmoContainer().transform.position = newGizmoPosition;
-            GetAttachedObject().transform.position = newGizmoPosition;
+            attachedGO.transform.position = newGizmoPosition;
 
-            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
-
-            Debug.Log("The translate plane attached object... = " + GetAttachedObject());
+            //Debug.Log("The translate plane attached object... = " + attachedGO);
         }
     }
 
@@ -102,6 +140,24 @@ public class GizmoTranslatePlane : GizmoTransform
         else
             return new Vector3(0, 0, 0);
     }
+
+    /*void BeginMeshOperation()
+    {
+        if (currentOperation == null)
+            currentOperation = new ComponentTranslation(HandleSelectionManager.Instance.GetUniqueSelectedIndices());
+        startPos = GetAttachedObject().transform.position;
+    }
+
+    void EndMeshOperation()
+    {
+        currentOperation.AddOffsetAmount(GetAttachedObject().transform.position - startPos);
+        try
+        {
+            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+        }
+        catch { }
+        currentOperation = null;
+    }*/
 }
 
 
@@ -207,22 +263,7 @@ public class GizmoTranslatePlane : GizmoTransform
             return new Vector3(0, 0, 0);
     }
 
-    void BeginMeshOperation()
-    {
-        if (currentOperation == null)
-            currentOperation = new ComponentTranslation(HandleSelectionManager.Instance.GetUniqueSelectedIndices());
-        startPos = GetAttachedObject().transform.position;
-    }
+    */
 
-    void EndMeshOperation()
-    {
-        currentOperation.AddOffsetAmount(GetAttachedObject().transform.position - startPos);
-        try
-        {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
-        }
-        catch { }
-        currentOperation = null;
-    }
-}
-*/
+    
+//}

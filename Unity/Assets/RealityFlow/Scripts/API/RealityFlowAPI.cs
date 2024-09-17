@@ -718,7 +718,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     public async Task<GameObject> SpawnPrimitive(Vector3 position, Quaternion rotation, Vector3 scale, EditableMesh inputMesh = null, ShapeType type = ShapeType.Cube)
     {
 
-        GameObject spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive); EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+        GameObject spawnedMesh = NetworkSpawnManager.Find(this).SpawnWithRoomScopeWithReturn(PrimitiveSpawner.instance.primitive);
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+
         if (inputMesh == null)
         {
             // Based on the shape
@@ -841,12 +843,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             }
 
 
-            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            //Debug.LogError("Are we undoing right now?? " + isUndoing);
 
             if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(SpawnPrimitive), spawnedMesh.name, position, rotation, scale, inputMesh, em.baseShape, spawnedMesh);
-                Debug.LogError("\n\n\n\nType is: " + em.baseShape);
+                //Debug.LogError("Type is: " + em.baseShape);
             }
         }
         catch (Exception ex)
@@ -861,8 +863,46 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         Debug.Log("Updating primitive...");
 
+        
+
+
+        GameObject curMesh = FindSpawnedObject(spawnedMesh.name);
+        //if (isUndoing)
+        //{
+        //    actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitive), new object[] { spawnedMesh.name, curMesh.transform.position, curMesh.transform.rotation, curMesh.transform.localScale, curMesh.GetComponent<EditableMesh>().smi }));
+
+        //    Debug.LogError("Undo is being logged with Pos: " + spawnedMesh.transform.position + ", Rot: " + spawnedMesh.transform.rotation + ", SCL: " + spawnedMesh.transform.localScale);
+        //}
+            
+        if (!isUndoing && curMesh != null)
+        {
+            RfObject oldData = spawnedObjects[spawnedMesh];
+            TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
+            SerializableMeshInfo oldSMI = JsonUtility.FromJson<SerializableMeshInfo>(oldData.meshJson);
+            
+            actionLogger.LogAction(nameof(UpdatePrimitive), spawnedMesh.name, oldTransform.position, oldTransform.rotation, oldTransform.scale, oldSMI);
+            //Debug.LogError("Type is: " + em.baseShape);
+        }
+
+        // Bake mesh so bounds get calculated correctly
+        VertexPosition.BakeVerticesWithNetworking(spawnedMesh.GetComponent<EditableMesh>());
+        if(spawnedMesh.GetComponent<MeshFilter>() != null)
+        {
+            spawnedMesh.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        }
+
         // Obtain the Special Mesh Data from primitive
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+
+        // Add BoxCollider based on bounds
+        if (spawnedMesh.GetComponent<BoxCollider>() != null)
+        {
+            BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
+            boxCollider.center = em.mesh.bounds.center;
+            boxCollider.size = em.mesh.bounds.size;
+            boxCollider.enabled = false;
+        }
+        //em.FinalizeMesh();
 
         // Set the Primitive's transform Data
         TransformData transformData = new TransformData
@@ -872,9 +912,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             scale = spawnedMesh.transform.localScale
         };
 
-        // Generate faces
-        PrimitiveRebuilder.RebuildMesh(spawnedMesh.GetComponent<EditableMesh>(), spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
-        SerializableMeshInfo smi = spawnedMesh.GetComponent<EditableMesh>().smi;
+        // Does PrimitiveRebuilder.RebuildMesh do anything necessary here?
+        //PrimitiveRebuilder.RebuildMesh(em, spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
+        SerializableMeshInfo smi = em.smi;
 
         RfObject rfObject = spawnedObjects[spawnedMesh];
         rfObject.transformJson = JsonUtility.ToJson(transformData);
@@ -905,6 +945,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         try
         {
             client.SendQueryAsync(createObject);
+
+            
         }
         catch (Exception ex)
         {
@@ -1656,6 +1698,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
         Dictionary<string, GraphData> graphData = graphsInDatabase?.ToDictionary(graph => graph.id);
 
+        // For every object stored in the db for this room, put it in the room at the correct location:
         foreach (RfObject obj in objectsInDatabase)
         {
             if (obj == null)
@@ -1676,8 +1719,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 obj.name = "PrimitiveBase";
 
             }
-            // Find the prefab in the catalogue
 
+            // Find the prefab in the catalogue
             GameObject prefab = catalogue.prefabs.Find(p => p.name == objectName);
             if (prefab == null)
             {
@@ -1691,19 +1734,33 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             {
                 // Spawn the object using NetworkSpawnManager to ensure it's synchronized across all users
                 var spawnedObject = spawnManager.SpawnWithRoomScopeWithReturn(prefab);
-                if (spawnedObject.GetComponent<EditableMesh>() != null)
+                if (spawnedObject.GetComponent<EditableMesh>() != null) // when we are working with primitiveBases
                 {
                     Debug.Log("Primitive Base");
 
+                    // get smi from RfObj
                     SerializableMeshInfo serializableMesh = JsonUtility.FromJson<SerializableMeshInfo>(obj.meshJson);
 
-                    // Error can't deserialize here for some reason. Can check with team or investigate 
-                    spawnedObject.GetComponent<EditableMesh>().smi = serializableMesh;
-                    Debug.Log(spawnedObject.GetComponent<EditableMesh>().baseShape);
+                    // Should deserialize correctly.
+                    EditableMesh em = spawnedObject.GetComponent<EditableMesh>();
+                    em.smi = serializableMesh;
+                    //spawnedObject.GetComponent<EditableMesh>().smi.printSMIPositions();
+                    Debug.Log(em.baseShape);
                     Debug.Log(spawnedObject.GetComponent<NetworkedMesh>().lastSize);
                     if (obj.type == "Primitive")
                     {
-                        obj.baseShape = spawnedObject.GetComponent<EditableMesh>().baseShape;
+                        obj.baseShape = em.baseShape;
+                    }
+
+                    em.RefreshMesh();
+
+                    // Add BoxCollider based on bounds
+                    if (spawnedObject.GetComponent<BoxCollider>() != null)
+                    {
+                        BoxCollider boxCollider = spawnedObject.GetComponent<BoxCollider>();
+                        boxCollider.center = em.mesh.bounds.center;
+                        boxCollider.size = em.mesh.bounds.size;
+                        boxCollider.enabled = false;
                     }
                 }
                 Debug.Log("Spawned object with room scope");
@@ -1965,13 +2022,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 originalPrefabName = rfObject.originalPrefabName; // Ensure this field exists and is set correctly when spawning objects
                 obj = rfObject;
             }
-            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            //Debug.LogError("Are we undoing right now?? " + isUndoing);
 
             // Log the action with all necessary details
             if (!isUndoing)
             {
-                actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, obj, scope);
-                Debug.LogError("ACTION ADDED!!!!");
+                actionLogger.LogAction(nameof(DespawnPrimitive), objectId, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, objectToDespawn.GetComponent<EditableMesh>().smi, obj, scope);
+                //Debug.LogError("ACTION ADDED!!!!");
             }
 
             // Remove object from the database
@@ -2017,11 +2074,12 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 DespawnPrimitive(objectToDespawn, scope);
                 return;
             }
-            Debug.LogError("Are we undoing right now?? " + isUndoing);
+            //Debug.LogError("Are we undoing right now?? " + isUndoing);
+            
             if (!isUndoing)
             {
                 actionLogger.LogAction(nameof(DespawnObject), originalPrefabName, objectToDespawn.transform.position, objectToDespawn.transform.rotation, objectToDespawn.transform.localScale, scope);
-                Debug.LogError("ACTION ADDED!!!!");
+                //Debug.LogError("ACTION ADDED!!!!");
             }
             // Remove object from the database
             RemoveObjectFromDatabase(objectId, () =>
@@ -2227,8 +2285,9 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 Vector3 position = (Vector3)action.Parameters[1];
                 Quaternion rotation = (Quaternion)action.Parameters[2];
                 Vector3 scale = (Vector3)action.Parameters[3];
-                RfObject rfObject = action.Parameters[4] as RfObject;
-                SpawnScope scope = (SpawnScope)action.Parameters[5];
+                SerializableMeshInfo smi = action.Parameters[4] as SerializableMeshInfo;
+                RfObject rfObject = action.Parameters[5] as RfObject;
+                SpawnScope scope = (SpawnScope)action.Parameters[6];
 
                 if (spawnedObjectsById.ContainsKey(objectId))
                 {
@@ -2241,27 +2300,56 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 {
                     // Recreate the primitive using the stored rfObject
                     GameObject respawnedObject = await SpawnPrimitive(position, rotation, scale, null, rfObject.baseShape);
+                    EditableMesh reEM = respawnedObject.GetComponent<EditableMesh>();
                     if (respawnedObject != null)
                     {
                         respawnedObject.transform.localScale = scale;
                         respawnedObjects[objectId] = respawnedObject;
+                        reEM.smi = smi;
+                        //if (obj.type == "Primitive")
+                        //{
+                        //    respawnedObject.baseShape = em.baseShape;
+                        //}
+                        reEM.RefreshMesh();
+
+                        // Add BoxCollider based on bounds
+                        if (respawnedObject.GetComponent<BoxCollider>() != null)
+                        {
+                            BoxCollider boxCollider = respawnedObject.GetComponent<BoxCollider>();
+                            boxCollider.center = reEM.mesh.bounds.center;
+                            boxCollider.size = reEM.mesh.bounds.size;
+                            boxCollider.enabled = false;
+                        }
                     }
                 }
                 else
                 {
                     string objName = action.Parameters[0] as string;
                     Debug.Log("Undoing the despawn of object named " + objName);
-                    position = (Vector3)action.Parameters[1];
-                    rotation = (Quaternion)action.Parameters[2];
-                    scale = (Vector3)action.Parameters[3];
                     scope = (SpawnScope)action.Parameters[5]; // Ensure the scope is logged during the initial action and passed here.
                     string originalPrefabName = GetOriginalPrefabName(objectId);
                     Debug.Log("The original prefab name in undo despawn is: " + originalPrefabName);
                     GameObject respawnedObject = await SpawnObject(objName, position, scale, rotation, scope);
+                    EditableMesh reEM = respawnedObject.GetComponent<EditableMesh>();
                     if (respawnedObject != null)
                     {
                         respawnedObject.transform.localScale = scale;
                         respawnedObjects[objName] = respawnedObject;
+                        reEM.smi = smi;
+                        //if (obj.type == "Primitive")
+                        //{
+                        //    respawnedObject.baseShape = em.baseShape;
+                        //}
+                        reEM.RefreshMesh();
+
+                        // Add BoxCollider based on bounds
+                        if (respawnedObject.GetComponent<BoxCollider>() != null)
+                        {
+                            BoxCollider boxCollider = respawnedObject.GetComponent<BoxCollider>();
+                            boxCollider.center = reEM.mesh.bounds.center;
+                            boxCollider.size = reEM.mesh.bounds.size;
+                            boxCollider.enabled = false;
+                        }
                     }
                     //save the spawned object add it to a list of respawned objects that can then be searched by despawn redo
                 }
@@ -2300,11 +2388,55 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 }
                 break;
-            case nameof(UpdateObjectTransform):
+
+            case nameof(UpdatePrimitive):                
                 objectName = (string)action.Parameters[0];
                 Vector3 oldPosition = (Vector3)action.Parameters[1];
                 Quaternion oldRotation = (Quaternion)action.Parameters[2];
                 Vector3 oldScale = (Vector3)action.Parameters[3];
+                SerializableMeshInfo oldSMI = action.Parameters[4] as SerializableMeshInfo;
+                
+                GameObject spawnedMesh = FindSpawnedObject(objectName);
+
+                Debug.Log("Undoing the transform of object named " + spawnedMesh);
+                actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitive), new object[] { spawnedMesh.name, spawnedMesh.transform.position, spawnedMesh.transform.rotation, spawnedMesh.transform.localScale, spawnedMesh.GetComponent<EditableMesh>().smi }));
+                //GameObject obj = FindSpawnedObject(objectName);
+                if (spawnedMesh != null)
+                {
+                    
+                    EditableMesh reEM = spawnedMesh.GetComponent<EditableMesh>();
+                    spawnedMesh.transform.localPosition = oldPosition;
+                    spawnedMesh.transform.localRotation = oldRotation;
+                    spawnedMesh.transform.localScale = oldScale;
+                    reEM.smi = oldSMI;
+                    //if (obj.type == "Primitive")
+                    //{
+                    //    respawnedObject.baseShape = em.baseShape;
+                    //}
+                    //reEM.RefreshMesh();
+                    reEM.FinalizeMesh();
+
+                    /*// Add BoxCollider based on bounds
+                    if (spawnedMesh.GetComponent<BoxCollider>() != null)
+                    {
+                        BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
+                        boxCollider.center = reEM.mesh.bounds.center;
+                        boxCollider.size = reEM.mesh.bounds.size;
+                        boxCollider.enabled = false;
+                    }*/
+                    UpdatePrimitive(spawnedMesh);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {spawnedMesh} not found during undo transform.");
+                }
+                break;
+
+            case nameof(UpdateObjectTransform):
+                objectName = (string)action.Parameters[0];
+                oldPosition = (Vector3)action.Parameters[1];
+                oldRotation = (Quaternion)action.Parameters[2];
+                oldScale = (Vector3)action.Parameters[3];
                 Debug.Log("Undoing the transform of object named " + objectName);
                 GameObject obj = FindSpawnedObject(objectName);
                 if (obj != null)
@@ -2544,11 +2676,57 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 break;
 
-            case nameof(UpdateObjectTransform):
+            case nameof(UpdatePrimitive):                
                 objectName = (string)action.Parameters[0];
                 Vector3 oldPosition = (Vector3)action.Parameters[1];
                 Quaternion oldRotation = (Quaternion)action.Parameters[2];
                 Vector3 oldScale = (Vector3)action.Parameters[3];
+                SerializableMeshInfo oldSMI = action.Parameters[4] as SerializableMeshInfo;
+                
+                GameObject spawnedMesh = FindSpawnedObject(objectName);
+
+                //Debug.LogError("Undoing the transform of object named " + spawnedMesh);
+                //GameObject obj = FindSpawnedObject(objectName);
+                if (spawnedMesh != null)
+                {
+                    
+                    EditableMesh reEM = spawnedMesh.GetComponent<EditableMesh>();
+                    //Debug.LogError("CurPos: " + spawnedMesh.transform.localPosition + ", oldPos: " +  oldPosition);
+                    //Debug.LogError("CurPos: " + spawnedMesh.transform.localRotation + ", oldPos: " +  oldRotation);
+                    //Debug.LogError("CurPos: " + spawnedMesh.transform.localScale + ", oldPos: " +  oldScale);
+
+                    spawnedMesh.transform.localPosition = oldPosition;
+                    spawnedMesh.transform.localRotation = oldRotation;
+                    spawnedMesh.transform.localScale = oldScale;
+                    reEM.smi = oldSMI;
+                    //if (obj.type == "Primitive")
+                    //{
+                    //    respawnedObject.baseShape = em.baseShape;
+                    //}
+                    //reEM.RefreshMesh();
+                    reEM.FinalizeMesh();
+
+                    // Add BoxCollider based on bounds
+                    /*if (spawnedMesh.GetComponent<BoxCollider>() != null)
+                    {
+                        BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
+                        boxCollider.center = reEM.mesh.bounds.center;
+                        boxCollider.size = reEM.mesh.bounds.size;
+                        boxCollider.enabled = false;
+                    }*/
+                    UpdatePrimitive(spawnedMesh);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {spawnedMesh} not found during undo transform.");
+                }
+                break;
+
+            case nameof(UpdateObjectTransform):
+                objectName = (string)action.Parameters[0];
+                oldPosition = (Vector3)action.Parameters[1];
+                oldRotation = (Quaternion)action.Parameters[2];
+                oldScale = (Vector3)action.Parameters[3];
                 Debug.Log("Undoing the transform of object named " + objectName);
                 GameObject obj = FindSpawnedObject(objectName);
                 if (obj != null)

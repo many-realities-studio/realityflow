@@ -343,6 +343,20 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         {
             rb.excludeLayers = ~rb.excludeLayers;
             rb.constraints = RigidbodyConstraints.None;
+
+            /*if (!RealityFlowAPI.Instance.isUndoing)
+            {
+                Debug.LogError("Undo is being logged with Pos: " + transform.localPosition + ", Rot: " + transform.localRotation + ", SCL: " + transform.localScale);
+                // Log the transformation at the start of holding
+                RealityFlowAPI.Instance.actionLogger.LogAction(
+                    nameof(RealityFlowAPI.UpdatePrimitive), // Action name to match the API
+                    gameObject.name,
+                    transform.localPosition,
+                    transform.localRotation,
+                    transform.localScale, 
+                    gameObject.GetComponent<EditableMesh>().smi
+                );
+            }*/
         }
         context.SendJson(CreateHeldMessage(true));
     }
@@ -364,7 +378,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         // Debug.Log("Run the EndHold() networking messages");
 
         if (!networkedPlayManager.playMode)
-            RealityFlowAPI.Instance.UpdateObjectTransform(gameObject.name);
+            RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
         context.SendJson(CreateHeldMessage(false));
 
         if (!networkedPlayManager.playMode)

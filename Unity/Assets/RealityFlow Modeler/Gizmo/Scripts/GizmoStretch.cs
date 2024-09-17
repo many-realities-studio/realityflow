@@ -46,6 +46,32 @@ public class GizmoStretch : GizmoTranslateAxis
             Destroy(tanSphere);
             BakeRotation();
 
+            if(lastUpdateRaySelect)
+            {
+                GameObject attachedGO = GetAttachedObject();
+                GameObject manipulatedGO = null;
+
+                if(attachedGO.GetComponent<ComponentSelectManipulator>() != null)
+                {
+                    manipulatedGO = attachedGO.GetComponent<ComponentSelectManipulator>().ReturnPairedObj();
+                }
+
+                if(attachedGO.GetComponent<MyNetworkedObject>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+                }
+
+                if(attachedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+                }
+                
+                if (manipulatedGO != null && manipulatedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(manipulatedGO);
+                }
+            }
+
             lastUpdateRaySelect = false;
         }
 
@@ -56,8 +82,6 @@ public class GizmoStretch : GizmoTranslateAxis
             Vector3 newMeshScale = GetStretchInGrid(GetNewMeshScale(originalMeshScale));
 
             GetAttachedObject().transform.localScale = newMeshScale;
-
-            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
         }
 
         
@@ -119,7 +143,12 @@ public class GizmoStretch : GizmoTranslateAxis
         currentOperation.AddOffsetAmount(newScale);
         try
         {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            if(GetAttachedObject().GetComponent<NetworkedMesh>())
+            {
+                // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+                HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            }
+            //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }
         catch { }
         currentOperation = null;

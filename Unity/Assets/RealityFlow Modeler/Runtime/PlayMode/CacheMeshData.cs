@@ -23,6 +23,8 @@ public class CacheMeshData : MonoBehaviour
     private bool compErr = false;
     private BoxCollider boxCol;
     private MeshCollider meshCol;
+    private EditableMesh em;
+    private EditableMesh cachedMesh;
     
     public void SetRfObject(RfObject rfObj)
     {
@@ -34,9 +36,12 @@ public class CacheMeshData : MonoBehaviour
         networkedPlayManager = FindObjectOfType<NetworkedPlayManager>();
         lastPlayModeState = networkedPlayManager.playMode;
 
+        em = gameObject.GetComponent<EditableMesh>();
+
         cachedPosition = transform.localPosition;
         cachedScale = transform.localScale;
         cachedRotation = transform.localRotation;
+        cachedMesh = em;
 
          // These should throw errors on failure (object doesn't have these components) TODO some other time:
         if(gameObject.GetComponent<Rigidbody>() != null)
@@ -78,6 +83,7 @@ public class CacheMeshData : MonoBehaviour
                 cachedPosition = transform.localPosition;
                 cachedScale = transform.localScale;
                 cachedRotation = transform.localRotation;
+                cachedMesh = em;
 
                 Debug.Log("These are my rfProperties, Static: " + rfObj.isStatic + " Collidable: " + rfObj.isCollidable + " GavityEnb: " + rfObj.isGravityEnabled);
 
@@ -125,6 +131,8 @@ public class CacheMeshData : MonoBehaviour
                 transform.localPosition = cachedPosition;
                 transform.localScale = cachedScale;
                 transform.localRotation = cachedRotation;
+                em = cachedMesh;
+                em.RefreshMesh();
 
                 //Debug.Log("there is a compErr: " + compErr);
 
@@ -148,12 +156,14 @@ public class CacheMeshData : MonoBehaviour
                     rb.useGravity = false;
                     rb.isKinematic = true;
 
-                    // the object needs to be selectable
-                    boxCol.enabled = true;
+                    // the object needs to be selectable (mesh colidder covers this)
+                    meshCol.enabled = true;
+                    boxCol.enabled = false;
                 }
 
 
-                RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+                //RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+                RealityFlowAPI.Instance.UpdateObjectTransform(gameObject.name);
                 // All meshes should be selectable after Play mode is exited
                 //gameObject.GetComponent<ObjectManipulator>().enabled = true;
             }

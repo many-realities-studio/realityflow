@@ -46,14 +46,38 @@ public class GizmoRotate : GizmoTranslateAxis
             Destroy(tanSphere);
             BakeRotation();
 
+            if(lastUpdateRaySelect)
+            {
+                GameObject attachedGO = GetAttachedObject();
+                GameObject manipulatedGO = null;
+
+                if(attachedGO.GetComponent<ComponentSelectManipulator>() != null)
+                {
+                    manipulatedGO = attachedGO.GetComponent<ComponentSelectManipulator>().ReturnPairedObj();
+                }
+
+                if(attachedGO.GetComponent<MyNetworkedObject>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+                }
+
+                if(attachedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+                }
+                
+                if (manipulatedGO != null && manipulatedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(manipulatedGO);
+                }
+            }
+
             lastUpdateRaySelect = false;
         }
 
         if (lastUpdateRaySelect)
         {
             GetAttachedObject().transform.eulerAngles = GetRotationInGrid(GetNewRotation(originalMeshRotate));
-
-            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
         }
     }
 
@@ -147,6 +171,11 @@ public class GizmoRotate : GizmoTranslateAxis
         currentOperation.AddOffsetAmount(GetAttachedObject().transform.localRotation * Quaternion.Inverse(startRot));
         try
         {
+            if(GetAttachedObject().GetComponent<NetworkedMesh>())
+            {
+                // RealityFlowAPI.Instance.UpdatePrimitive(GetAttachedObject());
+                HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            }
             // prefabs are not meshes like primitve bases
             //HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
         }

@@ -6,6 +6,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine.XR.Interaction.Toolkit;
 using Ubiq.Spawning;
 using UnityEngine;
+using Unity.VisualScripting;
 
 /// <summary>
 /// This class is used for the axis translate functionality of the gizmo
@@ -39,6 +40,33 @@ public class GizmoTranslateAxis : GizmoTransform
         else if (EndOfRaySelect())
         {
             DisableLineRenderer();
+            BakeRotation();
+
+            if(lastUpdateRaySelect)
+            {
+                GameObject attachedGO = GetAttachedObject();
+                GameObject manipulatedGO = null;
+
+                if(attachedGO.GetComponent<ComponentSelectManipulator>() != null)
+                {
+                    manipulatedGO = attachedGO.GetComponent<ComponentSelectManipulator>().ReturnPairedObj();
+                }
+
+                if(attachedGO.GetComponent<MyNetworkedObject>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdateObjectTransform(attachedGO.name);
+                }
+
+                if(attachedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+                }
+                
+                if (manipulatedGO != null && manipulatedGO.GetComponent<EditableMesh>() != null)
+                {
+                    RealityFlowAPI.Instance.UpdatePrimitive(manipulatedGO);
+                }
+            }
 
             lastUpdateRaySelect = false;
             //EndMeshOperation();
@@ -58,10 +86,6 @@ public class GizmoTranslateAxis : GizmoTransform
 
             GetGizmoContainer().transform.position = newGizmoPosition;
             GetAttachedObject().transform.position = newGizmoPosition;
-
-            RealityFlowAPI.Instance.UpdateObjectTransform(GetAttachedObject().name);
-
-            Debug.Log("The translate axis attached object... = " + GetAttachedObject());
         }
     }
 
@@ -176,10 +200,17 @@ public class GizmoTranslateAxis : GizmoTransform
 
     void EndMeshOperation()
     {
-        currentOperation.AddOffsetAmount(GetAttachedObject().transform.position - startPos);
+        GameObject attachedGO = GetAttachedObject();
+        currentOperation.AddOffsetAmount(attachedGO.transform.position - startPos);
         try
         {
-            HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            if(attachedGO.GetComponent<NetworkedMesh>())
+            {
+               //attachedGO.GetComponent<EditableMesh>().smi = new SerializableMeshInfo(attachedGO);
+               //RealityFlowAPI.Instance.UpdatePrimitive(attachedGO);
+               HandleSelectionManager.Instance.mesh.CacheOperation(currentOperation);
+            }
+
         }
         catch {  }
         currentOperation = null;

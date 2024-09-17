@@ -1,3 +1,4 @@
+/*
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -266,7 +267,7 @@ public class HandleSpawner : MonoBehaviour
         for(int i = 0; i < handles.Count; i++)
         {
             fh = handles[i].GetComponent<FaceHandle>();
-            fh.ReverseFaceWindingOrder();
+            //fh.ReverseFaceWindingOrder();
         }
     }
 
@@ -340,3 +341,4 @@ public class HandleSpawner : MonoBehaviour
         }
     }
 }
+*/

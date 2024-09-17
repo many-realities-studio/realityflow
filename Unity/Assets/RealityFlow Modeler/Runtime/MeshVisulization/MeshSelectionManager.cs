@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class MeshSelectionManager : MonoBehaviour
 {
@@ -9,8 +8,6 @@ public class MeshSelectionManager : MonoBehaviour
 
     private List<GameObject> selectedMeshes = new List<GameObject>();
     public GameObject lastSelection;
-
-    public UnityEvent<GameObject> ObjectSelected;
 
     private SelectTool selectTool;
 
@@ -43,7 +40,6 @@ public class MeshSelectionManager : MonoBehaviour
     {
         selectedMeshes.Add(go);
         lastSelection = go;
-        ObjectSelected.Invoke(go);
         try
         {
             EditableMesh em = go.GetComponent<EditableMesh>();

@@ -253,6 +253,20 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
                 rb.constraints = RigidbodyConstraints.None;
             }
 
+            Debug.Log("Started hold the action is now being logged to the ActionLogger");
+
+            if (!RealityFlowAPI.Instance.isUndoing)
+            {
+                // Log the transformation at the start of holding
+                RealityFlowAPI.Instance.actionLogger.LogAction(
+                    nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
+                    rfObj.id,
+                    transform.localPosition,
+                    transform.localRotation,
+                    transform.localScale
+                );
+            }
+
             // This would also be a place to change to boxcolliders collider interaction masks so that
             // the object can be placed within others to prevent it from colliding with UI.
             // TODO: 
@@ -267,19 +281,7 @@ public class MyNetworkedObject : MonoBehaviour, INetworkSpawnable
             //rb.useGravity = true;
         }
 
-        Debug.Log("Started hold the action is now being logged to the ActionLogger");
-
-        if (!RealityFlowAPI.Instance.isUndoing)
-        {
-            // Log the transformation at the start of holding
-            RealityFlowAPI.Instance.actionLogger.LogAction(
-                nameof(RealityFlowAPI.UpdateObjectTransform), // Action name to match the API
-                rfObj.id,
-                transform.localPosition,
-                transform.localRotation,
-                transform.localScale
-            );
-        }
+        
         context.SendJson(new Message()
         {
             position = transform.localPosition,

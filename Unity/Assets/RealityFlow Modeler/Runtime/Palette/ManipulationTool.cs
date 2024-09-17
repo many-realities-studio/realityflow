@@ -33,7 +33,7 @@ public class ManipulationTool : MonoBehaviour
                 }
             }
 
-            HandleSpawner.Instance.SetManipulationMode(mode);
+            //HandleSelectionManager.Instance.SetManipulationMode(mode);
         }
     }
 

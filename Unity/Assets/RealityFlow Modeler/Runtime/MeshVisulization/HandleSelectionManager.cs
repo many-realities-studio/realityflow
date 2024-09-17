@@ -5,6 +5,11 @@ using Ubiq.Rooms;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// HandleSelectionManager is the main controller for tracking the current state of handles.
+/// It serves as an access point for any other files that may select handles and keeps track of their
+/// changes.
+/// </summary>
 public class HandleSelectionManager : MonoBehaviour
 {
     public static HandleSelectionManager Instance { get; private set; }
@@ -13,9 +18,9 @@ public class HandleSelectionManager : MonoBehaviour
 
     private List<Handle> selectedHandles;
     public static List<int> selectedIndices;
-    public HandleSpawner handleSpawner { get; private set; }
+    public HandleSelector handleSelector { get; private set; }
     private GameObject spawnedManipulator;
-    public List<int> indicies => selectedIndices;
+    public List<int> indicies() { return selectedIndices; }
 
     public AttachGizmoState gizmoTool;
     private Vector3 selectionCentroid;
@@ -40,13 +45,13 @@ public class HandleSelectionManager : MonoBehaviour
         selectedHandles = new List<Handle>();
         selectedIndices = new List<int>();
 
-        GameObject tools = GameObject.Find("RealityFlow Editor");
+        GameObject tools = GameObject.Find("Gizmo Manager");
         gizmoTool = tools.GetComponent<AttachGizmoState>();
 
         GameObject selectManager = GameObject.Find("Component Select Manager");
-        handleSpawner = selectManager.gameObject.GetComponent<HandleSpawner>();
+        handleSelector = selectManager.gameObject.GetComponent<HandleSelector>();
         
-        if(handleSpawner == null)
+        if(handleSelector == null)
         {
             Debug.Log("Handle selector not found");
         }
@@ -63,9 +68,6 @@ public class HandleSelectionManager : MonoBehaviour
     }
 
     #region Selection
-    /// <summary>
-    /// Adds a handle to the list of selected handles and its corresponding indicies
-    /// </summary
     public void SelectHandle(Handle handle)
     {
         mesh = handle.mesh;
@@ -81,9 +83,6 @@ public class HandleSelectionManager : MonoBehaviour
         selectedIndices.AddRange(indicies);
     }
 
-    /// <summary>
-    /// Removes a handle from the list of selected handles if it's present
-    /// </summary>
     public void RemoveSelectedHandle(Handle handle)
     {
         try
@@ -142,7 +141,7 @@ public class HandleSelectionManager : MonoBehaviour
 
         Vector3 center = CalculateCentroidPosition();
         selectionCentroid = mesh.transform.TransformPoint(center);
-        // UpdateManipulatorPosition();
+        UpdateManipulatorPosition();
     }
 
     private Vector3 CalculateCentroidPosition()

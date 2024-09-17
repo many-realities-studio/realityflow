@@ -12,44 +12,38 @@ using Ubiq.Spawning;
 public class EditableMesh : MonoBehaviour, IRealityFlowObject
 {
     public string uuid { get; set; }
-
     public Mesh mesh { get; set; }
-
     MeshFilter meshFilter;
-
     new MeshRenderer renderer;
-
-    [SerializeField]
-    public EMFace[] faces { get; private set; }
-
-    public Vector3[] positions;
-
+    [SerializeField] public EMFace[] faces { get; private set; }
+    public Vector3[] positions; // positions of all vetricies for this mesh
     public Vector3[] normals;
-
     public EMSharedVertex[] sharedVertices;
     internal Dictionary<int, int> sharedVertexLookup;
-
     internal MeshOperationCache meshOperationCache;
-
     public ShapeType baseShape;
     public bool isEmpty = true;
-
     public string type { get; set; }
 
+    // The SMI sets the necessary values for storing the mesh to the database
     public SerializableMeshInfo smi
     {
         get { return new SerializableMeshInfo(gameObject); }
         set {
-            //Sets the info of the editable mesh based on an smi input
-            //From GetEM
+            // Sets the info of the editable mesh based on an smi input
+            //  TODO: correctly set smi in other files to get most recent update for storing in the db.
+
+            // Code yoinked and modified from SerializableMeshInfo.cs in GetEM()
+
+            // Set all verticies for serialization
             positions = new Vector3[value.vertices.Length / 3];
             for (int i = 0; i < positions.Length; i++)
             {
                 positions[i] = new Vector3(value.vertices[i * 3], value.vertices[i * 3 + 1], value.vertices[i * 3 + 2]);
             }
 
+            // Set all faces for serialization
             faces = new EMFace[value.faces.Length];
-
             for (int i = 0; i < value.faces.Length; i++)
             {
                 faces[i] = new EMFace(value.faces[i]);
@@ -59,7 +53,7 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
             baseShape = value.getShape();
 
-            //From create mesh
+            // Yoinked from create mesh
             sharedVertices = EMSharedVertex.GetSharedVertices(positions);
             sharedVertexLookup = EMSharedVertex.CreateSharedVertexDict(sharedVertices);
 
@@ -67,17 +61,15 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
             //From SerializeMesh
 
-            //To be taken out, should be a property of IRealityFloObject that communicates with the object transform directly
+            //To be taken out, should be a property of IRealityFlowObject that communicates with the object transform directly
             transform.localPosition = value.GetPosition();
-
             transform.localRotation = value.GetRotation();
-
             transform.localScale = value.GetScale();
 
             Material material = GetComponent<Renderer>().material;
             if (value.colorFlag)
             {
-                material.SetColor("_Color", value.GetColor());//smi.colors.GetColor());
+                material.SetColor("_Color", value.GetColor()); //smi.colors.GetColor());
             }
 
             if (value.metalFlag)
@@ -111,6 +103,24 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
 
         baseShape = ShapeType.NoShape;
     }
+
+    /*public void printSMI()
+    {
+        Debug.LogError("positions: " + positions + "\nfaces: " +
+                        faces + "\nbaseShape: " + baseShape +
+                        "\nPos: " + transform.localPosition +
+                        "\nRot: " + transform.localRotation +
+                        "\nScale: " + transform.localScale);
+    }*/
+
+    /*public void updateFromSMI()
+    {
+        positions = smi.vertices;
+        faces = smi.faces;
+        //transform.localPosition = smi.
+        //transform.localRotation +
+        //transform.localScale);
+    }*/
 
     public void CreateMesh(EditableMesh otherMesh)
     {

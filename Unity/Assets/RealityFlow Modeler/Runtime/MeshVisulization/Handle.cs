@@ -4,14 +4,12 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
 
-/// <summary>
-/// Class Handle provides base function for OnHover and OnSelection events
-/// </summary>
 public class Handle : MonoBehaviour
 {
     public EditableMesh mesh { get; set; }
 
     protected MeshRenderer meshRenderer;
+    Color defaultMat;
 
     public bool isSelected;
     private bool deselectOnRelease;
@@ -26,6 +24,8 @@ public class Handle : MonoBehaviour
 
         if (meshRenderer == null)
             meshRenderer = gameObject.GetComponent<MeshRenderer>();
+
+        defaultMat = meshRenderer.material.color;
     }
 
     public void OnHandleSelected()
@@ -35,9 +35,6 @@ public class Handle : MonoBehaviour
             Debug.LogError("SelectionManager not found");
         }
 
-        //if (!HandleSpawner.Instance.manipulationActive)
-        //    return;
-
         if (!isSelected)
         {
             isSelected = true;
@@ -46,7 +43,6 @@ public class Handle : MonoBehaviour
 
         if(isSelected && !deselectOnRelease)
         {
-            //selectionManager.SelectHandle(this);
             gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             selectionManager.SelectHandle(this);
             meshRenderer.material.color = selectionManager.OnSelectColor;
@@ -65,7 +61,7 @@ public class Handle : MonoBehaviour
     {
         if(!isSelected)
         {
-            meshRenderer.material.color = selectionManager.defaultColor;
+            meshRenderer.material.color = defaultMat;
         }
     }
 
@@ -77,7 +73,7 @@ public class Handle : MonoBehaviour
             deselectOnRelease = false;
             gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
             selectionManager.RemoveSelectedHandle(this);
-            meshRenderer.material.color = selectionManager.defaultColor;
+            meshRenderer.material.color = defaultMat;
         }
         else
         {

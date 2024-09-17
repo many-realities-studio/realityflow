@@ -6,8 +6,7 @@ using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using UnityEngine;
 
 /// <summary>
-/// Class MeshVisualization displays handles for the different components of a mesh
-/// // Class MeshVisualization manipulates the mesh material
+/// Class MeshVisualization displays handles for the different components of a mesh.
 /// </summary>
 public class MeshVisulization : MonoBehaviour
 {
@@ -53,9 +52,63 @@ public class MeshVisulization : MonoBehaviour
         meshRenderer = GetComponent<MeshRenderer>();
     }
 
-    /// <summary>
-    /// Displays vertex handles at each vertex of the mesh
-    /// </summary>
+    private void SetManipulationMode(ManipulationMode mode)
+    {
+        InvalidateHandleCache();
+        this.mode = mode;
+
+        // if (mode == ManipulationMode.mObject)
+        // {
+        //     gameObject.GetComponent<MeshCollider>().enabled = true;
+        // }
+    }
+
+    public void OnMeshSelected()
+    {
+        // Debug.LogError("Mesh Selected Occurs");
+        // Freeze mesh transformations for now
+        //Debug.Log("Freeze the mesh. The manipulate tool is set to " + selectToolManager.manipulationTool.isActive);
+        gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
+        //gameObject.GetComponent<MeshCollider>().enabled = false;
+
+        gameObject.GetComponent<MeshCollider>().enabled = false;
+        gameObject.GetComponent<BoundsControl>().HandlesActive = true;
+        gameObject.GetComponent<NetworkedMesh>().ControlSelection();
+
+        if (mode == ManipulationMode.vertex)
+        {
+            // if (lastMode != mode)
+            // {
+            //     Debug.Log("Last mode was not vertex so enable mesh collider");
+            //     gameObject.GetComponent<MeshCollider>().enabled = true;
+            // }
+            lastMode = mode;
+
+            DisplayVertexHandles();
+        }
+        else if (mode == ManipulationMode.edge)
+        {
+            // if (lastMode != mode)
+            // {
+            //     gameObject.GetComponent<MeshCollider>().enabled = true;
+            // }
+            lastMode = mode;
+
+            DisplayEdgeHandles();
+        }
+        else if (mode == ManipulationMode.face)
+        {
+            // if (lastMode != mode)
+            // {
+            //     gameObject.GetComponent<MeshCollider>().enabled = true;
+            // }
+            lastMode = mode;
+
+            DisplayFaceHandles();
+        }
+    }
+
+    #region Display Handles
     public void DisplayVertexHandles()
     {
         if (em == null)
@@ -84,10 +137,6 @@ public class MeshVisulization : MonoBehaviour
         handles = h.ToArray();
     }
 
-    /// <summary>
-    /// Displays edge handles using line renderers, two end points are set to world space
-    /// positions of two endpoints
-    /// </summary>
     public void DisplayEdgeHandles()
     {
         InvalidateHandleCache();
@@ -155,7 +204,9 @@ public class MeshVisulization : MonoBehaviour
 
         handles = h.ToArray();
     }
+    #endregion
 
+    #region Update Handles
     public void UpdateHandlePositions()
     {
         if (mode == ManipulationMode.vertex)
@@ -190,7 +241,8 @@ public class MeshVisulization : MonoBehaviour
         for(int i = 0; i < handles.Length; i++)
         {
             eh = handles[i].GetComponent<EdgeHandle>();
-            eh.UpdateMeshTransform();
+            eh.UpdateHandlePosition();
+            //eh.UpdateMeshTransform();
         }
     }
 
@@ -199,13 +251,13 @@ public class MeshVisulization : MonoBehaviour
         for (int i = 0; i < handles.Length; i++)
         {
             FaceHandle fh = handles[i].GetComponent<FaceHandle>();
-            fh.UpdateFacePosition();
+            //fh.UpdateFacePosition();
+            fh.UpdateHandlePosition();
         }
     }
+    #endregion
 
-    /// <summary>
-    /// Destroys all spawn handles
-    /// </summary>
+    #region Destroy and Invalidate Handles
     private void DestroyHandles()
     {
         if (handles == null)
@@ -222,63 +274,8 @@ public class MeshVisulization : MonoBehaviour
         handles = null;
     }
 
-    private void SetManipulationMode(ManipulationMode mode)
-    {
-        InvalidateHandleCache();
-        this.mode = mode;
+    #endregion
 
-        // if (mode == ManipulationMode.mObject)
-        // {
-        //     gameObject.GetComponent<MeshCollider>().enabled = true;
-        // }
-    }
-
-    public void OnMeshSelected()
-    {
-        // Freeze mesh transformations for now
-        //Debug.Log("Freeze the mesh. The manipulate tool is set to " + selectToolManager.manipulationTool.isActive);
-        gameObject.GetComponent<ObjectManipulator>().AllowedManipulations = TransformFlags.None;
-        //gameObject.GetComponent<MeshCollider>().enabled = false;
-
-        gameObject.GetComponent<MeshCollider>().enabled = false;
-        gameObject.GetComponent<BoundsControl>().HandlesActive = true;
-        gameObject.GetComponent<NetworkedMesh>().ControlSelection();
-
-        if (mode == ManipulationMode.vertex)
-        {
-            // if (lastMode != mode)
-            // {
-            //     Debug.Log("Last mode was not vertex so enable mesh collider");
-            //     gameObject.GetComponent<MeshCollider>().enabled = true;
-            // }
-            lastMode = mode;
-
-            DisplayVertexHandles();
-        }
-        else if (mode == ManipulationMode.edge)
-        {
-            // if (lastMode != mode)
-            // {
-            //     gameObject.GetComponent<MeshCollider>().enabled = true;
-            // }
-            lastMode = mode;
-
-            DisplayEdgeHandles();
-        }
-        else if (mode == ManipulationMode.face)
-        {
-            // if (lastMode != mode)
-            // {
-            //     gameObject.GetComponent<MeshCollider>().enabled = true;
-            // }
-            lastMode = mode;
-
-            DisplayFaceHandles();
-        }
-
-    }
-
-    // Update is called once per frame
     void Update()
     {
         // if (lastMode != mode && selectToolManager.manipulationTool.isActive)
@@ -306,6 +303,7 @@ public class MeshVisulization : MonoBehaviour
         }
     }
 
+    #region Mesh Material Updates
     private void CacheMetallicAndGlossyValues()
     {
         Material mat = gameObject.GetComponent<MeshRenderer>().material;
@@ -314,9 +312,6 @@ public class MeshVisulization : MonoBehaviour
         currentGlossyValue = mat.GetFloat("_Glossiness");
     }
 
-    /// <summary>
-    /// Sets the material of the EditableMesh to be opaque
-    /// </summary>
     public void SetMeshMaterialOpaque()
     {
         if (meshRenderer == null)
@@ -338,10 +333,6 @@ public class MeshVisulization : MonoBehaviour
 
         gameObject.GetComponent<MeshRenderer>().material = mat;
     }
-
-    /// <summary>
-    /// Sets the material of the EditableMesh to be transparent
-    /// </summary>
     public void SetMeshMaterialTransparent()
     {
         if (meshRenderer == null)
@@ -366,4 +357,5 @@ public class MeshVisulization : MonoBehaviour
         mat.color = newColor;
         gameObject.GetComponent<MeshRenderer>().material = mat;
     }
+    #endregion
 }
