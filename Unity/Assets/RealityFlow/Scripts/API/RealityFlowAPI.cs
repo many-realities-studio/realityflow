@@ -35,6 +35,8 @@ using RealityFlow.Collections;
 using RealityFlow.Scripting;
 using Newtonsoft.Json.Converters;
 using UnityEngine.Assertions.Must;
+using Org.BouncyCastle.Crypto.Parameters;
+
 
 // using UnityEditor.U2D; REMOVED FOR COMPILATION
 
@@ -863,9 +865,6 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
     {
         Debug.Log("Updating primitive...");
 
-        
-
-
         GameObject curMesh = FindSpawnedObject(spawnedMesh.name);
         //if (isUndoing)
         //{
@@ -903,6 +902,92 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             boxCollider.enabled = false;
         }
         //em.FinalizeMesh();
+
+        // Set the Primitive's transform Data
+        TransformData transformData = new TransformData
+        {
+            position = spawnedMesh.transform.position,
+            rotation = spawnedMesh.transform.rotation,
+            scale = spawnedMesh.transform.localScale
+        };
+
+        // Does PrimitiveRebuilder.RebuildMesh do anything necessary here?
+        //PrimitiveRebuilder.RebuildMesh(em, spawnedMesh.GetComponent<NetworkedMesh>().lastSize);
+        SerializableMeshInfo smi = em.smi;
+
+        RfObject rfObject = spawnedObjects[spawnedMesh];
+        rfObject.transformJson = JsonUtility.ToJson(transformData);
+        rfObject.meshJson = JsonUtility.ToJson(smi);
+
+        var createObject = new GraphQLRequest
+        {
+            Query = @"
+            mutation UpdateObject($input: UpdateObjectInput!) {
+                updateObject(input: $input) {
+                    id
+                }
+            }",
+            OperationName = "UpdateObject",
+            Variables = new
+            {
+                input = new
+                {
+                    id = rfObject.id,
+                    name = rfObject.name,
+                    graphId = rfObject.graphId,
+                    meshJson = rfObject.meshJson,
+                    transformJson = rfObject.transformJson
+                }
+            }
+        };
+
+        try
+        {
+            client.SendQueryAsync(createObject);
+
+            
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+
+        return spawnedMesh;
+    }
+
+    public GameObject UpdatePrimitiveColor(GameObject spawnedMesh, Color color, float metalFactor, float glossFactor)
+    {
+        Debug.Log("Updating primitive...");
+
+        GameObject curMesh = FindSpawnedObject(spawnedMesh.name);
+        //if (isUndoing)
+        //{
+        //    actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitive), new object[] { spawnedMesh.name, curMesh.transform.position, curMesh.transform.rotation, curMesh.transform.localScale, curMesh.GetComponent<EditableMesh>().smi }));
+
+        //    Debug.LogError("Undo is being logged with Pos: " + spawnedMesh.transform.position + ", Rot: " + spawnedMesh.transform.rotation + ", SCL: " + spawnedMesh.transform.localScale);
+        //}
+            
+        if (!isUndoing && curMesh != null)
+        {
+            RfObject oldData = spawnedObjects[spawnedMesh];
+            TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
+            SerializableMeshInfo oldSMI = JsonUtility.FromJson<SerializableMeshInfo>(oldData.meshJson);
+
+            Debug.Log("OLD COLOR IS: " + oldSMI.GetColor() + " NEW COLOR IS: " + color);
+            
+            actionLogger.LogAction(nameof(UpdatePrimitiveColor), spawnedMesh.name, oldSMI.GetColor(), oldSMI.metalFactor, oldSMI.glossFactor);
+            //Debug.LogError("Type is: " + em.baseShape);
+        }
+
+        EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
+
+        Material material = em.GetComponent<Renderer>().material;
+        if (material)
+        {
+            material.SetColor("baseColorFactor", color); //smi.colors.GetColor());
+            material.SetFloat("metallicFactor", metalFactor);
+            material.SetFloat("roughnessFactor", glossFactor);
+        }
 
         // Set the Primitive's transform Data
         TransformData transformData = new TransformData
@@ -2409,6 +2494,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     spawnedMesh.transform.localRotation = oldRotation;
                     spawnedMesh.transform.localScale = oldScale;
                     reEM.smi = oldSMI;
+
                     //if (obj.type == "Primitive")
                     //{
                     //    respawnedObject.baseShape = em.baseShape;
@@ -2432,6 +2518,33 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 }
                 break;
 
+            case nameof(UpdatePrimitiveColor):                
+                objectName = (string)action.Parameters[0];
+                Color oldColor = (Color)action.Parameters[1];
+                float oldMFactor = (float)action.Parameters[2];
+                float oldGFactor = (float)action.Parameters[3];
+                oldSMI = action.Parameters[4] as SerializableMeshInfo;
+                
+                spawnedMesh = FindSpawnedObject(objectName);
+
+                EditableMesh curEM  = spawnedMesh.GetComponent<EditableMesh>();
+
+                Debug.Log("Undoing the transform of object named " + spawnedMesh);
+                Debug.Log("WHILE UNDOING, THE OLD COLOR IS: " + oldColor);
+                actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitiveColor), new object[] { spawnedMesh.name, curEM.smi.GetColor(), curEM.smi.metalFactor, curEM.smi.glossFactor }));
+                //GameObject obj = FindSpawnedObject(objectName);
+                if (spawnedMesh != null)
+                {
+                    
+
+                    UpdatePrimitiveColor(spawnedMesh, oldColor, oldMFactor, oldGFactor);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {spawnedMesh} not found during undo transform.");
+                }
+                break;
+            
             case nameof(UpdateObjectTransform):
                 objectName = (string)action.Parameters[0];
                 oldPosition = (Vector3)action.Parameters[1];
@@ -2715,6 +2828,29 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         boxCollider.enabled = false;
                     }*/
                     UpdatePrimitive(spawnedMesh);
+                }
+                else
+                {
+                    Debug.LogError($"Object named {spawnedMesh} not found during undo transform.");
+                }
+                break;
+
+            case nameof(UpdatePrimitiveColor):                
+                objectName = (string)action.Parameters[0];
+                Color oldColor = (Color)action.Parameters[1];
+                float oldMFactor = (float)action.Parameters[2];
+                float oldGFactor = (float)action.Parameters[3];
+                oldSMI = action.Parameters[4] as SerializableMeshInfo;
+                
+                spawnedMesh = FindSpawnedObject(objectName);
+
+                EditableMesh curEM  = spawnedMesh.GetComponent<EditableMesh>();
+
+                //Debug.Log("Undoing the transform of object named " + spawnedMesh);
+                //GameObject obj = FindSpawnedObject(objectName);
+                if (spawnedMesh != null)
+                {
+                    UpdatePrimitiveColor(spawnedMesh, oldColor, oldMFactor, oldGFactor);
                 }
                 else
                 {
