@@ -884,6 +884,13 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
             //Debug.LogError("Type is: " + em.baseShape);
         }
 
+        // Bake mesh so bounds get calculated correctly
+        VertexPosition.BakeVerticesWithNetworking(spawnedMesh.GetComponent<EditableMesh>());
+        if(spawnedMesh.GetComponent<MeshFilter>() != null)
+        {
+            spawnedMesh.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        }
+
         // Obtain the Special Mesh Data from primitive
         EditableMesh em = spawnedMesh.GetComponent<EditableMesh>();
 
@@ -2406,16 +2413,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     //{
                     //    respawnedObject.baseShape = em.baseShape;
                     //}
-                    reEM.RefreshMesh();
+                    //reEM.RefreshMesh();
+                    reEM.FinalizeMesh();
 
-                    // Add BoxCollider based on bounds
+                    /*// Add BoxCollider based on bounds
                     if (spawnedMesh.GetComponent<BoxCollider>() != null)
                     {
                         BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
                         boxCollider.center = reEM.mesh.bounds.center;
                         boxCollider.size = reEM.mesh.bounds.size;
                         boxCollider.enabled = false;
-                    }
+                    }*/
                     UpdatePrimitive(spawnedMesh);
                 }
                 else
@@ -2695,16 +2703,17 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                     //{
                     //    respawnedObject.baseShape = em.baseShape;
                     //}
-                    reEM.RefreshMesh();
+                    //reEM.RefreshMesh();
+                    reEM.FinalizeMesh();
 
                     // Add BoxCollider based on bounds
-                    if (spawnedMesh.GetComponent<BoxCollider>() != null)
+                    /*if (spawnedMesh.GetComponent<BoxCollider>() != null)
                     {
                         BoxCollider boxCollider = spawnedMesh.GetComponent<BoxCollider>();
                         boxCollider.center = reEM.mesh.bounds.center;
                         boxCollider.size = reEM.mesh.bounds.size;
                         boxCollider.enabled = false;
-                    }
+                    }*/
                     UpdatePrimitive(spawnedMesh);
                 }
                 else
