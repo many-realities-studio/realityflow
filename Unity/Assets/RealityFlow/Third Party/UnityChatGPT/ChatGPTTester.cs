@@ -8,6 +8,16 @@ using Ubiq.Spawning;
 using System.IO;
 using System.Collections;
 using Newtonsoft.Json;
+using RealityFlow.Collections;
+using RealityFlow.NodeGraph;
+using RealityFlow.NodeUI;
+using RealityFlow.Scripting;
+
+public class StructuredAction
+{
+    public string Action { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
+}
 
 public class ChatGPTTester : MonoBehaviour
 {
@@ -35,6 +45,9 @@ public class ChatGPTTester : MonoBehaviour
         { "AddNodeToGraph", "Add a node(s) to the graph: {0}" },
     };
 
+    // New queue to store ChatGPT messages
+    private Queue<string> chatGPTMessageQueue = new Queue<string>();
+
     public string ChatGPTMessage => lastChatGPTResponseCache?.Choices?.FirstOrDefault()?.Message?.content ?? string.Empty;
 
     private void Awake()
@@ -56,6 +69,7 @@ public class ChatGPTTester : MonoBehaviour
         AddSelectedObjectToContext();
         AppendRemindersToPrompt();
 
+        //Logger.Instance.LogState("Processing your request....");
         StartCoroutine(SendRequestToChatGPT(originalReminders));
     }
 
@@ -84,7 +98,7 @@ public class ChatGPTTester : MonoBehaviour
             Vector3 indicatorPosition = raycastLogger.GetVisualIndicatorPosition();
             if (indicatorPosition != Vector3.zero)
             {
-                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the location {indicatorPosition} as the position data when you spawn any and all objects. Also unless specified otherwise use this location as the updateobjecttransform position";
+                reminderMessage += $"\n-------------------------------------------------------------------------\n\n\nUse the visualIndicator location {indicatorPosition} as the position data when you spawn any and all objects. Also unless specified otherwise use this location as the updateobjecttransform position";
                 Debug.LogError("Visual Indicator Location: " + indicatorPosition);
             }
 
@@ -101,10 +115,14 @@ public class ChatGPTTester : MonoBehaviour
             if (selectedObject != null)
             {
                 var visualScript = selectedObject.GetComponent<RealityFlow.NodeGraph.VisualScript>();
-                if (visualScript != null && visualScript.graph != null)
+                Vector3 objectPosition = selectedObject.transform.position;
+                string positionString = $"({objectPosition.x}, {objectPosition.y}, {objectPosition.z})";
+                if (visualScript != null)
                 {
-                    string graphJson = JsonUtility.ToJson(visualScript.graph);
-                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED";
+                    string graphJson = null;
+                    if (visualScript.graph != null)
+                        graphJson = JsonUtility.ToJson(visualScript.graph);
+                    var selectedObjectReminder = $"\n-------------------------------------------------------------------------\n\n\nVery important!! Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED also this is the object's current location: {positionString} don't move the object to its current location unless specified by visualIndicatorLocation ";
                     Debug.Log($"Selected object: {selectedObjectName}, Graph: {graphJson}");
                     AddTemporaryReminder(selectedObjectReminder);
                 }
@@ -143,24 +161,40 @@ public class ChatGPTTester : MonoBehaviour
     private IEnumerator SendRequestToChatGPT(string[] originalReminders)
     {
         yield return StartCoroutine(ChatGPTClient.Instance.Ask(LLMPromptToBePassed, response =>
-        {
-            lastChatGPTResponseCache = response;
-            ChatGPTProgress.Instance.StopProgress();
+         {
+             lastChatGPTResponseCache = response;
+             ChatGPTProgress.Instance.StopProgress();
 
-            WriteResponseToFile(ChatGPTMessage);
+             // Enqueue the ChatGPT message instead of processing it immediately
+             chatGPTMessageQueue.Enqueue(ChatGPTMessage);
+             WriteResponseToFile(ChatGPTMessage);
+             Debug.Log("ChatGPT message added to queue.");
 
-            Debug.Log("Logging message in plain English");
-            LogApiCalls(ChatGPTMessage);
-
-            RealityFlowAPI.Instance?.actionLogger?.LogGeneratedCode(ChatGPTMessage);
-
-            if (immediateCompilation)
-            {
-                StartCoroutine(ExecuteLoggedActionsCoroutine());
-            }
-        }));
+             // Optionally start processing the queue immediately if needed
+             if (immediateCompilation)
+             {
+                 StartCoroutine(ProcessAndExecuteResponses());
+             }
+         }));
 
         chatGPTQuestion.reminders = originalReminders;
+        LogApiCalls(ChatGPTMessage);
+    }
+
+    // New method to process the queue and execute responses
+    public IEnumerator ProcessAndExecuteResponses()
+    {
+        while (chatGPTMessageQueue.Count > 0)
+        {
+            string messageToProcess = chatGPTMessageQueue.Dequeue();
+            Debug.Log("Processing message from queue.");
+            ProcessAndExecuteResponse(messageToProcess);
+            Logger.Instance.LogInfo("All actions have been executed");
+            Logger.Instance.ClearAll();
+            Logger.Instance.AddHeader();
+            // Yield to ensure other coroutines and Unity engine have time to process
+            yield return null;
+        }
     }
 
     private string GetNodeDefinitionsJson()
@@ -198,7 +232,7 @@ public class ChatGPTTester : MonoBehaviour
         int startIndex = code.IndexOf(functionName) + functionName.Length + 1;
         if (startIndex < functionName.Length + 1)
         {
-            return "Unknown Object";
+            return "Object";
         }
 
         int endIndex = code.IndexOf(',', startIndex);
@@ -218,7 +252,7 @@ public class ChatGPTTester : MonoBehaviour
             }
             return parameter;
         }
-        return "Unknown Object";
+        return "Object";
     }
 
     public IEnumerator ExecuteLoggedActionsCoroutine()
@@ -247,16 +281,12 @@ public class ChatGPTTester : MonoBehaviour
     {
         Debug.Log("Written to " + Application.persistentDataPath + "/ChatGPTResponse.cs");
         string localPath = Application.persistentDataPath + "/ChatGPTResponse.cs";
-        //string externalPath = Path.Combine(Application.dataPath, "TestScript.cs");
 
         try
         {
 #if UNITY_EDITOR
             File.WriteAllText(localPath, response);
             Debug.Log("Response written to file: " + localPath);
-
-            //File.WriteAllText(externalPath, response);
-            //Debug.Log("Response written to file: " + externalPath);
 #endif
         }
         catch (Exception e)
@@ -264,4 +294,135 @@ public class ChatGPTTester : MonoBehaviour
             Debug.LogError("Failed to write response to file: " + e.Message);
         }
     }
+
+    private void ProcessAndExecuteResponse(string jsonResponse)
+    {
+        try
+        {
+            // Clean up the JSON response by removing markdown code block formatting
+            if (jsonResponse.Contains("```"))
+            {
+                int startIndex = jsonResponse.IndexOf('['); // Change to '[' for list
+                int endIndex = jsonResponse.LastIndexOf(']');
+                jsonResponse = jsonResponse.Substring(startIndex, endIndex - startIndex + 1);
+            }
+
+            // Deserialize the cleaned JSON response into a list of StructuredAction objects
+            var structuredResponses = JsonConvert.DeserializeObject<List<StructuredAction>>(jsonResponse);
+
+            // Process each action in the list
+            foreach (var action in structuredResponses)
+            {
+                ExecuteAction(action);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to process and execute the response: {ex.Message}");
+        }
+    }
+
+
+    private void ExecuteAction(StructuredAction action)
+    {
+        switch (action.Action)
+        {
+            case "SpawnObject":
+                string prefabName = action.Parameters["prefabName"].ToString();
+                var position = JsonConvert.DeserializeObject<Vector3>(action.Parameters["spawnPosition"].ToString());
+                var rotation = JsonConvert.DeserializeObject<Quaternion>(action.Parameters["spawnRotation"].ToString());
+                var scale = JsonConvert.DeserializeObject<Vector3>(action.Parameters["scale"].ToString());
+
+                RealityFlowAPI.Instance.SpawnObject(prefabName, position, scale, rotation, RealityFlowAPI.SpawnScope.Room);
+                break;
+
+            case "DespawnObject":
+                string objectNameToDespawn = action.Parameters["objectName"].ToString();
+                GameObject objectToDespawn = GameObject.Find(objectNameToDespawn);
+                if (objectToDespawn != null)
+                {
+                    RealityFlowAPI.Instance.DespawnObject(objectToDespawn);
+                }
+                break;
+
+            case "UpdateObjectTransform":
+                string objectNameToUpdate = action.Parameters["objectName"].ToString();
+                var newPosition = JsonConvert.DeserializeObject<Vector3>(action.Parameters["position"].ToString());
+                var newRotation = JsonConvert.DeserializeObject<Quaternion>(action.Parameters["rotation"].ToString());
+                var newScale = JsonConvert.DeserializeObject<Vector3>(action.Parameters["scale"].ToString());
+
+                RealityFlowAPI.Instance.UpdateObjectTransform(objectNameToUpdate, newPosition, newRotation, newScale);
+                break;
+
+            case "AddNodeToGraph":
+                string objectId = action.Parameters["objectId"].ToString();
+                GameObject obj = GameObject.Find(objectId);
+
+                if (obj == null)
+                {
+                    Debug.LogError($"Object with ID {objectId} not found.");
+                    return;
+                }
+
+                var visualScript = obj.GetComponent<VisualScript>();
+                if (visualScript == null)
+                {
+                    Debug.LogError("VisualScript component not found on the object.");
+                    return;
+                }
+
+                Graph graph = visualScript.graph;
+                if (graph == null)
+                {
+                    Debug.LogError("Graph not found on the VisualScript component.");
+                    return;
+                }
+
+                string nodeName = action.Parameters["nodeName"].ToString();
+                NodeDefinition nodeDef = RealityFlowAPI.Instance.NodeDefinitionDict[nodeName];
+
+                NodeIndex newNode = RealityFlowAPI.Instance.AddNodeToGraph(graph, nodeDef);
+                if (newNode != null)
+                {
+                    Debug.Log($"{nodeName} node added to the graph.");
+                }
+                break;
+
+                //TODO: Make the LLM be able to delete Nodes this was never completed 
+                /*
+                case "RemoveNodeFromGraph":
+                    objectId = action.Parameters["objectId"].ToString();
+                    obj = GameObject.Find(objectId);
+
+                    if (obj == null)
+                    {
+                        Debug.LogError($"Object with ID {objectId} not found.");
+                        return;
+                    }
+
+                    visualScript = obj.GetComponent<VisualScript>();
+                    if (visualScript == null)
+                    {
+                        Debug.LogError("VisualScript component not found on the object.");
+                        return;
+                    }
+
+                    graph = visualScript.graph;
+                    if (graph == null)
+                    {
+                        Debug.LogError("Graph not found on the VisualScript component.");
+                        return;
+                    }
+
+                    nodeName = action.Parameters["nodeName"].ToString();
+                    nodeDef = RealityFlowAPI.Instance.NodeDefinitionDict[nodeName];
+
+                    //Node nodeToDelete = graph.GetNode(nodeName);
+
+                    //RealityFlowAPI.Instance.RemoveNodeFromGraph(graph, )                
+                    break;
+                    */
+        }
+    }
+
 }

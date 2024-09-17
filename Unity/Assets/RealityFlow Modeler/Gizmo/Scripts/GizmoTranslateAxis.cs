@@ -40,6 +40,7 @@ public class GizmoTranslateAxis : GizmoTransform
         else if (EndOfRaySelect())
         {
             DisableLineRenderer();
+            BakeRotation();
 
             if(lastUpdateRaySelect)
             {

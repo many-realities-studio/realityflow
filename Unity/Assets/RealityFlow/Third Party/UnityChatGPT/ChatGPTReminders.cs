@@ -4,6 +4,202 @@ public static class Reminders
     //Use this script to add reminders that you want to pass to ChatGPT
     public static readonly string[] reminderTexts = new string[]
     {
+        //Object Spawn Reminder 
+        "The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'SpawnObject'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"prefabName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The name of the prefab to spawn.\"\n" +
+"        },\n" +
+"        \"spawnPosition\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        },\n" +
+"        \"scale\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        },\n" +
+"        \"spawnRotation\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" },\n" +
+"            \"w\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\", \"w\"]\n" +
+"        },\n" +
+"        \"scope\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The scope of the spawn, e.g., 'Room' or 'Peer'.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"prefabName\", \"spawnPosition\", \"scale\", \"spawnRotation\", \"scope\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+
+
+        //Reminder DespawnObject
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'DespawnObject'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The ID or name of the object to despawn.\"\n" +
+"        },\n" +
+"        \"scope\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The scope of the despawn, e.g., 'Room' or 'Peer'.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"objectToDespawn\", \"scope\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+
+//Reminder Update Object Transform
+
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'UpdateObjectTransform'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The name of the object to update.\"\n" +
+"        },\n" +
+"        \"position\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        },\n" +
+"        \"rotation\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" },\n" +
+"            \"w\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\", \"w\"]\n" +
+"        },\n" +
+"        \"scale\": {\n" +
+"          \"type\": \"object\",\n" +
+"          \"properties\": {\n" +
+"            \"x\": { \"type\": \"number\" },\n" +
+"            \"y\": { \"type\": \"number\" },\n" +
+"            \"z\": { \"type\": \"number\" }\n" +
+"          },\n" +
+"          \"required\": [\"x\", \"y\", \"z\"]\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"objectName\", \"position\", \"rotation\", \"scale\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+// Reminder AddNodeToGraph
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'AddNodeToGraph'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectId\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The ID of the graph where the node will be added.\"\n" +
+"        },\n" +
+"        \"nodeName\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The name of the node definition to be added.\"\n" +
+"        },\n" +
+"        \"index\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The index at which the node is added in the graph.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"graphId\", \"defName\", \"index\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+// Reminder RemoveNodeFromGraph
+"The JSON schema is:\n" +
+"{\n" +
+"  \"type\": \"object\",\n" +
+"  \"properties\": {\n" +
+"    \"action\": {\n" +
+"      \"type\": \"string\",\n" +
+"      \"description\": \"The action to be performed, e.g., 'RemoveNodeFromGraph'.\"\n" +
+"    },\n" +
+"    \"parameters\": {\n" +
+"      \"type\": \"object\",\n" +
+"      \"properties\": {\n" +
+"        \"objectId\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The ID of the graph from which the node will be removed.\"\n" +
+"        },\n" +
+"        \"node\": {\n" +
+"          \"type\": \"string\",\n" +
+"          \"description\": \"The index or identifier of the node to be removed.\"\n" +
+"        }\n" +
+"      },\n" +
+"      \"required\": [\"graphId\", \"node\"]\n" +
+"    }\n" +
+"  },\n" +
+"  \"required\": [\"action\", \"parameters\"],\n" +
+"  \"additionalProperties\": false\n" +
+"}",
+
         //Reminder 1
         "Only use the RealityFlow API which an example of which is referenced here:\n\n" +
         "# RealityFlowAPI Reference Sheet\n\n" +
@@ -359,18 +555,132 @@ public static class Reminders
         "        Debug.Log(\"Impulse node added to the graph.\");\n" +
         "    }\n" +
         "}\n" +
-        "to spawn an object do it like this and structure the code exactly like this, of course replace the object name with the actual object from the prompt: using UnityEngine;\n" +
-        "using System.Collections;\n" +
-        "using Graph = RealityFlow.NodeGraph.Graph;\n" +
-        "using RealityFlow.NodeGraph;\n" +
-        "\n" +
-        "public class SpawnCube\n" +
-        "{\n" +
-        "    public static void Execute()\n" +
-        "    {\n" +
-        "        Vector3 spawnPosition = new Vector3(-0.24f, -0.05f, 1.82f);\n" +
-        "        RealityFlowAPI.Instance.SpawnObject(\"Cube\", spawnPosition, Vector3.one, Quaternion.identity, RealityFlowAPI.SpawnScope.Room);\n" +
-        "    }\n" +
-        "}"
+        "Do not generate C# code. ONLY GENERATE JSON STRUCTURED IN THE SPECIFIED OUTPUT STRUCTURE FORMAT, to spawn an object do it like this and structure the code EXACTLY like this, of course replace the object name with the actual object from the prompt, so if it says spawn a key spawn a key. Here is a template if the user says spawn, create, or make a object do SpawnObject, if the user says move or anything like move, do updateObjectTransform, if the user says delete remove or anything like that, do DespawnObject. But only do what is asked for so if the user says move cube and there is an object reference just move the cube don't make a new one unless told to" +
+        //"For referencing objects use the specified id given to do all manipulations. Use the object {selectedObjectName} to do anything that the user requests if no other object name is given also use this as the objectID for nodes. Put that identifier as the objectId, objectName, or any other related identifier field.  Even if there is a object being referenced don't do anything the prompt doesn't say for instance if it says spawn a cube only spawn a cube don't make a node on the graph even if an object's graph is referenced. If requests have no object name use the object {selectedObjectName}. The current graph for this object is: {graphJson} once again ONLY USE IT IF THE USER SPECIFICALLY ASKS FOR NODES OR GRAPH MANIPULATIONS OR SOMETHING RELATED TO NODES EVEN IF AN OBJECT IS REFERENCED",
+       @"
+[
+    {
+        ""Action"": ""SpawnObject"",
+        ""Parameters"": {
+            ""prefabName"": ""Cube"",
+            ""spawnPosition"": {
+                ""x"": -2.98,
+                ""y"": 0.35,
+                ""z"": -1.40
+            },
+            ""spawnRotation"": {
+                ""x"": 0,
+                ""y"": 0,
+                ""z"": 0,
+                ""w"": 1
+            },
+            ""scale"": {
+                ""x"": 1,
+                ""y"": 1,
+                ""z"": 1
+            }
+        }
+    }
+]"
+,
+        @"
+        [
+            {
+                ""Action"": ""DespawnObject"",
+                ""Parameters"": {
+                    ""objectName"": ""Sphere""
+                }
+            }
+        ]",
+        @"
+[
+    {
+        ""Action"": ""UpdateObjectTransform"",
+        ""Parameters"": {
+            ""objectName"": ""Cylinder"",
+            ""position"": {
+                ""x"": 1.25,
+                ""y"": 0.75,
+                ""z"": -0.85
+            },
+            ""rotation"": {
+                ""x"": 0,
+                ""y"": 0.7071,
+                ""z"": 0,
+                ""w"": 0.7071
+            },
+            ""scale"": {
+                ""x"": 0.5,
+                ""y"": 2.0,
+                ""z"": 0.5
+            }
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""AddNodeToGraph"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeName"": ""StartNode""
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""RemoveNodeFromGraph"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeIndex"": 2
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""AddDataEdgeToGraph"",
+        ""Parameters"": {
+            ""graphId"": ""Graph123"",
+            ""fromNode"": 1,
+            ""fromPort"": 0,
+            ""toNode"": 3,
+            ""toPort"": 1
+        }
+    }
+]",
+@"
+[
+    {
+        ""Action"": ""SetNodePosition"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeIndex"": 4,
+            ""position"": {
+                ""x"": 100,
+                ""y"": 150
+            }
+        }
+    }
+]"
+,
+@"
+[
+    {
+        ""Action"": ""SetNodeFieldValue"",
+        ""Parameters"": {
+            ""objectId"": ""66a95613acd8a0f4a79780e7"",
+            ""nodeIndex"": 5,
+            ""fieldIndex"": 2,
+            ""value"": {
+                ""type"": ""String"",
+                ""data"": ""Hello World""
+            }
+        }
+    }
+]",
+
+
     };
 }
