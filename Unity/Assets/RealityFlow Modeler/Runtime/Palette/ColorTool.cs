@@ -15,6 +15,7 @@ using Unity.XR.CoreUtils;
 /// </summary>
 public class ColorTool : MonoBehaviour
 {
+    public bool isActive;
     public bool colorToolIsActive;
     public bool metallicToolIsActive;
     public bool smoothnessToolIsActive;
@@ -72,12 +73,18 @@ public class ColorTool : MonoBehaviour
 
     public void Activate(int tool, bool status)
     {
+        /*if(tool == 1)
+        {
+            
+            //Whiteboard.Instance.DoNotShow = status;
+        }*/
         if(tool == 2)
         {
+            isActive = status;
             colorToolIsActive = status;
         }
 
-        if(tool == 3)
+        /*if(tool == 3)
         {
             metallicToolIsActive = status;
         }
@@ -85,7 +92,7 @@ public class ColorTool : MonoBehaviour
         if(tool == 4)
         {
             smoothnessToolIsActive = status;
-        }
+        }*/
     }
 
     private void GetRayCollision()
@@ -104,7 +111,6 @@ public class ColorTool : MonoBehaviour
             {
                 if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>().IsRaySelected)
                 {
-
                      // GetObjectId ?!?!
 
                     UpdateMeshTexture();
@@ -143,10 +149,13 @@ public class ColorTool : MonoBehaviour
 
     void Update()
     {
-        if (colorToolIsActive || metallicToolIsActive || smoothnessToolIsActive)
+        if (isActive)
         {
-            // Checking for Object
-            GetRayCollision();
+            if (colorToolIsActive || metallicToolIsActive || smoothnessToolIsActive)
+            {
+                // Checking for Object
+                GetRayCollision();
+            }
         }
     }
 

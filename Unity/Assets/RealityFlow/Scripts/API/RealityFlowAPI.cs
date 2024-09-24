@@ -957,7 +957,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
     public GameObject UpdatePrimitiveColor(GameObject spawnedMesh, Color color, float metalFactor, float glossFactor)
     {
-        Debug.Log("Updating primitive...");
+        Debug.Log("Updating primitive Color...");
 
         GameObject curMesh = FindSpawnedObject(spawnedMesh.name);
         //if (isUndoing)
@@ -975,7 +975,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
             Debug.Log("OLD COLOR IS: " + oldSMI.GetColor() + " NEW COLOR IS: " + color);
             
-            actionLogger.LogAction(nameof(UpdatePrimitiveColor), spawnedMesh.name, oldSMI.GetColor(), oldSMI.metalFactor, oldSMI.glossFactor);
+            actionLogger.LogAction(nameof(UpdatePrimitiveColor), spawnedMesh.name, oldSMI.GetColor(), oldSMI.metalFactor, oldSMI.glossFactor, oldSMI);
             //Debug.LogError("Type is: " + em.baseShape);
         }
 
@@ -2531,12 +2531,10 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
 
                 Debug.Log("Undoing the transform of object named " + spawnedMesh);
                 Debug.Log("WHILE UNDOING, THE OLD COLOR IS: " + oldColor);
-                actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitiveColor), new object[] { spawnedMesh.name, curEM.smi.GetColor(), curEM.smi.metalFactor, curEM.smi.glossFactor }));
+                actionLogger.redoStack.Push(new ActionLogger.LoggedAction(nameof(UpdatePrimitiveColor), new object[] { spawnedMesh.name, curEM.smi.GetColor(), curEM.smi.metalFactor, curEM.smi.glossFactor, curEM.smi}));
                 //GameObject obj = FindSpawnedObject(objectName);
                 if (spawnedMesh != null)
                 {
-                    
-
                     UpdatePrimitiveColor(spawnedMesh, oldColor, oldMFactor, oldGFactor);
                 }
                 else

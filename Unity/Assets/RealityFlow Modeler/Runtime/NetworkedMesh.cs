@@ -43,6 +43,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Rigidbody rb;
     private EraserTool eraser;
 
+    private ColorTool color;
+
     bool lastOwner;
     public bool wasBake;
 
@@ -76,6 +78,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
         selectTool = FindObjectOfType<SelectTool>();*/
         eraser = FindObjectOfType<EraserTool>();
+
+        color = FindObjectOfType<ColorTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
 
@@ -368,7 +372,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
         }*/
 
-        if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive || eraser.isActive)
+        if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive || eraser.isActive || color.isActive)
             return;
 
         //Debug.Log("EndHold() was called");
