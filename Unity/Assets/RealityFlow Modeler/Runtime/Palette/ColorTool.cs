@@ -84,7 +84,7 @@ public class ColorTool : MonoBehaviour
             colorToolIsActive = status;
         }
 
-        /*if(tool == 3)
+        if(tool == 3)
         {
             metallicToolIsActive = status;
         }
@@ -92,7 +92,7 @@ public class ColorTool : MonoBehaviour
         if(tool == 4)
         {
             smoothnessToolIsActive = status;
-        }*/
+        }
     }
 
     private void GetRayCollision()
