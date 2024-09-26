@@ -985,8 +985,14 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         if (material)
         {
             material.SetColor("baseColorFactor", color); //smi.colors.GetColor());
-            material.SetFloat("metallicFactor", metalFactor);
-            material.SetFloat("roughnessFactor", glossFactor);
+            if(metalFactor != -1)
+            {
+                material.SetFloat("metallicFactor", metalFactor);
+            }
+            if(glossFactor != -1)
+            {
+                material.SetFloat("roughnessFactor", glossFactor);
+            }
         }
 
         // Set the Primitive's transform Data

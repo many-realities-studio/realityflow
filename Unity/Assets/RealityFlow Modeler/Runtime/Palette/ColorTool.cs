@@ -135,11 +135,11 @@ public class ColorTool : MonoBehaviour
             //}
             if (!metallicToolIsActive)
             {
-                currentMetallicValue = 0;
+                currentMetallicValue = -1;
             }
             if (!smoothnessToolIsActive)
             {
-                currentSmoothnessValue = 0;
+                currentSmoothnessValue = -1;
             }
 
             Debug.Log("COLOR TOOL IS UPDATING PRIMITIVE\n");
