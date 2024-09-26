@@ -861,10 +861,8 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedMesh;
     }
 
-    public GameObject UpdatePrimitive(GameObject spawnedMesh)
+    public GameObject UpdatePrimitive(GameObject spawnedMesh, bool logAction = true)
     {
-        Debug.Log("Updating primitive...");
-
         GameObject curMesh = FindSpawnedObject(spawnedMesh.name);
         //if (isUndoing)
         //{
@@ -873,7 +871,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         //    Debug.LogError("Undo is being logged with Pos: " + spawnedMesh.transform.position + ", Rot: " + spawnedMesh.transform.rotation + ", SCL: " + spawnedMesh.transform.localScale);
         //}
             
-        if (!isUndoing && curMesh != null)
+        if (logAction && curMesh != null)
         {
             RfObject oldData = spawnedObjects[spawnedMesh];
             TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
@@ -955,7 +953,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         return spawnedMesh;
     }
 
-    public GameObject UpdatePrimitiveColor(GameObject spawnedMesh, Color color, float metalFactor, float glossFactor)
+    public GameObject UpdatePrimitiveColor(GameObject spawnedMesh, Color color, float metalFactor, float glossFactor, bool logAction = true)
     {
         Debug.Log("Updating primitive Color...");
 
@@ -967,7 +965,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         //    Debug.LogError("Undo is being logged with Pos: " + spawnedMesh.transform.position + ", Rot: " + spawnedMesh.transform.rotation + ", SCL: " + spawnedMesh.transform.localScale);
         //}
             
-        if (!isUndoing && curMesh != null)
+        if (logAction && curMesh != null)
         {
             RfObject oldData = spawnedObjects[spawnedMesh];
             TransformData oldTransform = JsonUtility.FromJson<TransformData>(oldData.transformJson);
@@ -2341,6 +2339,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         // Clear the action stack after undo
         //actionLogger.ClearActionStack();
         Debug.Log($"Action stack after undo: {actionLogger.GetActionStackCount()}");
+        actionLogger.PrintActionStack();
         //StopAllCoroutines();
         isUndoing = false;
     }
@@ -2516,7 +2515,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                         boxCollider.size = reEM.mesh.bounds.size;
                         boxCollider.enabled = false;
                     }*/
-                    UpdatePrimitive(spawnedMesh);
+                    UpdatePrimitive(spawnedMesh, false);
                 }
                 else
                 {
@@ -2541,7 +2540,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
                 //GameObject obj = FindSpawnedObject(objectName);
                 if (spawnedMesh != null)
                 {
-                    UpdatePrimitiveColor(spawnedMesh, oldColor, oldMFactor, oldGFactor);
+                    UpdatePrimitiveColor(spawnedMesh, oldColor, oldMFactor, oldGFactor, false);
                 }
                 else
                 {
@@ -2710,6 +2709,7 @@ public class RealityFlowAPI : MonoBehaviour, INetworkSpawnable
         }
 
         Debug.Log($"Redo stack after redo: {actionLogger.GetRedoStackCount()}");
+        actionLogger.PrintRedoStack();
         isRedoing = false;
     }
 

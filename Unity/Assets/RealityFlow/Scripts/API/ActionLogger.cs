@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using RealityFlow.NodeGraph;
+using System;
 
 public class ActionLogger : MonoBehaviour
 {
@@ -74,7 +75,8 @@ public class ActionLogger : MonoBehaviour
         {
             actionStack.Push(action);
             Debug.Log($"Logged action: {functionName}");
-            //redoStack.Clear();
+            PrintActionStack();
+            redoStack.Clear();
         }
     }
 
@@ -106,7 +108,7 @@ public class ActionLogger : MonoBehaviour
         if (action != null)
         {
             Debug.Log($"Popped action: {action.FunctionName}");
-            if (isUndoing)
+            if (isUndoing && !(action.FunctionName == "UpdatePrimitive" || action.FunctionName == "UpdatePrimitiveColor" || action.FunctionName == "UpdateObjectTransform"))
             {
                 redoStack.Push(action);
                 Debug.Log($"Saved action to redo stack: {action.FunctionName}");
@@ -122,11 +124,11 @@ public class ActionLogger : MonoBehaviour
     public LoggedAction GetLastRedoAction()
     {
         var action = redoStack.Count > 0 ? redoStack.Pop() : null;
-        Debug.LogError("The current count of the redo stack is " + redoStack.Count);
+        Debug.Log("The current count of the redo stack is " + redoStack.Count);
         if (action != null)
         {
             Debug.Log($"Popped redo action: {action.FunctionName}");
-            if (isRedoing)
+            if (isRedoing && !(action.FunctionName == "UpdatePrimitive" || action.FunctionName == "UpdatePrimitiveColor" || action.FunctionName == "UpdateObjectTransform"))
             {
                 actionStack.Push(action);
                 Debug.Log($"Saved action back to action stack: {action.FunctionName}");
@@ -181,5 +183,27 @@ public class ActionLogger : MonoBehaviour
             actionStack.Push(currentCompoundAction);
             currentCompoundAction = null;
         }
+    }
+
+    public void PrintActionStack()
+    {
+        string undoString = "";
+        foreach(LoggedAction act in actionStack)
+        {
+            undoString += " " + act.GetDescription() + "\n";
+        }
+
+        Debug.Log(undoString);
+    }
+
+    public void PrintRedoStack()
+    {
+        string redoString = "";
+        foreach(LoggedAction act in redoStack)
+        {
+            redoString += " " + act.GetDescription() + "\n";
+        }
+
+        Debug.Log(redoString);
     }
 }
