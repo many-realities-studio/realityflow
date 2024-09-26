@@ -43,6 +43,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
     private Rigidbody rb;
     private EraserTool eraser;
 
+    private ColorTool color;
+
     bool lastOwner;
     public bool wasBake;
 
@@ -76,6 +78,8 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
 
         selectTool = FindObjectOfType<SelectTool>();*/
         eraser = FindObjectOfType<EraserTool>();
+
+        color = FindObjectOfType<ColorTool>();
 
         objectManipulator = gameObject.GetComponent<ObjectManipulator>();
 
@@ -368,9 +372,7 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
             VertexPosition.BakeVerticesWithNetworking(GetComponent<EditableMesh>());
         }*/
 
-        if (isSelected
-            || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive
-            || eraser.isActive)
+        if ((!owner && isHeld) || gameObject.GetComponent<SelectToolManager>().gizmoTool.isActive || eraser.isActive || color.isActive)
             return;
 
         //Debug.Log("EndHold() was called");
@@ -378,14 +380,14 @@ public class NetworkedMesh : MonoBehaviour, INetworkSpawnable
         // Debug.Log("Run the EndHold() networking messages");
 
         if (!networkedPlayManager.playMode)
-            RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
-        context.SendJson(CreateHeldMessage(false));
-
-        if (!networkedPlayManager.playMode)
         {
             rb.constraints = RigidbodyConstraints.FreezeAll;
             rb.excludeLayers = ~rb.excludeLayers;
         }
+
+        if (!networkedPlayManager.playMode)
+            RealityFlowAPI.Instance.UpdatePrimitive(gameObject);
+        context.SendJson(CreateHeldMessage(false));
     }
 
     /// <summary>

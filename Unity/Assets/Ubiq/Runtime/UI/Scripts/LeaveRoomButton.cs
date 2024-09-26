@@ -6,7 +6,7 @@ namespace Ubiq.Samples
 {
     public class LeaveRoomButton : MonoBehaviour
     {
-        public SocialMenu mainMenu;
+       /* public SocialMenu mainMenu;
 
         // Expected to be operated by UI
         public void LeaveRoom ()
@@ -15,6 +15,6 @@ namespace Ubiq.Samples
             {
                 mainMenu.roomClient.Join("",false);
             }
-        }
+        }*/
     }
 }

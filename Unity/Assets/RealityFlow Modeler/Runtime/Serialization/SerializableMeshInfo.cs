@@ -78,7 +78,7 @@ public class SerializableMeshInfo
 
         if (m.color != null)
         {
-            Debug.Log(m.color);
+            // Debug.Log(m.color);
             colorFlag = true;
             colors = new float[4] { m.color.r, m.color.g, m.color.b, m.color.a };
         }
@@ -91,7 +91,7 @@ public class SerializableMeshInfo
         {
             metalFlag = true;
             metalFactor = m.GetFloat("metallicFactor");
-            Debug.Log("MetalFactor: " + metalFactor);
+//            Debug.Log("MetalFactor: " + metalFactor);
         }
         else
         {

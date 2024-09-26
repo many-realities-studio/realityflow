@@ -23,6 +23,8 @@ public class AttachGizmoState : MonoBehaviour
     public GameObject sphere;
     public TransformType transformType;
     public MRTKRayInteractor interactor;
+
+    private LayerMask defaultLM;
     public bool lookForTarget;
     public bool checkMeshRaySelection;
     bool lastUpdateRaySelect;
@@ -55,6 +57,7 @@ public class AttachGizmoState : MonoBehaviour
             leftHand = rig.transform.Find("Camera Offset/MRTK LeftHand Controller").gameObject;
             // Debug.Log(leftHand);
         }
+        defaultLM = rightHand.transform.Find("Far Ray").gameObject.GetComponent<MRTKRayInteractor>().raycastMask;
         disabledComponents = new List<GameObject>();
         SetActiveInteractor();
     }
@@ -393,7 +396,9 @@ public class AttachGizmoState : MonoBehaviour
 
         GameObject farRay = GetActiveContollerFarRay();
 
-        farRay.GetComponent<MRTKRayInteractor>().raycastMask = ~farRay.GetComponent<MRTKRayInteractor>().raycastMask;
+
+
+        farRay.GetComponent<MRTKRayInteractor>().raycastMask = defaultLM;
         // 0 is default layer
         SetLayerOfFarRay(farRay, 0);
     }

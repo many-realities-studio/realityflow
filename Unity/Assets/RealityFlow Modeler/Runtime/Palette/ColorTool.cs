@@ -15,6 +15,7 @@ using Unity.XR.CoreUtils;
 /// </summary>
 public class ColorTool : MonoBehaviour
 {
+    public bool isActive;
     public bool colorToolIsActive;
     public bool metallicToolIsActive;
     public bool smoothnessToolIsActive;
@@ -72,8 +73,14 @@ public class ColorTool : MonoBehaviour
 
     public void Activate(int tool, bool status)
     {
+        /*if(tool == 1)
+        {
+            
+            //Whiteboard.Instance.DoNotShow = status;
+        }*/
         if(tool == 2)
         {
+            isActive = status;
             colorToolIsActive = status;
         }
 
@@ -104,7 +111,6 @@ public class ColorTool : MonoBehaviour
             {
                 if (currentHitResult.transform.gameObject.GetComponent<MRTKBaseInteractable>().IsRaySelected)
                 {
-
                      // GetObjectId ?!?!
 
                     UpdateMeshTexture();
@@ -113,33 +119,43 @@ public class ColorTool : MonoBehaviour
         }
     }
 
+    // This method is very dependent on the shader itself. Methods like SetColor look for the correct value to
+    // change by locating the property on the shader by it's name. To see the name, inspect the shader file
+    // in unity and scoll to the bottom. Change the string to the property name and it should work.
     private void UpdateMeshTexture()
     {
         // Update the game object depending on the tool and if it is a user created mesh and not selected by anyone else
         if (currentHitResult.collider != null && currentHitResult.transform.gameObject.GetComponent<EditableMesh>()
             && currentHitResult.transform.gameObject.GetComponent<ObjectManipulator>().enabled)
         {
-            if (colorToolIsActive)
+            GameObject hitObj = currentHitResult.collider.gameObject;
+            //if (colorToolIsActive)
+            //{
+            //    hitObj.GetComponent<Renderer>().material.SetColor("baseColorFactor", currentColor);
+            //}
+            if (!metallicToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetColor("_Color", currentColor);
+                currentMetallicValue = -1;
             }
-            if (metallicToolIsActive)
+            if (!smoothnessToolIsActive)
             {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("_Metallic", currentMetallicValue);
+                currentSmoothnessValue = -1;
             }
-            if (smoothnessToolIsActive)
-            {
-                currentHitResult.collider.gameObject.GetComponent<Renderer>().material.SetFloat("_Glossiness", currentSmoothnessValue);
-            }
+
+            Debug.Log("COLOR TOOL IS UPDATING PRIMITIVE\n");
+            RealityFlowAPI.Instance.UpdatePrimitiveColor(hitObj, currentColor, currentMetallicValue, currentSmoothnessValue);
         }
     }
 
     void Update()
     {
-        if (colorToolIsActive || metallicToolIsActive || smoothnessToolIsActive)
+        if (isActive)
         {
-            // Checking for Object
-            GetRayCollision();
+            if (colorToolIsActive || metallicToolIsActive || smoothnessToolIsActive)
+            {
+                // Checking for Object
+                GetRayCollision();
+            }
         }
     }
 

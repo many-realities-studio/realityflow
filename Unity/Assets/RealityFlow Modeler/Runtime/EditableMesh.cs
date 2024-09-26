@@ -69,18 +69,18 @@ public class EditableMesh : MonoBehaviour, IRealityFlowObject
             Material material = GetComponent<Renderer>().material;
             if (value.colorFlag)
             {
-                material.SetColor("_Color", value.GetColor()); //smi.colors.GetColor());
+                material.SetColor("baseColorFactor", value.GetColor()); //smi.colors.GetColor());
             }
 
-            if (value.metalFlag)
-            {
-                //material.SetFloat("metallicFactor", value.metalFactor);
-            }
+            // if (value.metalFlag)
+            // {
+            material.SetFloat("metallicFactor", value.metalFactor);
+            // }
 
-            if (value.glossFlag)
-            {
-                //material.SetFloat("roughnessFactor", value.glossFactor);
-            }
+            //if (value.glossFlag)
+            //{
+            material.SetFloat("roughnessFactor", value.glossFactor);
+            //}
 
             GetComponent<NetworkedMesh>().SetLastSize(value.lastSize);
         }
